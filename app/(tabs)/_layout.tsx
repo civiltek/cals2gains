@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // Cals2Gains - Tab Navigator Layout
 // ============================================
 
@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import Colors from '../../constants/colors';
 
-function CameraTabButton({ onPress, children }: any) {
+function CameraTabButton({ onPress, children }: { onPress?: () => void; children?: React.ReactNode }) {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -40,7 +40,7 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: t('home.title'),
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ color, size, focused }: { color: string; size: number; focused: boolean }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
               size={size}
@@ -54,7 +54,7 @@ export default function TabsLayout() {
         name="history"
         options={{
           title: t('history.title'),
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ color, size, focused }: { color: string; size: number; focused: boolean }) => (
             <Ionicons
               name={focused ? 'calendar' : 'calendar-outline'}
               size={size}
@@ -69,7 +69,7 @@ export default function TabsLayout() {
         options={{
           title: '',
           tabBarIcon: () => null,
-          tabBarButton: (props) => <CameraTabButton {...props} />,
+          tabBarButton: (props: any) => <CameraTabButton {...props} />,
         }}
       />
 
@@ -77,7 +77,7 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: t('profile.title'),
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ color, size, focused }: { color: string; size: number; focused: boolean }) => (
             <Ionicons
               name={focused ? 'person' : 'person-outline'}
               size={size}
