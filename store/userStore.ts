@@ -1,0 +1,145 @@
+﻿// ============================================
+// Cals2Gains - User Store (Zustand)
+// ============================================
+
+import { create } from 'zustand';
+import { User, UserGoals, UserProfile } from '../types';
+import {
+  getUserData,
+  updateUserProfile,
+  updateUserLanguage,
+  onAuthStateChange,
+  signOut as firebaseSignOut,
+} from '../services/firebase';
+import { loginRevenueCat, logoutRevenueCat } from '../services/revenuecat';
+import { differenceInDays } from 'date-fns';
+
+interface UserState {
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  authInitialized: boolean;
+
+  // Actions
+  setUser: (user: User | null) => void;
+  loadUserData: (uid: string) => Promise<void>;
+  updateProfile: (profile: Partial<UserProfile>, goals: Partial<UserGoals>) => Promise<void>;
+  updateLanguage: (language: 'es' | 'en') => Promise<void>;
+  signOut: () => Promise<void>;
+  initAuth: () => () => void; // Returns unsubscribe function
+
+  // Computed getters
+  isSubscriptionActive: () => boolean;
+  trialDaysRemaining: () => number;
+  isOnTrial: () => boolean;
+}
+
+export const useUserStore = create<UserState>((set, get) => ({
+  user: null,
+  isLoading: true,
+  isAuthenticated: false,
+  authInitialized: false,
+
+  setUser: (user) => {
+    set({ user, isAuthenticated: !!user });
+  },
+
+  loadUserData: async (uid: string) => {
+    set({ isLoading: true });
+    try {
+      const userData = await getUserData(uid);
+      set({ user: userData, isAuthenticated: true });
+
+      // Connect RevenueCat with user ID for cross-device sync
+      await loginRevenueCat(uid);
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  updateProfile: async (profile, goals) => {
+    const { user } = get();
+    if (!user) return;
+
+    const newProfile = { ...user.profile, ...profile };
+    const newGoals = { ...user.goals, ...goals };
+
+    // Optimistic update
+    set({ user: { ...user, profile: newProfile, goals: newGoals } });
+
+    try {
+      await updateUserProfile(user.uid, newProfile, newGoals);
+    } catch (error) {
+      // Revert on error
+      set({ user });
+      throw error;
+    }
+  },
+
+  updateLanguage: async (language) => {
+    const { user } = get();
+    if (!user) return;
+
+    set({ user: { ...user, language } });
+    try {
+      await updateUserLanguage(user.uid, language);
+    } catch (error) {
+      console.error('Failed to update language:', error);
+    }
+  },
+
+  signOut: async () => {
+    try {
+      await firebaseSignOut();
+      await logoutRevenueCat();
+      set({ user: null, isAuthenticated: false });
+    } catch (error) {
+      console.error('Sign out error:', error);
+      throw error;
+    }
+  },
+
+  initAuth: () => {
+    const unsubscribe = onAuthStateChange(async (firebaseUser) => {
+      if (firebaseUser) {
+        await get().loadUserData(firebaseUser.uid);
+      } else {
+        set({ user: null, isAuthenticated: false, isLoading: false });
+      }
+      set({ authInitialized: true });
+    });
+    return unsubscribe;
+  },
+
+  // Computed: check if subscription is active (trial or paid)
+  isSubscriptionActive: () => {
+    const { user } = get();
+    if (!user) return false;
+
+    if (user.subscriptionType === 'none') return false;
+
+    if (user.subscriptionExpiresAt) {
+      return new Date() < user.subscriptionExpiresAt;
+    }
+
+    return user.isSubscribed;
+  },
+
+  // Computed: days remaining in trial
+  trialDaysRemaining: () => {
+    const { user } = get();
+    if (!user || user.subscriptionType !== 'trial') return 0;
+
+    if (!user.subscriptionExpiresAt) return 0;
+    const remaining = differenceInDays(user.subscriptionExpiresAt, new Date());
+    return Math.max(0, remaining);
+  },
+
+  // Computed: is user currently on trial
+  isOnTrial: () => {
+    const { user } = get();
+    return user?.subscriptionType === 'trial' && get().isSubscriptionActive();
+  },
+}));

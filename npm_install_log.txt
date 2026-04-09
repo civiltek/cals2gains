@@ -1,0 +1,46 @@
+npm warn deprecated glob@7.1.6: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@7.1.6: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn cleanup Failed to remove some directories [
+npm warn cleanup   [
+npm warn cleanup     'C:\\Users\\Judit\\Documents\\Cals2Gains\\node_modules\\react-native',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\Judit\Documents\Cals2Gains\node_modules\react-native\ReactAndroid\src\main\java\com\facebook\react\uimanager'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\Judit\\Documents\\Cals2Gains\\node_modules\\react-native\\ReactAndroid\\src\\main\\java\\com\\facebook\\react\\uimanager'
+npm warn cleanup     }
+npm warn cleanup   ],
+npm warn cleanup   [
+npm warn cleanup     'C:\\Users\\Judit\\Documents\\Cals2Gains\\node_modules\\expo',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\Judit\Documents\Cals2Gains\node_modules\expo\node_modules\@expo'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\Judit\\Documents\\Cals2Gains\\node_modules\\expo\\node_modules\\@expo'
+npm warn cleanup     }
+npm warn cleanup   ],
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\C:\\Users\\Judit\\Documents\\Cals2Gains\\node_modules\\react-native',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\Judit\Documents\Cals2Gains\node_modules\react-native\ReactCommon\react\renderer\components\progressbar'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\Judit\\Documents\\Cals2Gains\\node_modules\\react-native\\ReactCommon\\react\\renderer\\components\\progressbar'
+npm warn cleanup     }
+npm warn cleanup   ],
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\C:\\Users\\Judit\\Documents\\Cals2Gains\\node_modules\\expo\\node_modules\\expo-modules-core',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\Judit\Documents\Cals2Gains\node_modules\expo\node_modules\expo-modules-core\android'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\Judit\\Documents\\Cals2Gains\\node_modules\\expo\\node_modules\\expo-modules-core\\android'
+npm warn cleanup     }
+npm warn cleanup   ]
+npm warn cleanup ]
+npm error code ENOTEMPTY
+npm error syscall rmdir
+npm error path C:\Users\Judit\Documents\Cals2Gains\node_modules\@react-native\codegen\lib\generators\modules
+npm error errno -4051
+npm error ENOTEMPTY: directory not empty, rmdir 'C:\Users\Judit\Documents\Cals2Gains\node_modules\@react-native\codegen\lib\generators\modules'
+npm error A complete log of this run can be found in: C:\Users\Judit\AppData\Local\npm-cache\_logs\2026-04-09T16_11_11_335Z-debug-0.log

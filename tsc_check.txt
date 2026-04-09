@@ -1,0 +1,24 @@
+app/(auth)/onboarding.tsx(17,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(auth)/welcome.tsx(18,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/_layout.tsx(43,26): error TS7031: Binding element 'color' implicitly has an 'any' type.
+app/(tabs)/_layout.tsx(43,33): error TS7031: Binding element 'size' implicitly has an 'any' type.
+app/(tabs)/_layout.tsx(43,39): error TS7031: Binding element 'focused' implicitly has an 'any' type.
+app/(tabs)/_layout.tsx(57,26): error TS7031: Binding element 'color' implicitly has an 'any' type.
+app/(tabs)/_layout.tsx(57,33): error TS7031: Binding element 'size' implicitly has an 'any' type.
+app/(tabs)/_layout.tsx(57,39): error TS7031: Binding element 'focused' implicitly has an 'any' type.
+app/(tabs)/_layout.tsx(72,26): error TS7006: Parameter 'props' implicitly has an 'any' type.
+app/(tabs)/_layout.tsx(80,26): error TS7031: Binding element 'color' implicitly has an 'any' type.
+app/(tabs)/_layout.tsx(80,33): error TS7031: Binding element 'size' implicitly has an 'any' type.
+app/(tabs)/_layout.tsx(80,39): error TS7031: Binding element 'focused' implicitly has an 'any' type.
+app/(tabs)/camera.tsx(22,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/index.tsx(16,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/profile.tsx(17,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/analysis.tsx(20,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/analysis.tsx(20,18): error TS2305: Module '"expo-router"' has no exported member 'useLocalSearchParams'.
+app/index.tsx(5,10): error TS2305: Module '"expo-router"' has no exported member 'Redirect'.
+app/paywall.tsx(16,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+services/firebase.ts(5,48): error TS7016: Could not find a declaration file for module 'firebase/app'. 'C:/Users/Judit/Documents/Cals2Gains/node_modules/firebase/app/dist/index.cjs.js' implicitly has an 'any' type.
+services/firebase.ts(16,8): error TS7016: Could not find a declaration file for module 'firebase/auth'. 'C:/Users/Judit/Documents/Cals2Gains/node_modules/firebase/auth/dist/index.cjs.js' implicitly has an 'any' type.
+services/firebase.ts(32,8): error TS7016: Could not find a declaration file for module 'firebase/firestore'. 'C:/Users/Judit/Documents/Cals2Gains/node_modules/firebase/firestore/dist/index.cjs.js' implicitly has an 'any' type.
+services/firebase.ts(269,29): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+services/firebase.ts(294,29): error TS7006: Parameter 'doc' implicitly has an 'any' type.

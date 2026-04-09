@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "Cals2Gains",
+    "slug": "cals2gains",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "cals2gains",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F172A"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.civiltek.cals2gains",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Cals2Gains necesita acceso a la camara para analizar tus comidas.",
+        "NSPhotoLibraryUsageDescription": "Cals2Gains necesita acceso a tus fotos.",
+        "CFBundleLocalizations": ["en", "es"]
+      },
+      "usesAppleSignIn": true,
+      "googleServicesFile": "./GoogleService-Info.plist"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#0F172A"
+      },
+      "package": "com.civiltek.cals2gains",
+      "versionCode": 1,
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "INTERNET"],
+      "googleServicesFile": "./google-services.json"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-apple-authentication",
+      ["expo-camera", { "cameraPermission": "Permitir acceso a camara para analizar comida." }],
+      ["expo-image-picker", { "photosPermission": "Permitir acceso a fotos." }],
+      "@react-native-google-signin/google-signin",
+      "expo-secure-store"
+    ],
+    "experiments": { "typedRoutes": true },
+    "extra": {
+      "router": { "origin": false },
+      "eas": { "projectId": "fc8adc61-e1b7-46e5-ad7d-3d88a40a252f" }
+    }
+  }
+}
