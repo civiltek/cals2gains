@@ -1,0 +1,23 @@
+The field "cli.appVersionSource" is not set, but it will be required in the future. Learn more: https://docs.expo.dev/build-reference/app-versions/
+Resolved "preview" environment for the build. Learn more: https://docs.expo.dev/eas/environment-variables/#setting-the-environment-for-your-builds
+No environment variables with visibility "Plain text" and "Sensitive" found for the "preview" environment on EAS.
+
+
+
+The field "cli.appVersionSource" is not set, but it will be required in the future. Learn more: https://docs.expo.dev/build-reference/app-versions/
+√ Using remote Android credentials (Expo server)
+√ Created keystore
+
+Compressing project files and uploading to EAS Build. Learn more: https://expo.fyi/eas-build-archive
+- Compressing project files√ Compressed project files 1s (622 KB)
+- Uploading to EAS Build (0 / 622 KB)\ Uploading to EAS Build (64.0 KB / 622 KB)| Uploading to EAS Build (192 KB / 622 KB)/ Uploading to EAS Build (512 KB / 622 KB)- Uploading to EAS Build (512 KB / 622 KB)\ Uploading to EAS Build (622 KB / 622 KB)| Uploading to EAS Build (622 KB / 622 KB)/ Uploading to EAS Build (622 KB / 622 KB)√ Uploaded to EAS 1s
+
+See logs: https://expo.dev/accounts/civiltek/projects/cals2gains/builds/b47b701a-a1af-4c2b-8e08-0667f2902401
+
+Waiting for build to complete. You can press Ctrl+C to exit.
+- Waiting for build to complete.\ Waiting for build to complete.| Waiting for build to complete./ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...- Build queued...\ Build queued...| Build queued.../ Build queued...  Build queued...
+
+Start builds sooner in the priority queue.
+Sign up for a paid plan at https://expo.dev/accounts/civiltek/settings/billing
+
+Waiting in Free tier queue

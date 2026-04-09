@@ -107,3 +107,85 @@ export interface FoodAnalysisResult {
 }
 
 export type AnalysisAnswers = Record<string, string>;
+
+// ============================================
+// Weight Tracking
+// ============================================
+
+export interface WeightEntry {
+  id: string;
+  userId: string;
+  weight: number; // kg
+  date: Date;
+  note?: string;
+}
+
+// ============================================
+// Water Tracking
+// ============================================
+
+export interface WaterLog {
+  userId: string;
+  date: string; // yyyy-MM-dd
+  glasses: number; // each glass = 250ml
+  goal: number; // glasses goal (default 8)
+}
+
+// ============================================
+// Food Database / Barcode
+// ============================================
+
+export interface FoodItem {
+  id: string;
+  barcode?: string;
+  name: string;
+  nameEs?: string;
+  nameEn?: string;
+  brand?: string;
+  servingSize: number; // grams
+  servingUnit: string;
+  nutritionPer100g: Nutrition;
+  nutritionPerServing: Nutrition;
+  source: 'openfoodfacts' | 'usda' | 'custom' | 'ai';
+  verified: boolean;
+}
+
+// ============================================
+// Meal Templates (Favorites)
+// ============================================
+
+export interface MealTemplate {
+  id: string;
+  userId: string;
+  name: string;
+  dishName: string;
+  dishNameEs: string;
+  dishNameEn: string;
+  nutrition: Nutrition;
+  estimatedWeight: number;
+  mealType: MealType;
+  ingredients: string[];
+  portionDescription: string;
+  photoUri?: string;
+  timesUsed: number;
+  lastUsed: Date;
+  createdAt: Date;
+}
+
+// ============================================
+// Macro Presets
+// ============================================
+
+export type MacroPreset = 'balanced' | 'high_protein' | 'keto' | 'low_fat' | 'custom';
+
+export interface MacroPresetConfig {
+  id: MacroPreset;
+  nameEs: string;
+  nameEn: string;
+  descriptionEs: string;
+  descriptionEn: string;
+  proteinPct: number;
+  carbsPct: number;
+  fatPct: number;
+  icon: string;
+}

@@ -337,6 +337,137 @@ async function updateDailyLog(userId: string, date: Date, newMeal: Omit<Meal, 'i
   }
 }
 
+// ============================================
+// WEIGHT TRACKING FUNCTIONS
+// ============================================
+
+/**
+ * Save a weight entry
+ */
+export async function saveWeightEntry(entry: Omit<import('../types').WeightEntry, 'id'>): Promise<string> {
+  const weightRef = collection(db, 'weightEntries');
+  const docRef = await addDoc(weightRef, {
+    ...entry,
+    date: Timestamp.fromDate(entry.date),
+  });
+  return docRef.id;
+}
+
+/**
+ * Get weight history for the last N days
+ */
+export async function getWeightHistory(userId: string, days: number = 90): Promise<import('../types').WeightEntry[]> {
+  const sinceDate = new Date();
+  sinceDate.setDate(sinceDate.getDate() - days);
+
+  const weightRef = collection(db, 'weightEntries');
+  const q = query(
+    weightRef,
+    where('userId', '==', userId),
+    where('date', '>=', Timestamp.fromDate(sinceDate)),
+    orderBy('date', 'desc'),
+    limit(365)
+  );
+
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    date: doc.data().date?.toDate() || new Date(),
+  })) as import('../types').WeightEntry[];
+}
+
+/**
+ * Delete a weight entry
+ */
+export async function deleteWeightEntry(entryId: string): Promise<void> {
+  const ref = doc(db, 'weightEntries', entryId);
+  await deleteDoc(ref);
+}
+
+// ============================================
+// WATER TRACKING FUNCTIONS
+// ============================================
+
+/**
+ * Save/update water log for a day
+ */
+export async function saveWaterLog(log: import('../types').WaterLog): Promise<void> {
+  const logRef = doc(db, 'waterLogs', `${log.userId}_${log.date}`);
+  await setDoc(logRef, log, { merge: true });
+}
+
+/**
+ * Get water log for a specific day
+ */
+export async function getWaterLog(userId: string, date: string): Promise<import('../types').WaterLog | null> {
+  const logRef = doc(db, 'waterLogs', `${userId}_${date}`);
+  const snap = await getDoc(logRef);
+  if (!snap.exists()) return null;
+  return snap.data() as import('../types').WaterLog;
+}
+
+// ============================================
+// MEAL TEMPLATE FUNCTIONS
+// ============================================
+
+/**
+ * Save a meal template
+ */
+export async function saveMealTemplate(template: Omit<import('../types').MealTemplate, 'id'>): Promise<string> {
+  const templatesRef = collection(db, 'mealTemplates');
+  const docRef = await addDoc(templatesRef, {
+    ...template,
+    lastUsed: Timestamp.fromDate(template.lastUsed),
+    createdAt: Timestamp.fromDate(template.createdAt),
+  });
+  return docRef.id;
+}
+
+/**
+ * Get all meal templates for a user
+ */
+export async function getMealTemplates(userId: string): Promise<import('../types').MealTemplate[]> {
+  const templatesRef = collection(db, 'mealTemplates');
+  const q = query(
+    templatesRef,
+    where('userId', '==', userId),
+    orderBy('timesUsed', 'desc'),
+    limit(50)
+  );
+
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    lastUsed: doc.data().lastUsed?.toDate() || new Date(),
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+  })) as import('../types').MealTemplate[];
+}
+
+/**
+ * Delete a meal template
+ */
+export async function deleteMealTemplate(templateId: string): Promise<void> {
+  const ref = doc(db, 'mealTemplates', templateId);
+  await deleteDoc(ref);
+}
+
+/**
+ * Update template usage count
+ */
+export async function updateTemplateUsage(templateId: string): Promise<void> {
+  const ref = doc(db, 'mealTemplates', templateId);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    const current = snap.data().timesUsed || 0;
+    await updateDoc(ref, {
+      timesUsed: current + 1,
+      lastUsed: Timestamp.now(),
+    });
+  }
+}
+
 /**
  * Get daily log summary
  */

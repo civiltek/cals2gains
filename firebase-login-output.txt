@@ -1,0 +1,15 @@
+[33m[1m! [22m[39m Authenticating with a `login:ci` token is deprecated and will be removed in a future major version of `firebase-tools`. Instead, use a service account key with `GOOGLE_APPLICATION_CREDENTIALS`: https://cloud.google.com/docs/authentication/getting-started
+
+To sign in to the Firebase CLI:
+
+1. Take note of your session ID:
+
+   [1m8559C[22m
+
+2. Visit the URL below on any device and follow the instructions to get your code:
+
+   https://auth.firebase.tools/login?code_challenge=WEXmVj83lsyMHiS6KB-djC2nSv_zav13upt5OPFIBK0&session=8559cf33-0b38-49c4-adc0-14e0573d570c&attest=mGzO-YT7fNvRwjkJfRbXHpo40k3hjg4LX3DpFE-1nDM
+
+3. Paste or enter the authorization code below once you have it:
+
+[34m?[39m [1mEnter authorization code:[22m[29G

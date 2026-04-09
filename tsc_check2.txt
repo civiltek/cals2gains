@@ -1,0 +1,9 @@
+app/(auth)/onboarding.tsx(17,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(auth)/welcome.tsx(18,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/camera.tsx(22,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/index.tsx(16,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/profile.tsx(17,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/analysis.tsx(20,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/analysis.tsx(20,18): error TS2305: Module '"expo-router"' has no exported member 'useLocalSearchParams'.
+app/index.tsx(5,10): error TS2305: Module '"expo-router"' has no exported member 'Redirect'.
+app/paywall.tsx(16,10): error TS2305: Module '"expo-router"' has no exported member 'router'.

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cals2Gains — Contador de Calorías con IA</title>
+    <meta name="description" content="Escanea tu comida con IA y controla calorías y macros al instante. Descarga Cals2Gains gratis.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0F172A;
+            color: #E2E8F0;
+            min-height: 100vh;
+        }
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #0F172A 100%);
+        }
+        .logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366F1, #A78BFA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            color: #94A3B8;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+        .feature {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: left;
+        }
+        .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .feature h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #F1F5F9; }
+        .feature p { font-size: 0.95rem; color: #94A3B8; line-height: 1.5; }
+        .badges {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            color: #A78BFA;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .badge:hover {
+            background: rgba(99, 102, 241, 0.25);
+            transform: translateY(-2px);
+        }
+        .coming-soon {
+            display: inline-block;
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #64748B;
+            font-size: 0.85rem;
+        }
+        footer a { color: #6366F1; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        .footer-links { margin-top: 0.5rem; }
+        .footer-links a { margin: 0 1rem; }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="logo">&#127822;</div>
+        <span class="coming-soon">Disponible pronto</span>
+        <h1>Cals2Gains</h1>
+        <p class="subtitle">
+            Tu nutricionista de bolsillo con inteligencia artificial.
+            Haz una foto de tu comida y obtén las calorías y macros al instante.
+        </p>
+        <div class="badges">
+            <a href="#" class="badge">&#9654;&#65039; Google Play</a>
+            <a href="#" class="badge">&#127822; App Store</a>
+        </div>
+    </div>
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">&#128247;</div>
+            <h3>Análisis con IA</h3>
+            <p>Haz una foto de cualquier comida y obtén los macros al instante gracias a GPT-4o Vision.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">&#128200;</div>
+            <h3>Seguimiento diario</h3>
+            <p>Visualiza tu progreso con gráficos claros de calorías y macronutrientes.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">&#127919;</div>
+            <h3>Objetivos personalizados</h3>
+            <p>Configura tus metas según tu objetivo: perder peso, ganar músculo o mantener.</p>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2026 CivilTek — info@civiltek.es</p>
+        <div class="footer-links">
+            <a href="/privacy">Política de privacidad</a>
+            <a href="/terms">Términos de servicio</a>
+        </div>
+    </footer>
+</body>
+</html>

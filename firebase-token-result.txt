@@ -1,0 +1,2 @@
+
+[1m[31mError:[39m[22m Cannot run login:ci in non-interactive mode.
