@@ -1,0 +1,1 @@
+√ Project already linked (ID: 381120d5-3866-4b97-af00-4c6840768327). To re-configure, remove the "extra.eas.projectId" field from your app config.
