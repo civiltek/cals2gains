@@ -1,0 +1,6 @@
+[master 8a785e7] Update EAS project ID and tsconfig
+ 5 files changed, 95 insertions(+), 8 deletions(-)
+ create mode 100644 eas_build_log2.txt
+ create mode 100644 eas_init_log.txt
+ create mode 100644 git_init_log.txt
+ create mode 100644 pip_log.txt
