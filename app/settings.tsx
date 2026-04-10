@@ -10,12 +10,15 @@ import {
   Alert,
   ActivityIndicator,
   Linking,
+  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { COLORS } from '../theme';
+import { terraService, TerraProvider, TerraConnection } from '../services/terraService';
+import { inBodyService } from '../services/inBodyService';
 
 interface UserSettings {
   nutritionMode: 'simple' | 'advanced';
@@ -33,6 +36,10 @@ interface UserSettings {
   connectedServices: {
     appleHealth: boolean;
     googleHealth: boolean;
+    garmin: boolean;
+    fitbit: boolean;
+    samsungHealth: boolean;
+    wearOS: boolean;
     inBody: boolean;
   };
 }
@@ -57,6 +64,10 @@ const SettingsScreen = () => {
     connectedServices: {
       appleHealth: false,
       googleHealth: false,
+      garmin: false,
+      fitbit: false,
+      samsungHealth: false,
+      wearOS: false,
       inBody: false,
     },
   });
@@ -112,15 +123,53 @@ const SettingsScreen = () => {
   const handleConnectService = async (service: string) => {
     setLoading(true);
     try {
+      const isCurrentlyConnected = settings.connectedServices[service as keyof typeof settings.connectedServices];
+
+      if (isCurrentlyConnected) {
+        // Disconnect
+        const terraProviderMap: Record<string, TerraProvider> = {
+          garmin: 'GARMIN', fitbit: 'FITBIT', samsungHealth: 'SAMSUNG', wearOS: 'WEAR_OS',
+        };
+        if (terraProviderMap[service]) {
+          await terraService.disconnect(terraProviderMap[service]);
+        } else if (service === 'inBody') {
+          await inBodyService.disconnect();
+        }
+      } else {
+        // Connect via Terra for third-party wearables
+        const terraProviderMap: Record<string, TerraProvider> = {
+          garmin: 'GARMIN', fitbit: 'FITBIT', samsungHealth: 'SAMSUNG', wearOS: 'WEAR_OS',
+        };
+        if (terraProviderMap[service]) {
+          const authUrl = await terraService.generateAuthUrl(terraProviderMap[service]);
+          if (authUrl) {
+            await Linking.openURL(authUrl);
+          } else {
+            Alert.alert('Error', 'No se pudo generar el enlace de autenticación. Inténtalo de nuevo.');
+            setLoading(false);
+            return;
+          }
+        } else if (service === 'inBody') {
+          const authUrl = await inBodyService.generateAuthUrl();
+          await Linking.openURL(authUrl);
+        }
+      }
+
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setSettings({
         ...settings,
         connectedServices: {
           ...settings.connectedServices,
-          [service]: !settings.connectedServices[service],
+          [service]: !isCurrentlyConnected,
         },
       });
-      Alert.alert('Éxito', `Servicio ${service} conectado/desconectado`);
+
+      Alert.alert(
+        'Éxito',
+        isCurrentlyConnected
+          ? `${service} desconectado`
+          : `${service} conectado correctamente`
+      );
     } catch (error) {
       Alert.alert('Error', `No se pudo conectar ${service}`);
     } finally {
@@ -552,53 +601,127 @@ const SettingsScreen = () => {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Servicios Conectados</Text>
           <View style={[styles.sectionContent, { backgroundColor: COLORS.background }]}>
+            {/* Apple Health (iOS) / Google Health Connect (Android) */}
+            {Platform.OS === 'ios' ? (
+              <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+                <View style={styles.serviceInfo}>
+                  <Ionicons name="logo-apple" size={24} color={COLORS.text} />
+                  <View style={styles.serviceText}>
+                    <Text style={[styles.serviceName, { color: COLORS.text }]}>Apple Health</Text>
+                    <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
+                      {settings.connectedServices.appleHealth ? 'Conectado' : 'No conectado'}
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={settings.connectedServices.appleHealth}
+                  onValueChange={() => handleConnectService('appleHealth')}
+                  trackColor={{ false: COLORS.border, true: `${COLORS.primary}40` }}
+                  thumbColor={settings.connectedServices.appleHealth ? COLORS.primary : COLORS.textSecondary}
+                />
+              </View>
+            ) : (
+              <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+                <View style={styles.serviceInfo}>
+                  <Ionicons name="logo-google" size={24} color="#4285F4" />
+                  <View style={styles.serviceText}>
+                    <Text style={[styles.serviceName, { color: COLORS.text }]}>Google Fit</Text>
+                    <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
+                      {settings.connectedServices.googleHealth ? 'Conectado' : 'No conectado'}
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={settings.connectedServices.googleHealth}
+                  onValueChange={() => handleConnectService('googleHealth')}
+                  trackColor={{ false: COLORS.border, true: `${COLORS.primary}40` }}
+                  thumbColor={settings.connectedServices.googleHealth ? COLORS.primary : COLORS.textSecondary}
+                />
+              </View>
+            )}
+
+            {/* Garmin */}
             <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
               <View style={styles.serviceInfo}>
-                <Ionicons name="logo-apple" size={24} color={COLORS.text} />
+                <Ionicons name="watch-outline" size={24} color="#007DC3" />
                 <View style={styles.serviceText}>
-                  <Text style={[styles.serviceName, { color: COLORS.text }]}>Apple Health</Text>
+                  <Text style={[styles.serviceName, { color: COLORS.text }]}>Garmin</Text>
                   <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
-                    {settings.connectedServices.appleHealth
-                      ? 'Conectado'
-                      : 'No conectado'}
+                    {settings.connectedServices.garmin ? 'Conectado' : 'No conectado'}
                   </Text>
                 </View>
               </View>
               <Switch
-                value={settings.connectedServices.appleHealth}
-                onValueChange={() => handleConnectService('appleHealth')}
-                trackColor={{ false: COLORS.border, true: `${COLORS.primary}40` }}
-                thumbColor={
-                  settings.connectedServices.appleHealth ? COLORS.primary : COLORS.textSecondary
-                }
+                value={settings.connectedServices.garmin}
+                onValueChange={() => handleConnectService('garmin')}
+                trackColor={{ false: COLORS.border, true: '#007DC340' }}
+                thumbColor={settings.connectedServices.garmin ? '#007DC3' : COLORS.textSecondary}
               />
             </View>
 
+            {/* Fitbit */}
             <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
               <View style={styles.serviceInfo}>
-                <Ionicons name="logo-google" size={24} color={COLORS.primary} />
+                <Ionicons name="pulse-outline" size={24} color="#00B0B9" />
                 <View style={styles.serviceText}>
-                  <Text style={[styles.serviceName, { color: COLORS.text }]}>
-                    Google Health Connect
-                  </Text>
+                  <Text style={[styles.serviceName, { color: COLORS.text }]}>Fitbit</Text>
                   <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
-                    {settings.connectedServices.googleHealth ? 'Conectado' : 'No conectado'}
+                    {settings.connectedServices.fitbit ? 'Conectado' : 'No conectado'}
                   </Text>
                 </View>
               </View>
               <Switch
-                value={settings.connectedServices.googleHealth}
-                onValueChange={() => handleConnectService('googleHealth')}
-                trackColor={{ false: COLORS.border, true: `${COLORS.primary}40` }}
-                thumbColor={
-                  settings.connectedServices.googleHealth ? COLORS.primary : COLORS.textSecondary
-                }
+                value={settings.connectedServices.fitbit}
+                onValueChange={() => handleConnectService('fitbit')}
+                trackColor={{ false: COLORS.border, true: '#00B0B940' }}
+                thumbColor={settings.connectedServices.fitbit ? '#00B0B9' : COLORS.textSecondary}
               />
             </View>
 
+            {/* Samsung Health */}
+            <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+              <View style={styles.serviceInfo}>
+                <Ionicons name="heart-circle-outline" size={24} color="#1428A0" />
+                <View style={styles.serviceText}>
+                  <Text style={[styles.serviceName, { color: COLORS.text }]}>Samsung Health</Text>
+                  <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
+                    {settings.connectedServices.samsungHealth ? 'Conectado' : 'No conectado'}
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={settings.connectedServices.samsungHealth}
+                onValueChange={() => handleConnectService('samsungHealth')}
+                trackColor={{ false: COLORS.border, true: '#1428A040' }}
+                thumbColor={settings.connectedServices.samsungHealth ? '#1428A0' : COLORS.textSecondary}
+              />
+            </View>
+
+            {/* Wear OS (Android only) */}
+            {Platform.OS === 'android' && (
+              <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+                <View style={styles.serviceInfo}>
+                  <Ionicons name="watch-outline" size={24} color="#4285F4" />
+                  <View style={styles.serviceText}>
+                    <Text style={[styles.serviceName, { color: COLORS.text }]}>Wear OS</Text>
+                    <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
+                      {settings.connectedServices.wearOS ? 'Conectado' : 'No conectado'}
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={settings.connectedServices.wearOS}
+                  onValueChange={() => handleConnectService('wearOS')}
+                  trackColor={{ false: COLORS.border, true: '#4285F440' }}
+                  thumbColor={settings.connectedServices.wearOS ? '#4285F4' : COLORS.textSecondary}
+                />
+              </View>
+            )}
+
+            {/* InBody */}
             <View style={styles.serviceItem}>
               <View style={styles.serviceInfo}>
-                <Ionicons name="fitness" size={24} color={COLORS.secondary} />
+                <Ionicons name="body-outline" size={24} color="#E8383D" />
                 <View style={styles.serviceText}>
                   <Text style={[styles.serviceName, { color: COLORS.text }]}>InBody</Text>
                   <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
@@ -609,10 +732,8 @@ const SettingsScreen = () => {
               <Switch
                 value={settings.connectedServices.inBody}
                 onValueChange={() => handleConnectService('inBody')}
-                trackColor={{ false: COLORS.border, true: `${COLORS.primary}40` }}
-                thumbColor={
-                  settings.connectedServices.inBody ? COLORS.primary : COLORS.textSecondary
-                }
+                trackColor={{ false: COLORS.border, true: '#E8383D40' }}
+                thumbColor={settings.connectedServices.inBody ? '#E8383D' : COLORS.textSecondary}
               />
             </View>
           </View>
@@ -639,7 +760,7 @@ const SettingsScreen = () => {
             <TouchableOpacity
               style={styles.linkItem}
               onPress={() =>
-                Linking.openURL('https://cals2gains.example.com/terms')
+                Linking.openURL('https://cals2gains.com/terms')
               }
             >
               <Text style={[styles.linkText, { color: COLORS.primary }]}>Términos de Servicio</Text>
@@ -648,7 +769,7 @@ const SettingsScreen = () => {
             <TouchableOpacity
               style={styles.linkItem}
               onPress={() =>
-                Linking.openURL('https://cals2gains.example.com/privacy')
+                Linking.openURL('https://cals2gains.com/privacy')
               }
             >
               <Text style={[styles.linkText, { color: COLORS.primary }]}>Política de Privacidad</Text>

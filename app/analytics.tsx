@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { mealStore } from '@/stores/mealStore';
-import { weightStore } from '@/stores/weightStore';
-import { waterStore } from '@/stores/waterStore';
+import { mealStore } from '../store/mealStore';
+import { weightStore } from '../store/weightStore';
+import { waterStore } from '../store/waterStore';
 import { COLORS } from '../theme';
 
 const { width } = Dimensions.get('window');

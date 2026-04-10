@@ -130,8 +130,8 @@ export default function WeeklyCoachedScreen() {
   }
 
   const currentDate = new Date();
-  const weekStart = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
-  const weekEnd = new Date(weekStart);
+  const currentWeekStart = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
+  const weekEnd = new Date(currentWeekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
 
   const formatDate = (date: Date) => date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
@@ -143,7 +143,7 @@ export default function WeeklyCoachedScreen() {
         <View>
           <Text style={styles.title}>Resumen Semanal</Text>
           <Text style={styles.dateRange}>
-            {formatDate(weekStart)} - {formatDate(weekEnd)}
+            {formatDate(currentWeekStart)} - {formatDate(weekEnd)}
           </Text>
         </View>
         <TouchableOpacity onPress={handleShare} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>

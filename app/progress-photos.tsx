@@ -18,9 +18,9 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
-import { useProgressPhotoStore } from '../stores/progressPhotoStore';
-import { useMeasurementStore } from '../stores/measurementStore';
-import { useWeightStore } from '../stores/weightStore';
+import { useProgressPhotoStore } from '../store/progressPhotoStore';
+import { useMeasurementStore } from '../store/measurementStore';
+import { useWeightStore } from '../store/weightStore';
 import { COLORS } from '../theme';
 
 const { width, height } = Dimensions.get('window');

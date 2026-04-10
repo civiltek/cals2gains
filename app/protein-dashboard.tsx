@@ -17,9 +17,9 @@ import { COLORS } from '../theme';
 import { useNavigation } from 'expo-router';
 
 // Mock store imports
-import { mealStore } from '../stores/mealStore';
-import { userStore } from '../stores/userStore';
-import { templateStore } from '../stores/templateStore';
+import { mealStore } from '../store/mealStore';
+import { userStore } from '../store/userStore';
+import { templateStore } from '../store/templateStore';
 
 const { width } = Dimensions.get('window');
 const RING_SIZE = 240;

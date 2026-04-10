@@ -14,7 +14,7 @@ import * as Haptics from 'expo-haptics';
 import { COLORS } from '../theme';
 
 // Mock store imports
-import { userStore } from '../stores/userStore';
+import { userStore } from '../store/userStore';
 
 const { width } = Dimensions.get('window');
 

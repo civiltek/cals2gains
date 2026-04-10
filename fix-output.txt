@@ -3,4 +3,4 @@ env: export EXPO_PUBLIC_FIREBASE_API_KEY EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN EXPO_P
 CommandError: "expo-av" is added as a dependency in your project's package.json but it doesn't seem to be installed. Please run "yarn" or "npm install" to fix this issue.
 Need to install the following packages:
 expo-doctor@1.18.18
-Ok to proceed? (y) 
+Ok to proceed? (y) DONE 

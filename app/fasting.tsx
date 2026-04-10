@@ -182,7 +182,7 @@ export default function FastingScreen() {
     }
   };
 
-  const handleCustomProtocol = () => {
+  const handleCustomProtocol = async () => {
     if (!customHours || isNaN(parseInt(customHours))) {
       Alert.alert('Error', 'Por favor ingresa un número válido de horas');
       return;

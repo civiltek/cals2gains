@@ -14,8 +14,8 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { useMeasurementStore } from '../stores/measurementStore';
-import { useWeightStore } from '../stores/weightStore';
+import { useMeasurementStore } from '../store/measurementStore';
+import { useWeightStore } from '../store/weightStore';
 import { COLORS } from '../theme';
 
 const { width } = Dimensions.get('window');

@@ -15,9 +15,9 @@ import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect } from '@react-navigation/native';
-import { mealStore } from '@/stores/mealStore';
-import { weightStore } from '@/stores/weightStore';
-import { waterStore } from '@/stores/waterStore';
+import { mealStore } from '../store/mealStore';
+import { weightStore } from '../store/weightStore';
+import { waterStore } from '../store/waterStore';
 import { COLORS } from '../theme';
 
 type FormatType = 'csv' | 'pdf';

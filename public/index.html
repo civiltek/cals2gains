@@ -26,8 +26,9 @@
         body{font-family:'Instrument Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--plum);color:var(--bone);line-height:1.6;overflow-x:hidden}
 
         /* ========== NAV ========== */
-        .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(23,18,29,0.85);border-bottom:1px solid var(--violet-15);transition:all .3s}
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(23,18,29,0.9);border-bottom:1px solid var(--violet-15);transition:all .3s}
         .nav-logo{display:flex;align-items:center;gap:.75rem;text-decoration:none}
+        .nav-logo img{border-radius:8px}
         .nav-wordmark{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-0.5px}
         .nav-wordmark .c{color:var(--violet)}.nav-wordmark .t{color:var(--coral)}.nav-wordmark .g{color:var(--violet)}
         .nav-links{display:flex;gap:2rem;align-items:center}
@@ -39,8 +40,8 @@
         /* ========== HERO ========== */
         .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:7rem 2rem 4rem;position:relative;overflow:hidden}
         .hero-bg{position:absolute;inset:0;pointer-events:none}
-        .hero-bg .orb1{position:absolute;top:-20%;right:-10%;width:700px;height:700px;background:radial-gradient(circle,rgba(156,140,255,0.1) 0%,transparent 65%);border-radius:50%;animation:pulse 8s ease-in-out infinite}
-        .hero-bg .orb2{position:absolute;bottom:-15%;left:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(255,106,77,0.06) 0%,transparent 65%);border-radius:50%;animation:pulse 10s ease-in-out infinite 2s}
+        .hero-bg .orb1{position:absolute;top:-20%;right:-10%;width:700px;height:700px;background:radial-gradient(circle,rgba(156,140,255,0.12) 0%,transparent 65%);border-radius:50%;animation:pulse 8s ease-in-out infinite}
+        .hero-bg .orb2{position:absolute;bottom:-15%;left:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(255,106,77,0.08) 0%,transparent 65%);border-radius:50%;animation:pulse 10s ease-in-out infinite 2s}
         .hero-bg .grid-lines{position:absolute;inset:0;background-image:linear-gradient(var(--violet-15) 1px,transparent 1px),linear-gradient(90deg,var(--violet-15) 1px,transparent 1px);background-size:80px 80px;opacity:.08;mask-image:radial-gradient(ellipse 60% 50% at 50% 50%,black 0%,transparent 100%)}
         @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.7}}
         .hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;max-width:1200px;width:100%;align-items:center;position:relative;z-index:2}
@@ -86,7 +87,10 @@
         .phone-macro.carbs .phone-macro-val{color:var(--bone)}
         .phone-macro.fat .phone-macro-val{color:var(--coral)}
         .phone-meal{background:var(--card);border-radius:10px;padding:.6rem .75rem;display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;border:1px solid var(--violet-15)}
-        .phone-meal-icon{width:32px;height:32px;border-radius:8px;background:var(--violet-15);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+        .phone-meal-icon{width:32px;height:32px;border-radius:8px;background:var(--violet-15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:600;font-size:.7rem}
+        .phone-meal-icon.avocado{background:linear-gradient(135deg,#90EE90 0%,#6BBB6B 100%);color:white}
+        .phone-meal-icon.chicken{background:linear-gradient(135deg,#FFB347 0%,#FF8C00 100%);color:white}
+        .phone-meal-icon.salad{background:linear-gradient(135deg,#7FD87F 0%,#5CA85C 100%);color:white}
         .phone-meal-info{flex:1}
         .phone-meal-name{font-size:.7rem;font-weight:600;color:var(--bone)}
         .phone-meal-cal{font-size:.6rem;color:var(--bone-60)}
@@ -98,23 +102,31 @@
         .section-title{font-family:'Outfit',sans-serif;font-size:2.8rem;font-weight:800;text-align:center;margin-bottom:.75rem;letter-spacing:-1px}
         .section-desc{text-align:center;color:var(--bone-60);font-size:1.1rem;max-width:550px;margin:0 auto 3.5rem;font-weight:400}
         .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
-        .feature-card{background:var(--card);border:1px solid var(--violet-15);border-radius:16px;padding:1.75rem;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
-        .feature-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gradient-vt);opacity:0;transition:opacity .35s}
-        .feature-card:hover{background:var(--card-hover);border-color:var(--violet-25);transform:translateY(-4px);box-shadow:0 20px 60px rgba(156,140,255,0.12)}
-        .feature-card:hover::after{opacity:1}
-        .feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1rem;background:var(--violet-15);transition:all .35s}
-        .feature-card:hover .feature-icon{background:var(--coral-15);transform:scale(1.08)}
-        .feature-title{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:700;color:var(--bone);margin-bottom:.5rem}
-        .feature-desc{font-size:.92rem;color:var(--bone-60);line-height:1.65}
+        .feature-card{background:linear-gradient(135deg,var(--card) 0%,var(--card-elevated) 100%);border:1px solid var(--violet-15);border-radius:16px;padding:1.75rem;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+        .feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--gradient-vt);opacity:0;transition:opacity .35s}
+        .feature-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 0% 0%,rgba(156,140,255,0.1) 0%,transparent 50%);pointer-events:none}
+        .feature-card:hover{background:linear-gradient(135deg,var(--card-hover) 0%,var(--card) 100%);border-color:var(--violet-25);transform:translateY(-6px);box-shadow:0 24px 60px rgba(156,140,255,0.15)}
+        .feature-card:hover::before{opacity:1}
+        .feature-icon{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;background:var(--violet-15);transition:all .35s;position:relative;z-index:1}
+        .feature-card:hover .feature-icon{background:var(--coral-15);transform:scale(1.12);box-shadow:0 8px 24px rgba(156,140,255,0.2)}
+        .feature-icon svg{width:24px;height:24px;stroke:var(--violet);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .feature-card:hover .feature-icon svg{stroke:var(--coral)}
+        .feature-title{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:700;color:var(--bone);margin-bottom:.5rem;position:relative;z-index:1}
+        .feature-desc{font-size:.92rem;color:var(--bone-60);line-height:1.65;position:relative;z-index:1}
 
         /* ========== HOW IT WORKS ========== */
         .how{padding:6rem 2rem;position:relative}
-        .how::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(156,140,255,0.03) 50%,transparent 100%);pointer-events:none}
+        .how::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(156,140,255,0.04) 50%,transparent 100%);pointer-events:none}
         .how-inner{max-width:900px;margin:0 auto;position:relative;z-index:2}
         .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5rem;margin-top:3rem}
         .step{text-align:center;position:relative}
         .step-num{font-family:'Geist Mono',monospace;font-size:3rem;font-weight:700;color:var(--violet-25);margin-bottom:.75rem;line-height:1}
-        .step-icon{font-size:2.5rem;margin-bottom:1rem;display:block}
+        .step-icon-box{width:200px;height:200px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;background:var(--violet-15);border-radius:20px;transition:all .35s;overflow:hidden;border:1px solid var(--violet-15)}
+        .step:hover .step-icon-box{background:var(--coral-15);transform:scale(1.04);border-color:var(--violet-25);box-shadow:0 16px 48px rgba(156,140,255,0.2)}
+        .step-icon-box img{width:100%;height:100%;object-fit:cover;border-radius:20px}
+        .step-icon{font-size:2rem;display:flex}
+        .step-icon svg{width:28px;height:28px;stroke:var(--violet);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .step:hover .step-icon svg{stroke:var(--coral)}
         .step-title{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:.5rem}
         .step-desc{font-size:.9rem;color:var(--bone-60);line-height:1.65;max-width:260px;margin:0 auto}
         .step-connector{display:none;position:absolute;top:2.5rem;right:-1.25rem;color:var(--violet-25);font-size:1.5rem}
@@ -132,8 +144,9 @@
         .premium-inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
         .premium-features{list-style:none}
         .premium-features li{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:1.25rem;font-size:1rem;color:var(--bone-60);line-height:1.6}
-        .premium-features li .check{width:24px;height:24px;border-radius:8px;background:var(--violet-15);display:flex;align-items:center;justify-content:center;color:var(--violet);font-size:.8rem;flex-shrink:0;margin-top:2px}
-        .premium-card{background:linear-gradient(135deg,rgba(156,140,255,0.08) 0%,rgba(255,106,77,0.05) 100%);border:1px solid var(--violet-25);border-radius:20px;padding:2.5rem;text-align:center}
+        .premium-features li .check{width:24px;height:24px;border-radius:8px;background:var(--violet-15);display:flex;align-items:center;justify-content:center;color:var(--violet);font-size:.8rem;flex-shrink:0;margin-top:2px;font-weight:700}
+        .premium-card{background:linear-gradient(135deg,rgba(156,140,255,0.12) 0%,rgba(255,106,77,0.08) 100%);border:2px solid var(--violet-25);border-radius:20px;padding:2.5rem;text-align:center;position:relative;overflow:hidden}
+        .premium-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gradient-vt)}
         .premium-price{font-family:'Outfit',sans-serif;font-size:3rem;font-weight:800;color:var(--bone);margin-bottom:.25rem}
         .premium-price span{font-size:1rem;font-weight:500;color:var(--bone-60)}
         .premium-period{font-size:.95rem;color:var(--bone-60);margin-bottom:1.5rem}
@@ -141,7 +154,7 @@
 
         /* ========== CTA ========== */
         .cta{padding:6rem 2rem;text-align:center;position:relative;overflow:hidden}
-        .cta::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(156,140,255,0.06) 0%,rgba(255,106,77,0.03) 100%);border-top:1px solid var(--violet-15)}
+        .cta::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(156,140,255,0.08) 0%,rgba(255,106,77,0.04) 100%);border-top:1px solid var(--violet-15)}
         .cta-inner{position:relative;z-index:2;max-width:600px;margin:0 auto}
         .cta h2{font-family:'Outfit',sans-serif;font-size:2.5rem;font-weight:800;margin-bottom:1rem;letter-spacing:-1px}
         .cta p{font-size:1.1rem;color:var(--bone-60);margin-bottom:2.5rem;line-height:1.7}
@@ -150,6 +163,7 @@
         footer{background:rgba(0,0,0,0.25);padding:3rem 2rem;border-top:1px solid var(--violet-15)}
         .footer-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
         .footer-brand{display:flex;align-items:center;gap:.6rem}
+        .footer-brand img{border-radius:8px}
         .footer-brand-name{font-family:'Outfit',sans-serif;font-weight:800;font-size:1.1rem}
         .footer-brand-name .c{color:var(--violet)}.footer-brand-name .t{color:var(--coral)}.footer-brand-name .g{color:var(--violet)}
         .footer-copy{color:var(--bone-35);font-size:.85rem}
@@ -196,10 +210,7 @@
 <!-- NAV -->
 <nav class="nav">
     <a href="#" class="nav-logo">
-        <svg viewBox="0 0 36 36" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="18" cy="18" r="14" stroke="#9C8CFF" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-dasharray="20 6 16 6 14 6 12 80" transform="rotate(-90 18 18)"/>
-            <path d="M28 10 L33 4 M33 4 L28 5.5 M33 4 L31.5 9" stroke="#FF6A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <img src="logo.png" width="44" height="44" alt="Cals2Gains logo">
         <span class="nav-wordmark"><span class="c">Cals</span><span class="t">2</span><span class="g">Gains</span></span>
     </a>
     <div class="nav-links">
@@ -267,9 +278,9 @@
                         <div class="phone-macro carbs"><span class="phone-macro-val">198g</span><span class="phone-macro-label">Carbos</span></div>
                         <div class="phone-macro fat"><span class="phone-macro-val">62g</span><span class="phone-macro-label">Grasa</span></div>
                     </div>
-                    <div class="phone-meal"><div class="phone-meal-icon">🥑</div><div class="phone-meal-info"><div class="phone-meal-name">Tostada con aguacate</div><div class="phone-meal-cal">340 kcal · 12g prot</div></div></div>
-                    <div class="phone-meal"><div class="phone-meal-icon">🍗</div><div class="phone-meal-info"><div class="phone-meal-name">Pollo a la plancha</div><div class="phone-meal-cal">520 kcal · 48g prot</div></div></div>
-                    <div class="phone-meal"><div class="phone-meal-icon">🥗</div><div class="phone-meal-info"><div class="phone-meal-name">Ensalada César</div><div class="phone-meal-cal">410 kcal · 32g prot</div></div></div>
+                    <div class="phone-meal"><div class="phone-meal-icon avocado">🥑</div><div class="phone-meal-info"><div class="phone-meal-name">Tostada con aguacate</div><div class="phone-meal-cal">340 kcal · 12g prot</div></div></div>
+                    <div class="phone-meal"><div class="phone-meal-icon chicken">🍗</div><div class="phone-meal-info"><div class="phone-meal-name">Pollo a la plancha</div><div class="phone-meal-cal">520 kcal · 48g prot</div></div></div>
+                    <div class="phone-meal"><div class="phone-meal-icon salad">🥗</div><div class="phone-meal-info"><div class="phone-meal-name">Ensalada César</div><div class="phone-meal-cal">410 kcal · 32g prot</div></div></div>
                 </div>
             </div>
         </div>
@@ -283,47 +294,65 @@
     <p class="section-desc">Desde el análisis con IA hasta el coaching personalizado — diseñada para que cumplas tus objetivos.</p>
     <div class="features-grid">
         <div class="feature-card">
-            <div class="feature-icon">📸</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
             <h3 class="feature-title">Análisis con IA</h3>
             <p class="feature-desc">Haz una foto de cualquier comida y GPT-4o Vision calcula los macros al instante.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🔊</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            </div>
             <h3 class="feature-title">Registro por voz</h3>
             <p class="feature-desc">Dile a la app lo que has comido y registra sin tocar la pantalla.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">📊</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 2v20M2 12h20"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            </div>
             <h3 class="feature-title">Escáner de códigos</h3>
             <p class="feature-desc">Escanea el código de barras de cualquier producto para obtener su info nutricional.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">⚖️</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="3"/><path d="M12 11c3.866 0 7-1.79 7-4m0 8c0 2.21-3.134 4-7 4s-7-1.79-7-4m7 4v4m-3-8a3 3 0 0 1 6 0"/></svg>
+            </div>
             <h3 class="feature-title">Control de peso</h3>
             <p class="feature-desc">Registra tu peso, visualiza tendencias y sigue tu progreso a 30, 90 días o 1 año.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">💧</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            </div>
             <h3 class="feature-title">Hidratación</h3>
             <p class="feature-desc">Controla tu consumo de agua diario con recordatorios y objetivos personalizados.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🧬</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><polyline points="12 22.08 12 12"/></svg>
+            </div>
             <h3 class="feature-title">Macros inteligentes</h3>
             <p class="feature-desc">5 presets (balanced, high protein, keto, low fat, custom) con coaching predictivo.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🍽️</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6-7 6 7M3 9h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/><path d="M9 13v4M15 13v4"/></svg>
+            </div>
             <h3 class="feature-title">Recetas y plantillas</h3>
             <p class="feature-desc">Guarda comidas frecuentes, importa recetas por URL y genera listas de compras.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">⏱️</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
             <h3 class="feature-title">Ayuno intermitente</h3>
             <p class="feature-desc">Timer integrado con protocolos 16:8, 18:6, 20:4 y ventanas personalizadas.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🤖</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 1 0 10.9 6.9M22 4l-10 10m0 0L11 3"/></svg>
+            </div>
             <h3 class="feature-title">Coach IA</h3>
             <p class="feature-desc">Recomendaciones semanales de macros basadas en tu progreso y hábitos reales.</p>
         </div>
@@ -339,19 +368,25 @@
         <div class="steps">
             <div class="step">
                 <div class="step-num">01</div>
-                <span class="step-icon">📷</span>
+                <div class="step-icon-box">
+                    <img src="step1.png" alt="Haz una foto de tu comida" width="200" height="200" loading="lazy">
+                </div>
                 <h3 class="step-title">Haz una foto</h3>
                 <p class="step-desc">Apunta la cámara a tu plato. La IA identifica los ingredientes y las cantidades.</p>
             </div>
             <div class="step">
                 <div class="step-num">02</div>
-                <span class="step-icon">✅</span>
+                <div class="step-icon-box">
+                    <img src="step2.png" alt="Confirma y ajusta los macros" width="200" height="200" loading="lazy">
+                </div>
                 <h3 class="step-title">Confirma y ajusta</h3>
                 <p class="step-desc">Revisa los resultados, ajusta las porciones si quieres y guarda en un toque.</p>
             </div>
             <div class="step">
                 <div class="step-num">03</div>
-                <span class="step-icon">📈</span>
+                <div class="step-icon-box">
+                    <img src="step3.png" alt="Sigue tu progreso nutricional" width="200" height="200" loading="lazy">
+                </div>
                 <h3 class="step-title">Sigue tu progreso</h3>
                 <p class="step-desc">Visualiza macros, tendencias y recibe coaching IA para cumplir tus objetivos.</p>
             </div>
@@ -387,8 +422,8 @@
         </div>
         <div class="premium-card">
             <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:1rem;color:var(--violet);margin-bottom:1rem">PREMIUM</div>
-            <div class="premium-price">4,99€ <span>/ mes</span></div>
-            <div class="premium-period">o 39,99€ / año (ahorra 33%)</div>
+            <div class="premium-price">9,90€ <span>/ mes</span></div>
+            <div class="premium-period">o 79,90€ / año (ahorra 33%)</div>
             <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:1.5rem;padding:1rem">Empezar prueba gratis</a>
             <div class="premium-trial">7 días gratis · Cancela cuando quieras</div>
         </div>
@@ -417,13 +452,10 @@
 <footer>
     <div class="footer-inner">
         <div class="footer-brand">
-            <svg viewBox="0 0 36 36" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="18" cy="18" r="14" stroke="#9C8CFF" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-dasharray="20 6 16 6 14 6 12 80" transform="rotate(-90 18 18)"/>
-                <path d="M28 10 L33 4 M33 4 L28 5.5 M33 4 L31.5 9" stroke="#FF6A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <img src="logo.png" width="36" height="36" alt="Cals2Gains logo">
             <span class="footer-brand-name"><span class="c">Cals</span><span class="t">2</span><span class="g">Gains</span></span>
         </div>
-        <span class="footer-copy">&copy; 2026 CivilTek — info@civiltek.es</span>
+        <span class="footer-copy">&copy; 2026 Civiltek Ingeniería SLU — info@cals2gains.com</span>
         <div class="footer-links">
             <a href="/privacy">Privacidad</a>
             <a href="/terms">Términos</a>

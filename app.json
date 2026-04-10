@@ -22,7 +22,13 @@
         "NSMicrophoneUsageDescription": "Cals2Gains usa el microfono para registrar comidas por voz.",
         "NSHealthShareUsageDescription": "Cals2Gains lee tus datos de salud (pasos, calorias, ejercicio, peso) para adaptar tus macros automaticamente.",
         "NSHealthUpdateUsageDescription": "Cals2Gains sincroniza tu peso con Apple Health.",
-        "CFBundleLocalizations": ["en", "es"]
+        "CFBundleLocalizations": [
+          "en",
+          "es",
+          "en",
+          "es"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       },
       "usesAppleSignIn": true,
       "googleServicesFile": "./GoogleService-Info.plist"
@@ -39,24 +45,53 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.INTERNET",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
       "googleServicesFile": "./google-services.json"
     },
     "plugins": [
       "expo-router",
       "expo-apple-authentication",
-      ["expo-camera", {"cameraPermission": "Permitir acceso a camara para analizar comida."}],
-      ["expo-image-picker", {"photosPermission": "Permitir acceso a fotos."}],
-      "expo-av",
-      ["expo-build-properties", {"android": {"compileSdkVersion": 34, "targetSdkVersion": 34, "minSdkVersion": 24, "kotlinVersion": "1.9.24"}, "ios": {"deploymentTarget": "15.1"}}],
-      "@react-native-google-signin/google-signin",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permitir acceso a camara para analizar comida."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Permitir acceso a fotos."
+        }
+      ],
+      "expo-audio",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "minSdkVersion": 24,
+            "kotlinVersion": "2.0.21"
+          },
+          "ios": {
+            "deploymentTarget": "16.0"
+          }
+        }
+      ],
       "expo-secure-store"
     ],
-    "experiments": {"typedRoutes": true},
+    "experiments": {
+      "typedRoutes": true
+    },
     "extra": {
-      "router": {"origin": false},
-      "eas": {"projectId": "381120d5-3866-4b97-af00-4c6840768327"}
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "381120d5-3866-4b97-af00-4c6840768327"
+      }
     },
     "owner": "civiltek"
   }

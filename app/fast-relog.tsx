@@ -16,8 +16,8 @@ import * as Haptics from 'expo-haptics';
 import { COLORS } from '../theme';
 
 // Mock store imports
-import { mealStore } from '../stores/mealStore';
-import { templateStore } from '../stores/templateStore';
+import { mealStore } from '../store/mealStore';
+import { templateStore } from '../store/templateStore';
 
 const { width } = Dimensions.get('window');
 
@@ -752,7 +752,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.border,
-    overflow: 'hidden,
+    overflow: 'hidden',
   },
   mealCardContent: {
     flexDirection: 'row',
