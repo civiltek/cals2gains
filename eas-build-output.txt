@@ -1,0 +1,21 @@
+
+⚠️ Detected that your app uses Expo Go for development, this is not recommended when building production apps.
+Learn more: https://expo.fyi/why-not-build-expo-go-for-production
+To suppress this warning, set EAS_BUILD_NO_EXPO_GO_WARNING=true.
+
+Resolved "production" environment for the build. Learn more: https://docs.expo.dev/eas/environment-variables/#setting-the-environment-for-your-builds
+No environment variables with visibility "Plain text" and "Sensitive" found for the "production" environment on EAS.
+
+- Incrementing versionCode from 2 to 3.\ Incrementing versionCode from 2 to 3.√ Incremented versionCode from 2 to 3.
+
+
+android.versionCode field in app config is ignored when version source is set to remote, but this value will still be in the manifest available via expo-constants. It's recommended to remove this value from app config.
+√ Using remote Android credentials (Expo server)
+√ Using Keystore from configuration: Build Credentials mEy9RZo1o7 (default)
+
+Compressing project files and uploading to EAS Build. Learn more: https://expo.fyi/eas-build-archive
+- Compressing project files\ Compressing project files| Compressing project files/ Compressing project files- Compressing project files\ Compressing project files| Compressing project files/ Compressing project files√ Compressed project files 2s (7.8 MB)
+- Uploading to EAS Build (0 / 7.8 MB)\ Uploading to EAS Build (127 KB / 7.8 MB)| Uploading to EAS Build (511 KB / 7.8 MB)/ Uploading to EAS Build (511 KB / 7.8 MB)- Uploading to EAS Build (511 KB / 7.8 MB)\ Uploading to EAS Build (511 KB / 7.8 MB)| Uploading to EAS Build (511 KB / 7.8 MB)/ Uploading to EAS Build (640 KB / 7.8 MB)- Uploading to EAS Build (1.5 MB / 7.8 MB)\ Uploading to EAS Build (1.9 MB / 7.8 MB)| Uploading to EAS Build (4.7 MB / 7.8 MB)/ Uploading to EAS Build (7.8 MB / 7.8 MB)- Uploading to EAS Build (7.8 MB / 7.8 MB)\ Uploading to EAS Build (7.8 MB / 7.8 MB)√ Uploaded to EAS 1s
+
+See logs: https://expo.dev/accounts/civiltek/projects/cals2gains/builds/92a9b216-365b-49b4-a1f3-58ee644fa125
+

@@ -24,22 +24,11 @@ import { useMealStore } from '../store/mealStore';
 import { useTemplateStore } from '../store/templateStore';
 import { searchFoods, lookupBarcode, analyzeTextFood } from '../services/foodDatabase';
 import { FoodItem, MealTemplate } from '../types';
+import { COLORS } from '../theme';
 
 // ============================================
 // CONSTANTS
 // ============================================
-
-const COLORS = {
-  background: '#17121D',
-  card: '#1E1829',
-  cardHover: '#2A2235',
-  violet: '#9C8CFF',
-  coral: '#FF6A4D',
-  bone: '#F7F2EA',
-  textSecondary: 'rgba(247,242,234,0.6)',
-  textTertiary: 'rgba(247,242,234,0.35)',
-  border: 'rgba(156,140,255,0.15)',
-};
 
 const MEAL_TYPES = [
   { id: 'breakfast', label: 'Desayuno', icon: 'sunny-outline' },

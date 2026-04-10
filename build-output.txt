@@ -56,3 +56,144 @@ To address all issues (including breaking changes), run:
 
 Run `npm audit` for details.
 === GIT ADD === 
+warning: in the working copy of 'app.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/(auth)/onboarding.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/_layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'constants/colors.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'eas.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'types/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.firebase/hosting.cHVibGlj.cache', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.firebaserc', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'GUIA-PUBLICACION.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/barcode-scanner.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/food-search.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/weight-tracker.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'brand-assets/C2G-Logo-Original.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'build-output.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'competitive-analysis.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'constants/macroPresets.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'eas_build_log4.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'firebase-auto.bat', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'firebase-deploy.bat', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'firebase.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'firebase_install_log.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'firebase_login.bat', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'firebase_login_log5.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'fix-and-build.bat', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'fix-output.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'install-and-stage.bat', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/cals2gains/privacy.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/cals2gains/terms.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/privacy.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/terms.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'release-notes.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/foodDatabase.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/healthKit.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/macroCoach.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/voiceLog.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'sso-build.bat', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'store-listing-metadata.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'store/templateStore.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'store/waterStore.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'store/weightStore.ts', LF will be replaced by CRLF the next time Git touches it
+=== GIT STATUS === 
+A  .firebase/hosting.cHVibGlj.cache
+A  .firebaserc
+A  GUIA-PUBLICACION.md
+M  app.json
+M  app/(auth)/onboarding.tsx
+M  app/(tabs)/index.tsx
+M  app/_layout.tsx
+A  app/barcode-scanner.tsx
+A  app/food-search.tsx
+A  app/weight-tracker.tsx
+M  assets/images/adaptive-icon.png
+M  assets/images/icon.png
+M  assets/images/splash.png
+A  brand-assets/C2G-AppIcon-1024.png
+A  brand-assets/C2G-AppIcon-120.png
+A  brand-assets/C2G-AppIcon-152.png
+A  brand-assets/C2G-AppIcon-167.png
+A  brand-assets/C2G-AppIcon-180.png
+A  brand-assets/C2G-AppIcon-192.png
+A  brand-assets/C2G-AppIcon-512.png
+A  brand-assets/C2G-AppIcon-76.png
+A  brand-assets/C2G-Brand-Sheet.png
+A  brand-assets/C2G-FeatureGraphic-1024x500.png
+A  brand-assets/C2G-Logo-Dark.png
+A  brand-assets/C2G-Logo-Light.png
+A  brand-assets/C2G-Logo-Original.svg
+A  brand-assets/C2G-Logomark-2048.png
+A  brand-assets/C2G-Mark-512.png
+A  brand-assets/C2G-Profile-800.png
+A  brand-assets/C2G-Splash-1284x2778.png
+A  brand-assets/fonts/GeistMono-Bold.ttf
+A  brand-assets/fonts/GeistMono-Regular.ttf
+A  brand-assets/fonts/InstrumentSans-Bold.ttf
+A  brand-assets/fonts/InstrumentSans-BoldItalic.ttf
+A  brand-assets/fonts/InstrumentSans-Italic.ttf
+A  brand-assets/fonts/InstrumentSans-Regular.ttf
+A  brand-assets/fonts/Outfit-Bold.ttf
+A  brand-assets/fonts/Outfit-Regular.ttf
+AM build-output.txt
+A  competitive-analysis.md
+M  constants/colors.ts
+A  constants/macroPresets.ts
+A  deploy-result.txt
+A  deploy-result2.txt
+A  deploy-result3.txt
+A  deploy.zip
+M  eas.json
+A  eas_build_log4.txt
+A  firebase-auth-code.txt
+A  firebase-auto.bat
+A  firebase-deploy.bat
+A  firebase-login-output.txt
+A  firebase-login-url.txt
+A  firebase-login.bat
+A  firebase-token-output.txt
+A  firebase-token-result.txt
+A  firebase.json
+A  firebase_install_log.txt
+A  firebase_login.bat
+A  firebase_login_log.txt
+A  firebase_login_log2.txt
+A  firebase_login_log3.txt
+A  firebase_login_log4.txt
+A  firebase_login_log5.txt
+A  firebase_login_log6.txt
+A  firebase_login_log7.txt
+A  fix-and-build.bat
+A  fix-build.bat
+A  fix-output.txt
+A  generate_screenshots.py
+A  install-and-stage.bat
+A  login-y-build.bat
+M  package-lock.json
+M  package.json
+A  public/cals2gains/privacy.html
+A  public/cals2gains/terms.html
+A  public/index.html
+A  public/privacy.html
+A  public/terms.html
+A  release-notes.json
+A  screenshots_log.txt
+M  services/firebase.ts
+A  services/foodDatabase.ts
+A  services/healthKit.ts
+A  services/macroCoach.ts
+A  services/voiceLog.ts
+A  sso-build.bat
+A  store-listing-metadata.md
+A  store-screenshots/screenshot_01_dashboard.png
+A  store-screenshots/screenshot_02_camera.png
+A  store-screenshots/screenshot_03_goals.png
+A  store/templateStore.ts
+A  store/waterStore.ts
+A  store/weightStore.ts
+A  tsc_check2.txt
+M  types/index.ts
+=== DONE === 

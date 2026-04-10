@@ -189,3 +189,260 @@ export interface MacroPresetConfig {
   fatPct: number;
   icon: string;
 }
+
+// ============================================
+// Quick Add (Manual Entry)
+// ============================================
+
+export interface QuickAddEntry {
+  id: string;
+  userId: string;
+  timestamp: Date;
+  name: string;
+  nutrition: Nutrition;
+  mealType: MealType;
+  source: 'quick_add';
+}
+
+// ============================================
+// Recipes
+// ============================================
+
+export interface RecipeIngredient {
+  name: string;
+  quantity: number;
+  unit: string;
+  nutrition: Nutrition;
+  isOptional?: boolean;
+}
+
+export interface Recipe {
+  id: string;
+  userId: string;
+  name: string;
+  nameEs: string;
+  nameEn: string;
+  description?: string;
+  ingredients: RecipeIngredient[];
+  servings: number;
+  prepTime?: number;
+  cookTime?: number;
+  instructions?: string[];
+  totalNutrition: Nutrition;
+  nutritionPerServing: Nutrition;
+  photoUri?: string;
+  tags: string[];
+  source: 'manual' | 'url_import' | 'ai';
+  sourceUrl?: string;
+  isFavorite: boolean;
+  timesUsed: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================
+// Training / Rest Day Goals
+// ============================================
+
+export type DayType = 'training' | 'rest';
+
+export interface DayTypeGoals {
+  training: UserGoals;
+  rest: UserGoals;
+  enabled: boolean;
+}
+
+// ============================================
+// Intermittent Fasting
+// ============================================
+
+export type FastingProtocol = '16:8' | '18:6' | '20:4' | '5:2' | 'custom';
+
+export interface FastingConfig {
+  enabled: boolean;
+  protocol: FastingProtocol;
+  eatingWindowStart: string; // HH:mm
+  eatingWindowEnd: string;   // HH:mm
+  fastingDays?: number[];    // for 5:2 — day indices (0=Mon)
+}
+
+export interface FastingSession {
+  id: string;
+  userId: string;
+  startTime: Date;
+  endTime?: Date;
+  targetHours: number;
+  completed: boolean;
+  date: string; // yyyy-MM-dd
+}
+
+// ============================================
+// Body Measurements
+// ============================================
+
+export interface BodyMeasurement {
+  id: string;
+  userId: string;
+  date: Date;
+  neck?: number;
+  chest?: number;
+  waist?: number;
+  hips?: number;
+  bicepLeft?: number;
+  bicepRight?: number;
+  thighLeft?: number;
+  thighRight?: number;
+  calfLeft?: number;
+  calfRight?: number;
+  bodyFat?: number;
+  muscleMass?: number;
+  note?: string;
+}
+
+// ============================================
+// Progress Photos
+// ============================================
+
+export type PhotoAngle = 'front' | 'side' | 'back';
+
+export interface ProgressPhoto {
+  id: string;
+  userId: string;
+  date: Date;
+  angle: PhotoAngle;
+  photoUri: string;
+  weight?: number;
+  bodyFat?: number;
+  note?: string;
+}
+
+// ============================================
+// Analytics / Streaks
+// ============================================
+
+export interface WeeklyDigest {
+  weekStart: string;
+  weekEnd: string;
+  avgCalories: number;
+  avgProtein: number;
+  avgCarbs: number;
+  avgFat: number;
+  daysLogged: number;
+  adherenceScore: number;
+  calorieGoalHits: number;
+  proteinGoalHits: number;
+  weightChange?: number;
+  streak: number;
+}
+
+export interface UserStreak {
+  currentStreak: number;
+  longestStreak: number;
+  lastLogDate: string;
+  totalDaysLogged: number;
+}
+
+// ============================================
+// Meal Planning
+// ============================================
+
+export interface PlannedMeal {
+  id: string;
+  userId: string;
+  date: string;
+  mealType: MealType;
+  recipeId?: string;
+  templateId?: string;
+  customName?: string;
+  nutrition: Nutrition;
+  servings: number;
+  completed: boolean;
+}
+
+export interface MealPlan {
+  id: string;
+  userId: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  meals: PlannedMeal[];
+  createdAt: Date;
+}
+
+// ============================================
+// Grocery List
+// ============================================
+
+export interface GroceryItem {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  category: GroceryCategory;
+  checked: boolean;
+  recipeId?: string;
+  mealPlanId?: string;
+}
+
+export type GroceryCategory =
+  | 'produce'
+  | 'protein'
+  | 'dairy'
+  | 'grains'
+  | 'canned'
+  | 'frozen'
+  | 'snacks'
+  | 'beverages'
+  | 'condiments'
+  | 'other';
+
+export interface GroceryList {
+  id: string;
+  userId: string;
+  name: string;
+  items: GroceryItem[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================
+// Reminders
+// ============================================
+
+export type ReminderType =
+  | 'meal_log'
+  | 'water'
+  | 'weight'
+  | 'fasting_start'
+  | 'fasting_end'
+  | 'meal_plan';
+
+export interface Reminder {
+  id: string;
+  userId: string;
+  type: ReminderType;
+  enabled: boolean;
+  time: string;
+  days: number[];
+  title: string;
+  body: string;
+}
+
+// ============================================
+// Data Export
+// ============================================
+
+export type ExportFormat = 'csv' | 'pdf';
+export type ExportScope = 'week' | 'month' | 'custom';
+
+export interface ExportRequest {
+  userId: string;
+  format: ExportFormat;
+  scope: ExportScope;
+  startDate: string;
+  endDate: string;
+  includeWeight: boolean;
+  includeMeasurements: boolean;
+  includeWater: boolean;
+  includeFasting: boolean;
+}

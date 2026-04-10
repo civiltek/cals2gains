@@ -3,7 +3,7 @@
 // ============================================
 
 import { create } from 'zustand';
-import { User, UserGoals, UserProfile } from '../types';
+import { DayType, DayTypeGoals, User, UserGoals, UserProfile } from '../types';
 import {
   getUserData,
   updateUserProfile,
@@ -19,6 +19,8 @@ interface UserState {
   isLoading: boolean;
   isAuthenticated: boolean;
   authInitialized: boolean;
+  dayTypeGoals: DayTypeGoals | null;
+  todayDayType: DayType;
 
   // Actions
   setUser: (user: User | null) => void;
@@ -27,6 +29,9 @@ interface UserState {
   updateLanguage: (language: 'es' | 'en') => Promise<void>;
   signOut: () => Promise<void>;
   initAuth: () => () => void; // Returns unsubscribe function
+  setDayTypeGoals: (goals: DayTypeGoals) => Promise<void>;
+  setTodayDayType: (type: DayType) => void;
+  getActiveGoals: () => UserGoals;
 
   // Computed getters
   isSubscriptionActive: () => boolean;
@@ -39,6 +44,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   isLoading: true,
   isAuthenticated: false,
   authInitialized: false,
+  dayTypeGoals: null,
+  todayDayType: 'rest',
 
   setUser: (user) => {
     set({ user, isAuthenticated: !!user });
@@ -111,6 +118,37 @@ export const useUserStore = create<UserState>((set, get) => ({
       set({ authInitialized: true });
     });
     return unsubscribe;
+  },
+
+  setDayTypeGoals: async (goals: DayTypeGoals) => {
+    set({ dayTypeGoals: goals });
+    const { user } = get();
+    if (!user) return;
+
+    try {
+      // TODO: Persist to Firebase when backend is ready
+      // await updateDayTypeGoals(user.uid, goals);
+    } catch (error) {
+      console.error('Failed to update day type goals:', error);
+      throw error;
+    }
+  },
+
+  setTodayDayType: (type: DayType) => {
+    set({ todayDayType: type });
+  },
+
+  getActiveGoals: () => {
+    const { user, dayTypeGoals, todayDayType } = get();
+    if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
+
+    // If day type goals are not enabled or not set, return regular goals
+    if (!dayTypeGoals || !dayTypeGoals.enabled) {
+      return user.goals;
+    }
+
+    // Return training or rest goals based on today's day type
+    return dayTypeGoals[todayDayType];
   },
 
   // Computed: check if subscription is active (trial or paid)

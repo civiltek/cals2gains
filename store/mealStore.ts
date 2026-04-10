@@ -3,7 +3,7 @@
 // ============================================
 
 import { create } from 'zustand';
-import { Meal, Nutrition, UserGoals } from '../types';
+import { Meal, MealType, Nutrition, UserGoals } from '../types';
 import {
   getMealsForDate,
   saveMeal,
@@ -29,6 +29,8 @@ interface MealState {
   removeMeal: (mealId: string) => Promise<void>;
   setSelectedDate: (date: Date) => void;
   refreshToday: (userId: string) => Promise<void>;
+  copyMealsToDate: (userId: string, fromDate: Date, toDate: Date, mealTypes?: MealType[]) => Promise<void>;
+  duplicateMeal: (meal: Meal, targetDate: Date) => Promise<string>;
 
   // Computed
   getTodayCalories: () => number;
@@ -147,5 +149,84 @@ export const useMealStore = create<MealState>((set, get) => ({
         [type]: [...(groups[type] || []), meal],
       };
     }, {} as Record<string, Meal[]>);
+  },
+
+  copyMealsToDate: async (userId: string, fromDate: Date, toDate: Date, mealTypes?: MealType[]) => {
+    set({ isLoading: true });
+    try {
+      const meals = await getMealsForDate(userId, fromDate);
+      const mealsToClone = mealTypes
+        ? meals.filter((m) => mealTypes.includes(m.mealType))
+        : meals;
+
+      const newMealIds: string[] = [];
+      for (const meal of mealsToClone) {
+        const newMeal: Omit<Meal, 'id'> = {
+          userId: meal.userId,
+          timestamp: new Date(
+            toDate.getFullYear(),
+            toDate.getMonth(),
+            toDate.getDate(),
+            meal.timestamp.getHours(),
+            meal.timestamp.getMinutes(),
+            meal.timestamp.getSeconds()
+          ),
+          photoUri: meal.photoUri,
+          dishName: meal.dishName,
+          dishNameEs: meal.dishNameEs,
+          dishNameEn: meal.dishNameEn,
+          ingredients: [...meal.ingredients],
+          portionDescription: meal.portionDescription,
+          estimatedWeight: meal.estimatedWeight,
+          nutrition: { ...meal.nutrition },
+          notes: meal.notes,
+          mealType: meal.mealType,
+          aiConfidence: meal.aiConfidence,
+        };
+        const mealId = await saveMeal(newMeal);
+        newMealIds.push(mealId);
+      }
+    } catch (error) {
+      console.error('Failed to copy meals to date:', error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  duplicateMeal: async (meal: Meal, targetDate: Date) => {
+    set({ isSaving: true });
+    try {
+      const newMeal: Omit<Meal, 'id'> = {
+        userId: meal.userId,
+        timestamp: new Date(
+          targetDate.getFullYear(),
+          targetDate.getMonth(),
+          targetDate.getDate(),
+          meal.timestamp.getHours(),
+          meal.timestamp.getMinutes(),
+          meal.timestamp.getSeconds()
+        ),
+        photoUri: meal.photoUri,
+        dishName: meal.dishName,
+        dishNameEs: meal.dishNameEs,
+        dishNameEn: meal.dishNameEn,
+        ingredients: [...meal.ingredients],
+        portionDescription: meal.portionDescription,
+        estimatedWeight: meal.estimatedWeight,
+        nutrition: { ...meal.nutrition },
+        notes: meal.notes,
+        mealType: meal.mealType,
+        aiConfidence: meal.aiConfidence,
+      };
+
+      const mealId = await saveMeal(newMeal);
+      return mealId;
+    } catch (error) {
+      console.error('Failed to duplicate meal:', error);
+      throw error;
+    } finally {
+      set({ isSaving: false });
+    }
   },
 }));

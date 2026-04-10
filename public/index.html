@@ -3,155 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cals2Gains — Tu nutricionista de bolsillo con IA. Escanea comida, registra por voz, controla macros, peso e hidratación. Potenciado por GPT-4o Vision.">
+    <meta name="theme-color" content="#17121D">
+    <meta property="og:title" content="Cals2Gains — Contador de Calorías con IA">
+    <meta property="og:description" content="Tu nutricionista de bolsillo. Escanea, registra, controla. Con inteligencia artificial.">
+    <meta property="og:type" content="website">
     <title>Cals2Gains — Contador de Calorías con IA</title>
-    <meta name="description" content="Escanea tu comida con IA y controla calorías y macros al instante. Descarga Cals2Gains gratis.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0F172A;
-            color: #E2E8F0;
-            min-height: 100vh;
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --plum:#17121D;--plum-light:#1E1829;--card:#1E1829;--card-hover:#2A2235;--card-elevated:#241E30;
+            --violet:#9C8CFF;--violet-bright:#B4A3FF;--coral:#FF6A4D;--coral-bright:#FF8A73;
+            --bone:#F7F2EA;--bone-60:rgba(247,242,234,0.6);--bone-35:rgba(247,242,234,0.35);--bone-08:rgba(247,242,234,0.08);
+            --violet-15:rgba(156,140,255,0.15);--violet-25:rgba(156,140,255,0.25);--violet-40:rgba(156,140,255,0.4);
+            --coral-15:rgba(255,106,77,0.15);--coral-25:rgba(255,106,77,0.25);
+            --gradient-vt:linear-gradient(135deg,#9C8CFF 0%,#FF6A4D 100%);
         }
-        .hero {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 2rem;
-            text-align: center;
-            background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #0F172A 100%);
+        html{scroll-behavior:smooth}
+        body{font-family:'Instrument Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--plum);color:var(--bone);line-height:1.6;overflow-x:hidden}
+
+        /* ========== NAV ========== */
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(23,18,29,0.85);border-bottom:1px solid var(--violet-15);transition:all .3s}
+        .nav-logo{display:flex;align-items:center;gap:.75rem;text-decoration:none}
+        .nav-wordmark{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-0.5px}
+        .nav-wordmark .c{color:var(--violet)}.nav-wordmark .t{color:var(--coral)}.nav-wordmark .g{color:var(--violet)}
+        .nav-links{display:flex;gap:2rem;align-items:center}
+        .nav-links a{color:var(--bone-60);text-decoration:none;font-size:.95rem;font-weight:500;transition:color .3s}
+        .nav-links a:hover{color:var(--violet)}
+        .nav-cta{background:var(--violet);color:var(--plum);padding:.6rem 1.4rem;border-radius:10px;font-weight:700;font-family:'Outfit',sans-serif;font-size:.9rem;text-decoration:none;transition:all .3s}
+        .nav-cta:hover{background:var(--violet-bright);transform:translateY(-1px);box-shadow:0 8px 24px rgba(156,140,255,.3)}
+
+        /* ========== HERO ========== */
+        .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:7rem 2rem 4rem;position:relative;overflow:hidden}
+        .hero-bg{position:absolute;inset:0;pointer-events:none}
+        .hero-bg .orb1{position:absolute;top:-20%;right:-10%;width:700px;height:700px;background:radial-gradient(circle,rgba(156,140,255,0.1) 0%,transparent 65%);border-radius:50%;animation:pulse 8s ease-in-out infinite}
+        .hero-bg .orb2{position:absolute;bottom:-15%;left:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(255,106,77,0.06) 0%,transparent 65%);border-radius:50%;animation:pulse 10s ease-in-out infinite 2s}
+        .hero-bg .grid-lines{position:absolute;inset:0;background-image:linear-gradient(var(--violet-15) 1px,transparent 1px),linear-gradient(90deg,var(--violet-15) 1px,transparent 1px);background-size:80px 80px;opacity:.08;mask-image:radial-gradient(ellipse 60% 50% at 50% 50%,black 0%,transparent 100%)}
+        @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.7}}
+        .hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;max-width:1200px;width:100%;align-items:center;position:relative;z-index:2}
+        .hero-text{max-width:560px}
+        .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--violet-15);border:1px solid var(--violet-25);border-radius:999px;padding:.4rem 1rem;font-size:.85rem;color:var(--violet);font-weight:600;margin-bottom:1.5rem}
+        .hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--coral);animation:blink 2s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+        .hero-title{font-family:'Outfit',sans-serif;font-size:3.5rem;font-weight:800;line-height:1.08;letter-spacing:-1.5px;margin-bottom:1.25rem}
+        .hero-title .violet{color:var(--violet)}.hero-title .coral{color:var(--coral)}
+        .hero-subtitle{font-size:1.15rem;color:var(--bone-60);line-height:1.75;margin-bottom:2.5rem;max-width:440px;font-weight:400}
+        .hero-buttons{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem}
+        .btn{padding:.9rem 1.8rem;border-radius:12px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;text-decoration:none;cursor:pointer;border:2px solid transparent;transition:all .3s cubic-bezier(.4,0,.2,1);display:inline-flex;align-items:center;gap:.6rem;white-space:nowrap}
+        .btn-primary{background:var(--violet);color:var(--plum)}
+        .btn-primary:hover{background:var(--violet-bright);transform:translateY(-2px);box-shadow:0 12px 40px rgba(156,140,255,.3)}
+        .btn-secondary{background:transparent;color:var(--bone);border-color:var(--bone-35)}
+        .btn-secondary:hover{border-color:var(--violet);color:var(--violet);background:var(--violet-15);transform:translateY(-2px)}
+        .hero-social-proof{display:flex;align-items:center;gap:.75rem;color:var(--bone-60);font-size:.9rem}
+        .hero-avatars{display:flex}
+        .hero-avatars span{width:32px;height:32px;border-radius:50%;border:2px solid var(--plum);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}
+        .hero-avatars span:nth-child(1){background:var(--violet);color:var(--plum);margin-left:0}
+        .hero-avatars span:nth-child(2){background:var(--coral);color:white}
+        .hero-avatars span:nth-child(3){background:var(--violet-bright);color:var(--plum)}
+        .hero-avatars span:nth-child(4){background:var(--card-elevated);color:var(--bone-60)}
+
+        /* Phone Mockup */
+        .hero-visual{display:flex;justify-content:center;align-items:center;position:relative}
+        .phone-mockup{width:280px;height:560px;background:var(--card);border-radius:36px;border:2px solid var(--violet-25);position:relative;box-shadow:0 40px 100px rgba(156,140,255,0.15),0 0 0 1px rgba(156,140,255,0.1);overflow:hidden}
+        .phone-notch{width:120px;height:28px;background:var(--plum);border-radius:0 0 16px 16px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:5}
+        .phone-screen{padding:2.5rem 1.25rem 1.25rem;height:100%;display:flex;flex-direction:column;background:var(--plum)}
+        .phone-header{text-align:center;margin-bottom:1.25rem}
+        .phone-greeting{font-size:.7rem;color:var(--bone-60);margin-bottom:.25rem}
+        .phone-date{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;color:var(--bone)}
+        .phone-ring{width:140px;height:140px;margin:0 auto 1rem;position:relative}
+        .phone-ring svg{width:100%;height:100%}
+        .phone-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        .phone-ring-cal{font-family:'Geist Mono',monospace;font-size:1.5rem;font-weight:600;color:var(--bone);line-height:1}
+        .phone-ring-sub{font-size:.6rem;color:var(--bone-60);margin-top:2px}
+        .phone-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem}
+        .phone-macro{background:var(--card);border-radius:10px;padding:.5rem;text-align:center;border:1px solid var(--violet-15)}
+        .phone-macro-val{font-family:'Geist Mono',monospace;font-size:.85rem;font-weight:600;display:block}
+        .phone-macro-label{font-size:.55rem;color:var(--bone-60);text-transform:uppercase;letter-spacing:.5px}
+        .phone-macro.protein .phone-macro-val{color:var(--violet)}
+        .phone-macro.carbs .phone-macro-val{color:var(--bone)}
+        .phone-macro.fat .phone-macro-val{color:var(--coral)}
+        .phone-meal{background:var(--card);border-radius:10px;padding:.6rem .75rem;display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;border:1px solid var(--violet-15)}
+        .phone-meal-icon{width:32px;height:32px;border-radius:8px;background:var(--violet-15);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+        .phone-meal-info{flex:1}
+        .phone-meal-name{font-size:.7rem;font-weight:600;color:var(--bone)}
+        .phone-meal-cal{font-size:.6rem;color:var(--bone-60)}
+        .phone-glow{position:absolute;width:300px;height:300px;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(156,140,255,0.12) 0%,transparent 70%);pointer-events:none;z-index:-1}
+
+        /* ========== FEATURES ========== */
+        .features{padding:6rem 2rem;max-width:1200px;margin:0 auto}
+        .section-label{font-family:'Geist Mono',monospace;font-size:.8rem;font-weight:500;color:var(--coral);text-transform:uppercase;letter-spacing:2px;margin-bottom:.75rem;text-align:center}
+        .section-title{font-family:'Outfit',sans-serif;font-size:2.8rem;font-weight:800;text-align:center;margin-bottom:.75rem;letter-spacing:-1px}
+        .section-desc{text-align:center;color:var(--bone-60);font-size:1.1rem;max-width:550px;margin:0 auto 3.5rem;font-weight:400}
+        .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+        .feature-card{background:var(--card);border:1px solid var(--violet-15);border-radius:16px;padding:1.75rem;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+        .feature-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gradient-vt);opacity:0;transition:opacity .35s}
+        .feature-card:hover{background:var(--card-hover);border-color:var(--violet-25);transform:translateY(-4px);box-shadow:0 20px 60px rgba(156,140,255,0.12)}
+        .feature-card:hover::after{opacity:1}
+        .feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1rem;background:var(--violet-15);transition:all .35s}
+        .feature-card:hover .feature-icon{background:var(--coral-15);transform:scale(1.08)}
+        .feature-title{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:700;color:var(--bone);margin-bottom:.5rem}
+        .feature-desc{font-size:.92rem;color:var(--bone-60);line-height:1.65}
+
+        /* ========== HOW IT WORKS ========== */
+        .how{padding:6rem 2rem;position:relative}
+        .how::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(156,140,255,0.03) 50%,transparent 100%);pointer-events:none}
+        .how-inner{max-width:900px;margin:0 auto;position:relative;z-index:2}
+        .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5rem;margin-top:3rem}
+        .step{text-align:center;position:relative}
+        .step-num{font-family:'Geist Mono',monospace;font-size:3rem;font-weight:700;color:var(--violet-25);margin-bottom:.75rem;line-height:1}
+        .step-icon{font-size:2.5rem;margin-bottom:1rem;display:block}
+        .step-title{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:.5rem}
+        .step-desc{font-size:.9rem;color:var(--bone-60);line-height:1.65;max-width:260px;margin:0 auto}
+        .step-connector{display:none;position:absolute;top:2.5rem;right:-1.25rem;color:var(--violet-25);font-size:1.5rem}
+
+        /* ========== STATS ========== */
+        .stats{padding:4rem 2rem}
+        .stats-inner{max-width:1000px;margin:0 auto;background:linear-gradient(135deg,var(--card) 0%,var(--card-elevated) 100%);border:1px solid var(--violet-15);border-radius:20px;padding:3rem 2rem;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;position:relative;overflow:hidden}
+        .stats-inner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gradient-vt)}
+        .stat{text-align:center}
+        .stat-val{font-family:'Geist Mono',monospace;font-size:2.2rem;font-weight:600;color:var(--violet);display:block;margin-bottom:.35rem;letter-spacing:-1px}
+        .stat-label{font-size:.9rem;color:var(--bone-60);font-weight:500}
+
+        /* ========== PREMIUM ========== */
+        .premium{padding:6rem 2rem}
+        .premium-inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+        .premium-features{list-style:none}
+        .premium-features li{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:1.25rem;font-size:1rem;color:var(--bone-60);line-height:1.6}
+        .premium-features li .check{width:24px;height:24px;border-radius:8px;background:var(--violet-15);display:flex;align-items:center;justify-content:center;color:var(--violet);font-size:.8rem;flex-shrink:0;margin-top:2px}
+        .premium-card{background:linear-gradient(135deg,rgba(156,140,255,0.08) 0%,rgba(255,106,77,0.05) 100%);border:1px solid var(--violet-25);border-radius:20px;padding:2.5rem;text-align:center}
+        .premium-price{font-family:'Outfit',sans-serif;font-size:3rem;font-weight:800;color:var(--bone);margin-bottom:.25rem}
+        .premium-price span{font-size:1rem;font-weight:500;color:var(--bone-60)}
+        .premium-period{font-size:.95rem;color:var(--bone-60);margin-bottom:1.5rem}
+        .premium-trial{font-size:.85rem;color:var(--coral);font-weight:600;margin-top:1rem}
+
+        /* ========== CTA ========== */
+        .cta{padding:6rem 2rem;text-align:center;position:relative;overflow:hidden}
+        .cta::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(156,140,255,0.06) 0%,rgba(255,106,77,0.03) 100%);border-top:1px solid var(--violet-15)}
+        .cta-inner{position:relative;z-index:2;max-width:600px;margin:0 auto}
+        .cta h2{font-family:'Outfit',sans-serif;font-size:2.5rem;font-weight:800;margin-bottom:1rem;letter-spacing:-1px}
+        .cta p{font-size:1.1rem;color:var(--bone-60);margin-bottom:2.5rem;line-height:1.7}
+
+        /* ========== FOOTER ========== */
+        footer{background:rgba(0,0,0,0.25);padding:3rem 2rem;border-top:1px solid var(--violet-15)}
+        .footer-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+        .footer-brand{display:flex;align-items:center;gap:.6rem}
+        .footer-brand-name{font-family:'Outfit',sans-serif;font-weight:800;font-size:1.1rem}
+        .footer-brand-name .c{color:var(--violet)}.footer-brand-name .t{color:var(--coral)}.footer-brand-name .g{color:var(--violet)}
+        .footer-copy{color:var(--bone-35);font-size:.85rem}
+        .footer-links{display:flex;gap:1.5rem}
+        .footer-links a{color:var(--bone-60);text-decoration:none;font-size:.85rem;transition:color .3s}
+        .footer-links a:hover{color:var(--violet)}
+
+        /* ========== RESPONSIVE ========== */
+        @media(max-width:1024px){
+            .hero-inner{grid-template-columns:1fr;text-align:center;gap:3rem}
+            .hero-text{max-width:100%}.hero-subtitle{max-width:100%;margin-left:auto;margin-right:auto}
+            .hero-buttons{justify-content:center}.hero-social-proof{justify-content:center}
+            .features-grid{grid-template-columns:repeat(2,1fr)}
+            .premium-inner{grid-template-columns:1fr}
         }
-        .logo {
-            width: 120px;
-            height: 120px;
-            border-radius: 28px;
-            background: linear-gradient(135deg, #6366F1, #8B5CF6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+        @media(max-width:768px){
+            .nav-links{display:none}
+            .hero-title{font-size:2.5rem}.section-title{font-size:2.2rem}
+            .features-grid{grid-template-columns:1fr}
+            .steps{grid-template-columns:1fr;gap:2rem}
+            .stats-inner{grid-template-columns:repeat(2,1fr)}
+            .phone-mockup{width:240px;height:480px}
+            .footer-inner{flex-direction:column;text-align:center}
         }
-        h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #6366F1, #A78BFA);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
+        @media(max-width:480px){
+            .hero{padding:6rem 1.25rem 3rem}
+            .hero-title{font-size:2rem}
+            .hero-buttons{flex-direction:column}.hero-buttons .btn{width:100%;justify-content:center}
+            .section-title{font-size:1.8rem}
+            .cta h2{font-size:1.8rem}
+            .premium-price{font-size:2.2rem}
         }
-        .subtitle {
-            font-size: 1.3rem;
-            color: #94A3B8;
-            max-width: 600px;
-            line-height: 1.6;
-            margin-bottom: 2.5rem;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            max-width: 900px;
-            margin: 3rem auto;
-            padding: 0 1rem;
-        }
-        .feature {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: left;
-        }
-        .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
-        .feature h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #F1F5F9; }
-        .feature p { font-size: 0.95rem; color: #94A3B8; line-height: 1.5; }
-        .badges {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(99, 102, 241, 0.15);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
-            color: #A78BFA;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-        .badge:hover {
-            background: rgba(99, 102, 241, 0.25);
-            transform: translateY(-2px);
-        }
-        .coming-soon {
-            display: inline-block;
-            background: linear-gradient(135deg, #10B981, #059669);
-            color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 999px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-        footer {
-            text-align: center;
-            padding: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            color: #64748B;
-            font-size: 0.85rem;
-        }
-        footer a { color: #6366F1; text-decoration: none; }
-        footer a:hover { text-decoration: underline; }
-        .footer-links { margin-top: 0.5rem; }
-        .footer-links a { margin: 0 1rem; }
+
+        /* ========== ANIMATIONS ========== */
+        @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        .hero-text{animation:fadeUp .8s ease-out}
+        .hero-visual{animation:fadeUp .8s ease-out .2s both}
+        .phone-mockup{animation:float 6s ease-in-out infinite}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
     </style>
 </head>
 <body>
-    <div class="hero">
-        <div class="logo">&#127822;</div>
-        <span class="coming-soon">Disponible pronto</span>
-        <h1>Cals2Gains</h1>
-        <p class="subtitle">
-            Tu nutricionista de bolsillo con inteligencia artificial.
-            Haz una foto de tu comida y obtén las calorías y macros al instante.
-        </p>
-        <div class="badges">
-            <a href="#" class="badge">&#9654;&#65039; Google Play</a>
-            <a href="#" class="badge">&#127822; App Store</a>
+
+<!-- NAV -->
+<nav class="nav">
+    <a href="#" class="nav-logo">
+        <svg viewBox="0 0 36 36" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="14" stroke="#9C8CFF" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-dasharray="20 6 16 6 14 6 12 80" transform="rotate(-90 18 18)"/>
+            <path d="M28 10 L33 4 M33 4 L28 5.5 M33 4 L31.5 9" stroke="#FF6A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="nav-wordmark"><span class="c">Cals</span><span class="t">2</span><span class="g">Gains</span></span>
+    </a>
+    <div class="nav-links">
+        <a href="#features">Funciones</a>
+        <a href="#how">Cómo funciona</a>
+        <a href="#premium">Premium</a>
+        <a href="#" class="nav-cta">Descargar</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+    <div class="hero-bg">
+        <div class="orb1"></div>
+        <div class="orb2"></div>
+        <div class="grid-lines"></div>
+    </div>
+    <div class="hero-inner">
+        <div class="hero-text">
+            <div class="hero-badge"><span class="dot"></span> Potenciado por GPT-4o Vision</div>
+            <h1 class="hero-title">
+                Tu nutrición,<br><span class="violet">potenciada</span> por <span class="coral">IA</span>
+            </h1>
+            <p class="hero-subtitle">Haz una foto de cualquier comida y obtén los macros al instante. Controla calorías, proteínas, peso e hidratación — todo desde una sola app.</p>
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.2l2.807 1.626a1 1 0 0 1 0 1.734l-2.807 1.626L15.206 12l2.492-2.493zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>
+                    Google Play
+                </a>
+                <a href="#" class="btn btn-secondary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    App Store
+                </a>
+            </div>
+            <div class="hero-social-proof">
+                <div class="hero-avatars">
+                    <span>JM</span><span>LP</span><span>CR</span><span>+</span>
+                </div>
+                Usuarios en beta probando la app
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="phone-glow"></div>
+            <div class="phone-mockup">
+                <div class="phone-notch"></div>
+                <div class="phone-screen">
+                    <div class="phone-header">
+                        <div class="phone-greeting">Buenos días</div>
+                        <div class="phone-date">Jueves, 10 abril</div>
+                    </div>
+                    <div class="phone-ring">
+                        <svg viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="58" stroke="rgba(156,140,255,0.12)" stroke-width="10" fill="none"/>
+                            <circle cx="70" cy="70" r="58" stroke="#9C8CFF" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="255" stroke-dashoffset="90" transform="rotate(-90 70 70)"/>
+                            <circle cx="70" cy="70" r="45" stroke="rgba(255,106,77,0.12)" stroke-width="8" fill="none"/>
+                            <circle cx="70" cy="70" r="45" stroke="#FF6A4D" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="198" stroke-dashoffset="60" transform="rotate(-90 70 70)"/>
+                        </svg>
+                        <div class="phone-ring-label">
+                            <span class="phone-ring-cal">1,847</span>
+                            <span class="phone-ring-sub">/ 2,200 kcal</span>
+                        </div>
+                    </div>
+                    <div class="phone-macros">
+                        <div class="phone-macro protein"><span class="phone-macro-val">142g</span><span class="phone-macro-label">Proteína</span></div>
+                        <div class="phone-macro carbs"><span class="phone-macro-val">198g</span><span class="phone-macro-label">Carbos</span></div>
+                        <div class="phone-macro fat"><span class="phone-macro-val">62g</span><span class="phone-macro-label">Grasa</span></div>
+                    </div>
+                    <div class="phone-meal"><div class="phone-meal-icon">🥑</div><div class="phone-meal-info"><div class="phone-meal-name">Tostada con aguacate</div><div class="phone-meal-cal">340 kcal · 12g prot</div></div></div>
+                    <div class="phone-meal"><div class="phone-meal-icon">🍗</div><div class="phone-meal-info"><div class="phone-meal-name">Pollo a la plancha</div><div class="phone-meal-cal">520 kcal · 48g prot</div></div></div>
+                    <div class="phone-meal"><div class="phone-meal-icon">🥗</div><div class="phone-meal-info"><div class="phone-meal-name">Ensalada César</div><div class="phone-meal-cal">410 kcal · 32g prot</div></div></div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="features">
-        <div class="feature">
-            <div class="feature-icon">&#128247;</div>
-            <h3>Análisis con IA</h3>
-            <p>Haz una foto de cualquier comida y obtén los macros al instante gracias a GPT-4o Vision.</p>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+    <div class="section-label">Funciones</div>
+    <h2 class="section-title">Todo lo que necesitas en una app</h2>
+    <p class="section-desc">Desde el análisis con IA hasta el coaching personalizado — diseñada para que cumplas tus objetivos.</p>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📸</div>
+            <h3 class="feature-title">Análisis con IA</h3>
+            <p class="feature-desc">Haz una foto de cualquier comida y GPT-4o Vision calcula los macros al instante.</p>
         </div>
-        <div class="feature">
-            <div class="feature-icon">&#128200;</div>
-            <h3>Seguimiento diario</h3>
-            <p>Visualiza tu progreso con gráficos claros de calorías y macronutrientes.</p>
+        <div class="feature-card">
+            <div class="feature-icon">🔊</div>
+            <h3 class="feature-title">Registro por voz</h3>
+            <p class="feature-desc">Dile a la app lo que has comido y registra sin tocar la pantalla.</p>
         </div>
-        <div class="feature">
-            <div class="feature-icon">&#127919;</div>
-            <h3>Objetivos personalizados</h3>
-            <p>Configura tus metas según tu objetivo: perder peso, ganar músculo o mantener.</p>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Escáner de códigos</h3>
+            <p class="feature-desc">Escanea el código de barras de cualquier producto para obtener su info nutricional.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚖️</div>
+            <h3 class="feature-title">Control de peso</h3>
+            <p class="feature-desc">Registra tu peso, visualiza tendencias y sigue tu progreso a 30, 90 días o 1 año.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💧</div>
+            <h3 class="feature-title">Hidratación</h3>
+            <p class="feature-desc">Controla tu consumo de agua diario con recordatorios y objetivos personalizados.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🧬</div>
+            <h3 class="feature-title">Macros inteligentes</h3>
+            <p class="feature-desc">5 presets (balanced, high protein, keto, low fat, custom) con coaching predictivo.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🍽️</div>
+            <h3 class="feature-title">Recetas y plantillas</h3>
+            <p class="feature-desc">Guarda comidas frecuentes, importa recetas por URL y genera listas de compras.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⏱️</div>
+            <h3 class="feature-title">Ayuno intermitente</h3>
+            <p class="feature-desc">Timer integrado con protocolos 16:8, 18:6, 20:4 y ventanas personalizadas.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3 class="feature-title">Coach IA</h3>
+            <p class="feature-desc">Recomendaciones semanales de macros basadas en tu progreso y hábitos reales.</p>
         </div>
     </div>
-    <footer>
-        <p>&copy; 2026 CivilTek — info@civiltek.es</p>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+    <div class="how-inner">
+        <div class="section-label">Cómo funciona</div>
+        <h2 class="section-title">Tres pasos. Cero complicaciones.</h2>
+        <p class="section-desc">Sin pesar gramos ni buscar en bases de datos interminables.</p>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">01</div>
+                <span class="step-icon">📷</span>
+                <h3 class="step-title">Haz una foto</h3>
+                <p class="step-desc">Apunta la cámara a tu plato. La IA identifica los ingredientes y las cantidades.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">02</div>
+                <span class="step-icon">✅</span>
+                <h3 class="step-title">Confirma y ajusta</h3>
+                <p class="step-desc">Revisa los resultados, ajusta las porciones si quieres y guarda en un toque.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">03</div>
+                <span class="step-icon">📈</span>
+                <h3 class="step-title">Sigue tu progreso</h3>
+                <p class="step-desc">Visualiza macros, tendencias y recibe coaching IA para cumplir tus objetivos.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+    <div class="stats-inner">
+        <div class="stat"><span class="stat-val">30+</span><span class="stat-label">Funciones integradas</span></div>
+        <div class="stat"><span class="stat-val">GPT-4o</span><span class="stat-label">Vision AI</span></div>
+        <div class="stat"><span class="stat-val">5</span><span class="stat-label">Presets de macros</span></div>
+        <div class="stat"><span class="stat-val">ES/EN</span><span class="stat-label">Bilingüe</span></div>
+    </div>
+</section>
+
+<!-- PREMIUM -->
+<section class="premium" id="premium">
+    <div class="premium-inner">
+        <div>
+            <div class="section-label">Premium</div>
+            <h2 class="section-title" style="text-align:left">Desbloquea todo el potencial</h2>
+            <p style="color:var(--bone-60);margin-bottom:2rem;font-size:1.05rem;line-height:1.7">Empieza gratis con todas las funciones básicas. Actualiza a Premium para acceder a las herramientas avanzadas.</p>
+            <ul class="premium-features">
+                <li><span class="check">✓</span> Coach IA semanal con ajuste adaptativo de macros</li>
+                <li><span class="check">✓</span> Modos día de entreno / día de descanso</li>
+                <li><span class="check">✓</span> Planificación de comidas y lista de compras automática</li>
+                <li><span class="check">✓</span> Fotos de progreso y medidas corporales</li>
+                <li><span class="check">✓</span> Exportación de datos en CSV y PDF</li>
+                <li><span class="check">✓</span> Sincronización con wearables (próximamente)</li>
+            </ul>
+        </div>
+        <div class="premium-card">
+            <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:1rem;color:var(--violet);margin-bottom:1rem">PREMIUM</div>
+            <div class="premium-price">4,99€ <span>/ mes</span></div>
+            <div class="premium-period">o 39,99€ / año (ahorra 33%)</div>
+            <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:1.5rem;padding:1rem">Empezar prueba gratis</a>
+            <div class="premium-trial">7 días gratis · Cancela cuando quieras</div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+    <div class="cta-inner">
+        <h2>Empieza a controlar tu nutrición <span style="color:var(--violet)">hoy</span></h2>
+        <p>Sin dietas complicadas. Sin contar gramos. Solo haz una foto y deja que la IA haga el resto.</p>
+        <div class="hero-buttons" style="justify-content:center">
+            <a href="#" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.2l2.807 1.626a1 1 0 0 1 0 1.734l-2.807 1.626L15.206 12l2.492-2.493zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>
+                Google Play
+            </a>
+            <a href="#" class="btn btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                App Store
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <svg viewBox="0 0 36 36" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="18" cy="18" r="14" stroke="#9C8CFF" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-dasharray="20 6 16 6 14 6 12 80" transform="rotate(-90 18 18)"/>
+                <path d="M28 10 L33 4 M33 4 L28 5.5 M33 4 L31.5 9" stroke="#FF6A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="footer-brand-name"><span class="c">Cals</span><span class="t">2</span><span class="g">Gains</span></span>
+        </div>
+        <span class="footer-copy">&copy; 2026 CivilTek — info@civiltek.es</span>
         <div class="footer-links">
-            <a href="/privacy">Política de privacidad</a>
-            <a href="/terms">Términos de servicio</a>
+            <a href="/privacy">Privacidad</a>
+            <a href="/terms">Términos</a>
         </div>
-    </footer>
+    </div>
+</footer>
+
 </body>
 </html>
