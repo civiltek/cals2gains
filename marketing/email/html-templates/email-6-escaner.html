@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La funcion secreta que lo cambia todo</title>
+<style>
+body { margin: 0; padding: 0; background-color: #F7F2EA; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+.email-wrapper { width: 100%; background-color: #F7F2EA; padding: 20px 0; }
+.email-container { max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; overflow: hidden; }
+.header { background-color: #17121D; padding: 30px 40px; text-align: center; }
+.header h1 { color: #FFFFFF; font-size: 22px; margin: 15px 0 0; font-weight: 600; }
+.accent-bar { height: 4px; background: linear-gradient(90deg, #F9644A 0%, #9587F8 100%); }
+.content { padding: 35px 40px; color: #333333; line-height: 1.6; font-size: 16px; }
+.content h2 { color: #17121D; font-size: 20px; margin-top: 0; }
+.content p { margin: 0 0 16px; }
+.content a { color: #F9644A; text-decoration: underline; }
+.cta-button { display: inline-block; background-color: #F9644A; color: #FFFFFF !important; text-decoration: none !important; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; margin: 10px 0 20px; }
+.tip-box { background-color: #F7F2EA; border-left: 4px solid #9587F8; padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+.tip-box p { margin: 0; font-size: 15px; color: #555; }
+.footer { background-color: #17121D; padding: 25px 40px; text-align: center; }
+.footer p { color: #999999; font-size: 13px; margin: 5px 0; }
+.footer a { color: #9587F8; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="email-wrapper">
+<div class="email-container">
+<div class="header">
+<h1 style="color:#FFFFFF;">Cals2Gains</h1>
+</div>
+<div class="accent-bar"></div>
+<div class="content">
+<h2>Escanea. Conoce. Decide.</h2>
+<p>Hola {{contact.FIRSTNAME | default:''}},</p>
+<p>Esta es probablemente la funcion favorita de nuestros usuarios, y queremos asegurarnos de que la conoces.</p>
+<p><strong>El escaner de comida con IA:</strong></p>
+<p>Apunta tu camara a cualquier plato — da igual si es una ensalada casera, un menu del dia o un tupper de la oficina — y Cals2Gains te dice en segundos:</p>
+<p>- Calorias totales estimadas<br>- Desglose de proteinas, carbohidratos y grasas<br>- Como encaja en tu objetivo del dia<br>- Sugerencias para equilibrar tu siguiente comida</p>
+<div class="tip-box"><p><strong>Pro tip:</strong> Funciona tambien con fotos del supermercado. Escanea el paquete de cualquier producto y compara opciones antes de comprar.</p></div>
+<p>Es como tener un nutricionista en el bolsillo. Literalmente.</p>
+<p>Y lo mejor: los primeros 7 dias son gratis. Sin compromiso, sin tarjeta.</p>
+<p style="text-align:center;"><a href="https://cals2gains.com" class="cta-button">Probar el escaner gratis</a></p>
+<p>La tecnologia al servicio de tu salud,<br>El equipo de Cals2Gains</p>
+</div>
+<div class="footer">
+<p><a href="https://cals2gains.com">cals2gains.com</a></p>
+<p>2026 Civiltek Ingenieria SLU</p>
+<p style="margin-top:10px;"><a href="{{ unsubscribe }}">Darse de baja</a> | <a href="{{ update_profile }}">Actualizar preferencias</a></p>
+</div>
+</div>
+</div>
+</body>
+</html>

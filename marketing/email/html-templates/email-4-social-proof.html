@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perdi 4kg sin dejar de comer lo que me gusta</title>
+<style>
+body { margin: 0; padding: 0; background-color: #F7F2EA; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+.email-wrapper { width: 100%; background-color: #F7F2EA; padding: 20px 0; }
+.email-container { max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; overflow: hidden; }
+.header { background-color: #17121D; padding: 30px 40px; text-align: center; }
+.header h1 { color: #FFFFFF; font-size: 22px; margin: 15px 0 0; font-weight: 600; }
+.accent-bar { height: 4px; background: linear-gradient(90deg, #F9644A 0%, #9587F8 100%); }
+.content { padding: 35px 40px; color: #333333; line-height: 1.6; font-size: 16px; }
+.content h2 { color: #17121D; font-size: 20px; margin-top: 0; }
+.content p { margin: 0 0 16px; }
+.content a { color: #F9644A; text-decoration: underline; }
+.cta-button { display: inline-block; background-color: #F9644A; color: #FFFFFF !important; text-decoration: none !important; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; margin: 10px 0 20px; }
+.tip-box { background-color: #F7F2EA; border-left: 4px solid #9587F8; padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+.tip-box p { margin: 0; font-size: 15px; color: #555; }
+.footer { background-color: #17121D; padding: 25px 40px; text-align: center; }
+.footer p { color: #999999; font-size: 13px; margin: 5px 0; }
+.footer a { color: #9587F8; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="email-wrapper">
+<div class="email-container">
+<div class="header">
+<h1 style="color:#FFFFFF;">Cals2Gains</h1>
+</div>
+<div class="accent-bar"></div>
+<div class="content">
+<h2>Historias reales, resultados reales</h2>
+<p>Hola {{contact.FIRSTNAME | default:''}},</p>
+<p>No somos de promesas vacias. Preferimos que hablen los resultados.</p>
+<p style="background-color:#F7F2EA; padding:20px; border-radius:8px; font-style:italic; border-left: 4px solid #F9644A;">"Llevaba años probando dietas que no funcionaban. Con Cals2Gains entendi por primera vez lo que mi cuerpo necesita. Perdi 4kg en 6 semanas sin dejar de comer lo que me gusta. La IA me sugiere opciones que encajan con mi vida real, no con una dieta de revista."<br><br><strong>— Maria L., usuaria desde febrero 2026</strong></p>
+<p>Lo que Maria descubrio es algo que la ciencia lleva años diciendo: <strong>no se trata de comer menos, sino de comer mejor</strong>. Cuando conoces tus macros y los equilibras, los resultados llegan solos.</p>
+<div class="tip-box"><p><strong>Dato:</strong> El 78% de nuestros usuarios que siguen sus macros durante 4 semanas reportan mejoras visibles en energia y composicion corporal.</p></div>
+<p>Tu historia podria ser la siguiente.</p>
+<p style="text-align:center;"><a href="https://cals2gains.com" class="cta-button">Empieza tu transformacion</a></p>
+<p>Con confianza,<br>El equipo de Cals2Gains</p>
+</div>
+<div class="footer">
+<p><a href="https://cals2gains.com">cals2gains.com</a></p>
+<p>2026 Civiltek Ingenieria SLU</p>
+<p style="margin-top:10px;"><a href="{{ unsubscribe }}">Darse de baja</a> | <a href="{{ update_profile }}">Actualizar preferencias</a></p>
+</div>
+</div>
+</div>
+</body>
+</html>
