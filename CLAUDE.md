@@ -20,11 +20,17 @@ Cualquier otra cosa de este documento es un derivado de estas tres.
 
 ## 2. Rutas clave del proyecto
 
-Raíz del proyecto: `C:\Users\Judit\Documents\Cals2Gains\`
-
 ```
 Cals2Gains/
 ├── Claude code/           ← ESTE SISTEMA (agentes, skills, reglas, context)
+│   ├── agents/            ← definiciones de agentes (.md)
+│   │   └── marketing/     ← sub-agentes de marketing (carousel, reels, hooks…)
+│   ├── commands/          ← slash commands (.md)
+│   ├── context/           ← contexto del proyecto (brand, tech-stack, finanzas…)
+│   ├── guardrails/        ← reglas, escalado, anti-patrones
+│   ├── memory/            ← estructura de memoria persistente
+│   ├── orchestration/     ← handoffs, workflows, tareas programadas
+│   └── skills/            ← skills reutilizables (crash-diagnosis, eas-build…)
 ├── _project-hub/          ← Hub central de estado del proyecto
 │   ├── PROJECT_STATUS.md  ← estado vivo (builds, bugs, métricas)
 │   ├── CHANGELOG.md       ← log de cambios (mantener últimas 50 entradas)
@@ -35,24 +41,51 @@ Cals2Gains/
 │   ├── BRAND.md           ← voz, colores, tipografía
 │   ├── CONTENT_PLAN.md    ← plan de contenido
 │   ├── SCREENSHOTS.md     ← índice de screenshots
+│   ├── SEO_REPORT.md      ← informe SEO
 │   └── dashboard.html     ← copia del dashboard financiero
-├── app/, components/, services/, store/, i18n/, hooks/, utils/, constants/, theme.ts
+├── app/                   ← código fuente React Native (Expo Router)
+│   ├── (auth)/            ← pantallas de autenticación
+│   └── (tabs)/            ← pantallas principales con tabs
+├── components/, services/, store/, i18n/, hooks/, utils/, constants/, theme.ts
+├── types/                 ← tipos TypeScript compartidos
+├── data/                  ← datos estáticos (spanishFoods.ts)
+├── content/               ← lead magnets y contenido descargable
 ├── public/, website/      ← landing cals2gains.com (Firebase hosting)
 ├── finances/
 │   ├── Cals2Gains_Finances.xlsx  ← FUENTE DE VERDAD financiera
-│   ├── dashboard.html              ← dashboard generado desde el Excel
-│   ├── receipts/{anthropic,openai,google,apple,meta,expo,hosting,otros}/
-│   └── reports/
+│   ├── dashboard.html            ← dashboard generado desde el Excel
+│   └── receipts/{anthropic,openai}/
 ├── marketing/             ← campañas, posts, screenshots, estrategias
+│   ├── instagram/         ← contenido IG
+│   ├── email/             ← plantillas de email
+│   ├── screenshots/       ← capturas para RRSS
+│   ├── strategies/        ← documentos de estrategia
+│   └── content-calendar/  ← calendario de contenido
 ├── brand-assets/          ← logos, iconos, fuentes
 ├── store-screenshots/     ← screenshots para App Store / Play Store
+├── docs/                  ← documentación (dossier inversores, guías, build-logs)
 ├── tools/
-│   ├── outlook-mcp-server          ← MCP Outlook (Tenant civiltek)
-│   ├── imap-mcp-server             ← IMAP cals2gains
+│   ├── outlook-mcp-server              ← MCP Outlook (Tenant civiltek)
+│   ├── imap-mcp-server                 ← IMAP cals2gains
 │   ├── imap-mcp-server-civiltek
 │   ├── imap-mcp-server-gmail-cals2gains
-│   └── imap-mcp-server-gmail-judith
-└── skills/instagram-commenter/     ← skill legado (respuestas a comentarios IG)
+│   ├── imap-mcp-server-gmail-judith
+│   └── telegram-mcp-server             ← MCP Telegram
+├── skills/                ← skills ejecutables (mirrors de Claude code/skills/)
+│   ├── instagram-commenter/  ← respuestas a comentarios IG (legado)
+│   ├── crash-diagnosis/
+│   ├── download-receipt/
+│   ├── eas-build/
+│   ├── publish-post/
+│   ├── update-dashboard/
+│   └── weekly-metrics/
+├── agents/                ← mirrors de Claude code/agents/
+├── commands/              ← mirrors de Claude code/commands/
+├── context/               ← mirrors de Claude code/context/
+├── guardrails/            ← mirrors de Claude code/guardrails/
+├── orchestration/         ← mirrors de Claude code/orchestration/
+├── memory/                ← mirrors de Claude code/memory/
+└── .github/workflows/    ← CI/CD workflows
 ```
 
 Memoria persistente de Cowork: `/sessions/*/mnt/.auto-memory/` (ver `memory/MEMORY-STRUCTURE.md`).
@@ -72,6 +105,9 @@ Cuando una tarea cae claramente dentro del alcance de un agente, invócalo (lée
 | `growth` | Métricas GA4, IG/FB, análisis, recomendaciones |
 | `ops` | Coordinación, limpieza, tareas programadas, salud del sistema |
 | `research` | Competidores, trends, user research |
+
+**Sub-agentes de marketing** (en `Claude code/agents/marketing/`):
+`brand-reviewer`, `caption-hashtag`, `carousel-designer`, `hook-writer`, `performance-analyzer`, `reels-scriptwriter`, `trend-scout`, `viral-strategist`
 
 Los handoffs entre agentes se definen en `Claude code/orchestration/HANDOFFS.md`.
 
@@ -96,8 +132,11 @@ Ubicación: `finances/receipts/{proveedor}/`
 - Voz: cercana, motivadora, basada en ciencia, no condescendiente
 
 ### Tech stack (resumen — detalle en `context/TECH-STACK.md`)
-- React Native + Expo Router (typed routes), SDK 54, RN 0.81.5
-- Firebase (Auth, Firestore, Storage), Zustand, i18next, RevenueCat
+- React 19.1.0, React Native 0.81.5, Expo SDK 54, Expo Router 6 (typed routes)
+- Firebase 10.x (Auth, Firestore, Storage), Zustand 4.x, i18next 23.x, RevenueCat (react-native-purchases 7.x)
+- Reanimated 4.1.1, Gesture Handler 2.28, Screens 4.16
+- Android: compileSdk 35, targetSdk 35, minSdk 24, Kotlin 2.0.21
+- iOS: deployment target 16.0, Apple Sign-In, Google Sign-In
 - EAS Build (owner `civiltek`, project `381120d5-3866-4b97-af00-4c6840768327`)
 - GA4 (`G-WMHZQ52NS2`, property `macrolens-ai-4c482`)
 
@@ -109,7 +148,7 @@ Ubicación: `finances/receipts/{proveedor}/`
 2. **Nunca inventar importes, métricas, recibos o estados de build.** Si no los ves, lo dices.
 3. **Nunca tocar credenciales, tokens o API keys.** No los pegues en archivos, no los pongas en CHANGELOG, no los envíes por email.
 4. **Nunca publicar contenido en RRSS sin que Judith lo haya revisado** (salvo flujos automáticos ya autorizados: respuestas a comentarios IG).
-5. **Nunca instalar la APK rota** (build `358414d2` — reanimated v3 incompatible). Siempre validar que el build es uno posterior al fix del 13/04/2026.
+5. **Nunca instalar la APK rota** (build `358414d2` — reanimated v3 incompatible). El proyecto ahora usa reanimated v4.1.1. Siempre validar que el build es uno posterior al fix del 13/04/2026.
 6. **Nunca modificar `finances/Cals2Gains_Finances.xlsx` sin hacer antes copia de seguridad** en `finances/Cals2Gains_Finances_pre_update.xlsx`.
 7. **Nunca borrar recibos originales (PDFs) de `finances/receipts/`.**
 8. **Nunca commitear `google-services.json`, `GoogleService-Info.plist`, `.env` ni similares.**
