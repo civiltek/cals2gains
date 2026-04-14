@@ -158,6 +158,21 @@ Reglas clave: R1 (nada inventado), R6 (nunca publicar sin aprobación explícita
 
 ---
 
+## W10-W16. Flujos de seguridad
+
+Los workflows de ciberseguridad están documentados en detalle en `orchestration/SECURITY-WORKFLOWS.md`:
+
+| Workflow | Nombre | Disparador | Agentes |
+|----------|--------|-----------|---------|
+| SW1 | Escaneo semanal de dependencias | Lunes / manual | security |
+| SW2 | Escaneo diario de secretos | Diario / manual | security |
+| SW3 | Auditoría mensual completa | 1er lunes del mes / `/security-audit` | security + appsec + infrasec |
+| SW4 | Respuesta a incidente | Alerta / detección | security + appsec/infrasec |
+| SW5 | Revisión pre-build producción | Antes de `eas build` prod | security |
+| SW6 | Revisión pre-deploy web | Antes de `firebase deploy` | security / infrasec |
+
+---
+
 ## Pendiente de confirmar con Judith
 
 - ⚠️ ¿Frecuencia ideal del `/morning-brief`? (Propuesta: manual, no automático.)

@@ -72,8 +72,14 @@ Cuando una tarea cae claramente dentro del alcance de un agente, invócalo (lée
 | `growth` | Métricas GA4, IG/FB, análisis, recomendaciones |
 | `ops` | Coordinación, limpieza, tareas programadas, salud del sistema |
 | `research` | Competidores, trends, user research |
+| `security` | Coordinación de ciberseguridad, auditorías, gestión de vulnerabilidades |
+| `appsec` | Seguridad de la app RN: código, dependencias, almacenamiento, auth |
+| `infrasec` | Seguridad de infraestructura: Firebase rules, hosting headers, API keys, cloud |
 
 Los handoffs entre agentes se definen en `Claude code/orchestration/HANDOFFS.md`.
+Los flujos de seguridad se detallan en `orchestration/SECURITY-WORKFLOWS.md`.
+La línea base de seguridad está en `guardrails/SECURITY-BASELINE.md`.
+El estado vivo de seguridad se mantiene en `_project-hub/SECURITY_STATUS.md`.
 
 ---
 

@@ -1,5 +1,30 @@
 # Changelog - Cals2Gains
 
+## 2026-04-14 — Sistema de agentes de ciberseguridad
+
+### Nuevos agentes de seguridad
+- `agents/security.md` — Coordinador de ciberseguridad: auditorías periódicas, escaneo de dependencias y secretos, gestión de vulnerabilidades.
+- `agents/appsec.md` — Seguridad de la app móvil: código RN, dependencias npm, almacenamiento seguro, auth, protección del APK.
+- `agents/infrasec.md` — Seguridad de infraestructura: Firestore rules, Storage rules, hosting headers, API keys, configuración cloud.
+
+### Nuevos archivos de soporte
+- `_project-hub/SECURITY_STATUS.md` — Estado vivo de seguridad con vulnerabilidades clasificadas (7 hallazgos iniciales).
+- `guardrails/SECURITY-BASELINE.md` — 12 estándares de seguridad mínimos (SB1-SB12).
+- `orchestration/SECURITY-WORKFLOWS.md` — 6 flujos de seguridad (SW1-SW6): escaneo deps, secretos, auditoría mensual, respuesta a incidentes, pre-build, pre-deploy.
+
+### Archivos actualizados
+- `CLAUDE.md` — Tabla de agentes ampliada con security, appsec, infrasec.
+- `orchestration/HANDOFFS.md` — Handoffs de seguridad añadidos (security↔appsec, security↔infrasec, appsec→app-dev, infrasec→web-dev, cualquiera→security).
+- `orchestration/WORKFLOWS.md` — Referencia a flujos de seguridad (W10-W16 → SECURITY-WORKFLOWS.md).
+
+### Hallazgos iniciales de seguridad
+- SEC-001/002: `google-services.json` y `GoogleService-Info.plist` commiteados (severidad media).
+- SEC-003: Sin validación de schema en Firestore rules (severidad media).
+- SEC-004: Sin límites de tamaño ni filtro MIME en Storage rules (severidad media).
+- SEC-005: Regex frágil en dailyLogs (severidad media).
+- SEC-006: Headers de seguridad HTTP no configurados (severidad baja).
+- SEC-007: GitHub Push Protection bloqueó tokens de GCloud (mitigada).
+
 ## 2026-04-14 (noche-4) — Motor audiovisual v4.0 (Studio)
 
 ### Visual Engine — Upgrade a calidad de estudio profesional

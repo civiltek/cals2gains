@@ -66,6 +66,42 @@ Cuando el copy necesita que una feature esté lista o visible.
 Informes entregados en `docs/research/YYYY-MM-DD_tema.md`.
 - Cierre: destinatario confirma lectura + aplica o descarta recomendación.
 
+### security → appsec
+Cuando la auditoría periódica o un incidente requiere revisar seguridad de la app.
+- Entrega: alcance del análisis (dependencias, código, auth, storage local).
+- B hace: ejecutar checklist de auditoría, reportar hallazgos con severidad.
+- Cierre: hallazgos documentados en `SECURITY_STATUS.md`.
+
+### security → infrasec
+Cuando la auditoría periódica o un incidente requiere revisar infraestructura cloud.
+- Entrega: alcance del análisis (Firestore rules, Storage rules, hosting headers, API keys).
+- B hace: ejecutar checklist de auditoría, proponer correcciones.
+- Cierre: hallazgos documentados en `SECURITY_STATUS.md`, propuestas presentadas a Judith (R10).
+
+### appsec → app-dev
+Cuando hay vulnerabilidad que corregir en código de la app.
+- Entrega: hallazgo con severidad + archivo + línea + fix propuesto.
+- B hace: implementar el fix, typecheck, build.
+- Cierre: fix aplicado, build verificado, hallazgo marcado como resuelto en `SECURITY_STATUS.md`.
+
+### infrasec → web-dev
+Cuando hay que aplicar headers de seguridad o fix en hosting.
+- Entrega: configuración propuesta para `firebase.json` + justificación.
+- B hace: aplicar config (tras aprobación de Judith — R10), deploy.
+- Cierre: headers verificados en producción, `SECURITY_STATUS.md` actualizado.
+
+### security → ops
+Registro de actividad de seguridad.
+- Entrega: descripción genérica del hallazgo/acción (sin exponer vulnerabilidades).
+- B hace: CHANGELOG + comunicar a Judith si procede.
+- Cierre: entrada en CHANGELOG.
+
+### cualquiera → security
+Cuando un agente detecta algo sospechoso durante su trabajo.
+- Entrega: qué se observó, dónde, cuándo.
+- B hace: evaluar severidad, investigar, escalar si es necesario.
+- Cierre: hallazgo clasificado en `SECURITY_STATUS.md` o descartado como falso positivo.
+
 ---
 
 ## Reglas de handoff
