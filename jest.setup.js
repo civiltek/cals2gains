@@ -32,6 +32,26 @@ jest.mock('./services/firebase', () => ({
   updateUserGoalsAndMode: jest.fn(() => Promise.resolve()),
   onAuthStateChange: jest.fn(() => () => {}),
   signOut: jest.fn(() => Promise.resolve()),
+  // Measurement store
+  saveMeasurement: jest.fn(() => Promise.resolve('mock-measurement-id')),
+  getMeasurements: jest.fn(() => Promise.resolve([])),
+  deleteMeasurement: jest.fn(() => Promise.resolve()),
+  // Progress photo store
+  saveProgressPhoto: jest.fn(() => Promise.resolve('mock-photo-id')),
+  getProgressPhotos: jest.fn(() => Promise.resolve([])),
+  deleteProgressPhoto: jest.fn(() => Promise.resolve()),
+  // Recipe store
+  saveRecipe: jest.fn(() => Promise.resolve('mock-recipe-id')),
+  getRecipes: jest.fn(() => Promise.resolve([])),
+  deleteRecipe: jest.fn(() => Promise.resolve()),
+  updateRecipe: jest.fn(() => Promise.resolve()),
+  updateRecipeFavorite: jest.fn(() => Promise.resolve()),
+  logRecipeAsMealFb: jest.fn(() => Promise.resolve('mock-logged-meal-id')),
+  // Template store
+  saveMealTemplate: jest.fn(() => Promise.resolve('mock-template-id')),
+  getMealTemplates: jest.fn(() => Promise.resolve([])),
+  deleteMealTemplate: jest.fn(() => Promise.resolve()),
+  updateTemplateUsage: jest.fn(() => Promise.resolve()),
 }));
 
 // Mock Firebase Firestore (for shoppingListStore)
@@ -53,6 +73,40 @@ jest.mock('./services/revenuecat', () => ({
   logoutRevenueCat: jest.fn(() => Promise.resolve()),
 }));
 
+// Mock reminder service
+jest.mock('./services/reminderService', () => ({
+  requestNotificationPermissions: jest.fn(() => Promise.resolve(true)),
+  getNotificationPermissions: jest.fn(() => Promise.resolve(true)),
+  scheduleDailyReminder: jest.fn(() => Promise.resolve('mock-notif-id')),
+  cancelReminder: jest.fn(() => Promise.resolve()),
+  cancelAllReminders: jest.fn(() => Promise.resolve()),
+  getScheduledNotifications: jest.fn(() => Promise.resolve([])),
+  getReminderContent: jest.fn((key) => ({
+    title: `Title for ${key}`,
+    body: `Body for ${key}`,
+  })),
+}));
+
+// Mock theme sync function
+jest.mock('./theme', () => ({
+  COLORS: {
+    primary: '#9C8CFF',
+    accent: '#FF6A4D',
+    background: '#17121D',
+    text: '#F7F2EA',
+    surface: '#1F1A28',
+    surfaceLight: '#2A2335',
+    border: '#2A2335',
+    violet: '#9C8CFF',
+    coral: '#FF6A4D',
+    bone: '#F7F2EA',
+    carbon: '#17121D',
+  },
+  BRAND_COLORS: {},
+  BRAND_FONTS: {},
+  _syncThemeColors: jest.fn(),
+}));
+
 // Mock expo modules
 jest.mock('expo-file-system/legacy', () => ({
   documentDirectory: '/mock/documents/',
@@ -63,7 +117,8 @@ jest.mock('expo-file-system/legacy', () => ({
   deleteAsync: jest.fn(() => Promise.resolve()),
   copyAsync: jest.fn(() => Promise.resolve()),
   moveAsync: jest.fn(() => Promise.resolve()),
-  EncodingType: { UTF8: 'utf8' },
+  readAsStringAsync: jest.fn(() => Promise.resolve('base64data')),
+  EncodingType: { UTF8: 'utf8', Base64: 'base64' },
 }));
 
 jest.mock('expo-print', () => ({
