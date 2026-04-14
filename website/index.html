@@ -622,27 +622,39 @@
             obs.observe(el);
         });
 
-        // LEAD FORM — Brevo subscription via sibforms
+        // LEAD FORM — Brevo subscription via hidden iframe form POST
         function handleLeadSubmit(e) {
             e.preventDefault();
-            const form = e.target;
-            const email = form.querySelector('input').value;
-            const btn = form.querySelector('button');
-            const origText = btn.textContent;
+            var form = e.target;
+            var email = form.querySelector('input').value;
+            var btn = form.querySelector('button');
             btn.disabled = true;
             btn.textContent = lang === 'es' ? 'Enviando...' : 'Sending...';
             if (window.gtag) gtag('event', 'lead_capture', { email_domain: email.split('@')[1] });
-            // Send to Brevo via sibforms endpoint
-            fetch('https://e16073f5.sibforms.com/serve/MUIFANJ7cd06Veo9bk942kJaC6WCiR3GdgciKExwgfSQDvL4iiBcp6BuMqcae5eZ1R0QWDYdi287h7arB48ys5WCUK0fw_4UO6oLAigE3MSjn35XTnn9SN_eq5SSorSeENj_iWLIyUHeOXFhk11t5wQDqaUSrBKw_HnWOZWpICGrjdVaHM6iOrkXsRQiCu0XaDml9P57J6f1Q-lncg==', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'EMAIL=' + encodeURIComponent(email),
-                mode: 'no-cors'
-            }).then(function() {
+            // Create hidden iframe + form to submit to Brevo sibforms (avoids CORS)
+            var iframeName = 'brevo_iframe_' + Date.now();
+            var iframe = document.createElement('iframe');
+            iframe.name = iframeName;
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            var hiddenForm = document.createElement('form');
+            hiddenForm.method = 'POST';
+            hiddenForm.action = 'https://e16073f5.sibforms.com/serve/MUIFANJ7cd06Veo9bk942kJaC6WCiR3GdgciKExwgfSQDvL4iiBcp6BuMqcae5eZ1R0QWDYdi287h7arB48ys5WCUK0fw_4UO6oLAigE3MSjn35XTnn9SN_eq5SSorSeENj_iWLIyUHeOXFhk11t5wQDqaUSrBKw_HnWOZWpICGrjdVaHM6iOrkXsRQiCu0XaDml9P57J6f1Q-lncg==';
+            hiddenForm.target = iframeName;
+            hiddenForm.style.display = 'none';
+            var emailInput = document.createElement('input');
+            emailInput.type = 'hidden';
+            emailInput.name = 'EMAIL';
+            emailInput.value = email;
+            hiddenForm.appendChild(emailInput);
+            document.body.appendChild(hiddenForm);
+            hiddenForm.submit();
+            // Show success after brief delay (form submits to iframe)
+            setTimeout(function() {
                 form.innerHTML = '<p style="color:var(--success);font-size:1.1rem;font-weight:700;padding:1rem">&#9989; ' + (lang === 'es' ? '¡Gracias! Revisa tu email para confirmar la suscripcion.' : 'Thanks! Check your email to confirm your subscription.') + '</p>';
-            }).catch(function() {
-                form.innerHTML = '<p style="color:var(--success);font-size:1.1rem;font-weight:700;padding:1rem">&#9989; ' + (lang === 'es' ? '¡Gracias! Revisa tu email para confirmar la suscripcion.' : 'Thanks! Check your email to confirm your subscription.') + '</p>';
-            });
+                // Cleanup
+                try { document.body.removeChild(iframe); document.body.removeChild(hiddenForm); } catch(ex) {}
+            }, 1500);
         }
 
         // NAV SCROLL
