@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#17121D">
-    <meta name="description" content="Cals2Gains — Links oficiales. App, redes sociales, recursos gratuitos y mas.">
+    <meta name="description" content="Cals2Gains — Links oficiales. App, redes sociales, recursos gratuitos y más.">
     <meta property="og:title" content="Cals2Gains — Links">
     <meta property="og:description" content="Todos los links oficiales de Cals2Gains. App, redes, recursos gratuitos.">
     <meta property="og:image" content="https://cals2gains.com/logo.png">
@@ -56,7 +56,8 @@
         .link-item.featured:hover{box-shadow:0 12px 40px rgba(255,106,77,0.25);transform:translateY(-3px)}
         .link-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
         .link-icon.app{background:rgba(255,255,255,0.15)}
-        .link-icon.ig{background:linear-gradient(135deg,#833AB4,#FD1D1D,#F77737)}
+        .link-icon.ig{background:linear-gradient(135deg,#833AB4,#FD1D1D,#F77737);position:relative}
+        .link-icon .flag{position:absolute;bottom:-3px;right:-3px;font-size:0.6rem;line-height:1}
         .link-icon.fb{background:#1877F2}
         .link-icon.web{background:var(--violet-15)}
         .link-icon.lead{background:rgba(255,106,77,0.15)}
@@ -80,19 +81,19 @@
         <div class="header">
             <div class="avatar"><img src="/c2g-icon.png" alt="Cals2Gains"></div>
             <div class="brand"><span class="c">Cals</span><span class="t">2</span><span class="g">Gains</span></div>
-            <div class="tagline">Tu nutricion con IA real &#127919;</div>
+            <div class="tagline">Tu nutrición con IA real &#127919;</div>
             <div class="badge"><span class="dot"></span> Potenciado por IA</div>
         </div>
         <div class="section-label">&#128242; Descarga la app</div>
         <div class="links">
             <a href="#" class="link-item featured" onclick="trackClick('google_play')">
                 <div class="link-icon app">&#9658;</div>
-                <div class="link-text"><div class="link-title">Google Play</div><div class="link-desc">Android — 7 dias gratis</div></div>
+                <div class="link-text"><div class="link-title">Google Play</div><div class="link-desc">Android — 7 días gratis</div></div>
                 <span class="link-arrow">&#8594;</span>
             </a>
             <a href="#" class="link-item featured" onclick="trackClick('app_store')">
                 <div class="link-icon app">&#63743;</div>
-                <div class="link-text"><div class="link-title">App Store</div><div class="link-desc">iOS — 7 dias gratis</div></div>
+                <div class="link-text"><div class="link-title">App Store</div><div class="link-desc">iOS — 7 días gratis</div></div>
                 <span class="link-arrow">&#8594;</span>
             </a>
         </div>
@@ -109,12 +110,12 @@
                 <span class="link-arrow">&#8594;</span>
             </a>
         </div>
-        <div class="section-label">&#128233; Guia de Macros Gratis</div>
+        <div class="section-label">&#128233; Guía de Macros Gratis</div>
         <div class="links">
             <div class="link-item" style="flex-direction:column;padding:0;border:1px solid var(--violet-25);background:var(--card)">
                 <div style="padding:1.25rem 1.25rem 0.5rem;text-align:center;width:100%">
                     <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:0.35rem">Calculadora de Macros</div>
-                    <div style="font-size:0.82rem;color:var(--bone-60);line-height:1.4">Suscribete y recibe gratis tu guia para calcular tus macros ideales.</div>
+                    <div style="font-size:0.82rem;color:var(--bone-60);line-height:1.4">Suscríbete y recibe gratis tu guía para calcular tus macros ideales.</div>
                 </div>
                 <iframe width="540" height="305" src="https://e16073f5.sibforms.com/serve/MUIFANJ7cd06Veo9bk942kJaC6WCiR3GdgciKExwgfSQDvL4iiBcp6BuMqcae5eZ1R0QWDYdi287h7arB48ys5WCUK0fw_4UO6oLAigE3MSjn35XTnn9SN_eq5SSorSeENj_iWLIyUHeOXFhk11t5wQDqaUSrBKw_HnWOZWpICGrjdVaHM6iOrkXsRQiCu0XaDml9P57J6f1Q-lncg==" frameborder="0" scrolling="auto" allowfullscreen style="display:block;margin:0 auto;max-width:100%;width:100%;border-radius:0 0 14px 14px"></iframe>
             </div>
@@ -122,12 +123,12 @@
         <div class="section-label">&#128241; Redes sociales</div>
         <div class="links">
             <a href="https://instagram.com/cals2gains" target="_blank" rel="noopener" class="link-item" onclick="trackClick('ig_en')">
-                <div class="link-icon ig">&#128247;</div>
+                <div class="link-icon ig"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="white" stroke="none"/></svg><span class="flag">&#127468;&#127463;</span></div>
                 <div class="link-text"><div class="link-title">@cals2gains</div><div class="link-desc">Instagram (English)</div></div>
                 <span class="link-arrow">&#8594;</span>
             </a>
             <a href="https://instagram.com/cals2gains_es" target="_blank" rel="noopener" class="link-item" onclick="trackClick('ig_es')">
-                <div class="link-icon ig">&#127466;&#127480;</div>
+                <div class="link-icon ig"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="white" stroke="none"/></svg><span class="flag">&#127466;&#127480;</span></div>
                 <div class="link-text"><div class="link-title">@cals2gains_es</div><div class="link-desc">Instagram (Español)</div></div>
                 <span class="link-arrow">&#8594;</span>
             </a>
@@ -141,13 +142,13 @@
         <div class="links">
             <a href="mailto:info@cals2gains.com" class="link-item" onclick="trackClick('email')">
                 <div class="link-icon web">&#9993;</div>
-                <div class="link-text"><div class="link-title">info@cals2gains.com</div><div class="link-desc">Escribenos</div></div>
+                <div class="link-text"><div class="link-title">info@cals2gains.com</div><div class="link-desc">Escríbenos</div></div>
                 <span class="link-arrow">&#8594;</span>
             </a>
         </div>
         <div class="footer">
             <a href="https://cals2gains.com">cals2gains.com</a>
-            <p>&copy; 2026 Civiltek Ingenieria SLU</p>
+            <p>&copy; 2026 Civiltek Ingeniería SLU</p>
         </div>
     </div>
     <script>
