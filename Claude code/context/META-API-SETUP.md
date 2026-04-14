@@ -472,3 +472,26 @@ meta_refresh_token
 - [Schedule Facebook Posts via API (2026)](https://zernio.com/blog/schedule-facebook-posts-via-api)
 - [Instagram Graph API Developer Guide 2026](https://elfsight.com/blog/instagram-graph-api-complete-developer-guide-for-2026/)
 - [Instagram Reels API Guide](https://www.getphyllo.com/post/a-complete-guide-to-the-instagram-reels-api)
+
+
+---
+
+## 13. Configuración de Modelos OpenAI (actualizado abril 2026)
+
+> Plan: OpenAI Business · Modelos disponibles: GPT-5.4 y GPT-5.4-pro · API key: la misma del `.env`
+
+### Asignación de modelos por subagente de marketing
+
+| Subagente | Modelo | Tier | Justificación |
+|-----------|--------|------|---------------|
+| `viral-strategist` | **GPT-5.4-pro** | Máximo rendimiento | Cerebro estratégico del pipeline; un brief excelente reduce errores downstream |
+| `brand-reviewer` | **GPT-5.4-pro** | Máximo rendimiento | Última barrera de calidad; evalúa múltiples restricciones simultáneamente |
+| `performance-analyzer` | **GPT-5.4-pro** | Máximo rendimiento | Cierra el ciclo de aprendizaje; insights de alta calidad mejoran todo el sistema |
+| `hook-writer` | GPT-5.4 | Estándar (volumen) | Alto volumen (3 variantes/pieza); creatividad suficiente con modelo estándar |
+| `caption-hashtag` | GPT-5.4 | Estándar (volumen) | Alto volumen (captions × 3 cuentas); validado downstream por brand-reviewer |
+| `reels-scriptwriter` | GPT-5.4 | Estándar | Trabajo estructurado siguiendo patrones del benchmark |
+| `carousel-designer` | GPT-5.4 | Estándar | Specs pautadas por brief + AIDA + paleta BRAND |
+| `trend-scout` | GPT-5.4 | Estándar | Bottleneck es la búsqueda web, no el razonamiento del modelo |
+
+### Nota de migración
+Todos los subagentes usaban anteriormente GPT-4o (o GPT-4 en versiones tempranas). Desde abril 2026, se migra a GPT-5.4 / GPT-5.4-pro según la tabla anterior. La API key no cambia.

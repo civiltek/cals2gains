@@ -71,3 +71,15 @@ HANDOFF → brand-reviewer
 - `@cals2gains` (EN principal) **lidera** y recibe la pieza más pulida.
 - `@calstogains` (EN outreach 8 seguidores) **replica** con pequeñas adaptaciones o comenta/interactúa; no crea contenido original sin orden expresa.
 - `@cals2gains_es` (ES) tiene su pieza **nativa en español**, no traducción.
+
+---
+
+## Modelo OpenAI recomendado
+
+| Modelo | Tier |
+|--------|------|
+| **GPT-5.4** | Estándar (volumen) |
+
+**¿Por qué GPT-5.4 estándar?** Caption-hashtag es un subagente de alto volumen: produce captions + hashtags por cada pieza, con variantes para 3 cuentas distintas. GPT-5.4 estándar es más rápido y económico que GPT-5.4-pro, y la calidad del caption depende más de seguir las reglas de BRAND.md y los inputs del pipeline que de razonamiento complejo. El brand-reviewer (GPT-5.4-pro) valida el resultado downstream, así que la calidad final está cubierta.
+
+> Anteriormente se habría usado GPT-4o. Desde abril 2026 se usa GPT-5.4 estándar (plan Business). La API key es la misma del .env.

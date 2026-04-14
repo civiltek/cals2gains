@@ -207,3 +207,25 @@ El paso 7 (aprobación de Judith) se ejecuta sobre Telegram, no en el chat de Co
 - **"¿Qué funcionó esta semana?"** → performance-analyzer + growth consolidan.
 
 Todos estos disparos los interpreta el agente generalista `agents/marketing.md`, que enruta al subagente correspondiente.
+
+
+---
+
+## Modelos OpenAI por paso del pipeline (actualizado abril 2026)
+
+> Plan OpenAI Business · Modelos: GPT-5.4 y GPT-5.4-pro · API key en `.env`
+
+| Paso | Subagente | Modelo |
+|------|-----------|--------|
+| 0. Tendencias | `trend-scout` | GPT-5.4 |
+| 2. Strategy | `viral-strategist` | **GPT-5.4-pro** |
+| 3. Hook | `hook-writer` | GPT-5.4 |
+| 4. Script (reel) | `reels-scriptwriter` | GPT-5.4 |
+| 4. Spec (carrusel) | `carousel-designer` | GPT-5.4 |
+| 5. Caption + Hashtags | `caption-hashtag` | GPT-5.4 |
+| 6. Brand Review | `brand-reviewer` | **GPT-5.4-pro** |
+| 9. Performance | `performance-analyzer` | **GPT-5.4-pro** |
+
+**Criterio de asignación:** GPT-5.4-pro para subagentes cuyas decisiones tienen impacto multiplicador (estrategia, auditoría final, análisis de rendimiento). GPT-5.4 estándar para producción de contenido donde la calidad viene pautada por el brief y se valida downstream.
+
+> Migración desde GPT-4o completada en abril 2026. Ver `META-API-SETUP.md § 13` para detalle.

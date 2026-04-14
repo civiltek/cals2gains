@@ -79,3 +79,15 @@ HANDOFF:
 ## Cadencia
 - Una ejecución por pieza, 48-72h post-publicación.
 - Resumen semanal consolidado → enviar a `growth` (W4) para snapshot en `_project-hub/METRICS.md`.
+
+---
+
+## Modelo OpenAI recomendado
+
+| Modelo | Tier |
+|--------|------|
+| **GPT-5.4-pro** | Máximo rendimiento |
+
+**¿Por qué GPT-5.4-pro?** El performance-analyzer cierra el ciclo de aprendizaje del pipeline. Analizar métricas post-publicación, detectar patrones de rendimiento, formular insights accionables y recomendar cambios estratégicos requiere razonamiento analítico profundo. GPT-5.4-pro genera digests más precisos y propone insights de mayor calidad que alimentan a trend-scout y viral-strategist, mejorando todo el pipeline a medio plazo. El volumen es bajo (1 ejecución por pieza, +48-72h), así que el coste de GPT-5.4-pro es marginal.
+
+> Anteriormente se habría usado GPT-4o. Desde abril 2026 se usa GPT-5.4-pro (plan Business). La API key es la misma del .env.

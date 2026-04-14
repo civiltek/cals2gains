@@ -58,3 +58,15 @@ Recomendación interna: A / B / C — razón: [1 línea]
 - ES (mito-realidad): "No engorda la fruta de noche. Engorda lo que no estás mirando."
 - EN (visual-compare, slide 1 carrusel): "200 kcal of X vs 200 kcal of Y" (bold, dos fotos lado a lado).
 - ES (rhetorical-Q): "¿Por qué sigues sin bajar grasa aunque entrenes 5 días?"
+
+---
+
+## Modelo OpenAI recomendado
+
+| Modelo | Tier |
+|--------|------|
+| **GPT-5.4** | Estándar (volumen) |
+
+**¿Por qué GPT-5.4 estándar?** El hook-writer genera 3 variantes por pieza y puede ejecutarse múltiples veces al día en ciclos batch. GPT-5.4 estándar es más rápido y económico que GPT-5.4-pro, y su capacidad creativa es sobrada para producir hooks de ≤10 palabras en EN y ES. La calidad estratégica ya viene garantizada por el brief del viral-strategist (que sí usa GPT-5.4-pro), así que aquí se prioriza velocidad y coste.
+
+> Anteriormente se habría usado GPT-4o. Desde abril 2026 se usa GPT-5.4 estándar (plan Business). La API key es la misma del .env.

@@ -1,7 +1,7 @@
-﻿// ============================================
+// ============================================
 // Cals2Gains - Voice Food Logging Service
 // ============================================
-// Uses OpenAI Whisper for speech-to-text, then GPT for nutrition estimation
+// Uses OpenAI Whisper for speech-to-text, then GPT-5.4 for nutrition estimation
 
 import * as FileSystem from 'expo-file-system/legacy';
 import { FoodItem } from '../types';

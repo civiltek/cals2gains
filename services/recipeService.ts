@@ -215,7 +215,7 @@ export async function importRecipeFromUrl(
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5.4',
         max_tokens: 2000,
         messages: [
           {

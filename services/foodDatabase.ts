@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // Cals2Gains - Food Database Service
 // ============================================
 // Barcode scanning via Open Food Facts API
@@ -213,7 +213,7 @@ export async function analyzeTextFood(
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5.4',
         max_tokens: 500,
         messages: [
           {

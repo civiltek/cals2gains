@@ -1,7 +1,7 @@
-﻿// ============================================
+// ============================================
 // Cals2Gains - OpenAI Vision Service
 // ============================================
-// Uses GPT-4o Vision to analyze food photos and estimate nutritional content
+// Uses gpt-5.4 Vision to analyze food photos and estimate nutritional content
 
 import { FoodAnalysisResult, AnalysisAnswers, MealType } from '../types';
 import { getAppLanguage } from '../utils/language';
@@ -154,7 +154,7 @@ Fill in accurate nutritional values based on ALL the ingredient information now 
 }
 
 /**
- * Analyze a food photo using GPT-4o Vision
+ * Analyze a food photo using gpt-5.4 Vision
  */
 export async function analyzeFoodPhoto(
   imageBase64: string,
@@ -172,7 +172,7 @@ export async function analyzeFoodPhoto(
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: 'gpt-5.4',
       max_tokens: 1000,
       messages: [
         {
@@ -283,7 +283,7 @@ export async function refineAnalysis(
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: 'gpt-5.4',
       max_tokens: 800,
       messages: [
         {
@@ -363,7 +363,7 @@ export interface AIMealSuggestion {
 }
 
 /**
- * Generate personalized meal suggestions using GPT-4o
+ * Generate personalized meal suggestions using gpt-5.4
  * Based on remaining macros, time of day, user history, and preferences
  */
 export async function generateAIMealSuggestions(params: {
@@ -443,7 +443,7 @@ Return ONLY a JSON array with exactly 5 objects:
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: 'gpt-5.4',
       max_tokens: 1200,
       temperature: 0.8,
       messages: [

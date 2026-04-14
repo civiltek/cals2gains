@@ -16,6 +16,9 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
+import json
+import os
+
 import httpx
 
 log = logging.getLogger("telegram-mcp.client")
@@ -74,7 +77,6 @@ class TelegramClient:
             "disable_web_page_preview": "true",
         }
         if reply_markup is not None:
-            import json
             data["reply_markup"] = json.dumps(reply_markup)
         return self._call("sendMessage", data=data)
 
@@ -86,10 +88,9 @@ class TelegramClient:
             "parse_mode": parse_mode,
         }
         if reply_markup is not None:
-            import json
             data["reply_markup"] = json.dumps(reply_markup)
         with open(image_path, "rb") as fh:
-            files = {"photo": (image_path.rsplit("/", 1)[-1], fh, "application/octet-stream")}
+            files = {"photo": (os.path.basename(image_path), fh, "application/octet-stream")}
             return self._call("sendPhoto", data=data, files=files)
 
     def get_updates(self, offset: Optional[int] = None,
@@ -99,7 +100,6 @@ class TelegramClient:
         if offset is not None:
             data["offset"] = offset
         if allowed_updates is not None:
-            import json
             data["allowed_updates"] = json.dumps(allowed_updates)
         result = self._call("getUpdates", data=data)
         # When no updates, Telegram returns [] which _call coerces to {} via .get.
@@ -111,6 +111,63 @@ class TelegramClient:
             data["text"] = text
         self._call("answerCallbackQuery", data=data)
 
+
+    def send_video_file(self, file_path: str, caption: Optional[str] = None,
+                        *, parse_mode: str = "HTML") -> dict[str, Any]:
+        """Send a video via sendVideo. Max 50 MB."""
+        data: dict[str, Any] = {
+            "chat_id": self.chat_id,
+            "parse_mode": parse_mode,
+        }
+        if caption:
+            data["caption"] = caption
+        with open(file_path, "rb") as fh:
+            files = {"video": (os.path.basename(file_path), fh, "video/mp4")}
+            return self._call("sendVideo", data=data, files=files)
+
+    def send_document_file(self, file_path: str, caption: Optional[str] = None,
+                           *, parse_mode: str = "HTML") -> dict[str, Any]:
+        """Send any file via sendDocument. Max 50 MB."""
+        data: dict[str, Any] = {
+            "chat_id": self.chat_id,
+            "parse_mode": parse_mode,
+        }
+        if caption:
+            data["caption"] = caption
+        with open(file_path, "rb") as fh:
+            files = {"document": (os.path.basename(file_path), fh, "application/octet-stream")}
+            return self._call("sendDocument", data=data, files=files)
+
+    def send_media_group_files(self, file_paths: list[str],
+                               caption: Optional[str] = None) -> list[dict[str, Any]]:
+        """Send 2-10 photos/videos as an album via sendMediaGroup."""
+        media_descriptors: list[dict[str, Any]] = []
+        files: dict[str, Any] = {}
+        for idx, fp in enumerate(file_paths):
+            attach_key = f"media{idx}"
+            ext = os.path.splitext(fp)[1].lower()
+            media_type = "video" if ext in (".mp4", ".mov", ".avi", ".mkv") else "photo"
+            entry: dict[str, Any] = {
+                "type": media_type,
+                "media": f"attach://{attach_key}",
+            }
+            if idx == 0 and caption:
+                entry["caption"] = caption
+                entry["parse_mode"] = "HTML"
+            media_descriptors.append(entry)
+            fh = open(fp, "rb")  # noqa: SIM115 — closed by httpx after upload
+            files[attach_key] = (os.path.basename(fp), fh, "application/octet-stream")
+
+        data: dict[str, Any] = {
+            "chat_id": self.chat_id,
+            "media": json.dumps(media_descriptors),
+        }
+        try:
+            result = self._call("sendMediaGroup", data=data, files=files)
+            return result if isinstance(result, list) else [result]
+        finally:
+            for _, (_, fh, _) in files.items():
+                fh.close()
     def close(self) -> None:
         self._client.close()
 

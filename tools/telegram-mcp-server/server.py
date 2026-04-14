@@ -346,6 +346,140 @@ def wait_for_reply(draft_id: str, timeout_seconds: int = 3600) -> dict[str, Any]
     }
 
 
+
+
+# ---------------------------------------------------------------------------
+# Media tools
+# ---------------------------------------------------------------------------
+
+_PHOTO_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"}
+_VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv"}
+_PHOTO_MAX_BYTES = 10 * 1024 * 1024   # 10 MB
+_MEDIA_MAX_BYTES = 50 * 1024 * 1024   # 50 MB
+
+
+def _validate_file(file_path: str, max_bytes: int, allowed_ext: set[str] | None = None) -> Path:
+    """Validate that a file exists, is within size limits, and has an allowed extension."""
+    p = Path(file_path)
+    if not p.exists():
+        raise RuntimeError(f"Archivo no encontrado: {file_path}")
+    if not p.is_file():
+        raise RuntimeError(f"La ruta no es un archivo: {file_path}")
+    size = p.stat().st_size
+    if size == 0:
+        raise RuntimeError(f"El archivo esta vacio: {file_path}")
+    if size > max_bytes:
+        raise RuntimeError(
+            f"Archivo demasiado grande: {size / (1024*1024):.1f} MB "
+            f"(maximo {max_bytes / (1024*1024):.0f} MB)"
+        )
+    if allowed_ext is not None:
+        ext = p.suffix.lower()
+        if ext not in allowed_ext:
+            raise RuntimeError(
+                f"Extension no soportada: {ext}. "
+                f"Permitidas: {', '.join(sorted(allowed_ext))}"
+            )
+    return p
+
+
+@mcp.tool()
+def send_photo(file_path: str, caption: Optional[str] = None) -> dict[str, Any]:
+    """Send a photo (JPG/PNG/GIF/WebP) to the Telegram chat.
+
+    Args:
+        file_path: Absolute path to the image file on Windows (e.g. C:\\Users\\Judit\\image.jpg).
+        caption:   Optional caption text (HTML supported).
+
+    Returns:
+        { message_id, chat_id }
+    """
+    _validate_file(file_path, _PHOTO_MAX_BYTES, _PHOTO_EXTENSIONS)
+    try:
+        result = client.send_photo(file_path, caption or "", parse_mode="HTML")
+    except TelegramError as exc:
+        log.error("send_photo failed: %s", exc)
+        raise
+    message_id = int(result.get("message_id", 0))
+    log.info("Sent photo %s (message_id=%s)", file_path, message_id)
+    return {"message_id": message_id, "chat_id": CHAT_ID}
+
+
+@mcp.tool()
+def send_video(file_path: str, caption: Optional[str] = None) -> dict[str, Any]:
+    """Send a video (MP4/MOV/AVI/MKV) to the Telegram chat.
+
+    Args:
+        file_path: Absolute path to the video file on Windows.
+        caption:   Optional caption text (HTML supported).
+
+    Returns:
+        { message_id, chat_id }
+    """
+    _validate_file(file_path, _MEDIA_MAX_BYTES, _VIDEO_EXTENSIONS)
+    try:
+        result = client.send_video_file(file_path, caption=caption)
+    except TelegramError as exc:
+        log.error("send_video failed: %s", exc)
+        raise
+    message_id = int(result.get("message_id", 0))
+    log.info("Sent video %s (message_id=%s)", file_path, message_id)
+    return {"message_id": message_id, "chat_id": CHAT_ID}
+
+
+@mcp.tool()
+def send_document(file_path: str, caption: Optional[str] = None) -> dict[str, Any]:
+    """Send any file as a document to the Telegram chat.
+
+    Args:
+        file_path: Absolute path to the file on Windows.
+        caption:   Optional caption text (HTML supported).
+
+    Returns:
+        { message_id, chat_id }
+    """
+    _validate_file(file_path, _MEDIA_MAX_BYTES)
+    try:
+        result = client.send_document_file(file_path, caption=caption)
+    except TelegramError as exc:
+        log.error("send_document failed: %s", exc)
+        raise
+    message_id = int(result.get("message_id", 0))
+    log.info("Sent document %s (message_id=%s)", file_path, message_id)
+    return {"message_id": message_id, "chat_id": CHAT_ID}
+
+
+@mcp.tool()
+def send_media_group(file_paths: list[str], caption: Optional[str] = None) -> dict[str, Any]:
+    """Send a group of photos/videos as an album to the Telegram chat.
+
+    Args:
+        file_paths: List of 2-10 absolute paths to photo or video files.
+                    Extension determines type: .mp4/.mov/.avi/.mkv -> video, rest -> photo.
+        caption:    Optional caption (HTML). Applied to the first item only.
+
+    Returns:
+        { message_ids: [...], chat_id, count }
+    """
+    if len(file_paths) < 2:
+        raise RuntimeError("send_media_group requiere al menos 2 archivos.")
+    if len(file_paths) > 10:
+        raise RuntimeError("send_media_group permite maximo 10 archivos.")
+    for fp in file_paths:
+        ext = Path(fp).suffix.lower()
+        if ext in _VIDEO_EXTENSIONS:
+            _validate_file(fp, _MEDIA_MAX_BYTES, _VIDEO_EXTENSIONS)
+        else:
+            _validate_file(fp, _PHOTO_MAX_BYTES, _PHOTO_EXTENSIONS)
+    try:
+        results = client.send_media_group_files(file_paths, caption=caption)
+    except TelegramError as exc:
+        log.error("send_media_group failed: %s", exc)
+        raise
+    message_ids = [int(r.get("message_id", 0)) for r in results]
+    log.info("Sent media group (%d items, message_ids=%s)", len(message_ids), message_ids)
+    return {"message_ids": message_ids, "chat_id": CHAT_ID, "count": len(message_ids)}
+
 # ---------------------------------------------------------------------------
 # Entrypoint
 # ---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 // Cals2Gains - Food Search & Add Screen
 // ============================================
 // Multi-input food logging: text search, barcode, AI analysis
-// Uses Open Food Facts API + GPT-4o-mini for text analysis
+// Uses Open Food Facts API + GPT-5.4 for text analysis
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {

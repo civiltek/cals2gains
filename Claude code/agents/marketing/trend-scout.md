@@ -85,3 +85,15 @@ Los demás subagentes **deben leer `TREND-INSIGHTS.md`** antes de producir. En p
 - Cambio algorítmico IG grande (p. ej. reels bajados de prioridad, cambio de ratio) → avisar inmediato, no esperar a la ronda.
 - Aparece una cuenta propia compitiendo directamente (fitness/nutrición app-tracking con IA) → flag estratégico.
 - Tendencia con riesgo reputacional (p. ej. trend de "ayuno extremo") que el equipo podría tocar por inercia → recomendar NO subirse.
+
+---
+
+## Modelo OpenAI recomendado
+
+| Modelo | Tier |
+|--------|------|
+| **GPT-5.4** | Estándar |
+
+**¿Por qué GPT-5.4 estándar?** Trend-scout hace investigación web intensiva (WebSearch + WebFetch) y consolida hallazgos. Su bottleneck es la búsqueda externa, no la capacidad de razonamiento del modelo. GPT-5.4 estándar es suficiente para sintetizar fuentes y aplicar la regla de ≥2 confirmaciones. Ejecuta 2×/semana con volumen moderado, así que el ahorro respecto a GPT-5.4-pro es significativo a largo plazo.
+
+> Anteriormente se habría usado GPT-4o. Desde abril 2026 se usa GPT-5.4 estándar (plan Business). La API key es la misma del .env.

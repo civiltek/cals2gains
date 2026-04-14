@@ -169,3 +169,59 @@ IG recomienda 3-5 hashtags específicos. Las keywords naturales en el caption so
 - ⚠️ Pendiente: ampliar lista ES con 2-3 cuentas de nicho específico app/tracking (no se encontraron en ≥2 fuentes aún).
 - ⚠️ Pendiente: ratio exacto reel/carrusel de cada cuenta top (estimación actual, no verificada numéricamente).
 - ⚠️ Pendiente: confirmar trending audio específico para fitness EN/ES (Central Cee "WAGWAN", "Seaside Eyes") — 1 fuente, pendiente segunda confirmación (próxima ronda jueves 2026-04-16).
+
+---
+
+## Actualización trend-scout biweekly · 2026-04-14 (segunda ejecución)
+
+### Upgrade algorítmico confirmado esta ronda
+
+**Share rate = señal #1 de distribución de Reels en 2026 (upgrade desde "top-3")**
+Actualización respecto a la entrada anterior (2026-04-14 primera ronda): el share rate ha pasado de ser señal secundaria en 2025 a ser *la* señal primaria de distribución de Reels en 2026. Fuentes: invideo.io (Reels Guide 2026) · buffer.com (Algorithm 2026) · evergreenfeed.com (Reels Algorithm 2026).
+
+→ **Implicación práctica para todos los subagentes:** el DM-bait CTA (patrón hook #9, ya documentado) debe ser la prioridad en piezas de alto potencial de share, por encima del "Guarda/Save". En piezas educativas y de debunking, añadir siempre el DM-bait.
+
+→ **`viral-strategist`:** filtrar ideas de contenido con criterio "¿es esto de enviar a alguien?".
+
+### Nueva feature IG a monitorear
+
+**"Blend" — feed compartido de Reels con amigos/grupos**
+Nueva feature de IG que permite crear un feed de Reels compartido con amigos o grupos. Vector de distribución adicional al DM share. Fuentes: invideo.io · buffer.com. Pendiente adopción masiva; monitorear próximas semanas.
+
+### Nuevo formato ASMR — confirmado y accionable
+
+**ASMR Food Prep Reels: upgrade de "pendiente" a confirmado**
+El formato ASMR food (overhead, sonidos de cocina, sin voz) queda confirmado como accionable en el pipeline de Cals2Gains. Ver Insight C en TREND-INSIGHTS.md 2026-04-14. Fuentes: amraandelma.com · stackinfluence.com · viraltrench.com.
+
+→ `reels-scriptwriter` y `carousel-designer`: pueden incorporar este formato faceless/ASMR como opción estándar en piezas de recetas/macros.
+
+### Nuevos patrones de hook — adición (confirmado 2026-04-14 segunda ejecución)
+
+**10. "I Run" movement hook:** Abrir con clips de movimiento (running, morning routine, salir a entrenar) con audio "I Run". Formato motivación de hábito. Bajo 13 s. Accionable EN + ES.
+
+**11. Esfuerzo → Logro (5-8 clips, "Girl to Girl" format):** Serie de clips esfuerzo-resultado, audio carry el mensaje. Texto mínimo. Bajo 20 s. Accionable para demo de app y mindset nutricional.
+
+### Mitos en ciclo — ampliación (accionables 2026-04-14)
+
+Añadir a los tres ya documentados (seed oils, huevos, detox):
+- **Diversidad dietética vs. eliminación:** eliminar grupos de alimentos daña el microbioma; diversidad es el consenso científico 2026. Alto potencial de share en ES y EN.
+- **Proteína vegetal "incompleta":** mito ampliamente debunked en 2026. Ángulo diferenciador: Cals2Gains trackea proteína vegetal/animal indistintamente.
+
+### Qué falta / pendientes actualizado (2026-04-14 segunda ejecución)
+
+- ⚠️ Pendiente: confirmar "Nieves Bolós" (@nievesbolos o similar) en ≥2 fuentes para añadir a Tabla B ES. Aparece 1× con 929K seguidores, psicóloga/coach nutricional.
+- ⚠️ Pendiente: confirmar "Pretty Little Baby" audio en ≥2 fuentes para fitness/nutrición.
+- ⚠️ Pendiente: confirmar si reels públicos están indexados por Google/Bing (1 fuente: invideo.io).
+- ⚠️ Pendiente: ratio exacto reel/carrusel de cuentas top (sigue sin dato duro verificado).
+
+
+---
+
+## Nota sobre modelos OpenAI en el pipeline (actualizado abril 2026)
+
+Los subagentes de marketing que leen este archivo operan con los siguientes modelos OpenAI (plan Business):
+
+- **GPT-5.4-pro** (máximo rendimiento): `viral-strategist`, `brand-reviewer`, `performance-analyzer` — decisiones estratégicas, auditoría y análisis.
+- **GPT-5.4** (estándar): `hook-writer`, `caption-hashtag`, `reels-scriptwriter`, `carousel-designer`, `trend-scout` — producción y volumen.
+
+> Migración desde GPT-4o completada en abril 2026. La API key es la misma del `.env`. Ver `META-API-SETUP.md § 13` para detalle completo.

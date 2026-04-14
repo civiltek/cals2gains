@@ -105,3 +105,15 @@ Cuando el veredicto interno es APROBADA, el brand-reviewer **no escribe el paque
 
 ## Regla
 **R6 siempre:** nunca se publica sin aprobación explícita de Judith. Excepción única autorizada: respuestas automáticas de `instagram-commenter` ya legacy.
+
+---
+
+## Modelo OpenAI recomendado
+
+| Modelo | Tier |
+|--------|------|
+| **GPT-5.4-pro** | Máximo rendimiento |
+
+**¿Por qué GPT-5.4-pro?** El brand-reviewer es la última barrera de calidad antes de Judith. Necesita evaluar simultáneamente brand voice, guardrails (R1/R6/R8), anti-patterns (AP5/AP9/AP10/AP15), features activas, idioma nativo y roles de cuenta. GPT-5.4-pro ofrece mayor profundidad de análisis y menor tasa de falsos positivos/negativos en la auditoría, lo que reduce rechazos innecesarios y, sobre todo, evita que pasen piezas con problemas. El coste extra se justifica porque un error aquí llega a Judith o peor, al público.
+
+> Anteriormente se habría usado GPT-4o. Desde abril 2026 se usa GPT-5.4-pro (plan Business). La API key es la misma del .env.

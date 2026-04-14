@@ -78,3 +78,15 @@ HANDOFF → caption-hashtag
 ## Escalaciones a Judith
 - Spec requiere asset visual custom que no encaja en plantillas existentes (→ pedir diseño).
 - Contenido sensible (claims médicos, trastornos alimentarios) → revisión antes de maquetar.
+
+---
+
+## Modelo OpenAI recomendado
+
+| Modelo | Tier |
+|--------|------|
+| **GPT-5.4** | Estándar |
+
+**¿Por qué GPT-5.4 estándar?** Carousel-designer produce specs slide-por-slide siguiendo la estructura AIDA y la paleta BRAND. Es trabajo creativo pero altamente pautado por el brief y los benchmarks. GPT-5.4 estándar ofrece velocidad y calidad suficiente para este paso del pipeline. La revisión estratégica ya la cubre brand-reviewer (GPT-5.4-pro) downstream.
+
+> Anteriormente se habría usado GPT-4o. Desde abril 2026 se usa GPT-5.4 estándar (plan Business). La API key es la misma del .env.

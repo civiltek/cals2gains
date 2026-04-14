@@ -56,3 +56,15 @@ HANDOFF → hook-writer
 
 ## Regla
 Nunca produce pieza final. Solo briefs. Un brief mal definido multiplica errores río abajo.
+
+---
+
+## Modelo OpenAI recomendado
+
+| Modelo | Tier |
+|--------|------|
+| **GPT-5.4-pro** | Máximo rendimiento |
+
+**¿Por qué GPT-5.4-pro?** El viral-strategist es el cerebro del pipeline: cada brief mal planteado multiplica errores en todos los subagentes downstream. La capacidad de razonamiento profundo de GPT-5.4-pro permite evaluar simultáneamente insights de tendencias, pilares de contenido, restricciones de guardrails y roles de cuenta para producir briefs de mayor calidad estratégica. El coste adicional se amortiza porque un buen brief reduce iteraciones y rechazos en brand-reviewer.
+
+> Anteriormente se habría usado GPT-4o. Desde abril 2026 se usa GPT-5.4-pro (plan Business). La API key es la misma del .env.

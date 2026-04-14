@@ -1,7 +1,7 @@
 // ============================================
 // Cals2Gains - Nutrition Label Scanner Screen
 // ============================================
-// Captures nutrition labels with camera, extracts via GPT-4o Vision OCR
+// Captures nutrition labels with camera, extracts via gpt-5.4 Vision OCR
 import React, { useState, useCallback, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Dimensions, ScrollView, TextInput,
@@ -91,7 +91,7 @@ export default function LabelScannerScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-5.4',
           messages: [
             {
               role: 'user',

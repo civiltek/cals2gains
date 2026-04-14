@@ -69,3 +69,15 @@ HANDOFF → caption-hashtag
 ## Escalaciones a Judith
 - El script requiere grabación en ubicación no disponible.
 - Necesita que Judith aparezca a cámara con cierto outfit/contexto — pedir confirmación.
+
+---
+
+## Modelo OpenAI recomendado
+
+| Modelo | Tier |
+|--------|------|
+| **GPT-5.4** | Estándar |
+
+**¿Por qué GPT-5.4 estándar?** El reels-scriptwriter produce scripts con timing segundo a segundo, overlays y shot lists — un trabajo estructurado que sigue patrones bien definidos del benchmark. GPT-5.4 estándar lo resuelve con velocidad y calidad suficiente. El razonamiento estratégico profundo ya viene del brief (viral-strategist, GPT-5.4-pro) y la validación la hace brand-reviewer (GPT-5.4-pro), así que este subagente no necesita el tier pro.
+
+> Anteriormente se habría usado GPT-4o. Desde abril 2026 se usa GPT-5.4 estándar (plan Business). La API key es la misma del .env.
