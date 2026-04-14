@@ -45,8 +45,9 @@ Excluido:
 
 - **Lectura/escritura Excel**: `openpyxl` (Python, via Bash sandbox) o librería equivalente.
 - **Lectura PDF**: skill `pdf` + `pdfplumber`/`pypdf` para extraer importe/fecha.
-- **MCPs de email**: `imap-civiltek`, `imap-gmail-cals2gains`, `imap-gmail-judith`, `gmail_*` para buscar recibos.
+- **MCPs de email**: `imap-civiltek`, `imap-gmail-cals2gains`, `imap-gmail-judith`, `imap-cals2gains-info`, `gmail_*` para buscar recibos.
 - **Outlook MCP**: `tools/outlook-mcp-server` (Tenant dca3514b-…, Client 22bf9098-…) para info@civiltek.es.
+- **Cuentas a escanear** (diario): `info@civiltek.es`, `cals2gains@gmail.com`, `judith.cordobes@gmail.com`, `info@cals2gains.com`.
 - **Chrome MCP**: para portales de facturación cuando haga falta (requiere login manual de Judith).
 - **Computer-use** sólo como último recurso (siempre read en browsers por tier).
 

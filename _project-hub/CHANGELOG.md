@@ -1,5 +1,11 @@
 # Changelog - Cals2Gains
 
+## 2026-04-14 — receipt-collector a diario + cuenta info@cals2gains.com
+
+- Frecuencia de `receipt-collector` cambiada de lun/jue a **diario 8:00**.
+- Añadida cuenta `info@cals2gains.com` a la lista de cuentas a escanear.
+- Cuentas activas: `info@civiltek.es`, `cals2gains@gmail.com`, `judith.cordobes@gmail.com`, `info@cals2gains.com`.
+
 ## 2026-04-14 — Implementación completa del sistema financiero y legal
 
 ### Código app — Eliminación de cuenta

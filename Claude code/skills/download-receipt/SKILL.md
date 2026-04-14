@@ -6,7 +6,13 @@
 - Email con factura adjunta detectado por MCPs IMAP/Gmail/Outlook.
 - PDF suelto en Downloads con nombre tipo recibo.
 - Comando `/receipts`.
-- Tarea programada `receipt-collector` (lun/jue 8:00).
+- Tarea programada `receipt-collector` (diario 8:00).
+
+## Cuentas a escanear
+- `info@civiltek.es` (Outlook MCP)
+- `cals2gains@gmail.com` (IMAP Gmail)
+- `judith.cordobes@gmail.com` (IMAP Gmail)
+- `info@cals2gains.com` (IMAP)
 
 ## Naming convention
 `YYYY-MM-DD_proveedor_descripcion-corta_importeXXX.ext`

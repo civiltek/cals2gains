@@ -10,7 +10,7 @@ Estado a: **14 de abril de 2026**.
 
 | Nombre | Frecuencia | Agente dueño | Workflow | Dispara | Notas |
 |--------|-----------|--------------|----------|---------|-------|
-| `receipt-collector` | Lun y Jue · 08:00 | `finance` | W1 | `download-receipt` → `update-dashboard` | Revisa emails + portales; anota en FINANCES |
+| `receipt-collector` | Diario · 08:00 | `finance` | W1 | `download-receipt` → `update-dashboard` | Revisa emails + portales; anota en FINANCES |
 | `metrics-collector` | Semanal | `growth` | W4 parcial | Captura métricas básicas | Solapa con `c2g-weekly-metrics`; ⚠️ confirmar si se puede unificar |
 | `c2g-weekly-metrics` | Lunes | `growth` | W4 | Skill `weekly-metrics` | Canal completo multi-plataforma |
 | `seo-optimizer` | Variable | `web-dev` | — | Revisión de SEO en landing | Genera sugerencias a `_project-hub/SEO_REPORT.md` |
@@ -31,7 +31,7 @@ Estado a: **14 de abril de 2026**.
 
 ## Coordinación entre tareas
 
-- `receipt-collector` (lun 8:00) → si encuentra recibo → dispara `update-dashboard` inline (no como tarea separada).
+- `receipt-collector` (diario 8:00) → si encuentra recibo → dispara `update-dashboard` inline (no como tarea separada).
 - `c2g-weekly-metrics` (lun) → su salida alimenta recomendaciones que `marketing` usará esa semana.
 - `limpieza-cowork-semanal` → **nunca** borra recibos (R3), **nunca** borra nada sin aprobación.
 - `c2g-monthly-finance-report` (1-3 mes) → ejecuta reconciliación + reporte + dashboard. Informa a Judith con resumen ejecutivo.
@@ -59,4 +59,6 @@ Estado a: **14 de abril de 2026**.
 - ⚠️ Clarificar `instagram-layout-fix` vs `fix-layout-errors`.
 - ⚠️ Decidir si borrar definitivamente `finance-tracker` deshabilitado.
 - ⚠️ Confirmar con Judith frecuencia de `c2g-legal-review` (propuesta: trimestral + pre-release).
-- ⚠️ Confirmar con Judith si `c2g-monthly-finance-report` debe correr automáticamente o solo bajo `/finance-report`.
+- ~~⚠️ Confirmar con Judith si `c2g-monthly-finance-report` debe correr automáticamente o solo bajo `/finance-report`.~~ → Confirmado: automático mensual.
+- ~~⚠️ Confirmar con Judith frecuencia de `c2g-legal-review`~~ → Confirmado: trimestral.
+- ~~⚠️ Confirmar frecuencia `receipt-collector`~~ → Cambiado a diario (antes lun/jue).

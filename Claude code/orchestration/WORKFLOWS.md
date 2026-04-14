@@ -6,7 +6,7 @@
 
 ## W1. Nueva factura / recibo detectado
 
-**Disparadores:** tarea `receipt-collector` (lun/jue 8:00), llegada de email con factura, input manual "tengo una factura nueva".
+**Disparadores:** tarea `receipt-collector` (diario 8:00), llegada de email con factura, input manual "tengo una factura nueva".
 
 1. **ops** detecta el disparador.
 2. **finance** — invoca skill `download-receipt`:
