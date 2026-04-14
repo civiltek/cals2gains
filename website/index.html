@@ -647,6 +647,18 @@
             emailInput.name = 'EMAIL';
             emailInput.value = email;
             hiddenForm.appendChild(emailInput);
+            // Honeypot field (must be empty for anti-bot)
+            var honeypot = document.createElement('input');
+            honeypot.type = 'hidden';
+            honeypot.name = 'email_address_check';
+            honeypot.value = '';
+            hiddenForm.appendChild(honeypot);
+            // Locale field
+            var localeInput = document.createElement('input');
+            localeInput.type = 'hidden';
+            localeInput.name = 'locale';
+            localeInput.value = 'es';
+            hiddenForm.appendChild(localeInput);
             document.body.appendChild(hiddenForm);
             hiddenForm.submit();
             // Show success after brief delay (form submits to iframe)
