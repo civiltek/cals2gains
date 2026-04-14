@@ -899,6 +899,60 @@ export async function updateRecipeFavorite(recipeId: string, isFavorite: boolean
 /**
  * Log a recipe as a meal
  */
+/**
+ * Delete user account and all associated data from Firestore, Storage and Auth.
+ * Deletes: users, meals, dailyLogs, weightEntries, waterLogs, progressPhotos, recipes, mealTemplates
+ */
+export async function deleteUserAccount(userId: string): Promise<void> {
+  const collectionsToDelete = [
+    'meals',
+    'weightEntries',
+    'waterLogs',
+    'progressPhotos',
+    'recipes',
+    'mealTemplates',
+  ];
+
+  // Delete documents from collections where userId is a field
+  for (const col of collectionsToDelete) {
+    const q = query(collection(db, col), where('userId', '==', userId));
+    const snap = await getDocs(q);
+    const deletePromises = snap.docs.map((d) => deleteDoc(d.ref));
+    await Promise.all(deletePromises);
+  }
+
+  // Delete dailyLogs (keyed as {userId}_{date})
+  const dailyLogsQuery = query(
+    collection(db, 'dailyLogs'),
+    where('userId', '==', userId)
+  );
+  const dailySnap = await getDocs(dailyLogsQuery);
+  await Promise.all(dailySnap.docs.map((d) => deleteDoc(d.ref)));
+
+  // Delete user document
+  const userRef = doc(db, 'users', userId);
+  await deleteDoc(userRef);
+
+  // Delete profile photo from Storage if exists
+  try {
+    const avatarRef = ref(storage, `users/${userId}/profile/avatar.jpg`);
+    const { deleteObject } = await import('firebase/storage');
+    await deleteObject(avatarRef);
+  } catch {
+    // Photo may not exist — ignore
+  }
+
+  // Delete Firebase Auth account
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    const { deleteUser } = await import('firebase/auth');
+    await deleteUser(currentUser);
+  }
+}
+
+/**
+ * Log a recipe as a meal
+ */
 export async function logRecipeAsMealFb(
   userId: string,
   recipeId: string,

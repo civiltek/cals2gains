@@ -27,12 +27,22 @@
     <meta name="twitter:image" content="https://cals2gains.com/logo.png">
     <meta name="twitter:image:alt" content="Cals2Gains — AI Nutrition App">
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-97MNMCDEG2"></script>
     <script>
+        // GA4 — solo se carga si el usuario acepta cookies analíticas
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-97MNMCDEG2');
+        function loadGA4() {
+            if (document.getElementById('ga4-script')) return;
+            var s = document.createElement('script');
+            s.id = 'ga4-script';
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=G-97MNMCDEG2';
+            document.head.appendChild(s);
+            gtag('js', new Date());
+            gtag('config', 'G-97MNMCDEG2');
+        }
+        // Cargar solo si ya consintió
+        if (localStorage.getItem('c2g_cookie_consent') === 'all') { loadGA4(); }
     </script>
 
     <title data-es="Cals2Gains — La única app de nutrición con IA real" data-en="Cals2Gains — The only nutrition app with real AI">Cals2Gains — La única app de nutrición con IA real</title>
@@ -2105,7 +2115,17 @@
                 <ul class="footer-links">
                     <li><a href="/privacy.html" data-es="Privacidad" data-en="Privacy">Privacidad</a></li>
                     <li><a href="/terms.html" data-es="Términos" data-en="Terms">Términos</a></li>
-                    <li><a href="https://instagram.com/cals2gains" target="_blank" data-es="Instagram" data-en="Instagram">Instagram</a></li>
+                    <li><a href="/aviso-legal.html" data-es="Aviso Legal" data-en="Legal Notice">Aviso Legal</a></li>
+                    <li><a href="/cookies.html" data-es="Cookies" data-en="Cookies">Cookies</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="footer-section-title" data-es="Síguenos" data-en="Follow Us">Síguenos</div>
+                <ul class="footer-links">
+                    <li><a href="https://instagram.com/cals2gains" target="_blank">@cals2gains (EN)</a></li>
+                    <li><a href="https://instagram.com/cals2gains_es" target="_blank">@cals2gains_es</a></li>
+                    <li><a href="mailto:info@cals2gains.com">info@cals2gains.com</a></li>
                 </ul>
             </div>
         </div>
@@ -2197,6 +2217,27 @@
                 }
             });
         });
+    </script>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1E1828;border-top:1px solid rgba(156,140,255,0.3);padding:16px 24px;z-index:9999;font-family:'Outfit',sans-serif;">
+        <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <p style="color:#F7F2EA;font-size:14px;margin:0;flex:1;min-width:280px;" id="cookie-text" data-es="Usamos cookies analíticas (Google Analytics) para mejorar tu experiencia. <a href='/cookies.html' style='color:#9C8CFF'>Más info</a>" data-en="We use analytics cookies (Google Analytics) to improve your experience. <a href='/cookies.html' style='color:#9C8CFF'>More info</a>">Usamos cookies analíticas (Google Analytics) para mejorar tu experiencia. <a href="/cookies.html" style="color:#9C8CFF">Más info</a></p>
+            <div style="display:flex;gap:8px;flex-shrink:0;">
+                <button onclick="acceptCookies('necessary')" style="background:transparent;border:1px solid #9C8CFF;color:#9C8CFF;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;" id="cookie-btn-necessary" data-es="Solo necesarias" data-en="Necessary only">Solo necesarias</button>
+                <button onclick="acceptCookies('all')" style="background:linear-gradient(135deg,#FF6A4D,#9C8CFF);border:none;color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;" id="cookie-btn-all" data-es="Aceptar todas" data-en="Accept all">Aceptar todas</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function acceptCookies(level) {
+            localStorage.setItem('c2g_cookie_consent', level);
+            document.getElementById('cookie-banner').style.display = 'none';
+            if (level === 'all') { loadGA4(); }
+        }
+        if (!localStorage.getItem('c2g_cookie_consent')) {
+            document.getElementById('cookie-banner').style.display = 'block';
+        }
     </script>
 
 </body>

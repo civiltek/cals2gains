@@ -1,5 +1,32 @@
 # Changelog - Cals2Gains
 
+## 2026-04-14 — Implementación completa del sistema financiero y legal
+
+### Código app — Eliminación de cuenta
+- `services/firebase.ts`: nueva función `deleteUserAccount()` — borra todas las colecciones del usuario (meals, dailyLogs, weightEntries, waterLogs, progressPhotos, recipes, mealTemplates), documento de usuario, foto de perfil de Storage y cuenta de Firebase Auth.
+- `store/userStore.ts`: nueva acción `deleteAccount()` — logout de RevenueCat + eliminación completa.
+- `app/settings.tsx`: conectado el botón "Eliminar cuenta" a la función real (antes era stub).
+
+### Textos legales — Reescritura completa
+- `public/privacy.html`: reescrita desde cero para RGPD/LOPD-GDD. Ahora cubre: datos de cuenta, perfil, nutrición, salud (peso, medidas, ayuno, fotos progreso), voz, wearables, suscripciones. Incluye tabla de base legal, servicios de terceros con DPA, retención, derechos ARCO+ con mecanismos, referencia AEPD.
+- `public/terms.html`: actualizada con disclaimers de IA (sección 3), aviso de salud (sección 2: "NO sustituye consejo médico"), eliminación de cuenta (sección 6), reembolsos, IA generativa.
+- `public/aviso-legal.html`: NUEVO — aviso legal/Impressum LSSI-CE con datos de CivilTek.
+- `public/cookies.html`: NUEVO — política de cookies con tabla de cookies GA4, tipos, gestión.
+- Sincronizadas todas las copias a `public/cals2gains/`, `website/`, `website/cals2gains/`.
+
+### Web — Banner de cookies y GA4 condicionado
+- `public/index.html`: GA4 ahora solo se carga si el usuario acepta cookies analíticas (cumplimiento RGPD). Banner de consentimiento con opciones "Solo necesarias" / "Aceptar todas". Footer actualizado con links a aviso legal, cookies y redes sociales.
+
+### Dashboard financiero
+- Corregido KPI roto (HTML malformado). Añadido cargo faltante de Anthropic €595. Añadidos KPIs de balance neto, gasto mensual y saldo OpenAI. Historial ordenado por fecha.
+- Dashboard copiado a ambas ubicaciones (`finances/` y `_project-hub/`).
+
+### Data Safety Section
+- `docs/legal/data-safety-section.md`: documento preparatorio para rellenar en Google Play Console con todos los tipos de datos, servicios de terceros y prácticas de seguridad.
+
+### Hub actualizado
+- `_project-hub/LEGAL.md`: estado actualizado de 🟡 a 🟢 — todos los bloqueantes resueltos.
+
 ## 2026-04-14 — Puesta en marcha del sistema de agentes financiero y legal
 
 ### Nuevo agente: `legal`
