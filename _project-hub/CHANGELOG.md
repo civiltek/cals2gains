@@ -1,5 +1,29 @@
 # Changelog - Cals2Gains
 
+## 2026-04-14 — Corrección de hallazgos de seguridad (8/8 resueltos)
+
+### Firestore Rules — reescritura completa
+- Validación de schema en `create` para todas las colecciones: campos requeridos, tipos, enums, límites.
+- Funciones helper: `isAuth()`, `isOwner()`, `ownsResource()`, `validNutrition()`, `ownsLogById()`.
+- `dailyLogs`: regex mejorado de `_.*` a `_[0-9]{4}-[0-9]{2}-[0-9]{2}` + validación doble de userId.
+- `waterLogs`: **reglas añadidas** — fix del bug "Missing or insufficient permissions".
+
+### Storage Rules — límites añadidos
+- Máximo 10 MB por archivo.
+- Solo tipo MIME `image/*` permitido.
+
+### Firebase Hosting — headers de seguridad
+- HSTS, X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy, Permissions-Policy, X-XSS-Protection.
+
+### Dependencias
+- Override `undici@^7.10.0` en package.json para resolver 10 CVEs (1 high, 9 moderate). `npm audit`: 0 vulnerabilidades.
+
+### .gitignore
+- `google-services.json` y `GoogleService-Info.plist` añadidos a `.gitignore`.
+
+### Escaneo de secretos
+- Grep de patterns de API keys en código fuente (.ts/.tsx/.js/.jsx/.json) — limpio.
+
 ## 2026-04-14 — Sistema de agentes de ciberseguridad
 
 ### Nuevos agentes de seguridad

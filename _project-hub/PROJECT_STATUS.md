@@ -50,10 +50,13 @@ Pantallas principales:
 ## Bugs Conocidos
 - **Firebase Storage:** Error al subir fotos de progreso (ArrayBuffer issue → usar XMLHttpRequest como workaround)
 - **expo-notifications:** Removido temporalmente por crash en Android sin FCM configurado
-- **Firebase Water permissions:** "Missing or insufficient permissions" en water tracker
+- ~~**Firebase Water permissions:** "Missing or insufficient permissions" en water tracker~~ → RESUELTO (reglas añadidas en `firestore.rules`)
 - **Tema oscuro:** Corregidos ~70 issues en auditoría, pueden quedar edge cases
 
 ## Bugs Resueltos recientemente
+- **[14/04] Firebase Water permissions** — RESUELTO
+  - Causa: colección `waterLogs` no tenía reglas de seguridad en `firestore.rules`
+  - Fix: reglas añadidas con auth + owner check + schema validation
 - **[13/04 23:30] Crash inmediato al abrir APK en Android** — RESUELTO
   - Causa: `react-native-reanimated` 3.19.5 incompatible con RN 0.81/Expo SDK 54 (buscaba campo `mIsFinished` en `MessageQueueThreadImpl` que ya no existe)
   - Fix: upgrade a `react-native-reanimated` ~4.1.1 + instalación de `react-native-worklets` 0.5.1 + cambio del plugin babel a `react-native-worklets/plugin`

@@ -2,60 +2,150 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── User profile ──
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    // ── Helper functions ──
+
+    function isAuth() {
+      return request.auth != null;
     }
 
-    // ── Meals (top-level collection) ──
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    function ownsResource() {
+      return isAuth() && request.auth.uid == resource.data.userId;
+    }
+
+    function ownsNewResource() {
+      return isAuth() && request.auth.uid == request.resource.data.userId;
+    }
+
+    function hasFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function validNutrition(n) {
+      return n.keys().hasAll(['calories', 'protein', 'carbs', 'fat'])
+        && n.calories is number && n.calories >= 0
+        && n.protein is number && n.protein >= 0
+        && n.carbs   is number && n.carbs   >= 0
+        && n.fat     is number && n.fat     >= 0;
+    }
+
+    // Verifica que el ID del documento empieza con el UID del usuario + '_'
+    function ownsLogById(logId) {
+      return isAuth() && logId.matches(request.auth.uid + '_[0-9]{4}-[0-9]{2}-[0-9]{2}');
+    }
+
+    // ── User profile ──
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && hasFields(['email', 'createdAt', 'goals', 'profile'])
+        && request.resource.data.goals is map
+        && request.resource.data.profile is map;
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+
+      // ── Shopping list (subcollection) ──
+      match /shoppingList/{itemId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && hasFields(['name', 'checked', 'addedAt'])
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0
+          && request.resource.data.name.size() <= 500
+          && request.resource.data.checked is bool;
+        allow update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // ── Meals ──
     match /meals/{mealId} {
-      allow read, update, delete: if request.auth != null &&
-        request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null &&
-        request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if ownsResource();
+      allow create: if ownsNewResource()
+        && hasFields(['userId', 'timestamp', 'dishName', 'nutrition', 'mealType'])
+        && request.resource.data.dishName is string
+        && request.resource.data.dishName.size() <= 500
+        && request.resource.data.mealType in ['breakfast', 'lunch', 'dinner', 'snack']
+        && request.resource.data.nutrition is map
+        && validNutrition(request.resource.data.nutrition);
     }
 
     // ── Meal templates ──
     match /mealTemplates/{templateId} {
-      allow read, update, delete: if request.auth != null &&
-        request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null &&
-        request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if ownsResource();
+      allow create: if ownsNewResource()
+        && hasFields(['userId', 'name', 'nutrition', 'mealType', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 500
+        && request.resource.data.mealType in ['breakfast', 'lunch', 'dinner', 'snack']
+        && request.resource.data.nutrition is map
+        && validNutrition(request.resource.data.nutrition);
     }
 
     // ── Weight entries ──
     match /weightEntries/{entryId} {
-      allow read, update, delete: if request.auth != null &&
-        request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null &&
-        request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if ownsResource();
+      allow create: if ownsNewResource()
+        && hasFields(['userId', 'weight', 'date'])
+        && request.resource.data.weight is number
+        && request.resource.data.weight > 0
+        && request.resource.data.weight < 700;
     }
 
     // ── Progress photos ──
     match /progressPhotos/{photoId} {
-      allow read, update, delete: if request.auth != null &&
-        request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null &&
-        request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if ownsResource();
+      allow create: if ownsNewResource()
+        && hasFields(['userId', 'date', 'angle', 'photoUri'])
+        && request.resource.data.angle in ['front', 'side', 'back']
+        && request.resource.data.photoUri is string;
     }
 
     // ── Recipes ──
     match /recipes/{recipeId} {
-      allow read, update, delete: if request.auth != null &&
-        request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null &&
-        request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if ownsResource();
+      allow create: if ownsNewResource()
+        && hasFields(['userId', 'name', 'ingredients', 'servings', 'source', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 500
+        && request.resource.data.ingredients is list
+        && request.resource.data.servings is number
+        && request.resource.data.servings > 0
+        && request.resource.data.source in ['manual', 'url_import', 'ai'];
     }
 
-    // ── Shopping list (subcollection of user) ──
-    match /users/{userId}/shoppingList/{itemId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // ── Daily logs (keyed by {userId}_{date}) ──
+    // ── Daily logs (keyed by {userId}_{yyyy-MM-dd}) ──
     match /dailyLogs/{logId} {
-      allow read, write: if request.auth != null &&
-        logId.matches(request.auth.uid + '_.*');
+      allow read: if ownsLogById(logId);
+      allow create: if ownsLogById(logId)
+        && hasFields(['userId', 'date', 'totalNutrition'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.date is string
+        && request.resource.data.totalNutrition is map;
+      allow update: if ownsLogById(logId)
+        && resource.data.userId == request.auth.uid;
+      allow delete: if ownsLogById(logId)
+        && resource.data.userId == request.auth.uid;
+    }
+
+    // ── Water logs (keyed by {userId}_{yyyy-MM-dd}) ──
+    // Fix: colección sin reglas previas → bug "Missing or insufficient permissions"
+    match /waterLogs/{logId} {
+      allow read: if ownsLogById(logId);
+      allow create: if ownsLogById(logId)
+        && hasFields(['userId', 'date', 'glasses', 'goal'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.glasses is number
+        && request.resource.data.glasses >= 0
+        && request.resource.data.goal is number
+        && request.resource.data.goal > 0;
+      allow update: if ownsLogById(logId)
+        && resource.data.userId == request.auth.uid;
+      allow delete: if ownsLogById(logId)
+        && resource.data.userId == request.auth.uid;
     }
   }
 }
