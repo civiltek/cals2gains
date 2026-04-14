@@ -10,14 +10,309 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { mealStore } from '../store/mealStore';
 import { weightStore } from '../store/weightStore';
 import { waterStore } from '../store/waterStore';
-import { COLORS } from '../theme';
+import { useColors } from '../store/themeStore';
 
 const { width } = Dimensions.get('window');
 const CARD_PADDING = 16;
 const CHART_HEIGHT = 240;
+
+const createStyles = (C: any) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: C.background,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 32,
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: C.text,
+    marginBottom: 24,
+  },
+  periodSelector: {
+    flexDirection: 'row',
+    marginBottom: 24,
+    gap: 8,
+  },
+  periodTab: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: C.surface,
+    borderWidth: 1,
+    borderColor: C.border,
+    alignItems: 'center',
+  },
+  periodTabActive: {
+    backgroundColor: C.primary,
+    borderColor: C.primary,
+  },
+  periodTabText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: C.textSecondary,
+  },
+  periodTabTextActive: {
+    color: C.background,
+  },
+  card: {
+    backgroundColor: C.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: C.border,
+    padding: CARD_PADDING,
+    marginBottom: 16,
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: C.textSecondary,
+    marginBottom: 16,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  streakContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  streakItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  streakValue: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: C.primary,
+    marginBottom: 4,
+  },
+  streakLabel: {
+    fontSize: 12,
+    color: C.textSecondary,
+  },
+  adherenceContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  circularProgress: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: C.surfaceLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 4,
+    borderColor: C.primary,
+    position: 'relative',
+    marginBottom: 16,
+  },
+  adherenceValue: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: C.primary,
+  },
+  adherencePercent: {
+    fontSize: 14,
+    color: C.textSecondary,
+  },
+  adherenceLabel: {
+    fontSize: 12,
+    color: C.textSecondary,
+    marginTop: 8,
+  },
+  macroRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 12,
+  },
+  macroLabel: {
+    width: 70,
+    fontSize: 13,
+    fontWeight: '600',
+    color: C.text,
+  },
+  macroBar: {
+    flex: 1,
+    height: 24,
+    backgroundColor: C.surfaceLight,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  macroFill: {
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  macroText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: C.background,
+  },
+  chartContainer: {
+    height: CHART_HEIGHT,
+    justifyContent: 'flex-end',
+    marginTop: 12,
+  },
+  chartGrid: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  chartGridLine: {
+    height: 1,
+    backgroundColor: C.border,
+    marginBottom: 20,
+  },
+  trendLineContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: CHART_HEIGHT,
+  },
+  weightChangeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  weightChange: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: C.primary,
+  },
+  weightChangePercent: {
+    fontSize: 13,
+    color: C.textSecondary,
+    marginTop: 4,
+  },
+  weightRange: {
+    fontSize: 12,
+    color: C.textMuted,
+    marginTop: 8,
+  },
+  macroBreakdownContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    height: 180,
+    marginTop: 12,
+    gap: 12,
+  },
+  macroBar3D: {
+    flex: 1,
+    backgroundColor: C.primary,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 12,
+  },
+  macroBar3DProtein: {
+    backgroundColor: C.primary,
+  },
+  macroBar3DCarbs: {
+    backgroundColor: C.accent,
+  },
+  macroBar3DFat: {
+    backgroundColor: '#FFB84D',
+  },
+  macroBar3DLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: C.background,
+    marginBottom: 4,
+  },
+  dayCard: {
+    backgroundColor: C.surfaceLight,
+    borderRadius: 8,
+    padding: 12,
+    flex: 1,
+    alignItems: 'center',
+  },
+  dayCardDate: {
+    fontSize: 12,
+    color: C.textSecondary,
+    marginBottom: 4,
+  },
+  dayCardCalories: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: C.text,
+  },
+  waterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  waterValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: C.primary,
+  },
+  waterGoal: {
+    fontSize: 13,
+    color: C.textSecondary,
+    marginTop: 4,
+  },
+  waterIcon: {
+    fontSize: 40,
+    color: C.accent,
+  },
+});
+
+/**
+ * Safely parse a date from Firestore or any source.
+ * Handles: Date objects, Firestore Timestamps, ISO strings, numbers, undefined/null.
+ */
+function safeDate(d: any): Date {
+  if (!d) return new Date(0);
+  if (d instanceof Date) return isNaN(d.getTime()) ? new Date(0) : d;
+  if (typeof d?.toDate === 'function') return d.toDate(); // Firestore Timestamp
+  if (typeof d === 'string' || typeof d === 'number') {
+    const parsed = new Date(d);
+    return isNaN(parsed.getTime()) ? new Date(0) : parsed;
+  }
+  if (d.seconds != null) return new Date(d.seconds * 1000); // Raw Firestore Timestamp
+  return new Date(0);
+}
+
+/**
+ * Extract date from a meal object (supports both .date and .timestamp fields)
+ */
+function getMealDate(m: any): Date {
+  return safeDate(m.timestamp || m.date);
+}
+
+/**
+ * Extract calories from a meal (supports both .calories and .nutrition.calories)
+ */
+function getMealCalories(m: any): number {
+  return m.nutrition?.calories || m.calories || 0;
+}
+
+function getMealProtein(m: any): number {
+  return m.nutrition?.protein || m.protein || 0;
+}
+
+function getMealCarbs(m: any): number {
+  return m.nutrition?.carbs || m.carbs || 0;
+}
+
+function getMealFat(m: any): number {
+  return m.nutrition?.fat || m.fat || 0;
+}
 
 type PeriodType = 'week' | 'month' | 'quarter';
 
@@ -55,259 +350,10 @@ interface WaterStats {
   goal: number;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 32,
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.bone,
-    marginBottom: 24,
-  },
-  periodSelector: {
-    flexDirection: 'row',
-    marginBottom: 24,
-    gap: 8,
-  },
-  periodTab: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: COLORS.card,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    alignItems: 'center',
-  },
-  periodTabActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
-  },
-  periodTabText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-  },
-  periodTabTextActive: {
-    color: COLORS.background,
-  },
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: CARD_PADDING,
-    marginBottom: 16,
-  },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-    marginBottom: 16,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  streakContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  streakItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  streakValue: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: COLORS.violet,
-    marginBottom: 4,
-  },
-  streakLabel: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  adherenceContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-  },
-  circularProgress: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: COLORS.cardHover,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 4,
-    borderColor: COLORS.violet,
-    position: 'relative',
-    marginBottom: 16,
-  },
-  adherenceValue: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: COLORS.violet,
-  },
-  adherencePercent: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  adherenceLabel: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: 8,
-  },
-  macroRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    gap: 12,
-  },
-  macroLabel: {
-    width: 70,
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.bone,
-  },
-  macroBar: {
-    flex: 1,
-    height: 24,
-    backgroundColor: COLORS.cardHover,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  macroFill: {
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  macroText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.background,
-  },
-  chartContainer: {
-    height: CHART_HEIGHT,
-    justifyContent: 'flex-end',
-    marginTop: 12,
-  },
-  chartGrid: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  chartGridLine: {
-    height: 1,
-    backgroundColor: COLORS.border,
-    marginBottom: 20,
-  },
-  trendLineContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: CHART_HEIGHT,
-  },
-  weightChangeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  weightChange: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.violet,
-  },
-  weightChangePercent: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginTop: 4,
-  },
-  weightRange: {
-    fontSize: 12,
-    color: COLORS.textTertiary,
-    marginTop: 8,
-  },
-  macroBreakdownContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-    height: 180,
-    marginTop: 12,
-    gap: 12,
-  },
-  macroBar3D: {
-    flex: 1,
-    backgroundColor: COLORS.violet,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 12,
-  },
-  macroBar3DProtein: {
-    backgroundColor: COLORS.violet,
-  },
-  macroBar3DCarbs: {
-    backgroundColor: COLORS.coral,
-  },
-  macroBar3DFat: {
-    backgroundColor: '#FFB84D',
-  },
-  macroBar3DLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.background,
-    marginBottom: 4,
-  },
-  dayCard: {
-    backgroundColor: COLORS.cardHover,
-    borderRadius: 8,
-    padding: 12,
-    flex: 1,
-    alignItems: 'center',
-  },
-  dayCardDate: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginBottom: 4,
-  },
-  dayCardCalories: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.bone,
-  },
-  waterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  waterValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.violet,
-  },
-  waterGoal: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginTop: 4,
-  },
-  waterIcon: {
-    fontSize: 40,
-    color: COLORS.coral,
-  },
-});
-
 export default function AnalyticsScreen() {
+  const C = useColors();
+  const { t } = useTranslation();
+  const styles = createStyles(C);
   const [period, setPeriod] = useState<PeriodType>('week');
   const [loading, setLoading] = useState(false);
 
@@ -336,11 +382,12 @@ export default function AnalyticsScreen() {
   }, [period]);
 
   const streakData = useMemo((): StreakData => {
+    try {
     const meals = mealStore.getMeals();
-    const targetCalories = 2000; // Configurable target
+    const targetCalories = 2000;
 
     const sortedMeals = [...meals].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      (a, b) => getMealDate(a).getTime() - getMealDate(b).getTime()
     );
 
     let currentStreak = 0;
@@ -349,7 +396,9 @@ export default function AnalyticsScreen() {
     const uniqueDates = new Set<string>();
 
     for (const meal of sortedMeals) {
-      const dateKey = new Date(meal.date).toISOString().split('T')[0];
+      const d = getMealDate(meal);
+      if (d.getTime() === 0) continue; // skip invalid dates
+      const dateKey = d.toISOString().split('T')[0];
       uniqueDates.add(dateKey);
     }
 
@@ -359,10 +408,12 @@ export default function AnalyticsScreen() {
       .map((d) => new Date(d));
 
     for (const date of sortedDates) {
+      if (isNaN(date.getTime())) continue;
+      const dateStr = date.toISOString().split('T')[0];
       const mealsOnDate = sortedMeals.filter(
-        (m) => new Date(m.date).toISOString().split('T')[0] === date.toISOString().split('T')[0]
+        (m) => getMealDate(m).toISOString().split('T')[0] === dateStr
       );
-      const totalCalories = mealsOnDate.reduce((sum, m) => sum + (m.calories || 0), 0);
+      const totalCalories = mealsOnDate.reduce((sum, m) => sum + getMealCalories(m), 0);
 
       const meetsGoal =
         totalCalories >= targetCalories * 0.9 && totalCalories <= targetCalories * 1.1;
@@ -393,104 +444,135 @@ export default function AnalyticsScreen() {
       longestStreak,
       totalDaysLogged: uniqueDates.size,
     };
+    } catch (e) {
+      console.error('streakData error:', e);
+      return { currentStreak: 0, longestStreak: 0, totalDaysLogged: 0 };
+    }
   }, []);
 
   const adherenceScore = useMemo((): number => {
-    const meals = mealStore.getMeals();
-    const targetCalories = 2000;
+    try {
+      const meals = mealStore.getMeals();
+      const targetCalories = 2000;
 
-    const mealsInPeriod = meals.filter((m) => {
-      const mealDate = new Date(m.date);
-      return mealDate >= dateRange.start && mealDate <= dateRange.end;
-    });
+      const mealsInPeriod = meals.filter((m) => {
+        const mealDate = getMealDate(m);
+        return mealDate >= dateRange.start && mealDate <= dateRange.end;
+      });
 
-    if (mealsInPeriod.length === 0) return 0;
+      if (mealsInPeriod.length === 0) return 0;
 
-    const mealsPerDay: { [key: string]: number } = {};
-    mealsInPeriod.forEach((meal) => {
-      const dateKey = new Date(meal.date).toISOString().split('T')[0];
-      mealsPerDay[dateKey] = (mealsPerDay[dateKey] || 0) + (meal.calories || 0);
-    });
+      const mealsPerDay: { [key: string]: number } = {};
+      mealsInPeriod.forEach((meal) => {
+        const d = getMealDate(meal);
+        if (d.getTime() === 0) return;
+        const dateKey = d.toISOString().split('T')[0];
+        mealsPerDay[dateKey] = (mealsPerDay[dateKey] || 0) + getMealCalories(meal);
+      });
 
-    const meetsGoal = Object.values(mealsPerDay).filter(
-      (cals) => cals >= targetCalories * 0.9 && cals <= targetCalories * 1.1
-    ).length;
+      const days = Object.keys(mealsPerDay).length;
+      if (days === 0) return 0;
 
-    return Math.round((meetsGoal / Object.keys(mealsPerDay).length) * 100);
+      const meetsGoal = Object.values(mealsPerDay).filter(
+        (cals) => cals >= targetCalories * 0.9 && cals <= targetCalories * 1.1
+      ).length;
+
+      return Math.round((meetsGoal / days) * 100);
+    } catch (e) {
+      console.error('adherenceScore error:', e);
+      return 0;
+    }
   }, [dateRange]);
 
   const macroAverages = useMemo((): MacroAverage => {
-    const meals = mealStore.getMeals();
+    try {
+      const meals = mealStore.getMeals();
 
-    const mealsInPeriod = meals.filter((m) => {
-      const mealDate = new Date(m.date);
-      return mealDate >= dateRange.start && mealDate <= dateRange.end;
-    });
+      const mealsInPeriod = meals.filter((m) => {
+        const mealDate = getMealDate(m);
+        return mealDate >= dateRange.start && mealDate <= dateRange.end;
+      });
 
-    if (mealsInPeriod.length === 0)
+      if (mealsInPeriod.length === 0)
+        return { protein: 0, carbs: 0, fat: 0 };
+
+      const totals = mealsInPeriod.reduce(
+        (acc, meal) => ({
+          protein: acc.protein + getMealProtein(meal),
+          carbs: acc.carbs + getMealCarbs(meal),
+          fat: acc.fat + getMealFat(meal),
+        }),
+        { protein: 0, carbs: 0, fat: 0 }
+      );
+
+      return {
+        protein: Math.round(totals.protein / mealsInPeriod.length),
+        carbs: Math.round(totals.carbs / mealsInPeriod.length),
+        fat: Math.round(totals.fat / mealsInPeriod.length),
+      };
+    } catch (e) {
+      console.error('macroAverages error:', e);
       return { protein: 0, carbs: 0, fat: 0 };
-
-    const totals = mealsInPeriod.reduce(
-      (acc, meal) => ({
-        protein: acc.protein + (meal.protein || 0),
-        carbs: acc.carbs + (meal.carbs || 0),
-        fat: acc.fat + (meal.fat || 0),
-      }),
-      { protein: 0, carbs: 0, fat: 0 }
-    );
-
-    return {
-      protein: Math.round(totals.protein / mealsInPeriod.length),
-      carbs: Math.round(totals.carbs / mealsInPeriod.length),
-      fat: Math.round(totals.fat / mealsInPeriod.length),
-    };
+    }
   }, [dateRange]);
 
   const caloriesTrend = useMemo((): TrendPoint[] => {
-    const meals = mealStore.getMeals();
+    try {
+      const meals = mealStore.getMeals();
 
-    const mealsInPeriod = meals.filter((m) => {
-      const mealDate = new Date(m.date);
-      return mealDate >= dateRange.start && mealDate <= dateRange.end;
-    });
+      const mealsInPeriod = meals.filter((m) => {
+        const mealDate = getMealDate(m);
+        return mealDate >= dateRange.start && mealDate <= dateRange.end;
+      });
 
-    const mealsPerDay: { [key: string]: number } = {};
-    mealsInPeriod.forEach((meal) => {
-      const dateKey = new Date(meal.date).toISOString().split('T')[0];
-      mealsPerDay[dateKey] = (mealsPerDay[dateKey] || 0) + (meal.calories || 0);
-    });
+      const mealsPerDay: { [key: string]: number } = {};
+      mealsInPeriod.forEach((meal) => {
+        const d = getMealDate(meal);
+        if (d.getTime() === 0) return;
+        const dateKey = d.toISOString().split('T')[0];
+        mealsPerDay[dateKey] = (mealsPerDay[dateKey] || 0) + getMealCalories(meal);
+      });
 
-    return Object.entries(mealsPerDay)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, calories]) => ({ date, calories }));
+      return Object.entries(mealsPerDay)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, calories]) => ({ date, calories }));
+    } catch (e) {
+      console.error('caloriesTrend error:', e);
+      return [];
+    }
   }, [dateRange]);
 
   const weightProgress = useMemo((): WeightTrend => {
-    const weights = weightStore.getWeights();
+    try {
+      const weights = weightStore.getWeights();
 
-    const weightsInPeriod = weights.filter((w) => {
-      const wDate = new Date(w.date);
-      return wDate >= dateRange.start && wDate <= dateRange.end;
-    });
+      const weightsInPeriod = weights.filter((w) => {
+        const wDate = safeDate(w.date);
+        return wDate.getTime() > 0 && wDate >= dateRange.start && wDate <= dateRange.end;
+      });
 
-    if (weightsInPeriod.length === 0)
+      if (weightsInPeriod.length === 0)
+        return { change: 0, percent: 0, startWeight: 0, endWeight: 0 };
+
+      const sortedWeights = [...weightsInPeriod].sort(
+        (a, b) => safeDate(a.date).getTime() - safeDate(b.date).getTime()
+      );
+
+      const startWeight = sortedWeights[0].weight || 0;
+      const endWeight = sortedWeights[sortedWeights.length - 1].weight || 0;
+      const change = endWeight - startWeight;
+      const percent = startWeight > 0 ? (change / startWeight) * 100 : 0;
+
+      return {
+        change: Math.round(change * 10) / 10,
+        percent: Math.round(percent * 10) / 10,
+        startWeight,
+        endWeight,
+      };
+    } catch (e) {
+      console.error('weightProgress error:', e);
       return { change: 0, percent: 0, startWeight: 0, endWeight: 0 };
-
-    const sortedWeights = weightsInPeriod.sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-
-    const startWeight = sortedWeights[0].weight;
-    const endWeight = sortedWeights[sortedWeights.length - 1].weight;
-    const change = endWeight - startWeight;
-    const percent = (change / startWeight) * 100;
-
-    return {
-      change: Math.round(change * 10) / 10,
-      percent: Math.round(percent * 10) / 10,
-      startWeight,
-      endWeight,
-    };
+    }
   }, [dateRange]);
 
   const macroBreakdown = useMemo(() => {
@@ -518,20 +600,25 @@ export default function AnalyticsScreen() {
   }, [caloriesTrend]);
 
   const waterStats = useMemo((): WaterStats => {
-    const water = waterStore.getWater();
+    try {
+      const water = waterStore.getWater();
 
-    const waterInPeriod = water.filter((w) => {
-      const wDate = new Date(w.date);
-      return wDate >= dateRange.start && wDate <= dateRange.end;
-    });
+      const waterInPeriod = water.filter((w) => {
+        const wDate = safeDate(w.date);
+        return wDate.getTime() > 0 && wDate >= dateRange.start && wDate <= dateRange.end;
+      });
 
-    if (waterInPeriod.length === 0) return { average: 0, goal: 2000 };
+      if (waterInPeriod.length === 0) return { average: 0, goal: 2000 };
 
-    const total = waterInPeriod.reduce((sum, w) => sum + (w.amount || 0), 0);
-    return {
-      average: Math.round(total / waterInPeriod.length),
-      goal: 2000,
-    };
+      const total = waterInPeriod.reduce((sum, w) => sum + (w.amount || 0), 0);
+      return {
+        average: Math.round(total / waterInPeriod.length),
+        goal: 2000,
+      };
+    } catch (e) {
+      console.error('waterStats error:', e);
+      return { average: 0, goal: 2000 };
+    }
   }, [dateRange]);
 
   const renderTrendLine = () => {
@@ -557,7 +644,7 @@ export default function AnalyticsScreen() {
         viewBox={`0 0 ${width - 80} ${CHART_HEIGHT}`}
         style={{ position: 'absolute' }}
       >
-        <path d={pathD} stroke={COLORS.violet} strokeWidth={2} fill="none" />
+        <path d={pathD} stroke={C.primary} strokeWidth={2} fill="none" />
       </svg>
     );
   };
@@ -568,7 +655,7 @@ export default function AnalyticsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.header}>Estadísticas</Text>
+        <Text style={styles.header}>{t('analytics.title')}</Text>
 
         {/* Period Selector */}
         <View style={styles.periodSelector}>
@@ -582,7 +669,7 @@ export default function AnalyticsScreen() {
                 period === 'week' && styles.periodTabTextActive,
               ]}
             >
-              Semana
+              {t('analytics.week')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -595,7 +682,7 @@ export default function AnalyticsScreen() {
                 period === 'month' && styles.periodTabTextActive,
               ]}
             >
-              Mes
+              {t('analytics.month')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -608,33 +695,33 @@ export default function AnalyticsScreen() {
                 period === 'quarter' && styles.periodTabTextActive,
               ]}
             >
-              3 Meses
+              {t('analytics.threeMonths')}
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Streak Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Racha Actual</Text>
+          <Text style={styles.cardTitle}>{t('analytics.currentStreak')}</Text>
           <View style={styles.streakContainer}>
             <View style={styles.streakItem}>
               <Text style={styles.streakValue}>🔥 {streakData.currentStreak}</Text>
-              <Text style={styles.streakLabel}>días actuales</Text>
+              <Text style={styles.streakLabel}>{t('analytics.currentDays')}</Text>
             </View>
             <View style={styles.streakItem}>
               <Text style={styles.streakValue}>{streakData.longestStreak}</Text>
-              <Text style={styles.streakLabel}>racha más larga</Text>
+              <Text style={styles.streakLabel}>{t('analytics.longestStreak')}</Text>
             </View>
             <View style={styles.streakItem}>
               <Text style={styles.streakValue}>{streakData.totalDaysLogged}</Text>
-              <Text style={styles.streakLabel}>días registrados</Text>
+              <Text style={styles.streakLabel}>{t('analytics.totalLogged')}</Text>
             </View>
           </View>
         </View>
 
         {/* Adherence Score */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Cumplimiento de Metas</Text>
+          <Text style={styles.cardTitle}>{t('analytics.goalAdherence')}</Text>
           <View style={styles.adherenceContainer}>
             <View style={styles.circularProgress}>
               <View>
@@ -643,14 +730,14 @@ export default function AnalyticsScreen() {
               </View>
             </View>
             <Text style={styles.adherenceLabel}>
-              Frecuencia de cumplimiento de objetivos calóricos (±10%)
+              {t('analytics.goalAdherenceDesc')}
             </Text>
           </View>
         </View>
 
         {/* Calorie Trend */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Tendencia Calórica</Text>
+          <Text style={styles.cardTitle}>{t('analytics.calorieTrend')}</Text>
           <View style={styles.chartContainer}>
             <View style={styles.chartGrid}>
               {[0, 1, 2, 3, 4].map((i) => (
@@ -663,22 +750,22 @@ export default function AnalyticsScreen() {
           </View>
           {caloriesTrend.length > 0 && (
             <Text style={styles.cardTitle}>
-              Promedio: {Math.round(caloriesTrend.reduce((sum, p) => sum + p.calories, 0) / caloriesTrend.length)} cal
+              {t('analytics.average')}: {Math.round(caloriesTrend.reduce((sum, p) => sum + p.calories, 0) / caloriesTrend.length)} cal
             </Text>
           )}
         </View>
 
         {/* Weekly Macro Averages */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Promedios Macro</Text>
+          <Text style={styles.cardTitle}>{t('analytics.macroAverages')}</Text>
           <View>
             <View style={styles.macroRow}>
-              <Text style={styles.macroLabel}>Proteína</Text>
+              <Text style={styles.macroLabel}>{t('analytics.protein')}</Text>
               <View style={styles.macroBar}>
                 <View
                   style={[
                     styles.macroFill,
-                    { width: `${Math.min((macroAverages.protein / 150) * 100, 100)}%`, backgroundColor: COLORS.violet },
+                    { width: `${Math.min((macroAverages.protein / 150) * 100, 100)}%`, backgroundColor: C.primary },
                   ]}
                 >
                   <Text style={styles.macroText}>{macroAverages.protein}g</Text>
@@ -686,12 +773,12 @@ export default function AnalyticsScreen() {
               </View>
             </View>
             <View style={styles.macroRow}>
-              <Text style={styles.macroLabel}>Carbos</Text>
+              <Text style={styles.macroLabel}>{t('analytics.carbs')}</Text>
               <View style={styles.macroBar}>
                 <View
                   style={[
                     styles.macroFill,
-                    { width: `${Math.min((macroAverages.carbs / 300) * 100, 100)}%`, backgroundColor: COLORS.coral },
+                    { width: `${Math.min((macroAverages.carbs / 300) * 100, 100)}%`, backgroundColor: C.accent },
                   ]}
                 >
                   <Text style={styles.macroText}>{macroAverages.carbs}g</Text>
@@ -699,7 +786,7 @@ export default function AnalyticsScreen() {
               </View>
             </View>
             <View style={styles.macroRow}>
-              <Text style={styles.macroLabel}>Grasas</Text>
+              <Text style={styles.macroLabel}>{t('analytics.fats')}</Text>
               <View style={styles.macroBar}>
                 <View
                   style={[
@@ -716,7 +803,7 @@ export default function AnalyticsScreen() {
 
         {/* Weight Progress */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Progreso de Peso</Text>
+          <Text style={styles.cardTitle}>{t('analytics.weightProgress')}</Text>
           <View style={styles.weightChangeContainer}>
             <View>
               <Text style={styles.weightChange}>
@@ -732,26 +819,26 @@ export default function AnalyticsScreen() {
             <Ionicons
               name={weightProgress.change <= 0 ? 'trending-down' : 'trending-up'}
               size={40}
-              color={weightProgress.change <= 0 ? COLORS.coral : '#FF9999'}
+              color={weightProgress.change <= 0 ? C.accent : '#FF9999'}
             />
           </View>
         </View>
 
         {/* Macro Breakdown */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Distribución Macro</Text>
+          <Text style={styles.cardTitle}>{t('analytics.macroDistribution')}</Text>
           <View style={styles.macroBreakdownContainer}>
             <View style={[styles.macroBar3D, styles.macroBar3DProtein, { height: `${macroBreakdown.protein}%` }]}>
               <Text style={styles.macroBar3DLabel}>{Math.round(macroBreakdown.protein)}%</Text>
-              <Text style={styles.macroBar3DLabel}>Proteína</Text>
+              <Text style={styles.macroBar3DLabel}>{t('analytics.protein')}</Text>
             </View>
             <View style={[styles.macroBar3D, styles.macroBar3DCarbs, { height: `${macroBreakdown.carbs}%` }]}>
               <Text style={styles.macroBar3DLabel}>{Math.round(macroBreakdown.carbs)}%</Text>
-              <Text style={styles.macroBar3DLabel}>Carbos</Text>
+              <Text style={styles.macroBar3DLabel}>{t('analytics.carbs')}</Text>
             </View>
             <View style={[styles.macroBar3D, styles.macroBar3DFat, { height: `${macroBreakdown.fat}%` }]}>
               <Text style={styles.macroBar3DLabel}>{Math.round(macroBreakdown.fat)}%</Text>
-              <Text style={styles.macroBar3DLabel}>Grasas</Text>
+              <Text style={styles.macroBar3DLabel}>{t('analytics.fats')}</Text>
             </View>
           </View>
         </View>
@@ -759,17 +846,17 @@ export default function AnalyticsScreen() {
         {/* Best/Worst Days */}
         {bestWorstDays && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Mejor y Peor Día</Text>
+            <Text style={styles.cardTitle}>{t('analytics.bestAndWorst')}</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <View style={styles.dayCard}>
                 <Text style={styles.dayCardDate}>{bestWorstDays.best.date}</Text>
                 <Text style={styles.dayCardCalories}>{bestWorstDays.best.calories}</Text>
-                <Text style={styles.dayCardDate}>calorías (Mejor)</Text>
+                <Text style={styles.dayCardDate}>{t('analytics.caloriesBest')}</Text>
               </View>
               <View style={styles.dayCard}>
                 <Text style={styles.dayCardDate}>{bestWorstDays.worst.date}</Text>
                 <Text style={styles.dayCardCalories}>{bestWorstDays.worst.calories}</Text>
-                <Text style={styles.dayCardDate}>calorías (Peor)</Text>
+                <Text style={styles.dayCardDate}>{t('analytics.caloriesWorst')}</Text>
               </View>
             </View>
           </View>
@@ -777,12 +864,12 @@ export default function AnalyticsScreen() {
 
         {/* Water Stats */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Agua Diaria</Text>
+          <Text style={styles.cardTitle}>{t('analytics.dailyWater')}</Text>
           <View style={styles.waterContainer}>
             <View>
               <Text style={styles.waterValue}>{waterStats.average} ml</Text>
-              <Text style={styles.waterGoal}>promedio diario</Text>
-              <Text style={styles.waterGoal}>meta: {waterStats.goal} ml</Text>
+              <Text style={styles.waterGoal}>{t('analytics.dailyAverage')}</Text>
+              <Text style={styles.waterGoal}>{t('analytics.waterGoal')}: {waterStats.goal} ml</Text>
             </View>
             <Ionicons name="water" style={styles.waterIcon} />
           </View>

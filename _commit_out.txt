@@ -1,0 +1,504 @@
+[feat/add-app-source dd1809e] feat: add React Native/Expo app source code
+ 581 files changed, 60420 insertions(+), 13681 deletions(-)
+ create mode 160000 .claude/worktrees/elastic-poitras
+ create mode 100644 .easignore
+ create mode 100644 C2G_Fase1_Calendario_ES.xlsx
+ create mode 100644 CLAUDE.md
+ create mode 100644 Claude code/CHANGELOG.md
+ create mode 100644 Claude code/CLAUDE.md
+ create mode 100644 Claude code/README.md
+ create mode 100644 Claude code/agents/app-dev.md
+ create mode 100644 Claude code/agents/finance.md
+ create mode 100644 Claude code/agents/growth.md
+ create mode 100644 Claude code/agents/marketing.md
+ create mode 100644 Claude code/agents/marketing/README.md
+ create mode 100644 Claude code/agents/marketing/brand-reviewer.md
+ create mode 100644 Claude code/agents/marketing/caption-hashtag.md
+ create mode 100644 Claude code/agents/marketing/carousel-designer.md
+ create mode 100644 Claude code/agents/marketing/hook-writer.md
+ create mode 100644 Claude code/agents/marketing/performance-analyzer.md
+ create mode 100644 Claude code/agents/marketing/reels-scriptwriter.md
+ create mode 100644 Claude code/agents/marketing/trend-scout.md
+ create mode 100644 Claude code/agents/marketing/viral-strategist.md
+ create mode 100644 Claude code/agents/ops.md
+ create mode 100644 Claude code/agents/research.md
+ create mode 100644 Claude code/agents/web-dev.md
+ create mode 100644 Claude code/commands/build-app.md
+ create mode 100644 Claude code/commands/deploy-web.md
+ create mode 100644 Claude code/commands/metrics.md
+ create mode 100644 Claude code/commands/morning-brief.md
+ create mode 100644 Claude code/commands/receipts.md
+ create mode 100644 Claude code/commands/status.md
+ create mode 100644 Claude code/context/ACCOUNTS.md
+ create mode 100644 Claude code/context/BRAND.md
+ create mode 100644 Claude code/context/FINANCES-OVERVIEW.md
+ create mode 100644 Claude code/context/MARKETING-BENCHMARKS.md
+ create mode 100644 Claude code/context/META-API-SETUP.md
+ create mode 100644 Claude code/context/PROJECT-OVERVIEW.md
+ create mode 100644 Claude code/context/TECH-STACK.md
+ create mode 100644 Claude code/context/TREND-INSIGHTS.md
+ create mode 100644 Claude code/guardrails/ANTI-PATTERNS.md
+ create mode 100644 Claude code/guardrails/ESCALATION.md
+ create mode 100644 Claude code/guardrails/RULES.md
+ create mode 100644 Claude code/memory/MEMORY-STRUCTURE.md
+ create mode 100644 Claude code/orchestration/CONTENT-PIPELINE.md
+ create mode 100644 Claude code/orchestration/HANDOFFS.md
+ create mode 100644 Claude code/orchestration/WORKFLOWS.md
+ create mode 100644 Claude code/orchestration/scheduled-tasks-map.md
+ create mode 100644 Claude code/orchestration/scheduled-tasks-prompts/instagram-comment-replies.md
+ create mode 100644 Claude code/orchestration/scheduled-tasks-prompts/instagram-comments-afternoon.md
+ create mode 100644 Claude code/orchestration/scheduled-tasks-prompts/instagram-comments-morning.md
+ create mode 100644 Claude code/orchestration/scheduled-tasks-prompts/trend-scout.md
+ create mode 100644 Claude code/skills/crash-diagnosis/SKILL.md
+ create mode 100644 Claude code/skills/download-receipt/SKILL.md
+ create mode 100644 Claude code/skills/eas-build/SKILL.md
+ create mode 100644 Claude code/skills/publish-post/SKILL.md
+ create mode 100644 Claude code/skills/update-dashboard/SKILL.md
+ create mode 100644 Claude code/skills/weekly-metrics/SKILL.md
+ create mode 100644 _phone_screen.png
+ create mode 100644 _project-hub/ACCOUNTS.md
+ create mode 100644 _project-hub/BRAND.md
+ create mode 100644 _project-hub/CHANGELOG.md
+ create mode 100644 _project-hub/CONTENT_PLAN.md
+ create mode 100644 _project-hub/FEATURES.md
+ create mode 100644 _project-hub/FINANCES.md
+ create mode 100644 _project-hub/METRICS.md
+ create mode 100644 _project-hub/PROJECT_STATUS.md
+ create mode 100644 _project-hub/SCREENSHOTS.md
+ create mode 100644 _project-hub/SEO_REPORT.md
+ create mode 100644 _project-hub/dashboard.html
+ create mode 100644 app/(tabs)/tools.tsx
+ create mode 100644 app/about.tsx
+ create mode 100644 app/edit-meal.tsx
+ create mode 100644 app/edit-profile.tsx
+ create mode 100644 app/help.tsx
+ create mode 100644 app/nutrition-settings.tsx
+ create mode 100644 app/shopping-list.tsx
+ create mode 100644 app/water-tracker.tsx
+ create mode 100644 brand-assets/C2G-Facebook-Cover-820x312.png
+ create mode 100644 brand-assets/C2G-Facebook-Cover-EN-820x312.png
+ create mode 100644 brand-assets/C2G-Facebook-Cover-ES-820x312.png
+ create mode 100644 data/spanishFoods.ts
+ create mode 100644 deploy-seo-fixes.bat
+ create mode 100644 docs/Cals2Gains_Dossier_Inversores.docx
+ create mode 100644 docs/Cals2Gains_Master_Prompt.md
+ create mode 100644 docs/build-logs/auto_log.txt
+ create mode 100644 docs/build-logs/b64loader.js
+ rename build-output.txt => docs/build-logs/build-output.txt (100%)
+ create mode 100644 docs/build-logs/chrome_full.png
+ create mode 100644 docs/build-logs/chunk_0.txt
+ create mode 100644 docs/build-logs/chunk_1.txt
+ create mode 100644 docs/build-logs/chunk_2.txt
+ create mode 100644 docs/build-logs/chunk_3.txt
+ create mode 100644 docs/build-logs/chunk_4.txt
+ create mode 100644 docs/build-logs/chunk_5.txt
+ create mode 100644 docs/build-logs/chunk_6.txt
+ create mode 100644 docs/build-logs/chunk_7.txt
+ create mode 100644 docs/build-logs/cors_server.py
+ create mode 100644 docs/build-logs/deploy-ga-result.txt
+ create mode 100644 docs/build-logs/deploy-gsc-result.txt
+ create mode 100644 docs/build-logs/deploy-index-result.txt
+ rename deploy-landing-output.txt => docs/build-logs/deploy-landing-output.txt (100%)
+ rename deploy-landing.bat => docs/build-logs/deploy-landing.bat (100%)
+ rename deploy-landing2.bat => docs/build-logs/deploy-landing2.bat (100%)
+ rename deploy-output2.txt => docs/build-logs/deploy-output2.txt (100%)
+ rename deploy-result.txt => docs/build-logs/deploy-result.txt (100%)
+ rename deploy-result2.txt => docs/build-logs/deploy-result2.txt (100%)
+ rename deploy-result3.txt => docs/build-logs/deploy-result3.txt (100%)
+ create mode 100644 docs/build-logs/deploy-seo-result.txt
+ create mode 100644 docs/build-logs/deploy-storage-log.txt
+ create mode 100644 docs/build-logs/deploy-storage-log2.txt
+ create mode 100644 docs/build-logs/deploy-verify-result.txt
+ rename deploy.zip => docs/build-logs/deploy.zip (100%)
+ create mode 100644 docs/build-logs/deploy_log.txt
+ create mode 100644 docs/build-logs/dialog_handler.ps1
+ create mode 100644 docs/build-logs/dialog_handler2.ps1
+ create mode 100644 docs/build-logs/dialog_handler3.ps1
+ create mode 100644 docs/build-logs/dialog_log.txt
+ create mode 100644 docs/build-logs/download-logs.bat
+ create mode 100644 docs/build-logs/download-logs.ps1
+ rename eas-build.bat => docs/build-logs/eas-build.bat (100%)
+ create mode 100644 docs/build-logs/eas-log3.txt
+ create mode 100644 docs/build-logs/eas-log4.txt
+ create mode 100644 docs/build-logs/eas_build10.txt
+ create mode 100644 docs/build-logs/eas_build11.txt
+ create mode 100644 docs/build-logs/eas_build3.txt
+ create mode 100644 docs/build-logs/eas_build4.txt
+ create mode 100644 docs/build-logs/eas_build5.txt
+ create mode 100644 docs/build-logs/eas_build6.txt
+ create mode 100644 docs/build-logs/eas_build7.txt
+ create mode 100644 docs/build-logs/eas_build8.txt
+ create mode 100644 docs/build-logs/eas_build9.txt
+ rename eas_build_log.txt => docs/build-logs/eas_build_log.txt (100%)
+ rename eas_build_log2.txt => docs/build-logs/eas_build_log2.txt (100%)
+ rename eas_build_log3.txt => docs/build-logs/eas_build_log3.txt (100%)
+ rename eas_build_log4.txt => docs/build-logs/eas_build_log4.txt (100%)
+ create mode 100644 docs/build-logs/eas_build_output.txt
+ rename eas_init_log.txt => docs/build-logs/eas_init_log.txt (100%)
+ rename eas_install_log.txt => docs/build-logs/eas_install_log.txt (100%)
+ create mode 100644 docs/build-logs/eas_update.txt
+ rename firebase-auth-code.txt => docs/build-logs/firebase-auth-code.txt (100%)
+ rename firebase-auto.bat => docs/build-logs/firebase-auto.bat (100%)
+ rename firebase-deploy.bat => docs/build-logs/firebase-deploy.bat (100%)
+ create mode 100644 docs/build-logs/firebase-domain-create.txt
+ create mode 100644 docs/build-logs/firebase-domain-info.txt
+ rename firebase-login-output.txt => docs/build-logs/firebase-login-output.txt (100%)
+ rename firebase-login-url.txt => docs/build-logs/firebase-login-url.txt (100%)
+ rename firebase-login.bat => docs/build-logs/firebase-login.bat (100%)
+ create mode 100644 docs/build-logs/firebase-reauth-log.txt
+ create mode 100644 docs/build-logs/firebase-sites.txt
+ rename firebase-token-output.txt => docs/build-logs/firebase-token-output.txt (100%)
+ rename firebase-token-result.txt => docs/build-logs/firebase-token-result.txt (100%)
+ create mode 100644 docs/build-logs/firebase-version.txt
+ rename firebase_install_log.txt => docs/build-logs/firebase_install_log.txt (100%)
+ rename firebase_login.bat => docs/build-logs/firebase_login.bat (100%)
+ rename firebase_login_log.txt => docs/build-logs/firebase_login_log.txt (100%)
+ rename firebase_login_log2.txt => docs/build-logs/firebase_login_log2.txt (100%)
+ rename firebase_login_log3.txt => docs/build-logs/firebase_login_log3.txt (100%)
+ rename firebase_login_log4.txt => docs/build-logs/firebase_login_log4.txt (100%)
+ rename firebase_login_log5.txt => docs/build-logs/firebase_login_log5.txt (100%)
+ rename firebase_login_log6.txt => docs/build-logs/firebase_login_log6.txt (100%)
+ rename firebase_login_log7.txt => docs/build-logs/firebase_login_log7.txt (100%)
+ rename fix-and-build.bat => docs/build-logs/fix-and-build.bat (100%)
+ rename fix-build.bat => docs/build-logs/fix-build.bat (100%)
+ rename fix-output.txt => docs/build-logs/fix-output.txt (100%)
+ create mode 100644 docs/build-logs/gcloud-auth.txt
+ create mode 100644 docs/build-logs/gcloud-token.txt
+ create mode 100644 docs/build-logs/gcloud-token2.txt
+ create mode 100644 docs/build-logs/get-build-logs.bat
+ rename git-commit-output.txt => docs/build-logs/git-commit-output.txt (100%)
+ rename git-commit.bat => docs/build-logs/git-commit.bat (100%)
+ rename git-push-output.txt => docs/build-logs/git-push-output.txt (100%)
+ rename git-push.bat => docs/build-logs/git-push.bat (100%)
+ rename git-remote-check.bat => docs/build-logs/git-remote-check.bat (100%)
+ rename git-remote-output.txt => docs/build-logs/git-remote-output.txt (100%)
+ rename git_commit2.txt => docs/build-logs/git_commit2.txt (100%)
+ rename git_init_log.txt => docs/build-logs/git_init_log.txt (100%)
+ create mode 100644 docs/build-logs/http_server.ps1
+ create mode 100644 docs/build-logs/img_viewer.html
+ rename install-and-stage.bat => docs/build-logs/install-and-stage.bat (100%)
+ create mode 100644 docs/build-logs/install-log.txt
+ create mode 100644 docs/build-logs/install-log2.txt
+ create mode 100644 docs/build-logs/install-log3.txt
+ create mode 100644 docs/build-logs/install-log4.txt
+ create mode 100644 docs/build-logs/install-log5.txt
+ create mode 100644 docs/build-logs/js_chunk1.txt
+ create mode 100644 docs/build-logs/js_chunk2.txt
+ create mode 100644 docs/build-logs/js_chunk3.txt
+ rename login-y-build.bat => docs/build-logs/login-y-build.bat (100%)
+ create mode 100644 docs/build-logs/login_log.txt
+ create mode 100644 docs/build-logs/metro-log.txt
+ rename metro_install.txt => docs/build-logs/metro_install.txt (100%)
+ create mode 100644 docs/build-logs/npm-install-log.txt
+ create mode 100644 docs/build-logs/npm_ci_test.txt
+ create mode 100644 docs/build-logs/npm_install2.txt
+ rename npm_install_log.txt => docs/build-logs/npm_install_log.txt (100%)
+ rename npm_install_log2.txt => docs/build-logs/npm_install_log2.txt (100%)
+ rename pip_log.txt => docs/build-logs/pip_log.txt (100%)
+ create mode 100644 docs/build-logs/run-build.bat
+ rename screenshots_log.txt => docs/build-logs/screenshots_log.txt (100%)
+ create mode 100644 docs/build-logs/serve.py
+ rename sso-build.bat => docs/build-logs/sso-build.bat (100%)
+ create mode 100644 docs/build-logs/temp_b64.txt
+ create mode 100644 docs/build-logs/test_capture.png
+ rename tsc_check.txt => docs/build-logs/tsc_check.txt (100%)
+ rename tsc_check2.txt => docs/build-logs/tsc_check2.txt (100%)
+ create mode 100644 docs/build-logs/versions.txt
+ create mode 100644 docs/guides/CHECKLIST-PRUEBAS-IPHONE.md
+ create mode 100644 docs/guides/COMO-PROBAR-IPHONE.md
+ rename GUIA-PUBLICACION.md => docs/guides/GUIA-PUBLICACION.md (100%)
+ rename GUIA_COMPLETA_SETUP_Y_PUBLICACION.md => docs/guides/GUIA_COMPLETA_SETUP_Y_PUBLICACION.md (100%)
+ create mode 100644 docs/guides/TESTING.md
+ rename store-listing-metadata.md => docs/guides/store-listing-metadata.md (97%)
+ rename release-notes.json => docs/release-notes.json (100%)
+ create mode 100644 docs/reports/C2G_SEO_Audit_Performance_Report.html
+ create mode 100644 docs/reports/Cals2Gains_Auditoria_Android.docx
+ create mode 100644 docs/reports/c2g_metrics.js
+ create mode 100644 docs/reports/cals2gains_growth_dashboard.html
+ create mode 100644 docs/reports/metricas_semana_15_2026-04-11.txt
+ delete mode 100644 eas-build-output.txt
+ create mode 100644 finances/Cals2Gains_Finances.xlsx
+ create mode 100644 finances/Cals2Gains_Finances_backup.xlsx
+ create mode 100644 finances/Cals2Gains_Finances_pre_update.xlsx
+ create mode 100644 finances/dashboard.html
+ create mode 100644 finances/receipt-collector-report_2026-04-13.txt
+ create mode 100644 finances/receipts/anthropic/2026-04-13_anthropic_receipt-2466-5491-6579_595eur.pdf
+ create mode 100644 finances/receipts/anthropic/Invoice-5RBPQUSE-0001.pdf
+ create mode 100644 finances/receipts/anthropic/Invoice-5RBPQUSE-0002.pdf
+ create mode 100644 finances/receipts/anthropic/Invoice-5RBPQUSE-0003.pdf
+ create mode 100644 finances/receipts/anthropic/Invoice-5RBPQUSE-0004.pdf
+ create mode 100644 finances/receipts/anthropic/Receipt-2090-6146-8736.pdf
+ create mode 100644 finances/receipts/anthropic/Receipt-2223-8391-6912.pdf
+ create mode 100644 finances/receipts/anthropic/Receipt-2276-0916-6675.pdf
+ create mode 100644 finances/receipts/anthropic/Receipt-2399-9403-0181.pdf
+ create mode 100644 finances/receipts/openai/2026-04-10_openai_invoice-872130F5-0003_121usd.txt
+ create mode 100644 firestore.indexes.json
+ create mode 100644 hooks/useAdaptiveEngines.ts
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_01_black_box_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_02_poll_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_03_myth_carbs_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_04_apps_2015_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_05_tdee_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_06_60_quit_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_07_4apps_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_08_comments_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_09_macros101_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_10_3seconds_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_11_lose_gain_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_12_14700M_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_13_deficit_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_14_something_coming_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_15_protein_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_16_real_ai_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_17_myth_fasting_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_18_wishlist_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_19_wearables_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_20_30features_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_21_999month_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_22_coach_x10_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_23_hydration_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_24_3days_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_25_recomp_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_26_2days_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_27_goodbye_old_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_F1_28_tomorrow_EN.png
+ create mode 100644 marketing/Campaign_F1/EN/C2G_Fase1_Calendario_EN.xlsx
+ create mode 100644 marketing/Campaign_F1/EN/schedule_en.json
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_01_caja_negra_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_02_encuesta_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_03_mito_carbos_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_04_apps_2015_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_05_tdee_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_06_60_abandona_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_07_4apps_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_08_comenta_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_09_macros101_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_10_3segundos_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_11_perder_ganar_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_12_14700M_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_13_deficit_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_14_algo_viene_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_15_proteina_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_16_ia_real_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_17_mito_ayuno_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_18_que_quieres_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_19_wearables_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_20_30funciones_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_21_999mes_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_22_coach_x10_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_23_hidratacion_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_24_faltan3dias_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_25_recomp_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_26_faltan2dias_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_27_adios_antigua_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/C2G_F1_28_manana_ES.png
+ create mode 100644 marketing/Campaign_F1/ES/design_philosophy.md
+ create mode 100644 marketing/brand_temp/C2G-Logo-Dark.png
+ create mode 100644 marketing/brand_temp/C2G-Logo-Light.png
+ create mode 100644 marketing/brand_temp/C2G-Logomark-2048.png
+ create mode 100644 marketing/brand_temp/C2G-Mark-512.png
+ create mode 100644 marketing/brand_temp/C2G-Profile-800.png
+ create mode 100644 marketing/brand_temp/InstrumentSans-Bold.ttf
+ create mode 100644 marketing/brand_temp/InstrumentSans-Regular.ttf
+ create mode 100644 marketing/brand_temp/Outfit-Bold.ttf
+ create mode 100644 marketing/brand_temp/Outfit-Regular.ttf
+ create mode 100644 marketing/content-calendar/C2G_Calendario_Instagram_2semanas.md
+ create mode 100644 marketing/content-calendar/C2G_Calendario_v2.md
+ create mode 100644 marketing/content-calendar/C2G_Calendario_v3.md
+ create mode 100644 marketing/content-calendar/C2G_Contenido_Para_Aprobacion.md
+ create mode 100644 marketing/content-calendar/social_media_calendar_april_2026.md
+ create mode 100644 marketing/frames/C2G_Demo_Reel_ESTEMP_MPY_wvf_snd.mp4
+ create mode 100644 marketing/frames/c2g_01_dashboard.png
+ create mode 100644 marketing/frames/dashboard_dark_es.png
+ create mode 100644 marketing/frames/f01_dashboard_top.png
+ create mode 100644 marketing/frames/f02_dashboard_scroll.png
+ create mode 100644 marketing/frames/f03_acciones_rapidas.png
+ create mode 100644 marketing/frames/f04_que_como.png
+ create mode 100644 marketing/frames/f05_que_como_scroll.png
+ create mode 100644 marketing/frames/f06_dashboard_top2.png
+ create mode 100644 marketing/frames/f07_herramientas.png
+ create mode 100644 marketing/frames/f08_historial.png
+ create mode 100644 marketing/frames/f09_perfil.png
+ create mode 100644 marketing/frames/history_dark_es.png
+ create mode 100644 marketing/frames/new_dashboard.png
+ create mode 100644 marketing/frames/raw_dashboard.png
+ create mode 100644 marketing/frames/raw_historial.png
+ create mode 100644 marketing/frames/s01_dashboard_top.png
+ create mode 100644 marketing/frames/s02_dashboard_scroll.png
+ create mode 100644 marketing/frames/s03_historial.png
+ create mode 100644 marketing/frames/s04_que_como.png
+ create mode 100644 marketing/frames/s05_ai_review.png
+ create mode 100644 marketing/frames/s06_herramientas.png
+ create mode 100644 marketing/frames/s07_perfil.png
+ create mode 100644 marketing/frames/tools_dark_es.png
+ create mode 100644 marketing/frames/verify_t1.png
+ create mode 100644 marketing/frames/verify_t10.png
+ create mode 100644 marketing/frames/verify_t18.png
+ create mode 100644 marketing/frames/verify_t5.png
+ create mode 100644 marketing/instagram/app_screenshot_home_es_dark.png
+ create mode 100644 marketing/instagram/generate_posts.py
+ create mode 100644 marketing/instagram/generate_posts_en.py
+ create mode 100644 marketing/instagram/posts_en/01_manual_logging.png
+ create mode 100644 marketing/instagram/posts_en/02_black_box.png
+ create mode 100644 marketing/instagram/posts_en/03_myth_carbs.png
+ create mode 100644 marketing/instagram/posts_en/04_multiple_apps.png
+ create mode 100644 marketing/instagram/posts_en/05_motivational.png
+ create mode 100644 marketing/instagram/posts_en/06_big_reveal.png
+ create mode 100644 marketing/instagram/posts_en/07_comparison.png
+ create mode 100644 marketing/instagram/posts_en/08_photo_macros.png
+ create mode 100644 marketing/instagram/posts_en/09_ai_coach.png
+ create mode 100644 marketing/instagram/posts_en/10_goal_modes.png
+ create mode 100644 marketing/instagram/posts_en/11_weekly_recap.png
+ create mode 100644 marketing/instagram/posts_en/12_coming_soon.png
+ create mode 100644 marketing/instagram/posts_es/01_searching_foods.png
+ create mode 100644 marketing/instagram/posts_es/02_black_box.png
+ create mode 100644 marketing/instagram/posts_es/03_myth_carbs.png
+ create mode 100644 marketing/instagram/posts_es/04_how_many_apps.png
+ create mode 100644 marketing/instagram/posts_es/05_count_to_know.png
+ create mode 100644 marketing/instagram/posts_es/06_big_reveal.png
+ create mode 100644 marketing/instagram/posts_es/06_big_reveal_v2.png
+ create mode 100644 marketing/instagram/posts_es/06_big_reveal_v4.png
+ create mode 100644 marketing/instagram/posts_es/07_comparison.png
+ create mode 100644 marketing/instagram/posts_es/07_comparison_v2.png
+ create mode 100644 marketing/instagram/posts_es/07_macros_v4.png
+ create mode 100644 marketing/instagram/posts_es/08_photo_to_macros.png
+ create mode 100644 marketing/instagram/posts_es/08_photo_to_macros_v2.png
+ create mode 100644 marketing/instagram/posts_es/08_photo_to_macros_v3.png
+ create mode 100644 marketing/instagram/posts_es/08_photo_to_macros_v4.png
+ create mode 100644 marketing/instagram/posts_es/09_ai_coach.png
+ create mode 100644 marketing/instagram/posts_es/09_ai_coach_v2.png
+ create mode 100644 marketing/instagram/posts_es/09_ia_coach_v4.png
+ create mode 100644 marketing/instagram/posts_es/10_escaner_v4.png
+ create mode 100644 marketing/instagram/posts_es/10_five_modes.png
+ create mode 100644 marketing/instagram/posts_es/10_five_modes_v2.png
+ create mode 100644 marketing/instagram/posts_es/11_deficit_v4.png
+ create mode 100644 marketing/instagram/posts_es/11_weekly_recap.png
+ create mode 100644 marketing/instagram/posts_es/11_weekly_recap_v2.png
+ create mode 100644 marketing/instagram/posts_es/12_coming_soon.png
+ create mode 100644 marketing/instagram/posts_es/12_coming_soon_v2.png
+ create mode 100644 marketing/instagram/posts_es/MANIFEST.txt
+ create mode 100644 marketing/instagram/posts_es/UPLOAD_GUIDE.txt
+ create mode 100644 marketing/instagram/profile/C2G_Logo_Square.png
+ create mode 100644 marketing/instagram/profile/C2G_Profile_Picture.png
+ create mode 100644 marketing/instagram/reels/C2G_Demo_Reel_EN.mp4
+ create mode 100644 marketing/instagram/reels/C2G_Demo_Reel_ES.mp4
+ create mode 100644 marketing/instagram/reels/C2G_Reel06_CameraIA_ES.mp4
+ create mode 100644 marketing/instagram/reels/C2G_Reel_CameraIA_EN.mp4
+ create mode 100644 marketing/instagram/reels/C2G_Reel_CameraIA_ES.mp4
+ create mode 100644 marketing/instagram/reels/Cals2Gains_Guiones_Reels_Instagram.docx
+ create mode 100644 marketing/instagram/reels/INDICE_SCREENSHOTS.md
+ create mode 100644 marketing/instagram/reels/en_dark/01_today.jpg
+ create mode 100644 marketing/instagram/reels/en_dark/02_goals.jpg
+ create mode 100644 marketing/instagram/reels/en_dark/04_que_como_full.jpg
+ create mode 100644 marketing/instagram/reels/en_dark/05_scan_result.png
+ create mode 100644 marketing/instagram/reels/es_dark/01_today.png
+ create mode 100644 marketing/instagram/reels/es_dark/02_goals.png
+ create mode 100644 marketing/instagram/reels/es_dark/03_que_como.png
+ create mode 100644 marketing/instagram/reels/es_dark/04_que_como_full.png
+ create mode 100644 marketing/instagram/reels/es_dark/05_scan_result.png
+ create mode 100644 marketing/instagram/screenshots/app_home_es_real.png
+ create mode 100644 marketing/instagram/screenshots/cap3.ps1
+ create mode 100644 marketing/instagram/screenshots/cap4.ps1
+ create mode 100644 marketing/instagram/screenshots/cap_alt.ps1
+ create mode 100644 marketing/instagram/screenshots/cap_pwa.ps1
+ create mode 100644 marketing/instagram/screenshots/cap_view.ps1
+ create mode 100644 marketing/instagram/screenshots/capture.ps1
+ create mode 100644 marketing/instagram/screenshots/capture2.ps1
+ create mode 100644 marketing/instagram/screenshots/capture_chrome.ps1
+ create mode 100644 marketing/instagram/screenshots/check_crop.png
+ create mode 100644 marketing/instagram/screenshots/chrome_acciones.png
+ create mode 100644 marketing/instagram/screenshots/chrome_dashboard.png
+ create mode 100644 marketing/instagram/screenshots/chrome_dashboard_alt.png
+ create mode 100644 marketing/instagram/screenshots/chrome_herramientas.png
+ create mode 100644 marketing/instagram/screenshots/chrome_historial.png
+ create mode 100644 marketing/instagram/screenshots/chrome_historial_bottom.png
+ create mode 100644 marketing/instagram/screenshots/chrome_perfil.png
+ create mode 100644 marketing/instagram/screenshots/chrome_test_crop.png
+ create mode 100644 marketing/instagram/screenshots/chrome_verify.png
+ create mode 100644 marketing/instagram/screenshots/chrome_window.png
+ create mode 100644 marketing/instagram/screenshots/dashboard_es_dark.png
+ create mode 100644 marketing/instagram/screenshots/full_screen.png
+ create mode 100644 marketing/instagram/screenshots/fullscreen_dashboard.png
+ create mode 100644 marketing/instagram/screenshots/fullscreen_narrow.png
+ create mode 100644 marketing/instagram/screenshots/iphone_01_dashboard.png
+ create mode 100644 marketing/instagram/screenshots/iphone_02_historial_top.png
+ create mode 100644 marketing/instagram/screenshots/iphone_03_historial_bottom.png
+ create mode 100644 marketing/instagram/screenshots/iphone_04_herramientas.png
+ create mode 100644 marketing/instagram/screenshots/iphone_05_perfil.png
+ create mode 100644 marketing/instagram/screenshots/iphone_06_acciones_comidas.png
+ create mode 100644 marketing/instagram/screenshots/pwa_dashboard.png
+ create mode 100644 marketing/instagram/screenshots/pwa_perfil.png
+ create mode 100644 marketing/instagram/screenshots/real_dashboard.png
+ create mode 100644 marketing/instagram/screenshots/real_herramientas.png
+ create mode 100644 marketing/instagram/screenshots/real_historial_all.png
+ create mode 100644 marketing/instagram/screenshots/real_historial_bottom.png
+ create mode 100644 marketing/instagram/screenshots/real_historial_fotos.png
+ create mode 100644 marketing/instagram/screenshots/silent_cap.ps1
+ create mode 100644 marketing/instagram/screenshots/test_dash_540.png
+ create mode 100644 marketing/instagram/screenshots/test_dashboard.png
+ rename generate_screenshots.py => marketing/screenshots/generate_screenshots.py (97%)
+ create mode 100644 marketing/strategies/C2G_Campaign_Plan_v2.md
+ create mode 100644 marketing/strategies/C2G_Estrategia_Competitiva_v3.md
+ create mode 100644 marketing/strategies/C2G_Influencers_Research.md
+ create mode 100644 marketing/strategies/C2G_Instagram_Posts_Copies.md
+ create mode 100644 marketing/strategies/C2G_Instagram_Posts_v2.md
+ create mode 100644 marketing/strategies/C2G_Instagram_Posts_v3.md
+ create mode 100644 marketing/strategies/C2G_Instagram_Strategy.md
+ create mode 100644 marketing/strategies/C2G_Plan_Crecimiento_Completo.md
+ create mode 100644 marketing/strategies/C2G_Scheduling_Guide.md
+ rename competitive-analysis.md => marketing/strategies/competitive-analysis.md (100%)
+ create mode 100644 marketing/strategies/estrategia-comentarios-influencers.html
+ create mode 100644 marketing/strategies/seguimiento-comentarios-influencers.xlsx
+ create mode 100644 metro.config.js
+ create mode 100644 public/c2g-icon.png
+ create mode 100644 public/google937c3016137923f8.html
+ create mode 100644 public/index.old.html
+ create mode 100644 public/landing.html
+ create mode 100644 public/logo.png
+ create mode 100644 public/robots.txt
+ create mode 100644 public/sitemap.xml
+ create mode 100644 skills/instagram-commenter.skill
+ create mode 100644 skills/instagram-commenter/SKILL.md
+ create mode 100644 skills/instagram-commenter/references/comment-examples.md
+ create mode 100644 skills/instagram-commenter/references/daily-log.md
+ create mode 100644 skills/instagram-commenter/references/influencers.md
+ create mode 100644 storage.rules
+ create mode 100644 store/adaptiveStore.ts
+ create mode 100644 store/analysisStore.ts
+ create mode 100644 store/reminderStore.ts
+ create mode 100644 store/shoppingListStore.ts
+ create mode 100644 store/themeStore.ts
+ create mode 100644 tools/imap-mcp-server-civiltek/imap_mcp_server.py
+ create mode 100644 tools/imap-mcp-server-civiltek/requirements.txt
+ create mode 100644 tools/imap-mcp-server-gmail-cals2gains/imap_mcp_server.py
+ create mode 100644 tools/imap-mcp-server-gmail-cals2gains/requirements.txt
+ create mode 100644 tools/imap-mcp-server-gmail-judith/imap_mcp_server.py
+ create mode 100644 tools/imap-mcp-server-gmail-judith/requirements.txt
+ create mode 100644 tools/imap-mcp-server/.gitignore
+ create mode 100644 tools/imap-mcp-server/config.example.env
+ create mode 100644 tools/imap-mcp-server/imap_mcp_server.py
+ create mode 100644 tools/imap-mcp-server/requirements.txt
+ create mode 100644 tools/outlook-mcp-server/CREDENTIALS.md
+ create mode 100644 tools/outlook-mcp-server/SETUP.md
+ create mode 100644 tools/outlook-mcp-server/authorize.py
+ create mode 100644 tools/outlook-mcp-server/requirements.txt
+ create mode 100644 tools/outlook-mcp-server/run_server.py
+ create mode 100644 tools/outlook-mcp-server/server.py
+ create mode 100644 tools/telegram-mcp-server/.env.example
+ create mode 100644 tools/telegram-mcp-server/.gitignore
+ create mode 100644 tools/telegram-mcp-server/README.md
+ create mode 100644 tools/telegram-mcp-server/draft_store.py
+ create mode 100644 tools/telegram-mcp-server/requirements.txt
+ create mode 100644 tools/telegram-mcp-server/server.py
+ create mode 100644 tools/telegram-mcp-server/telegram_client.py
+ create mode 100644 tools/telegram-mcp-server/test_connection.py
+ create mode 100644 utils/imageUtils.ts
+ create mode 100644 utils/language.ts
+ create mode 100644 website/cals2gains-landing.html
+ rename privacy-policy.html => website/cals2gains/privacy.html (100%)
+ rename terms-of-service.html => website/cals2gains/terms.html (100%)
+ create mode 100644 website/index-prod-original.html
+ create mode 100644 website/index.html
+ create mode 100644 website/privacy.html
+ create mode 100644 website/terms.html
+ create mode 100644 website/verificar-search-console.html

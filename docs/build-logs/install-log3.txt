@@ -1,0 +1,6 @@
+npm warn using --force Recommended protections disabled.
+npm error code ETARGET
+npm error notarget No matching version found for babel-preset-expo@~13.0.7.
+npm error notarget In most cases you or one of your dependencies are requesting
+npm error notarget a package version that doesn't exist.
+npm error A complete log of this run can be found in: C:\Users\Judit\AppData\Local\npm-cache\_logs\2026-04-11T15_35_23_018Z-debug-0.log

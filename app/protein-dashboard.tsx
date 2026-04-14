@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from 'react';
+// ============================================
+// Cals2Gains - Protein Dashboard
+// ============================================
+// Protein-first tracking view with progress ring,
+// remaining targets, streak, quick foods, and timeline
+
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,24 +12,19 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  FlatList,
   Alert,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { COLORS } from '../theme';
-import { useNavigation } from 'expo-router';
-
-// Mock store imports
-import { mealStore } from '../store/mealStore';
-import { userStore } from '../store/userStore';
-import { templateStore } from '../store/templateStore';
+import { useColors } from '../store/themeStore';
+import { useUserStore } from '../store/userStore';
+import { useMealStore } from '../store/mealStore';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
-const RING_SIZE = 240;
-const RING_WIDTH = 12;
+const RING_SIZE = 200;
+const RING_WIDTH = 14;
 
 interface ProteinFood {
   id: string;
@@ -34,577 +35,535 @@ interface ProteinFood {
 }
 
 const QUICK_PROTEIN_FOODS: ProteinFood[] = [
-  { id: '1', name: 'Pechuga de Pollo', protein: 31, serving: '100g', icon: 'drumstick' },
-  { id: '2', name: 'Huevos', protein: 6, serving: '1 unidad', icon: 'egg' },
-  { id: '3', name: 'Whey Protein', protein: 25, serving: '30g', icon: 'flask' },
-  { id: '4', name: 'Yogur Griego', protein: 10, serving: '100g', icon: 'cup' },
-  { id: '5', name: 'Atún', protein: 26, serving: '100g', icon: 'fish' },
-  { id: '6', name: 'Queso Cottage', protein: 14, serving: '100g', icon: 'cheese' },
+  { id: '1', name: 'proteinDashboard.chickenBreast', protein: 31, serving: '100g', icon: 'restaurant-outline' },
+  { id: '2', name: 'proteinDashboard.eggs', protein: 12, serving: '2 uds', icon: 'ellipse-outline' },
+  { id: '3', name: 'proteinDashboard.wheyProtein', protein: 25, serving: '30g', icon: 'flask-outline' },
+  { id: '4', name: 'proteinDashboard.greekYogurt', protein: 10, serving: '100g', icon: 'cafe-outline' },
+  { id: '5', name: 'proteinDashboard.cannedTuna', protein: 26, serving: '100g', icon: 'fish-outline' },
+  { id: '6', name: 'proteinDashboard.cottageCheese', protein: 14, serving: '100g', icon: 'nutrition-outline' },
 ];
 
-interface MealLog {
-  id: string;
-  name: string;
-  protein: number;
-  time: string;
-  mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner';
-}
-
-interface ProteinStreak {
-  count: number;
-  lastDate: string;
-}
-
 export default function ProteinDashboard() {
-  const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
+  const C = useColors();
+  const styles = useMemo(() => createStyles(C), [C]);
+  const macroStyles = useMemo(() => createMacroStyles(C), [C]);
+  const { t, i18n } = useTranslation();
+  const { user } = useUserStore();
+  const { todayMeals, todayNutrition, addMeal } = useMealStore();
 
-  const [isProteinPrimero, setIsProteinPrimero] = useState(true);
-  const [todaysMeals, setTodaysMeals] = useState<MealLog[]>([]);
-  const [proteinGoal, setProteinGoal] = useState(160);
-  const [proteinConsumed, setProteinConsumed] = useState(87);
-  const [proteinRemaining, setProteinRemaining] = useState(proteinGoal - proteinConsumed);
-  const [mealsRemaining, setMealsRemaining] = useState(2);
-  const [proteinStreak, setProteinStreak] = useState<ProteinStreak>({ count: 12, lastDate: '2026-04-10' });
+  const proteinGoal = user?.goals?.protein || 150;
 
-  useEffect(() => {
-    // Simulate loading data from stores
-    const loadData = () => {
-      setProteinConsumed(87);
-      setProteinGoal(160);
-      setProteinRemaining(73);
-      setMealsRemaining(2);
-      setTodaysMeals([
-        { id: '1', name: 'Desayuno - Huevos y Tostadas', protein: 18, time: '07:30', mealType: 'breakfast' },
-        { id: '2', name: 'Almuerzo - Pechuga de Pollo', protein: 52, time: '12:45', mealType: 'lunch' },
-        { id: '3', name: 'Snack - Whey Protein', protein: 25, time: '15:30', mealType: 'snack' },
-      ]);
-    };
-    loadData();
-  }, []);
+  // Calculate from real meal data
+  const proteinConsumed = useMemo(
+    () => Math.round(todayNutrition?.protein || 0),
+    [todayNutrition]
+  );
+  const proteinRemaining = Math.max(0, proteinGoal - proteinConsumed);
+  const percentage = Math.min(proteinConsumed / proteinGoal, 1);
 
-  const handleToggleProteinPrimero = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setIsProteinPrimero(!isProteinPrimero);
-  };
+  // Count meals remaining (assume 4 meals/day max)
+  const mealsEaten = todayMeals.length;
+  const mealsRemaining = Math.max(1, 4 - mealsEaten);
+  const nextMealTarget = proteinRemaining > 0 ? Math.ceil(proteinRemaining / mealsRemaining) : 0;
 
-  const handleQuickLog = (food: ProteinFood) => {
+  // Streak — count consecutive days meeting protein goal from recent meals
+  // (simplified: just show from todayMeals context)
+  const streakDays = 0; // TODO: compute from historical data
+
+  const handleQuickLog = async (food: ProteinFood) => {
+    if (!user?.uid) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const newProteinConsumed = proteinConsumed + food.protein;
-    setProteinConsumed(newProteinConsumed);
-    setProteinRemaining(Math.max(0, proteinGoal - newProteinConsumed));
-
-    const newMeal: MealLog = {
-      id: Math.random().toString(),
-      name: food.name,
-      protein: food.protein,
-      time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-      mealType: 'snack',
-    };
-    setTodaysMeals([...todaysMeals, newMeal]);
-
-    Alert.alert(
-      'Registrado',
-      `${food.name} (+${food.protein}g proteína) agregado`,
-      [{ text: 'OK', onPress: () => {} }],
-      { cancelable: true }
-    );
+    try {
+      await addMeal({
+        userId: user.uid,
+        timestamp: new Date(),
+        photoUri: '',
+        dishName: food.name,
+        dishNameEs: food.name,
+        dishNameEn: food.name,
+        ingredients: [],
+        portionDescription: food.serving,
+        estimatedWeight: parseInt(food.serving) || 100,
+        nutrition: {
+          calories: Math.round(food.protein * 5), // rough estimate
+          protein: food.protein,
+          carbs: 0,
+          fat: Math.round(food.protein * 0.3),
+          fiber: 0,
+        },
+        mealType: 'snack',
+        aiConfidence: 0.9,
+      });
+      Alert.alert(t('common.logged'), `${t(food.name)} (+${food.protein}g ${t('nutrition.protein')})`);
+    } catch {
+      Alert.alert(t('errors.error'), t('proteinDashboard.logError'));
+    }
   };
 
-  const renderProteinRing = () => {
-    const circumference = 2 * Math.PI * (RING_SIZE / 2 - RING_WIDTH);
-    const percentage = Math.min(proteinConsumed / proteinGoal, 1);
-    const strokeDashoffset = circumference * (1 - percentage);
+  // ── Ring SVG ──
+  const radius = RING_SIZE / 2 - RING_WIDTH;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference * (1 - percentage);
 
-    return (
-      <View style={styles.ringContainer}>
-        <Svg width={RING_SIZE} height={RING_SIZE} style={styles.ring}>
-          {/* Background circle */}
-          <Circle
-            cx={RING_SIZE / 2}
-            cy={RING_SIZE / 2}
-            r={RING_SIZE / 2 - RING_WIDTH}
-            stroke={COLORS.border}
-            strokeWidth={RING_WIDTH}
-            fill="none"
-          />
-          {/* Progress circle */}
-          <Circle
-            cx={RING_SIZE / 2}
-            cy={RING_SIZE / 2}
-            r={RING_SIZE / 2 - RING_WIDTH}
-            stroke={COLORS.primary}
-            strokeWidth={RING_WIDTH}
-            fill="none"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
-            rotation={-90}
-            origin={`${RING_SIZE / 2}, ${RING_SIZE / 2}`}
-          />
-        </Svg>
-        <View style={styles.ringText}>
-          <Text style={styles.ringNumber}>{Math.round(proteinConsumed)}</Text>
-          <Text style={styles.ringLabel}>g</Text>
-          <Text style={styles.ringSeparator}>/</Text>
-          <Text style={styles.ringGoal}>{proteinGoal}</Text>
-          <Text style={styles.ringGoalLabel}>g</Text>
-        </View>
-      </View>
-    );
-  };
-
-  const nextMealProteinTarget = proteinRemaining > 0 ? Math.ceil(proteinRemaining / mealsRemaining) : 0;
-
-  const renderProteinRemainingCard = () => (
-    <View style={[styles.card, { backgroundColor: COLORS.surfaceSecondary }]}>
-      <View style={styles.cardHeader}>
-        <Ionicons name="flame" size={20} color={COLORS.accent} />
-        <Text style={styles.cardTitle}>Proteína Restante</Text>
-      </View>
-      <Text style={styles.remainingText}>Te faltan {proteinRemaining}g</Text>
-      <Text style={styles.suggestionsText}>
-        {mealsRemaining} comidas restantes × {nextMealProteinTarget}g promedio
-      </Text>
-      <View style={styles.suggestionsContainer}>
-        <Text style={styles.suggestionsLabel}>Ideas:</Text>
-        <Text style={styles.suggestionItem}>• Pechuga de pollo ({nextMealProteinTarget}g)</Text>
-        <Text style={styles.suggestionItem}>• Huevos × 6 ({nextMealProteinTarget}g)</Text>
-        <Text style={styles.suggestionItem}>• Atún + Arroz ({nextMealProteinTarget}g)</Text>
-      </View>
-    </View>
-  );
-
-  const renderSecondaryMacros = () => (
-    <View style={styles.secondaryMacrosContainer}>
-      <View style={styles.macroBar}>
-        <View style={styles.macroLabel}>
-          <Text style={styles.macroName}>Carbohidratos</Text>
-          <Text style={styles.macroValue}>184g / 250g</Text>
-        </View>
-        <View style={[styles.barBackground, { backgroundColor: COLORS.border }]}>
-          <View
-            style={[
-              styles.barProgress,
-              {
-                width: '74%',
-                backgroundColor: COLORS.info,
-              },
-            ]}
-          />
-        </View>
-      </View>
-
-      <View style={styles.macroBar}>
-        <View style={styles.macroLabel}>
-          <Text style={styles.macroName}>Grasas</Text>
-          <Text style={styles.macroValue}>52g / 65g</Text>
-        </View>
-        <View style={[styles.barBackground, { backgroundColor: COLORS.border }]}>
-          <View
-            style={[
-              styles.barProgress,
-              {
-                width: '80%',
-                backgroundColor: COLORS.warning,
-              },
-            ]}
-          />
-        </View>
-      </View>
-    </View>
-  );
-
-  const renderQuickProteinFoods = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Proteínas Rápidas</Text>
-      <View style={styles.foodGrid}>
-        {QUICK_PROTEIN_FOODS.map((food) => (
-          <TouchableOpacity
-            key={food.id}
-            style={styles.foodCard}
-            onPress={() => handleQuickLog(food)}
-          >
-            <View style={styles.foodCardContent}>
-              <Ionicons
-                name={food.icon as any}
-                size={32}
-                color={COLORS.primary}
-                style={styles.foodIcon}
-              />
-              <Text style={styles.foodName}>{food.name}</Text>
-              <Text style={styles.foodProtein}>+{food.protein}g</Text>
-              <Text style={styles.foodServing}>{food.serving}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  );
-
-  const renderTodaysProteinLog = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Registro Hoy</Text>
-      <View style={styles.timelineContainer}>
-        {todaysMeals.map((meal, index) => (
-          <View key={meal.id} style={styles.timelineItem}>
-            <View style={styles.timelineMarker}>
-              <View style={styles.timelineCircle} />
-              {index < todaysMeals.length - 1 && <View style={styles.timelineLine} />}
-            </View>
-            <View style={styles.timelineContent}>
-              <Text style={styles.mealTime}>{meal.time}</Text>
-              <Text style={styles.mealName}>{meal.name}</Text>
-              <Text style={styles.mealProtein}>Proteína: {meal.protein}g</Text>
-            </View>
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-
-  const renderProteinStreak = () => (
-    <View style={[styles.card, { backgroundColor: COLORS.success + '15' }]}>
-      <View style={styles.streakContent}>
-        <Ionicons name="flame-outline" size={24} color={COLORS.success} />
-        <View style={styles.streakText}>
-          <Text style={styles.streakNumber}>{proteinStreak.count} días</Text>
-          <Text style={styles.streakLabel}>Alcanzando tu objetivo de proteína</Text>
-        </View>
-      </View>
-    </View>
-  );
-
-  if (!isProteinPrimero) {
-    return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <Text style={styles.centerText}>Vista estándar</Text>
-        <TouchableOpacity
-          style={[styles.button, styles.buttonPrimary]}
-          onPress={handleToggleProteinPrimero}
-        >
-          <Text style={styles.buttonText}>Volver a Proteína Primero</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  // Ring color based on progress
+  const ringColor = percentage >= 1
+    ? C.success
+    : percentage >= 0.7
+      ? C.primary
+      : percentage >= 0.4
+        ? C.protein
+        : C.accent;
 
   return (
     <ScrollView
-      style={[styles.container, { paddingTop: insets.top }]}
+      style={styles.container}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header with toggle */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Proteína Primero</Text>
-        <TouchableOpacity
-          style={styles.toggleButton}
-          onPress={handleToggleProteinPrimero}
-        >
-          <Ionicons name="swap-horizontal" size={20} color={COLORS.primary} />
-          <Text style={styles.toggleText}>Cambiar vista</Text>
-        </TouchableOpacity>
+      {/* ── Protein Ring ── */}
+      <View style={styles.ringContainer}>
+        <View style={styles.ringWrapper}>
+          <Svg width={RING_SIZE} height={RING_SIZE}>
+            {/* Background track */}
+            <Circle
+              cx={RING_SIZE / 2}
+              cy={RING_SIZE / 2}
+              r={radius}
+              stroke={C.surfaceLight || C.border}
+              strokeWidth={RING_WIDTH}
+              fill="none"
+            />
+            {/* Progress arc */}
+            <Circle
+              cx={RING_SIZE / 2}
+              cy={RING_SIZE / 2}
+              r={radius}
+              stroke={ringColor}
+              strokeWidth={RING_WIDTH}
+              fill="none"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              rotation={-90}
+              origin={`${RING_SIZE / 2}, ${RING_SIZE / 2}`}
+            />
+          </Svg>
+          {/* Center text — positioned absolutely inside the ring */}
+          <View style={styles.ringCenterText}>
+            <Text style={[styles.ringNumber, { color: ringColor }]}>{proteinConsumed}</Text>
+            <Text style={styles.ringUnit}>{t('common.of')} {proteinGoal}g</Text>
+          </View>
+        </View>
+        <Text style={styles.ringCaption}>
+          {percentage >= 1 ? t('proteinDashboard.goalMet') : `${Math.round(percentage * 100)}% ${t('proteinDashboard.ofGoal')}`}
+        </Text>
       </View>
 
-      {/* Protein Ring */}
-      {renderProteinRing()}
+      {/* ── Remaining Card ── */}
+      {proteinRemaining > 0 && (
+        <View style={styles.remainingCard}>
+          <View style={styles.remainingHeader}>
+            <View style={styles.remainingIconCircle}>
+              <Ionicons name="flame" size={20} color={C.accent} />
+            </View>
+            <View style={styles.remainingHeaderText}>
+              <Text style={styles.remainingTitle}>{t('proteinDashboard.remaining')}</Text>
+              <Text style={styles.remainingValue}>{proteinRemaining}g</Text>
+            </View>
+          </View>
 
-      {/* Protein Remaining Card */}
-      {renderProteinRemainingCard()}
+          <View style={styles.remainingDivider} />
 
-      {/* Protein Streak */}
-      {renderProteinStreak()}
+          <View style={styles.remainingMeta}>
+            <View style={styles.metaItem}>
+              <Ionicons name="time-outline" size={16} color={C.textSecondary} />
+              <Text style={styles.metaText}>{mealsRemaining} {t('proteinDashboard.mealsRemaining')}</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Ionicons name="trending-up-outline" size={16} color={C.primary} />
+              <Text style={[styles.metaText, { color: C.primary }]}>
+                ~{nextMealTarget}g {t('proteinDashboard.perMeal')}
+              </Text>
+            </View>
+          </View>
 
-      {/* Quick Protein Foods */}
-      {renderQuickProteinFoods()}
+          <View style={styles.suggestionsBox}>
+            <Text style={styles.suggestionsLabel}>{t('proteinDashboard.quickIdeas')}</Text>
+            <Text style={styles.suggestionItem}>
+              {t('proteinDashboard.suggestions')}
+            </Text>
+          </View>
+        </View>
+      )}
 
-      {/* Secondary Macros */}
-      {renderSecondaryMacros()}
+      {/* ── Streak Badge ── */}
+      {streakDays > 0 && (
+        <View style={styles.streakCard}>
+          <Ionicons name="flame" size={22} color={C.accent} />
+          <Text style={styles.streakText}>
+            <Text style={styles.streakNumber}>{streakDays} {t('common.days')}</Text> {t('proteinDashboard.meetingGoal')}
+          </Text>
+        </View>
+      )}
 
-      {/* Today's Protein Log */}
-      {renderTodaysProteinLog()}
+      {/* ── Other Macros ── */}
+      <View style={styles.macrosCard}>
+        <Text style={styles.sectionTitle}>{t('proteinDashboard.otherMacros')}</Text>
+        <MacroRow
+          label={t('nutrition.carbs')}
+          value={Math.round(todayNutrition?.carbs || 0)}
+          goal={user?.goals?.carbs || 250}
+          color={C.carbs}
+        />
+        <MacroRow
+          label={t('nutrition.fat')}
+          value={Math.round(todayNutrition?.fat || 0)}
+          goal={user?.goals?.fat || 65}
+          color={C.fat}
+        />
+        <MacroRow
+          label={t('nutrition.fiber')}
+          value={Math.round(todayNutrition?.fiber || 0)}
+          goal={user?.goals?.fiber || 30}
+          color={C.fiber}
+        />
+      </View>
 
-      <View style={styles.spacing} />
+      {/* ── Quick Protein Foods ── */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('proteinDashboard.quickProteins')}</Text>
+        <View style={styles.foodGrid}>
+          {QUICK_PROTEIN_FOODS.map((food) => (
+            <TouchableOpacity
+              key={food.id}
+              style={styles.foodCard}
+              onPress={() => handleQuickLog(food)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name={food.icon as any} size={24} color={C.primary} />
+              <Text style={styles.foodName} numberOfLines={1}>{t(food.name)}</Text>
+              <Text style={styles.foodProtein}>+{food.protein}g</Text>
+              <Text style={styles.foodServing}>{food.serving}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* ── Today's Timeline ── */}
+      {todayMeals.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('proteinDashboard.todayLog')}</Text>
+          <View style={styles.timeline}>
+            {todayMeals.map((meal, i) => {
+              const time = meal.timestamp instanceof Date
+                ? meal.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                : '';
+              const mealProtein = Math.round(meal.nutrition?.protein || 0);
+              const dishName = i18n.language === 'es'
+                ? (meal.dishNameEs || meal.dishName)
+                : (meal.dishNameEn || meal.dishName);
+
+              return (
+                <View key={meal.id} style={styles.timelineItem}>
+                  <View style={styles.timelineLeft}>
+                    <View style={[styles.timelineDot, { backgroundColor: C.primary }]} />
+                    {i < todayMeals.length - 1 && <View style={styles.timelineLine} />}
+                  </View>
+                  <View style={styles.timelineContent}>
+                    <Text style={styles.timelineTime}>{time}</Text>
+                    <Text style={styles.timelineName} numberOfLines={1}>{dishName}</Text>
+                    <View style={styles.timelineProteinBadge}>
+                      <Text style={styles.timelineProteinText}>{mealProtein}g prot</Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      )}
+
+      <View style={{ height: 32 }} />
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 32,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  toggleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: COLORS.surfaceSecondary,
-    borderRadius: 8,
-    gap: 6,
-  },
-  toggleText: {
-    fontSize: 12,
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-  ringContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  ring: {
-    marginBottom: -60,
-  },
-  ringText: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  ringNumber: {
-    fontSize: 44,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
-  ringLabel: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    marginBottom: 4,
-  },
-  ringSeparator: {
-    fontSize: 20,
-    color: COLORS.border,
-    marginVertical: 4,
-  },
-  ringGoal: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-  },
-  ringGoalLabel: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  card: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 8,
-  },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-  },
-  remainingText: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.primary,
-    marginBottom: 4,
-  },
-  suggestionsText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginBottom: 12,
-  },
-  suggestionsContainer: {
-    backgroundColor: COLORS.background,
-    borderRadius: 8,
-    padding: 12,
-    gap: 4,
-  },
-  suggestionsLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  suggestionItem: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-  },
-  streakContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  streakText: {
-    flex: 1,
-  },
-  streakNumber: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.success,
-  },
-  streakLabel: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 12,
-  },
-  foodGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    justifyContent: 'space-between',
-  },
-  foodCard: {
-    width: (width - 48) / 2,
-    backgroundColor: COLORS.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    overflow: 'hidden',
-  },
-  foodCardContent: {
-    padding: 12,
-    alignItems: 'center',
-  },
-  foodIcon: {
-    marginBottom: 8,
-  },
-  foodName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  foodProtein: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.primary,
-    marginBottom: 2,
-  },
-  foodServing: {
-    fontSize: 10,
-    color: COLORS.textSecondary,
-  },
-  secondaryMacrosContainer: {
-    gap: 12,
-    marginBottom: 24,
-  },
-  macroBar: {
-    gap: 8,
-  },
-  macroLabel: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  macroName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  macroValue: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  barBackground: {
-    height: 6,
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  barProgress: {
-    height: '100%',
-    borderRadius: 3,
-  },
-  timelineContainer: {
-    gap: 16,
-  },
-  timelineItem: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  timelineMarker: {
-    alignItems: 'center',
-    width: 24,
-  },
-  timelineCircle: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: COLORS.primary,
-    marginTop: 2,
-  },
-  timelineLine: {
-    width: 2,
-    height: 48,
-    backgroundColor: COLORS.border,
-    marginTop: 4,
-  },
-  timelineContent: {
-    flex: 1,
-    paddingTop: 2,
-  },
-  mealTime: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-  },
-  mealName: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginTop: 2,
-  },
-  mealProtein: {
-    fontSize: 11,
-    color: COLORS.primary,
-    marginTop: 2,
-  },
-  button: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonPrimary: {
-    backgroundColor: COLORS.primary,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  centerText: {
-    fontSize: 16,
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  spacing: {
-    height: 20,
-  },
-});
+// ── Sub-component: Macro progress bar ──
+const MacroRow: React.FC<{
+  label: string;
+  value: number;
+  goal: number;
+  color: string;
+}> = ({ label, value, goal, color }) => {
+  const C = useColors();
+  const macroStyles = useMemo(() => createMacroStyles(C), [C]);
+  const pct = Math.min((value / goal) * 100, 100);
+  return (
+    <View style={macroStyles.row}>
+      <View style={macroStyles.labelRow}>
+        <Text style={macroStyles.label}>{label}</Text>
+        <Text style={macroStyles.values}>{value}g / {goal}g</Text>
+      </View>
+      <View style={macroStyles.barBg}>
+        <View style={[macroStyles.barFill, { width: `${pct}%`, backgroundColor: color }]} />
+      </View>
+    </View>
+  );
+};
+
+function createMacroStyles(C: any) {
+  return StyleSheet.create({
+    row: { gap: 6, marginTop: 14 },
+    labelRow: { flexDirection: 'row', justifyContent: 'space-between' },
+    label: { fontSize: 13, fontWeight: '600', color: C.text },
+    values: { fontSize: 13, color: C.textSecondary },
+    barBg: { height: 6, borderRadius: 3, backgroundColor: C.surfaceLight || C.border, overflow: 'hidden' },
+    barFill: { height: '100%', borderRadius: 3 },
+  });
+}
+
+// ── Main styles ──
+function createStyles(C: any) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: C.background,
+    },
+    scrollContent: {
+      paddingHorizontal: 16,
+      paddingBottom: 32,
+    },
+
+    // Ring
+    ringContainer: {
+      alignItems: 'center',
+      marginTop: 8,
+      marginBottom: 24,
+    },
+    ringWrapper: {
+      width: RING_SIZE,
+      height: RING_SIZE,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    ringCenterText: {
+      position: 'absolute',
+      alignItems: 'center',
+    },
+    ringNumber: {
+      fontSize: 44,
+      fontWeight: '800',
+      lineHeight: 48,
+    },
+    ringUnit: {
+      fontSize: 14,
+      color: C.textSecondary,
+      marginTop: 2,
+    },
+    ringCaption: {
+      fontSize: 13,
+      color: C.textSecondary,
+      marginTop: 8,
+    },
+
+    // Remaining card
+    remainingCard: {
+      backgroundColor: C.surface,
+      borderRadius: 16,
+      padding: 18,
+      marginBottom: 14,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    remainingHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 14,
+    },
+    remainingIconCircle: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: C.accent + '18',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    remainingHeaderText: {
+      flex: 1,
+    },
+    remainingTitle: {
+      fontSize: 13,
+      color: C.textSecondary,
+    },
+    remainingValue: {
+      fontSize: 28,
+      fontWeight: '800',
+      color: C.text,
+      lineHeight: 32,
+    },
+    remainingDivider: {
+      height: 1,
+      backgroundColor: C.border,
+      marginVertical: 14,
+    },
+    remainingMeta: {
+      flexDirection: 'row',
+      gap: 20,
+    },
+    metaItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    metaText: {
+      fontSize: 13,
+      color: C.textSecondary,
+    },
+    suggestionsBox: {
+      marginTop: 14,
+      backgroundColor: C.background,
+      borderRadius: 10,
+      padding: 12,
+    },
+    suggestionsLabel: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: C.textSecondary,
+      marginBottom: 4,
+    },
+    suggestionItem: {
+      fontSize: 12,
+      color: C.textMuted,
+      lineHeight: 18,
+    },
+
+    // Streak
+    streakCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: C.accent + '12',
+      borderRadius: 14,
+      padding: 14,
+      marginBottom: 14,
+      gap: 10,
+      borderWidth: 1,
+      borderColor: C.accent + '25',
+    },
+    streakText: {
+      fontSize: 14,
+      color: C.textSecondary,
+    },
+    streakNumber: {
+      fontWeight: '700',
+      color: C.accent,
+    },
+
+    // Macros card
+    macrosCard: {
+      backgroundColor: C.surface,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+
+    // Sections
+    section: {
+      marginBottom: 20,
+    },
+    sectionTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: C.text,
+      marginBottom: 12,
+    },
+
+    // Food grid
+    foodGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+    },
+    foodCard: {
+      width: (width - 52) / 3,
+      backgroundColor: C.surface,
+      borderRadius: 14,
+      padding: 12,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: C.border,
+      gap: 4,
+    },
+    foodName: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: C.text,
+      textAlign: 'center',
+      marginTop: 4,
+    },
+    foodProtein: {
+      fontSize: 15,
+      fontWeight: '800',
+      color: C.protein,
+    },
+    foodServing: {
+      fontSize: 10,
+      color: C.textMuted,
+    },
+
+    // Timeline
+    timeline: {
+      gap: 0,
+    },
+    timelineItem: {
+      flexDirection: 'row',
+      gap: 14,
+      minHeight: 60,
+    },
+    timelineLeft: {
+      alignItems: 'center',
+      width: 20,
+    },
+    timelineDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      marginTop: 4,
+    },
+    timelineLine: {
+      width: 2,
+      flex: 1,
+      backgroundColor: C.border,
+      marginTop: 4,
+    },
+    timelineContent: {
+      flex: 1,
+      paddingBottom: 16,
+    },
+    timelineTime: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: C.textMuted,
+    },
+    timelineName: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+      marginTop: 2,
+    },
+    timelineProteinBadge: {
+      alignSelf: 'flex-start',
+      backgroundColor: C.protein + '20',
+      borderRadius: 8,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      marginTop: 4,
+    },
+    timelineProteinText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: C.protein,
+    },
+  });
+}

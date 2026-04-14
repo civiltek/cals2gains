@@ -9,14 +9,16 @@ import {
   Dimensions,
   Alert,
   FlatList,
-  SvgProps,
 } from 'react-native';
+import Svg, { Ellipse, Circle, Line, Text as SvgText, Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 import { useMeasurementStore } from '../store/measurementStore';
 import { useWeightStore } from '../store/weightStore';
-import { COLORS } from '../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useColors } from '../store/themeStore';
 
 const { width } = Dimensions.get('window');
 
@@ -55,21 +57,87 @@ interface Comparison {
   mejora: boolean;
 }
 
-const BodySilhouette: React.FC<{ width: number }> = ({ width: silhouetteWidth }) => (
-  <View style={[styles.silhouetteContainer, { width: silhouetteWidth }]}>
-    <View style={styles.silhouetteHead} />
-    <View style={styles.silhouetteTorso}>
-      <Text style={styles.silhouetteLabel}>Pecho</Text>
-      <Text style={styles.silhouetteLabel}>Cintura</Text>
-      <Text style={styles.silhouetteLabel}>Cadera</Text>
+const BodySilhouette: React.FC<{ width: number; colors: ReturnType<typeof useColors> }> = ({ width: silhouetteWidth, colors }) => {
+  const { t } = useTranslation();
+  const svgW = 200;
+  const svgH = 320;
+  const cx = 100; // center x
+  // Measurement points with labels on the right side
+  const points = [
+    { label: t('measurements.neck'), y: 68, rx: 18 },
+    { label: t('measurements.chest'), y: 115, rx: 40 },
+    { label: t('measurements.waist'), y: 160, rx: 30 },
+    { label: t('measurements.hip'), y: 195, rx: 38 },
+    { label: t('measurements.thigh'), y: 240, rx: 18 },
+    { label: t('measurements.calf'), y: 290, rx: 12 },
+  ];
+
+  return (
+    <View style={[styles.silhouetteContainer, { width: silhouetteWidth }]}>
+      <Svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`}>
+        {/* Head */}
+        <Circle cx={cx} cy={35} r={22} fill={colors.primary + '20'} stroke={colors.primary} strokeWidth={2} />
+        {/* Neck */}
+        <Path d={`M${cx - 10} 57 L${cx - 10} 72 L${cx + 10} 72 L${cx + 10} 57`} fill={colors.primary + '15'} stroke={colors.primary} strokeWidth={1.5} />
+        {/* Torso */}
+        <Path
+          d={`M${cx - 40} 72 C${cx - 44} 100, ${cx - 42} 120, ${cx - 30} 155 C${cx - 28} 165, ${cx - 35} 180, ${cx - 38} 200 L${cx + 38} 200 C${cx + 35} 180, ${cx + 28} 165, ${cx + 30} 155 C${cx + 42} 120, ${cx + 44} 100, ${cx + 40} 72 Z`}
+          fill={colors.primary + '12'}
+          stroke={colors.primary}
+          strokeWidth={2}
+        />
+        {/* Left leg */}
+        <Path
+          d={`M${cx - 38} 200 C${cx - 36} 210, ${cx - 25} 215, ${cx - 22} 225 L${cx - 18} 270 C${cx - 17} 280, ${cx - 16} 290, ${cx - 14} 310 L${cx - 6} 310 C${cx - 8} 290, ${cx - 9} 275, ${cx - 8} 260 L${cx - 5} 215`}
+          fill={colors.primary + '12'}
+          stroke={colors.primary}
+          strokeWidth={1.5}
+        />
+        {/* Right leg */}
+        <Path
+          d={`M${cx + 38} 200 C${cx + 36} 210, ${cx + 25} 215, ${cx + 22} 225 L${cx + 18} 270 C${cx + 17} 280, ${cx + 16} 290, ${cx + 14} 310 L${cx + 6} 310 C${cx + 8} 290, ${cx + 9} 275, ${cx + 8} 260 L${cx + 5} 215`}
+          fill={colors.primary + '12'}
+          stroke={colors.primary}
+          strokeWidth={1.5}
+        />
+        {/* Measurement indicator dots and labels */}
+        {points.map((pt, i) => (
+          <React.Fragment key={i}>
+            {/* Dashed line from body to label */}
+            <Line
+              x1={cx + pt.rx + 2}
+              y1={pt.y}
+              x2={cx + pt.rx + 22}
+              y2={pt.y}
+              stroke={colors.primary}
+              strokeWidth={1}
+              strokeDasharray="3,3"
+            />
+            {/* Dot on body */}
+            <Circle cx={cx + pt.rx} cy={pt.y} r={4} fill={colors.primary} />
+            <Circle cx={cx - pt.rx} cy={pt.y} r={4} fill={colors.primary} />
+            {/* Label */}
+            <SvgText
+              x={cx + pt.rx + 26}
+              y={pt.y + 4}
+              fill={colors.textSecondary}
+              fontSize={11}
+              fontWeight="600"
+            >
+              {pt.label}
+            </SvgText>
+          </React.Fragment>
+        ))}
+      </Svg>
     </View>
-    <View style={styles.silhouetteLeg} />
-    <View style={styles.silhouetteLeg} />
-  </View>
-);
+  );
+};
 
 export default function MeasurementsScreen() {
+  const { t } = useTranslation();
+  const C = useColors();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { measurements, addMeasurement, getMeasurementHistory } = useMeasurementStore();
   const { weights } = useWeightStore();
 
@@ -99,10 +167,10 @@ export default function MeasurementsScreen() {
     const comps: Comparison[] = [];
 
     const campos = [
-      { key: 'cintura', label: 'Cintura' },
-      { key: 'cadera', label: 'Cadera' },
-      { key: 'grasaCorporal', label: 'Grasa Corporal' },
-      { key: 'masaMuscular', label: 'Masa Muscular' },
+      { key: 'cintura', label: t('measurements.waist') },
+      { key: 'cadera', label: t('measurements.hip') },
+      { key: 'grasaCorporal', label: t('measurements.bodyFat') },
+      { key: 'masaMuscular', label: t('measurements.muscleMass') },
     ];
 
     campos.forEach((campo) => {
@@ -168,12 +236,12 @@ export default function MeasurementsScreen() {
 
   const handleSave = async () => {
     if (!validateInputs()) {
-      Alert.alert('Error', 'Por favor ingresa valores numéricos válidos');
+      Alert.alert('Error', t('measurements.invalidValues'));
       return;
     }
 
     if (Object.values(inputs).every((v) => !v)) {
-      Alert.alert('Error', 'Por favor ingresa al menos una medida');
+      Alert.alert('Error', t('measurements.atLeastOne'));
       return;
     }
 
@@ -200,65 +268,70 @@ export default function MeasurementsScreen() {
 
       addMeasurement(measurement);
       setInputs({});
-      Alert.alert('Éxito', 'Medidas guardadas correctamente');
+      Alert.alert(t('common.success'), t('measurements.saved'));
       loadHistory();
     } catch (error) {
-      Alert.alert('Error', 'No se pudieron guardar las medidas');
+      Alert.alert('Error', t('measurements.saveFailed'));
     }
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: C.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={28} color={COLORS.violet} />
+        <View style={[styles.header, { paddingTop: insets.top + 8, zIndex: 10 }]}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            activeOpacity={0.6}
+            style={{ backgroundColor: C.surface, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Ionicons name="chevron-back" size={24} color={C.text} />
           </TouchableOpacity>
           <View>
-            <Text style={styles.headerTitle}>Medidas Corporales</Text>
-            <Text style={styles.headerDate}>{new Date().toLocaleDateString('es-ES')}</Text>
+            <Text style={[styles.headerTitle, { color: C.text }]}>{t('measurements.title')}</Text>
+            <Text style={[styles.headerDate, { color: C.textSecondary }]}>{new Date().toLocaleDateString('es-ES')}</Text>
           </View>
-          <View style={{ width: 28 }} />
+          <View style={{ width: 40 }} />
         </View>
 
         {/* Body Silhouette */}
-        <View style={styles.silhouetteSection}>
-          <BodySilhouette width={width * 0.5} />
+        <View style={[styles.silhouetteSection, { backgroundColor: C.card, borderColor: C.border }]}>
+          <BodySilhouette width={width * 0.5} colors={C} />
         </View>
 
         {/* Input Form */}
         <View style={styles.formSection}>
-          <Text style={styles.sectionTitle}>Ingresa tus medidas</Text>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('measurements.enterMeasurements')}</Text>
 
           {/* Row 1: Cuello, Pecho */}
           <View style={styles.formRow}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Cuello</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.neck')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: C.text, backgroundColor: C.card }]}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.cuello || ''}
                   onChangeText={(value) => handleInputChange('cuello', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Pecho</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.chest')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.pecho || ''}
                   onChangeText={(value) => handleInputChange('pecho', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
           </View>
@@ -266,31 +339,31 @@ export default function MeasurementsScreen() {
           {/* Row 2: Cintura, Cadera */}
           <View style={styles.formRow}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Cintura</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.waist')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.cintura || ''}
                   onChangeText={(value) => handleInputChange('cintura', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Cadera</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.hip')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.cadera || ''}
                   onChangeText={(value) => handleInputChange('cadera', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
           </View>
@@ -298,31 +371,31 @@ export default function MeasurementsScreen() {
           {/* Row 3: Bíceps I/D */}
           <View style={styles.formRow}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Bíceps I</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.bicepsL')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.bicepsI || ''}
                   onChangeText={(value) => handleInputChange('bicepsI', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Bíceps D</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.bicepsR')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.biceipsD || ''}
                   onChangeText={(value) => handleInputChange('biceipsD', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
           </View>
@@ -330,31 +403,31 @@ export default function MeasurementsScreen() {
           {/* Row 4: Muslo I/D */}
           <View style={styles.formRow}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Muslo I</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.thighL')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.musloI || ''}
                   onChangeText={(value) => handleInputChange('musloI', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Muslo D</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.thighR')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.musloD || ''}
                   onChangeText={(value) => handleInputChange('musloD', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
           </View>
@@ -362,31 +435,31 @@ export default function MeasurementsScreen() {
           {/* Row 5: Gemelo I/D */}
           <View style={styles.formRow}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Gemelo I</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.calfL')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.gemeloI || ''}
                   onChangeText={(value) => handleInputChange('gemeloI', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Gemelo D</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.calfR')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="cm"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.gemeloD || ''}
                   onChangeText={(value) => handleInputChange('gemeloD', value)}
                 />
-                <Text style={styles.inputUnit}>cm</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>cm</Text>
               </View>
             </View>
           </View>
@@ -394,42 +467,42 @@ export default function MeasurementsScreen() {
           {/* Row 6: Grasa Corporal, Masa Muscular */}
           <View style={styles.formRow}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Grasa Corporal</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.bodyFat')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="%"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.grasaCorporal || ''}
                   onChangeText={(value) => handleInputChange('grasaCorporal', value)}
                 />
-                <Text style={styles.inputUnit}>%</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>%</Text>
               </View>
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Masa Muscular</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.muscleMass')}</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: C.card, borderColor: C.border }]}>
                 <TextInput
                   style={styles.input}
                   placeholder="kg"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="decimal-pad"
                   value={inputs.masaMuscular || ''}
                   onChangeText={(value) => handleInputChange('masaMuscular', value)}
                 />
-                <Text style={styles.inputUnit}>kg</Text>
+                <Text style={[styles.inputUnit, { color: C.textTertiary }]}>kg</Text>
               </View>
             </View>
           </View>
 
           {/* Notes Field */}
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Notas (opcional)</Text>
+            <Text style={[styles.inputLabel, { color: C.textSecondary }]}>{t('measurements.notes')}</Text>
             <TextInput
-              style={[styles.input, styles.notesInput]}
-              placeholder="Añade observaciones..."
-              placeholderTextColor={COLORS.textTertiary}
+              style={[styles.input, styles.notesInput, { color: C.text, backgroundColor: C.card }]}
+              placeholder={t('measurements.notesPlaceholder')}
+              placeholderTextColor={C.textTertiary}
               multiline
               numberOfLines={3}
               value={inputs.notas || ''}
@@ -438,9 +511,9 @@ export default function MeasurementsScreen() {
           </View>
 
           {/* Save Button */}
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Ionicons name="checkmark-circle" size={20} color={COLORS.bone} />
-            <Text style={styles.saveButtonText}>Guardar Medidas</Text>
+          <TouchableOpacity style={[styles.saveButton, { backgroundColor: C.accent }]} onPress={handleSave}>
+            <Ionicons name="checkmark-circle" size={20} color={C.white} />
+            <Text style={[styles.saveButtonText, { color: C.white }]}>{t('measurements.save')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -448,14 +521,14 @@ export default function MeasurementsScreen() {
         {history.length > 0 && (
           <View style={styles.historySection}>
             <TouchableOpacity
-              style={styles.historyHeader}
+              style={[styles.historyHeader, { borderBottomColor: C.border }]}
               onPress={() => setShowHistory(!showHistory)}
             >
-              <Text style={styles.sectionTitle}>Historial</Text>
+              <Text style={[styles.sectionTitle, { color: C.text }]}>{t('measurements.history')}</Text>
               <Ionicons
                 name={showHistory ? 'chevron-up' : 'chevron-down'}
                 size={20}
-                color={COLORS.violet}
+                color={C.primary}
               />
             </TouchableOpacity>
 
@@ -465,23 +538,23 @@ export default function MeasurementsScreen() {
                 data={history}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                  <View style={styles.historyCard}>
-                    <Text style={styles.historyDate}>{item.fecha}</Text>
+                  <View style={[styles.historyCard, { backgroundColor: C.card, borderColor: C.border }]}>
+                    <Text style={[styles.historyDate, { color: C.primary }]}>{item.fecha}</Text>
                     <View style={styles.historyContent}>
                       {item.cintura && (
-                        <Text style={styles.historyValue}>Cintura: {item.cintura}cm</Text>
+                        <Text style={[styles.historyValue, { color: C.textSecondary }]}>Cintura: {item.cintura}cm</Text>
                       )}
                       {item.cadera && (
-                        <Text style={styles.historyValue}>Cadera: {item.cadera}cm</Text>
+                        <Text style={[styles.historyValue, { color: C.textSecondary }]}>Cadera: {item.cadera}cm</Text>
                       )}
                       {item.grasaCorporal !== undefined && (
-                        <Text style={styles.historyValue}>
-                          Grasa: {item.grasaCorporal.toFixed(1)}%
+                        <Text style={[styles.historyValue, { color: C.textSecondary }]}>
+                          {t('measurements.bodyFat')}: {item.grasaCorporal.toFixed(1)}%
                         </Text>
                       )}
                       {item.masaMuscular && (
-                        <Text style={styles.historyValue}>
-                          Masa Muscular: {item.masaMuscular.toFixed(1)}kg
+                        <Text style={[styles.historyValue, { color: C.textSecondary }]}>
+                          {t('measurements.muscleMass')}: {item.masaMuscular.toFixed(1)}kg
                         </Text>
                       )}
                     </View>
@@ -496,40 +569,40 @@ export default function MeasurementsScreen() {
         {comparisons.length > 0 && (
           <View style={styles.comparisonSection}>
             <TouchableOpacity
-              style={styles.comparisonHeader}
+              style={[styles.comparisonHeader, { borderBottomColor: C.border }]}
               onPress={() => setShowComparison(!showComparison)}
             >
-              <Text style={styles.sectionTitle}>Cambios Recientes</Text>
+              <Text style={[styles.sectionTitle, { color: C.text }]}>{t('measurements.recentChanges')}</Text>
               <Ionicons
                 name={showComparison ? 'chevron-up' : 'chevron-down'}
                 size={20}
-                color={COLORS.violet}
+                color={C.primary}
               />
             </TouchableOpacity>
 
             {showComparison && (
               <View>
                 {comparisons.map((comp, idx) => (
-                  <View key={idx} style={styles.comparisonCard}>
+                  <View key={idx} style={[styles.comparisonCard, { backgroundColor: C.card, borderColor: C.border }]}>
                     <View style={styles.comparisonTop}>
-                      <Text style={styles.comparisonField}>{comp.campo}</Text>
+                      <Text style={[styles.comparisonField, { color: C.text }]}>{comp.campo}</Text>
                       <View
                         style={[
                           styles.comparisonBadge,
-                          { backgroundColor: comp.mejora ? '#4CAF50' : '#FF9800' },
+                          { backgroundColor: comp.mejora ? C.success : C.warning },
                         ]}
                       >
                         <Ionicons
                           name={comp.mejora ? 'arrow-down' : 'arrow-up'}
                           size={14}
-                          color={COLORS.bone}
+                          color={C.white}
                         />
                         <Text style={styles.comparisonPercent}>
                           {comp.porciento.toFixed(1)}%
                         </Text>
                       </View>
                     </View>
-                    <Text style={styles.comparisonValues}>
+                    <Text style={[styles.comparisonValues, { color: C.textTertiary }]}>
                       {comp.anterior.toFixed(1)} → {comp.actual.toFixed(1)}
                     </Text>
                   </View>
@@ -548,7 +621,6 @@ export default function MeasurementsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -564,21 +636,17 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.bone,
     marginBottom: 4,
   },
   headerDate: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
   silhouetteSection: {
     alignItems: 'center',
     marginBottom: 32,
     paddingVertical: 24,
-    backgroundColor: COLORS.card,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   silhouetteContainer: {
     alignItems: 'center',
@@ -587,13 +655,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.violet,
     marginBottom: 8,
   },
   silhouetteTorso: {
     width: 60,
     height: 80,
-    backgroundColor: COLORS.violet,
     borderRadius: 12,
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -602,13 +668,11 @@ const styles = StyleSheet.create({
   silhouetteLeg: {
     width: 20,
     height: 60,
-    backgroundColor: COLORS.violet,
     borderRadius: 10,
     marginVertical: 4,
   },
   silhouetteLabel: {
     fontSize: 9,
-    color: COLORS.bone,
     fontWeight: '600',
   },
   formSection: {
@@ -617,7 +681,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.bone,
     marginBottom: 16,
   },
   formRow: {
@@ -631,30 +694,25 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: 6,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
     paddingRight: 12,
   },
   input: {
     flex: 1,
     height: 44,
     paddingHorizontal: 12,
-    color: COLORS.bone,
     fontSize: 14,
     fontWeight: '500',
   },
   inputUnit: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textTertiary,
   },
   notesInput: {
     height: 80,
@@ -666,7 +724,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: COLORS.coral,
     borderRadius: 12,
     height: 48,
     marginTop: 8,
@@ -674,7 +731,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   historySection: {
     marginBottom: 24,
@@ -685,20 +741,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   historyCard: {
-    backgroundColor: COLORS.card,
     borderRadius: 12,
     padding: 12,
     marginTop: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   historyDate: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.violet,
     marginBottom: 8,
   },
   historyContent: {
@@ -706,7 +758,6 @@ const styles = StyleSheet.create({
   },
   historyValue: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
   comparisonSection: {
     marginBottom: 24,
@@ -717,15 +768,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   comparisonCard: {
-    backgroundColor: COLORS.card,
     borderRadius: 12,
     padding: 12,
     marginTop: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   comparisonTop: {
     flexDirection: 'row',
@@ -736,7 +784,6 @@ const styles = StyleSheet.create({
   comparisonField: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   comparisonBadge: {
     flexDirection: 'row',
@@ -749,10 +796,8 @@ const styles = StyleSheet.create({
   comparisonPercent: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   comparisonValues: {
     fontSize: 12,
-    color: COLORS.textTertiary,
   },
 });

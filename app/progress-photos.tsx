@@ -17,72 +17,104 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
+import { useTranslation } from 'react-i18next';
 import { useProgressPhotoStore } from '../store/progressPhotoStore';
 import { useMeasurementStore } from '../store/measurementStore';
 import { useWeightStore } from '../store/weightStore';
-import { COLORS } from '../theme';
+import { useUserStore } from '../store/userStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useColors } from '../store/themeStore';
 
 const { width, height } = Dimensions.get('window');
 
 type PhotoAngle = 'front' | 'side' | 'back';
 
-interface ProgressPhoto {
-  id: string;
-  uri: string;
-  localPath: string;
-  fecha: string;
-  angle: PhotoAngle;
-  peso?: number;
-  grasaCorporal?: number;
-  notas?: string;
-  timestamp: number;
-}
-
-interface PhotoDetail {
-  photo: ProgressPhoto;
-  isDayLight?: boolean;
-}
+// Use the store's ProgressPhoto type which has 'photoUri', 'date', 'weight', 'bodyFat', 'note'
+// We add a helper to get the display URI and formatted date
+const getPhotoUri = (photo: any): string => {
+  const uri = photo.photoUri || photo.uri || '';
+  // On web, local file:// URIs don't work — return empty to show placeholder
+  if (Platform.OS === 'web' && uri && !uri.startsWith('data:') && !uri.startsWith('http')) {
+    return '';
+  }
+  return uri;
+};
+const getPhotoDate = (photo: any): string => {
+  if (photo.fecha) return photo.fecha;
+  if (photo.date) {
+    const d = photo.date instanceof Date ? photo.date : new Date(photo.date);
+    return d.toISOString().split('T')[0];
+  }
+  return '';
+};
+const getPhotoTimestamp = (photo: any): number => {
+  if (photo.timestamp) return photo.timestamp;
+  if (photo.date) {
+    const d = photo.date instanceof Date ? photo.date : new Date(photo.date);
+    return d.getTime();
+  }
+  return 0;
+};
 
 const TabButton: React.FC<{
   label: string;
   isActive: boolean;
   onPress: () => void;
-}> = ({ label, isActive, onPress }) => (
+  colors: ReturnType<typeof useColors>;
+}> = ({ label, isActive, onPress, colors }) => (
   <TouchableOpacity
-    style={[styles.tabButton, isActive && styles.tabButtonActive]}
+    style={[styles.tabButton, isActive && styles.tabButtonActive, {
+      backgroundColor: isActive ? colors.primary : colors.card,
+      borderColor: isActive ? colors.primary : colors.border
+    }]}
     onPress={onPress}
   >
-    <Text style={[styles.tabText, isActive && styles.tabTextActive]}>{label}</Text>
+    <Text style={[styles.tabText, isActive && styles.tabTextActive, {
+      color: isActive ? colors.white : colors.textSecondary
+    }]}>{label}</Text>
   </TouchableOpacity>
 );
 
 const PhotoThumbnail: React.FC<{
-  photo: ProgressPhoto;
+  photo: any;
   onPress: () => void;
-}> = ({ photo, onPress }) => (
+  onDelete: () => void;
+  colors: ReturnType<typeof useColors>;
+}> = ({ photo, onPress, onDelete, colors }) => (
   <TouchableOpacity
-    style={styles.thumbnail}
+    style={[styles.thumbnail, { backgroundColor: colors.card, borderColor: colors.border }]}
     onPress={onPress}
     activeOpacity={0.7}
   >
     <Image
-      source={{ uri: photo.uri }}
+      source={{ uri: getPhotoUri(photo) }}
       style={styles.thumbnailImage}
       resizeMode="cover"
     />
     <View style={styles.thumbnailOverlay}>
-      <Text style={styles.thumbnailDate}>{photo.fecha}</Text>
+      <Text style={[styles.thumbnailDate, { color: colors.white }]}>{getPhotoDate(photo)}</Text>
     </View>
+    {/* Delete button */}
+    <TouchableOpacity
+      style={styles.deleteBtn}
+      onPress={(e) => { e.stopPropagation?.(); onDelete(); }}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+    >
+      <View style={{ backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 12, width: 28, height: 28, alignItems: 'center', justifyContent: 'center' }}>
+        <Ionicons name="trash-outline" size={15} color="#FF6B6B" />
+      </View>
+    </TouchableOpacity>
   </TouchableOpacity>
 );
 
 const ComparisonSlider: React.FC<{
-  earliestPhoto: ProgressPhoto;
-  latestPhoto: ProgressPhoto;
+  earliestPhoto: any;
+  latestPhoto: any;
   position: number;
   onPositionChange: (pos: number) => void;
-}> = ({ earliestPhoto, latestPhoto, position, onPositionChange }) => {
+  colors: ReturnType<typeof useColors>;
+}> = ({ earliestPhoto, latestPhoto, position, onPositionChange, colors }) => {
   const sliderWidth = width - 32;
 
   return (
@@ -90,12 +122,12 @@ const ComparisonSlider: React.FC<{
       <View
         style={[
           styles.comparisonSlider,
-          { width: sliderWidth },
+          { width: sliderWidth, backgroundColor: colors.background, borderColor: colors.border },
         ]}
       >
         {/* Background image (latest) */}
         <Image
-          source={{ uri: latestPhoto.uri }}
+          source={{ uri: getPhotoUri(latestPhoto) }}
           style={styles.comparisonImage}
           resizeMode="cover"
         />
@@ -108,7 +140,7 @@ const ComparisonSlider: React.FC<{
           ]}
         >
           <Image
-            source={{ uri: earliestPhoto.uri }}
+            source={{ uri: getPhotoUri(earliestPhoto) }}
             style={[styles.comparisonImage, { width: sliderWidth }]}
             resizeMode="cover"
           />
@@ -118,17 +150,17 @@ const ComparisonSlider: React.FC<{
         <TouchableOpacity
           style={[
             styles.sliderHandle,
-            { left: `${position}%` },
+            { left: `${position}%`, backgroundColor: colors.accent },
           ]}
           onPress={() => {}}
         >
-          <View style={styles.sliderHandleInner} />
+          <View style={[styles.sliderHandleInner, { backgroundColor: colors.accent }]} />
         </TouchableOpacity>
       </View>
 
       {/* Slider track for positioning */}
       <View
-        style={styles.sliderTrack}
+        style={[styles.sliderTrack, { backgroundColor: colors.background, borderColor: colors.border }]}
         onTouchMove={(e) => {
           const touchX = e.nativeEvent.locationX;
           const trackWidth = sliderWidth;
@@ -136,23 +168,27 @@ const ComparisonSlider: React.FC<{
           onPositionChange(newPosition);
         }}
       >
-        <View style={[styles.sliderFill, { width: `${position}%` }]} />
+        <View style={[styles.sliderFill, { width: `${position}%`, backgroundColor: colors.primary }]} />
       </View>
 
       {/* Labels */}
       <View style={styles.comparisonLabels}>
-        <Text style={styles.comparisonLabel}>{earliestPhoto.fecha}</Text>
-        <Text style={styles.comparisonLabel}>{latestPhoto.fecha}</Text>
+        <Text style={[styles.comparisonLabel, { color: colors.textSecondary }]}>{getPhotoDate(earliestPhoto)}</Text>
+        <Text style={[styles.comparisonLabel, { color: colors.textSecondary }]}>{getPhotoDate(latestPhoto)}</Text>
       </View>
     </View>
   );
 };
 
 export default function ProgressPhotosScreen() {
+  const C = useColors();
+  const { t } = useTranslation();
   const router = useRouter();
-  const { photos, addPhoto, getPhotosByAngle } = useProgressPhotoStore();
+  const insets = useSafeAreaInsets();
+  const { photos, addPhoto, getPhotosByAngle, deletePhoto, loadPhotos } = useProgressPhotoStore();
   const { measurements } = useMeasurementStore();
   const { weights } = useWeightStore();
+  const { user } = useUserStore();
 
   const [activeTab, setActiveTab] = useState<PhotoAngle>('front');
   const [tabPhotos, setTabPhotos] = useState<ProgressPhoto[]>([]);
@@ -162,20 +198,25 @@ export default function ProgressPhotosScreen() {
   const [comparisonPosition, setComparisonPosition] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
+  const [photosLoaded, setPhotosLoaded] = useState(false);
 
   const tabLabels: Record<PhotoAngle, string> = {
-    front: 'Frontal',
-    side: 'Lateral',
-    back: 'Espalda',
+    front: t('progressPhotos.front'),
+    side: t('progressPhotos.side'),
+    back: t('progressPhotos.back'),
   };
+
+  // Load photos from Firebase on mount
+  useEffect(() => {
+    if (user?.uid && !photosLoaded) {
+      loadPhotos(user.uid).then(() => setPhotosLoaded(true));
+    }
+    requestCameraPermission();
+  }, [user?.uid]);
 
   useEffect(() => {
     loadPhotosForTab();
-  }, [activeTab]);
-
-  useEffect(() => {
-    requestCameraPermission();
-  }, []);
+  }, [activeTab, photos]);
 
   const requestCameraPermission = async () => {
     try {
@@ -190,11 +231,17 @@ export default function ProgressPhotosScreen() {
 
   const loadPhotosForTab = () => {
     const filtered = getPhotosByAngle(activeTab);
-    setTabPhotos(filtered.sort((a, b) => b.timestamp - a.timestamp));
+    setTabPhotos(filtered.sort((a: any, b: any) => getPhotoTimestamp(b) - getPhotoTimestamp(a)));
   };
 
   const savePhotoLocally = async (photoUri: string): Promise<string> => {
     try {
+      // On web, FileSystem paths don't work — convert to base64 data URI
+      if (Platform.OS === 'web') {
+        // The picker already returns a usable URI on web (blob or data URI)
+        return photoUri;
+      }
+
       const filename = `progress_${Date.now()}.jpg`;
       const localPath = `${FileSystem.documentDirectory}progress_photos/${filename}`;
 
@@ -221,8 +268,8 @@ export default function ProgressPhotosScreen() {
   const handleTakePhoto = async () => {
     if (permissionDenied) {
       Alert.alert(
-        'Permiso requerido',
-        'Necesitamos acceso a la cámara para tomar fotos'
+        t('permissions.required'),
+        t('permissions.cameraNeeded')
       );
       return;
     }
@@ -238,7 +285,7 @@ export default function ProgressPhotosScreen() {
       if (!result.canceled && result.assets[0]) {
         const photoUri = result.assets[0].uri;
 
-        // Save locally
+        // Save locally so URI persists across app restarts
         const localPath = await savePhotoLocally(photoUri);
 
         // Get current weight and body fat
@@ -248,62 +295,152 @@ export default function ProgressPhotosScreen() {
             ? measurements[0].grasaCorporal
             : undefined;
 
-        const newPhoto: ProgressPhoto = {
-          id: Date.now().toString(),
-          uri: photoUri,
-          localPath,
-          fecha: new Date().toISOString().split('T')[0],
+        // Save to Firestore — use localPath as photoUri for persistence
+        if (!user?.uid) {
+          Alert.alert('Error', t('common.userNotAuthenticated'));
+          return;
+        }
+        await addPhoto({
+          userId: user.uid,
+          date: new Date(),
           angle: activeTab,
-          peso: currentWeight,
-          grasaCorporal: currentBodyFat,
-          timestamp: Date.now(),
-        };
-
-        addPhoto(newPhoto);
+          photoUri: localPath,
+          weight: currentWeight,
+          bodyFat: currentBodyFat,
+        });
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         loadPhotosForTab();
-        Alert.alert('Éxito', 'Foto guardada correctamente');
+        Alert.alert(t('common.success'), t('photos.saved'));
       }
     } catch (error) {
       console.error('Error taking photo:', error);
-      Alert.alert('Error', 'No se pudo guardar la foto');
+      Alert.alert('Error', t('photos.saveError'));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSelectPhoto = (photo: ProgressPhoto) => {
+  const handlePickFromGallery = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          t('permissions.required'),
+          t('permissions.galleryNeeded')
+        );
+        return;
+      }
+
+      setIsLoading(true);
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: false,
+        aspect: [3, 4],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const photoUri = result.assets[0].uri;
+
+        // Save locally so URI persists
+        const localPath = await savePhotoLocally(photoUri);
+
+        const currentWeight = weights && weights.length > 0 ? weights[0].peso : undefined;
+        const currentBodyFat =
+          measurements && measurements.length > 0
+            ? measurements[0].grasaCorporal
+            : undefined;
+
+        if (!user?.uid) {
+          Alert.alert('Error', t('common.userNotAuthenticated'));
+          return;
+        }
+        await addPhoto({
+          userId: user.uid,
+          date: new Date(),
+          angle: activeTab,
+          photoUri: localPath,
+          weight: currentWeight,
+          bodyFat: currentBodyFat,
+        });
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        loadPhotosForTab();
+        Alert.alert(t('common.success'), t('photos.saved'));
+      }
+    } catch (error) {
+      console.error('Error picking photo:', error);
+      Alert.alert('Error', t('photos.saveError'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSelectPhoto = (photo: any) => {
     setSelectedPhoto(photo);
     setShowDetailModal(true);
   };
 
   const handleStartComparison = () => {
     if (tabPhotos.length < 2) {
-      Alert.alert('Información', 'Necesitas al menos 2 fotos para comparar');
+      Alert.alert(t('progressPhotos.info'), t('progressPhotos.needTwoPhotos'));
       return;
     }
     setComparisonPosition(50);
     setShowComparisonModal(true);
   };
 
-  const getPhotoMetadata = (photo: ProgressPhoto) => {
+  const handleDeletePhoto = (photo: any) => {
+    Alert.alert(
+      t('photos.deleteTitle'),
+      t('photos.deleteConfirm'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deletePhoto(photo.id);
+              await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              loadPhotosForTab();
+              // Close detail modal if open
+              if (showDetailModal && selectedPhoto?.id === photo.id) {
+                setShowDetailModal(false);
+                setSelectedPhoto(null);
+              }
+            } catch (error) {
+              Alert.alert('Error', t('photos.deleteError'));
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const getPhotoMetadata = (photo: any) => {
     const lines = [];
-    if (photo.peso) lines.push(`Peso: ${photo.peso.toFixed(1)} kg`);
-    if (photo.grasaCorporal !== undefined)
-      lines.push(`Grasa: ${photo.grasaCorporal.toFixed(1)}%`);
+    if (photo.weight) lines.push(t('progressPhotos.weight', { value: photo.weight.toFixed(1) }));
+    else if (photo.peso) lines.push(t('progressPhotos.weight', { value: photo.peso.toFixed(1) }));
+    if (photo.bodyFat !== undefined) lines.push(`Grasa: ${photo.bodyFat.toFixed(1)}%`);
+    else if (photo.grasaCorporal !== undefined) lines.push(`Grasa: ${photo.grasaCorporal.toFixed(1)}%`);
     return lines;
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: C.background }]}>
       {/* Header */}
-      <View style={styles.headerContainer}>
+      <View style={[styles.headerContainer, { paddingTop: insets.top, zIndex: 10, backgroundColor: C.background, borderBottomColor: C.border }]}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={28} color={COLORS.violet} />
+          <TouchableOpacity
+            onPress={() => router.back()}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            activeOpacity={0.6}
+            style={{ backgroundColor: C.surface, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Ionicons name="chevron-back" size={24} color={C.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Fotos de Progreso</Text>
-          <View style={{ width: 28 }} />
+          <Text style={[styles.headerTitle, { color: C.text }]}>{t('progressPhotos.title')}</Text>
+          <View style={{ width: 40 }} />
         </View>
 
         {/* Tabs */}
@@ -314,6 +451,7 @@ export default function ProgressPhotosScreen() {
               label={tabLabels[angle]}
               isActive={activeTab === angle}
               onPress={() => setActiveTab(angle)}
+              colors={C}
             />
           ))}
         </View>
@@ -326,27 +464,36 @@ export default function ProgressPhotosScreen() {
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.takePhotoButton]}
+            style={[styles.actionButton, { backgroundColor: C.accent, borderColor: C.accent }]}
             onPress={handleTakePhoto}
             disabled={isLoading}
           >
             {isLoading ? (
-              <ActivityIndicator color={COLORS.bone} size="small" />
+              <ActivityIndicator color={C.white} size="small" />
             ) : (
               <>
-                <Ionicons name="camera" size={20} color={COLORS.bone} />
-                <Text style={styles.actionButtonText}>Tomar Foto</Text>
+                <Ionicons name="camera" size={18} color={C.white} />
+                <Text style={[styles.actionButtonText, { color: C.white }]}>{t('progressPhotos.camera')}</Text>
               </>
             )}
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: C.primary, borderColor: C.primary }]}
+            onPress={handlePickFromGallery}
+            disabled={isLoading}
+          >
+            <Ionicons name="images" size={18} color={C.white} />
+            <Text style={[styles.actionButtonText, { color: C.white }]}>{t('progressPhotos.gallery')}</Text>
+          </TouchableOpacity>
+
           {tabPhotos.length > 1 && (
             <TouchableOpacity
-              style={[styles.actionButton, styles.compareButton]}
+              style={[styles.actionButton, { backgroundColor: C.card, borderColor: C.border }]}
               onPress={handleStartComparison}
             >
-              <Ionicons name="swap-horizontal" size={20} color={COLORS.bone} />
-              <Text style={styles.actionButtonText}>Comparar</Text>
+              <Ionicons name="swap-horizontal" size={18} color={C.text} />
+              <Text style={[styles.actionButtonText, { color: C.text }]}>{t('progressPhotos.compare')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -354,24 +501,26 @@ export default function ProgressPhotosScreen() {
         {/* Photos Grid */}
         {tabPhotos.length > 0 ? (
           <>
-            <Text style={styles.gridTitle}>
+            <Text style={[styles.gridTitle, { color: C.textSecondary }]}>
               {tabPhotos.length} foto{tabPhotos.length !== 1 ? 's' : ''}
             </Text>
             <View style={styles.photoGrid}>
-              {tabPhotos.map((photo) => (
+              {tabPhotos.map((photo: any) => (
                 <PhotoThumbnail
                   key={photo.id}
                   photo={photo}
                   onPress={() => handleSelectPhoto(photo)}
+                  onDelete={() => handleDeletePhoto(photo)}
+                  colors={C}
                 />
               ))}
             </View>
           </>
         ) : (
           <View style={styles.emptyState}>
-            <Ionicons name="image-outline" size={48} color={COLORS.violet} />
-            <Text style={styles.emptyStateTitle}>No hay fotos</Text>
-            <Text style={styles.emptyStateText}>
+            <Ionicons name="image-outline" size={48} color={C.primary} />
+            <Text style={[styles.emptyStateTitle, { color: C.text }]}>{t('progressPhotos.emptyTitle')}</Text>
+            <Text style={[styles.emptyStateText, { color: C.textSecondary }]}>
               Comienza a registrar tu progreso tomando una foto
             </Text>
           </View>
@@ -388,44 +537,52 @@ export default function ProgressPhotosScreen() {
         onRequestClose={() => setShowDetailModal(false)}
       >
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: C.card, borderColor: C.border }]}>
             {selectedPhoto && (
               <>
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>{selectedPhoto.fecha}</Text>
+                <View style={[styles.modalHeader, { borderBottomColor: C.border }]}>
+                  <Text style={[styles.modalTitle, { color: C.text }]}>{getPhotoDate(selectedPhoto)}</Text>
                   <TouchableOpacity onPress={() => setShowDetailModal(false)}>
-                    <Ionicons name="close" size={24} color={COLORS.bone} />
+                    <Ionicons name="close" size={24} color={C.text} />
                   </TouchableOpacity>
                 </View>
 
                 <Image
-                  source={{ uri: selectedPhoto.uri }}
+                  source={{ uri: getPhotoUri(selectedPhoto) }}
                   style={styles.modalImage}
                   resizeMode="contain"
                 />
 
                 {getPhotoMetadata(selectedPhoto).length > 0 && (
-                  <View style={styles.metadataSection}>
+                  <View style={[styles.metadataSection, { borderTopColor: C.border }]}>
                     {getPhotoMetadata(selectedPhoto).map((line, idx) => (
                       <View key={idx} style={styles.metadataRow}>
-                        <Text style={styles.metadataText}>{line}</Text>
+                        <Text style={[styles.metadataText, { color: C.textSecondary }]}>{line}</Text>
                       </View>
                     ))}
                   </View>
                 )}
 
-                {selectedPhoto.notas && (
-                  <View style={styles.notasSection}>
-                    <Text style={styles.notasLabel}>Notas</Text>
-                    <Text style={styles.notasText}>{selectedPhoto.notas}</Text>
+                {(selectedPhoto.notas || selectedPhoto.note) && (
+                  <View style={[styles.notasSection, { borderTopColor: C.border }]}>
+                    <Text style={[styles.notasLabel, { color: C.primary }]}>{t('progressPhotos.notes')}</Text>
+                    <Text style={[styles.notasText, { color: C.textSecondary }]}>{selectedPhoto.notas || selectedPhoto.note}</Text>
                   </View>
                 )}
 
+                {/* Delete from detail view */}
                 <TouchableOpacity
-                  style={styles.closeButton}
+                  style={[styles.closeButton, { backgroundColor: C.error || '#FF4444' }]}
+                  onPress={() => handleDeletePhoto(selectedPhoto)}
+                >
+                  <Text style={[styles.closeButtonText, { color: '#FFFFFF' }]}>{t('progressPhotos.deleteTitle')}</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.closeButton, { backgroundColor: C.primary, marginTop: 0 }]}
                   onPress={() => setShowDetailModal(false)}
                 >
-                  <Text style={styles.closeButtonText}>Cerrar</Text>
+                  <Text style={[styles.closeButtonText, { color: C.white }]}>{t('progressPhotos.close')}</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -441,13 +598,13 @@ export default function ProgressPhotosScreen() {
         onRequestClose={() => setShowComparisonModal(false)}
       >
         <View style={styles.modalBackdrop}>
-          <View style={styles.comparisonModalContent}>
+          <View style={[styles.comparisonModalContent, { backgroundColor: C.card, borderColor: C.border }]}>
             {tabPhotos.length > 1 && (
               <>
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Comparación</Text>
+                <View style={[styles.modalHeader, { borderBottomColor: C.border }]}>
+                  <Text style={[styles.modalTitle, { color: C.text }]}>{t('progressPhotos.comparison')}</Text>
                   <TouchableOpacity onPress={() => setShowComparisonModal(false)}>
-                    <Ionicons name="close" size={24} color={COLORS.bone} />
+                    <Ionicons name="close" size={24} color={C.text} />
                   </TouchableOpacity>
                 </View>
 
@@ -456,35 +613,36 @@ export default function ProgressPhotosScreen() {
                   latestPhoto={tabPhotos[0]}
                   position={comparisonPosition}
                   onPositionChange={setComparisonPosition}
+                  colors={C}
                 />
 
                 <View style={styles.comparisonInfo}>
-                  <View style={styles.infoCard}>
-                    <Text style={styles.infoLabel}>Primera foto</Text>
-                    <Text style={styles.infoValue}>
-                      {tabPhotos[tabPhotos.length - 1].fecha}
+                  <View style={[styles.infoCard, { backgroundColor: C.background, borderColor: C.border }]}>
+                    <Text style={[styles.infoLabel, { color: C.textTertiary }]}>{t('progressPhotos.firstPhoto')}</Text>
+                    <Text style={[styles.infoValue, { color: C.text }]}>
+                      {getPhotoDate(tabPhotos[tabPhotos.length - 1])}
                     </Text>
                   </View>
-                  <View style={styles.infoCard}>
-                    <Text style={styles.infoLabel}>Última foto</Text>
-                    <Text style={styles.infoValue}>{tabPhotos[0].fecha}</Text>
+                  <View style={[styles.infoCard, { backgroundColor: C.background, borderColor: C.border }]}>
+                    <Text style={[styles.infoLabel, { color: C.textTertiary }]}>{t('progressPhotos.lastPhoto')}</Text>
+                    <Text style={[styles.infoValue, { color: C.text }]}>{getPhotoDate(tabPhotos[0])}</Text>
                   </View>
                 </View>
 
-                {tabPhotos[0].peso && tabPhotos[tabPhotos.length - 1].peso && (
-                  <View style={styles.comparisonStats}>
-                    <Text style={styles.statsLabel}>Cambio de peso</Text>
-                    <Text style={styles.statsValue}>
-                      {(tabPhotos[0].peso - tabPhotos[tabPhotos.length - 1].peso).toFixed(1)} kg
+                {(tabPhotos[0].weight || tabPhotos[0].peso) && (tabPhotos[tabPhotos.length - 1].weight || tabPhotos[tabPhotos.length - 1].peso) && (
+                  <View style={[styles.comparisonStats, { backgroundColor: C.background, borderColor: C.border }]}>
+                    <Text style={[styles.statsLabel, { color: C.textTertiary }]}>{t('progressPhotos.weightChange')}</Text>
+                    <Text style={[styles.statsValue, { color: C.accent }]}>
+                      {((tabPhotos[0].weight || tabPhotos[0].peso) - (tabPhotos[tabPhotos.length - 1].weight || tabPhotos[tabPhotos.length - 1].peso)).toFixed(1)} kg
                     </Text>
                   </View>
                 )}
 
                 <TouchableOpacity
-                  style={styles.closeButton}
+                  style={[styles.closeButton, { backgroundColor: C.primary }]}
                   onPress={() => setShowComparisonModal(false)}
                 >
-                  <Text style={styles.closeButtonText}>Cerrar</Text>
+                  <Text style={[styles.closeButtonText, { color: C.white }]}>{t('progressPhotos.close')}</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -498,12 +656,9 @@ export default function ProgressPhotosScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   headerContainer: {
-    backgroundColor: COLORS.background,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   header: {
     flexDirection: 'row',
@@ -516,7 +671,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.bone,
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -529,22 +683,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: COLORS.card,
     borderWidth: 1,
-    borderColor: COLORS.border,
     alignItems: 'center',
   },
   tabButtonActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
   },
   tabText: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
   },
   tabTextActive: {
-    color: COLORS.bone,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -566,22 +714,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   takePhotoButton: {
-    backgroundColor: COLORS.coral,
-    borderColor: COLORS.coral,
   },
   compareButton: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
   },
   actionButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   gridTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: 12,
   },
   photoGrid: {
@@ -595,9 +737,7 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 4,
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: COLORS.card,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   thumbnailImage: {
     width: '100%',
@@ -612,10 +752,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
+  deleteBtn: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+  },
   thumbnailDate: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.bone,
+    color: '#F7F2EA',
   },
   emptyState: {
     alignItems: 'center',
@@ -625,12 +770,10 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.bone,
     marginTop: 16,
   },
   emptyStateText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     marginTop: 8,
     textAlign: 'center',
   },
@@ -643,20 +786,16 @@ const styles = StyleSheet.create({
   modalContent: {
     width: width - 32,
     maxHeight: height - 100,
-    backgroundColor: COLORS.card,
     borderRadius: 16,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   comparisonModalContent: {
     width: width - 32,
     maxHeight: height - 100,
-    backgroundColor: COLORS.card,
     borderRadius: 16,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -665,12 +804,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   modalTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   modalImage: {
     width: '100%',
@@ -680,44 +817,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
   },
   metadataRow: {
     paddingVertical: 6,
   },
   metadataText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
   },
   notasSection: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
   },
   notasLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.violet,
     marginBottom: 6,
   },
   notasText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     lineHeight: 18,
   },
   closeButton: {
     marginHorizontal: 16,
     marginVertical: 12,
     paddingVertical: 12,
-    backgroundColor: COLORS.violet,
     borderRadius: 12,
     alignItems: 'center',
   },
   closeButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   comparisonContainer: {
     paddingHorizontal: 16,
@@ -727,9 +857,7 @@ const styles = StyleSheet.create({
     height: height * 0.4,
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: COLORS.background,
     borderWidth: 1,
-    borderColor: COLORS.border,
     marginBottom: 16,
   },
   comparisonImage: {
@@ -748,7 +876,6 @@ const styles = StyleSheet.create({
     top: 0,
     width: 4,
     height: '100%',
-    backgroundColor: COLORS.coral,
     justifyContent: 'center',
     alignItems: 'center',
     transform: [{ translateX: -2 }],
@@ -757,21 +884,17 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.coral,
     opacity: 0.7,
   },
   sliderTrack: {
     height: 40,
-    backgroundColor: COLORS.background,
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: COLORS.border,
     marginBottom: 12,
   },
   sliderFill: {
     height: '100%',
-    backgroundColor: COLORS.violet,
   },
   comparisonLabels: {
     flexDirection: 'row',
@@ -780,7 +903,6 @@ const styles = StyleSheet.create({
   comparisonLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
   },
   comparisonInfo: {
     flexDirection: 'row',
@@ -792,40 +914,32 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 12,
-    backgroundColor: COLORS.background,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   infoLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textTertiary,
     marginBottom: 4,
   },
   infoValue: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   comparisonStats: {
     paddingHorizontal: 16,
     marginBottom: 12,
     paddingVertical: 12,
-    backgroundColor: COLORS.background,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   statsLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textTertiary,
     marginBottom: 4,
   },
   statsValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.coral,
   },
 });

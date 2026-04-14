@@ -1,0 +1,160 @@
+================================================================================
+  RECEIPT COLLECTOR — INFORME DE EJECUCIÓN
+  Fecha: 13/04/2026  |  Proyecto: Cals2Gains  |  Cuenta: info@civiltek.es
+================================================================================
+
+RESUMEN EJECUTIVO
+-----------------
+Ejecución completada con éxito. Se encontró 1 recibo nuevo (OpenAI API, $121 USD).
+Total acumulado actualizado: 525,08 € (histórico desde mar 2024).
+Total abril 2026: 502,08 €.
+
+
+────────────────────────────────────────────────────────────────────────────────
+1. FUENTES ESCANEADAS
+────────────────────────────────────────────────────────────────────────────────
+
+▶ Gmail (info@civiltek.es)
+  - Correos de facturación revisados (últimos 30 días)
+  - Facturas detectadas: Anthropic Invoice-5RBPQUSE-0003 (ya registrada),
+    Anthropic Invoice-5RBPQUSE-0004 (ya registrada), OpenAI 872130F5-0003 (NUEVA)
+  - Resultado: 1 factura nueva identificada para seguimiento
+
+
+────────────────────────────────────────────────────────────────────────────────
+2. PORTALES WEB VISITADOS
+────────────────────────────────────────────────────────────────────────────────
+
+┌──────────────────────┬───────────────────────────────────────────────────────┐
+│ Portal               │ Resultado                                             │
+├──────────────────────┼───────────────────────────────────────────────────────┤
+│ Anthropic (console)  │ ⚠ Requiere login — sesión no activa en Chrome        │
+│                      │   Facturas obtenidas previamente vía Gmail            │
+├──────────────────────┼───────────────────────────────────────────────────────┤
+│ OpenAI API Platform  │ ✅ Acceso OK — 1 factura NUEVA encontrada             │
+│                      │   Invoice 872130F5-0003 · $121,00 · 10/04/2026        │
+│                      │   PDF no descargable (Stripe JS-only)                 │
+│                      │   → Guardado como .txt con todos los metadatos        │
+├──────────────────────┼───────────────────────────────────────────────────────┤
+│ ChatGPT (Plus)       │ ⚠ No accesible — sin suscripción Plus activa          │
+├──────────────────────┼───────────────────────────────────────────────────────┤
+│ Google Play Console  │ ⚠ Requiere login — sesión no activa en Chrome        │
+│                      │   Cargo mensual 23 € ya registrado                    │
+├──────────────────────┼───────────────────────────────────────────────────────┤
+│ Meta Ads             │ ✅ Acceso OK — sin transacciones nuevas               │
+│                      │   Gasto iCloud 9,99 € ya registrado (factura previa)  │
+├──────────────────────┼───────────────────────────────────────────────────────┤
+│ Expo (EAS)           │ ✅ Acceso OK — plan Free activo, sin cargos           │
+├──────────────────────┼───────────────────────────────────────────────────────┤
+│ Vercel / Hosting     │ ✅ Acceso OK — sin facturas nuevas en período         │
+└──────────────────────┴───────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────
+3. RECIBOS GUARDADOS (NUEVOS)
+────────────────────────────────────────────────────────────────────────────────
+
+Directorio base: C:\Users\Judit\Documents\Cals2Gains\finances\receipts\
+
+  ✅ NUEVO  openai\2026-04-10_openai_invoice-872130F5-0003_121usd.txt
+            Proveedor : OpenAI
+            Concepto  : API Credits Pay-as-you-go
+            Importe   : $121,00 USD · 111,32 € (cambio 0,92)
+            Fecha     : 10/04/2026
+            Formato   : .txt (PDF de Stripe no descargable vía automatización)
+
+  ─ SIN CAMBIOS  anthropic\ — 8 PDFs ya existentes, ninguna factura nueva
+                 google\    — sin factura nueva en período
+                 apple\     — sin factura nueva en período
+                 meta\      — sin transacciones
+                 expo\      — plan Free, sin recibo
+                 hosting\   — sin factura nueva en período
+                 otros\     — sin movimiento
+
+
+────────────────────────────────────────────────────────────────────────────────
+4. CAMBIOS EN EL EXCEL (Cals2Gains_Finances.xlsx)
+────────────────────────────────────────────────────────────────────────────────
+
+Sheet "Gastos" — 3 filas añadidas:
+  Fila 5: 09/04/2026 · Anthropic · Claude Team · IA/Suscripciones
+           170,78 € (EUR) · IVA: Sí · Invoice-5RBPQUSE-0003
+  Fila 6: 10/04/2026 · OpenAI · API Credits Pay-as-you-go · IA/Suscripciones
+           111,32 € ($121 USD) · IVA: No · Invoice 872130F5-0003
+  Fila 7: 13/04/2026 · Anthropic · Claude Team · IA/Suscripciones
+           170,00 € (EUR) · IVA: Sí · Invoice-5RBPQUSE-0004
+
+Sheet "Resumen Mensual" — Columna Abril 2026 actualizada:
+  IA/Suscripciones : 462,09 €  (iCloud 9,99 + Anthropic ×2 + OpenAI)
+  App Stores       :  23,00 €  (Google Play Console)
+  Publicidad       :  16,99 €  (Meta Ads)
+  TOTAL            : 502,08 €
+
+Sheet "Suscripciones" — Actualizaciones:
+  Claude (Anthropic): Plan → Team, Mensual → 170 €, Anual → 2.040 €
+                      Próxima renovación → 09/05/2026, Estado → Activa
+  OpenAI            : Estado → API activa pay-as-you-go
+
+Sheet "P&L" — Columna Abril 2026:
+  IA/Suscripciones : 462,09 €
+  App Stores       :  23,00 €
+  Publicidad       :  16,99 €
+  Total Gastos     : 502,08 €
+  Total Ingresos   :   0,00 €
+  RESULTADO NETO   : -502,08 €
+  Burn Rate        : 502,08 €/mes
+
+
+────────────────────────────────────────────────────────────────────────────────
+5. TOTALES ACTUALIZADOS
+────────────────────────────────────────────────────────────────────────────────
+
+  Total histórico (desde mar 2024) : 525,08 €
+  Total abril 2026                 : 502,08 €
+  Gasto recurrente estimado        : ~196,98 €/mes
+    · Claude Team (Anthropic)      : 170,00 €/mes
+    · Google Play Console          :  23,00 €/mes
+    · Meta Ads                     :   3,99 €/mes (estimado)
+
+  Nota: iCloud 9,99 €/mes se contabiliza como gasto compartido Cals2Gains
+        (clasificado en IA/Suscripciones para este proyecto)
+
+
+────────────────────────────────────────────────────────────────────────────────
+6. ANOMALÍAS Y ALERTAS
+────────────────────────────────────────────────────────────────────────────────
+
+  ⚠ ALERTA — Cargo inesperado OpenAI API
+    Importe   : $121,00 USD (111,32 €)
+    Fecha     : 10/04/2026
+    Contexto  : Este cargo no estaba previamente registrado en el Excel
+                ni en el dashboard. Corresponde a uso de créditos API
+                pay-as-you-go (modelo GPT-4o / o3-mini u otros).
+    Acción    : Registrado y contabilizado. Se recomienda revisar en
+                platform.openai.com/usage qué llamadas generaron
+                $121 de consumo en el período, y valorar si activar
+                alertas de gasto en OpenAI Platform para evitar
+                sorpresas futuras.
+
+  ℹ INFO — PDF de Stripe no descargable vía automatización
+    Los PDFs de facturas Stripe (invoice.stripe.com) requieren
+    autenticación y renderizado JS. Se guardó registro .txt completo
+    como alternativa. Para obtener el PDF, acceder manualmente a:
+    https://invoice.stripe.com/i/acct_xxx/872130F5-0003
+
+
+────────────────────────────────────────────────────────────────────────────────
+7. ARCHIVOS ACTUALIZADOS EN ESTA EJECUCIÓN
+────────────────────────────────────────────────────────────────────────────────
+
+  ✅ finances\receipts\openai\2026-04-10_openai_invoice-872130F5-0003_121usd.txt
+  ✅ finances\Cals2Gains_Finances.xlsx  (via COM · sheets: Gastos, Resumen Mensual,
+                                          Suscripciones, P&L)
+  ✅ finances\dashboard.html
+  ✅ _project-hub\dashboard.html
+  ✅ _project-hub\FINANCES.md
+  ✅ finances\receipt-collector-report_2026-04-13.txt  ← este archivo
+
+================================================================================
+  FIN DEL INFORME · receipt-collector · 13/04/2026
+================================================================================

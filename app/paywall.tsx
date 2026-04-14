@@ -2,7 +2,7 @@
 // Cals2Gains - Paywall / Subscription Screen
 // ============================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,18 +17,22 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
-import Colors from '../constants/colors';
+import { useColors } from '../store/themeStore';
 import {
   getOfferings,
   purchasePackage,
   restorePurchases,
 } from '../services/revenuecat';
 import { useUserStore } from '../store/userStore';
-import { PurchasesPackage } from 'react-native-purchases';
+
+// Use `any` type to avoid importing native module directly (crashes in Expo Go)
+type PurchasesPackage = any;
 
 export default function PaywallScreen() {
   const { t } = useTranslation();
   const { user, loadUserData } = useUserStore();
+  const C = useColors();
+  const styles = useMemo(() => createStyles(C), [C]);
 
   const [packages, setPackages] = useState<PurchasesPackage[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<PurchasesPackage | null>(null);
@@ -132,14 +136,14 @@ export default function PaywallScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#1a0a3e', Colors.background]}
+        colors={[C.background, C.background]}
         style={StyleSheet.absoluteFill}
       />
 
       <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
         {/* Close button */}
         <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
-          <Ionicons name="close" size={22} color={Colors.textSecondary} />
+          <Ionicons name="close" size={22} color={C.textSecondary} />
         </TouchableOpacity>
 
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -165,7 +169,7 @@ export default function PaywallScreen() {
           {/* Pricing plans */}
           {isLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator color={Colors.primary} />
+              <ActivityIndicator color={C.primary} />
               <Text style={styles.loadingText}>{t('paywall.loading')}</Text>
             </View>
           ) : (
@@ -206,7 +210,7 @@ export default function PaywallScreen() {
 
                       <View style={[styles.planRadio, isSelected && styles.planRadioSelected]}>
                         {isSelected && (
-                          <Ionicons name="checkmark" size={16} color={Colors.white} />
+                          <Ionicons name="checkmark" size={16} color="#FFFFFF" />
                         )}
                       </View>
                     </View>
@@ -238,7 +242,7 @@ export default function PaywallScreen() {
                         </Text>
                       </View>
                       <View style={styles.planRadioSelected}>
-                        <Ionicons name="checkmark" size={16} color={Colors.white} />
+                        <Ionicons name="checkmark" size={16} color="#FFFFFF" />
                       </View>
                     </View>
                     <Text style={styles.annualSavings}>{t('paywall.savePercent', { percent: '58' })}</Text>
@@ -264,7 +268,7 @@ export default function PaywallScreen() {
           <View style={styles.ctaContainer}>
             {/* Trial info */}
             <View style={styles.trialInfo}>
-              <Ionicons name="gift-outline" size={16} color={Colors.accent} />
+              <Ionicons name="gift-outline" size={16} color={C.accent} />
               <Text style={styles.trialInfoText}>{t('paywall.trialInfo')}</Text>
             </View>
 
@@ -274,10 +278,10 @@ export default function PaywallScreen() {
               disabled={isPurchasing || !selectedPackage || isLoading}
             >
               {isPurchasing ? (
-                <ActivityIndicator color={Colors.white} size="small" />
+                <ActivityIndicator color="#FFFFFF" size="small" />
               ) : (
                 <>
-                  <Ionicons name="sparkles" size={20} color={Colors.white} />
+                  <Ionicons name="sparkles" size={20} color="#FFFFFF" />
                   <Text style={styles.subscribeButtonText}>{t('paywall.subscribe')}</Text>
                 </>
               )}
@@ -289,7 +293,7 @@ export default function PaywallScreen() {
               disabled={isRestoring}
             >
               {isRestoring ? (
-                <ActivityIndicator color={Colors.textMuted} size="small" />
+                <ActivityIndicator color={C.textMuted} size="small" />
               ) : (
                 <Text style={styles.restoreText}>{t('paywall.restorePurchases')}</Text>
               )}
@@ -303,228 +307,230 @@ export default function PaywallScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 56,
-    right: 20,
-    zIndex: 10,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  hero: {
-    alignItems: 'center',
-    paddingTop: 60,
-    paddingBottom: 24,
-    paddingHorizontal: 24,
-  },
-  heroEmoji: {
-    fontSize: 56,
-    marginBottom: 16,
-  },
-  heroTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: Colors.text,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  heroSubtitle: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  featuresContainer: {
-    marginHorizontal: 20,
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    marginBottom: 20,
-  },
-  featureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 8,
-    gap: 14,
-  },
-  featureIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: Colors.primary + '20',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  featureEmoji: {
-    fontSize: 18,
-  },
-  featureText: {
-    flex: 1,
-    fontSize: 14,
-    color: Colors.text,
-    lineHeight: 20,
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    gap: 12,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-  },
-  plansContainer: {
-    marginHorizontal: 20,
-    gap: 12,
-    marginBottom: 20,
-  },
-  planCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 18,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  planCardSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary + '10',
-  },
-  planCardAnnual: {
-    borderColor: Colors.primaryLight,
-  },
-  bestValueBadge: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderBottomLeftRadius: 12,
-  },
-  bestValueText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Colors.white,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  planHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  planTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginBottom: 4,
-  },
-  planTitleSelected: {
-    color: Colors.text,
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  planPrice: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: Colors.text,
-  },
-  planPeriod: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: Colors.textSecondary,
-  },
-  planRadio: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  planRadioSelected: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.primary,
-    borderWidth: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  annualSavings: {
-    fontSize: 13,
-    color: Colors.accent,
-    fontWeight: '600',
-    marginTop: 6,
-  },
-  ctaContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 32,
-    gap: 12,
-  },
-  trialInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: Colors.accent + '15',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: Colors.accent + '30',
-  },
-  trialInfoText: {
-    fontSize: 14,
-    color: Colors.accent,
-    fontWeight: '500',
-  },
-  subscribeButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 16,
-    paddingVertical: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  subscribeButtonDisabled: {
-    opacity: 0.5,
-  },
-  subscribeButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: Colors.white,
-  },
-  restoreButton: {
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  restoreText: {
-    fontSize: 14,
-    color: Colors.textMuted,
-    textDecorationLine: 'underline',
-  },
-  termsText: {
-    fontSize: 11,
-    color: Colors.textMuted,
-    textAlign: 'center',
-    lineHeight: 16,
-    paddingHorizontal: 8,
-  },
-});
+function createStyles(C: any) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: C.background,
+    },
+    closeButton: {
+      position: 'absolute',
+      top: 56,
+      right: 20,
+      zIndex: 10,
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: C.surface,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    hero: {
+      alignItems: 'center',
+      paddingTop: 60,
+      paddingBottom: 24,
+      paddingHorizontal: 24,
+    },
+    heroEmoji: {
+      fontSize: 56,
+      marginBottom: 16,
+    },
+    heroTitle: {
+      fontSize: 28,
+      fontWeight: '800',
+      color: C.text,
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+    heroSubtitle: {
+      fontSize: 16,
+      color: C.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    featuresContainer: {
+      marginHorizontal: 20,
+      backgroundColor: C.surface,
+      borderRadius: 20,
+      padding: 20,
+      borderWidth: 1,
+      borderColor: C.border,
+      marginBottom: 20,
+    },
+    featureRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 8,
+      gap: 14,
+    },
+    featureIconContainer: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: C.primary + '20',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    featureEmoji: {
+      fontSize: 18,
+    },
+    featureText: {
+      flex: 1,
+      fontSize: 14,
+      color: C.text,
+      lineHeight: 20,
+    },
+    loadingContainer: {
+      alignItems: 'center',
+      paddingVertical: 32,
+      gap: 12,
+    },
+    loadingText: {
+      fontSize: 14,
+      color: C.textSecondary,
+    },
+    plansContainer: {
+      marginHorizontal: 20,
+      gap: 12,
+      marginBottom: 20,
+    },
+    planCard: {
+      backgroundColor: C.surface,
+      borderRadius: 16,
+      padding: 18,
+      borderWidth: 2,
+      borderColor: C.border,
+      position: 'relative',
+      overflow: 'hidden',
+    },
+    planCardSelected: {
+      borderColor: C.primary,
+      backgroundColor: C.primary + '10',
+    },
+    planCardAnnual: {
+      borderColor: C.primaryLight,
+    },
+    bestValueBadge: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      backgroundColor: C.primary,
+      paddingHorizontal: 12,
+      paddingVertical: 4,
+      borderBottomLeftRadius: 12,
+    },
+    bestValueText: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: '#FFFFFF',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    planHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    planTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: C.textSecondary,
+      marginBottom: 4,
+    },
+    planTitleSelected: {
+      color: C.text,
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    planPrice: {
+      fontSize: 28,
+      fontWeight: '800',
+      color: C.text,
+    },
+    planPeriod: {
+      fontSize: 14,
+      fontWeight: '400',
+      color: C.textSecondary,
+    },
+    planRadio: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      borderWidth: 2,
+      borderColor: C.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    planRadioSelected: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: C.primary,
+      borderWidth: 0,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    annualSavings: {
+      fontSize: 13,
+      color: C.accent,
+      fontWeight: '600',
+      marginTop: 6,
+    },
+    ctaContainer: {
+      paddingHorizontal: 20,
+      paddingBottom: 32,
+      gap: 12,
+    },
+    trialInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: C.accent + '15',
+      borderRadius: 20,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      borderWidth: 1,
+      borderColor: C.accent + '30',
+    },
+    trialInfoText: {
+      fontSize: 14,
+      color: C.accent,
+      fontWeight: '500',
+    },
+    subscribeButton: {
+      backgroundColor: C.primary,
+      borderRadius: 16,
+      paddingVertical: 18,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 10,
+    },
+    subscribeButtonDisabled: {
+      opacity: 0.5,
+    },
+    subscribeButtonText: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: '#FFFFFF',
+    },
+    restoreButton: {
+      alignItems: 'center',
+      paddingVertical: 12,
+    },
+    restoreText: {
+      fontSize: 14,
+      color: C.textMuted,
+      textDecorationLine: 'underline',
+    },
+    termsText: {
+      fontSize: 11,
+      color: C.textMuted,
+      textAlign: 'center',
+      lineHeight: 16,
+      paddingHorizontal: 8,
+    },
+  });
+}

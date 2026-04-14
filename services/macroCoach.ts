@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // Cals2Gains - AI Predictive Macro Coaching
 // ============================================
 // Integrates: weight trends, health/wearable data, activity,
@@ -227,5 +227,92 @@ Response format:
       "icon": "emoji",
       "severity": "info|warning|success"
     }
-  C'J}`  return parts.join('\n');
+  ]
+}`;
+
+function calculateWeekSummary(
+  user: User,
+  meals: Meal[],
+  weights: WeightEntry[],
+  healthData: HealthData | null,
+  workouts: WorkoutSummary[]
+): WeekSummary {
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const weekMeals = meals.filter((m) => new Date(m.timestamp).getTime() >= weekAgo.getTime());
+  const weekWeights = weights.filter((w) => new Date(w.date).getTime() >= weekAgo.getTime());
+
+  const daysLogged = new Set(
+    weekMeals.map((m) => new Date(m.timestamp).toDateString())
+  ).size;
+
+  const totalCals = weekMeals.reduce((s, m) => s + (m.nutrition?.calories ?? 0), 0);
+  const totalProt = weekMeals.reduce((s, m) => s + (m.nutrition?.protein ?? 0), 0);
+  const totalCarbs = weekMeals.reduce((s, m) => s + (m.nutrition?.carbs ?? 0), 0);
+  const totalFat = weekMeals.reduce((s, m) => s + (m.nutrition?.fat ?? 0), 0);
+  const divisor = Math.max(daysLogged, 1);
+
+  let weightChange: number | null = null;
+  if (weekWeights.length >= 2) {
+    const sorted = [...weekWeights].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+    weightChange = sorted[sorted.length - 1].weight - sorted[0].weight;
+  }
+
+  const targetCals = user.goals?.calories ?? 2000;
+  const adherenceScore = daysLogged > 0
+    ? Math.min(100, Math.round((daysLogged / 7) * 100 * (1 - Math.abs(totalCals / divisor - targetCals) / targetCals)))
+    : 0;
+
+  return {
+    avgCalories: Math.round(totalCals / divisor),
+    avgProtein: Math.round(totalProt / divisor),
+    avgCarbs: Math.round(totalCarbs / divisor),
+    avgFat: Math.round(totalFat / divisor),
+    avgSteps: healthData?.steps ?? 0,
+    avgActiveCalories: healthData?.activeCalories ?? 0,
+    weightChange,
+    daysLogged,
+    adherenceScore: Math.max(0, adherenceScore),
+  };
+}
+
+function buildCoachingContext(
+  user: User,
+  weekSummary: WeekSummary,
+  bodyComp: BodyComposition | undefined,
+  healthData: HealthData | null,
+  workouts: WorkoutSummary[]
+): string {
+  const parts: string[] = [];
+
+  parts.push(`User Profile: ${user.gender || 'unknown'}, ${user.age || '?'}y, ${user.weight || '?'}kg, ${user.height || '?'}cm`);
+  parts.push(`Goal: ${user.goal || 'maintain_weight'}`);
+  parts.push(`Current macros: ${user.goals?.calories ?? '?'} kcal, P:${user.goals?.protein ?? '?'}g, C:${user.goals?.carbs ?? '?'}g, F:${user.goals?.fat ?? '?'}g`);
+
+  parts.push(`\nWeek Summary (${weekSummary.daysLogged} days logged):`);
+  parts.push(`Avg: ${weekSummary.avgCalories} kcal, P:${weekSummary.avgProtein}g, C:${weekSummary.avgCarbs}g, F:${weekSummary.avgFat}g`);
+  parts.push(`Adherence: ${weekSummary.adherenceScore}%`);
+
+  if (weekSummary.weightChange !== null) {
+    parts.push(`Weight change: ${weekSummary.weightChange > 0 ? '+' : ''}${weekSummary.weightChange.toFixed(1)} kg`);
+  }
+
+  if (healthData) {
+    parts.push(`\nHealth data: ${healthData.steps} steps, ${healthData.activeCalories} active kcal`);
+  }
+
+  if (workouts.length > 0) {
+    parts.push(`Workouts this week: ${workouts.length}`);
+    workouts.forEach((w) => {
+      parts.push(`- ${w.type}: ${w.duration}min, ${w.caloriesBurned} kcal`);
+    });
+  }
+
+  if (bodyComp) {
+    parts.push(`\nBody composition (${bodyComp.source}): ${bodyComp.bodyFatPct}% BF, ${bodyComp.muscleMass}kg muscle, BMR: ${bodyComp.bmr}`);
+  }
+
+  return parts.join('\n');
 }

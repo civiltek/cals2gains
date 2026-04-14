@@ -13,6 +13,7 @@ import {
   logRecipeAsMealFb,
 } from '../services/firebase';
 import { addNutrition, emptyNutrition } from '../utils/nutrition';
+import { useMealStore } from './mealStore';
 
 interface RecipeState {
   recipes: Recipe[];
@@ -134,15 +135,19 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
 
     try {
       // Calculate nutrition for the given servings
+      // Support both nutritionPerServing and nutrition (legacy/imported recipes)
+      const nps = recipe.nutritionPerServing || (recipe as any).nutrition || {
+        calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0,
+      };
       const mealNutrition: Nutrition = {
-        calories: (recipe.nutritionPerServing.calories * servings) || 0,
-        protein: (recipe.nutritionPerServing.protein * servings) || 0,
-        carbs: (recipe.nutritionPerServing.carbs * servings) || 0,
-        fat: (recipe.nutritionPerServing.fat * servings) || 0,
-        fiber: (recipe.nutritionPerServing.fiber * servings) || 0,
-        sugar: (recipe.nutritionPerServing.sugar || 0) * servings,
-        saturatedFat: (recipe.nutritionPerServing.saturatedFat || 0) * servings,
-        sodium: (recipe.nutritionPerServing.sodium || 0) * servings,
+        calories: ((nps.calories ?? 0) * servings) || 0,
+        protein: ((nps.protein ?? 0) * servings) || 0,
+        carbs: ((nps.carbs ?? 0) * servings) || 0,
+        fat: ((nps.fat ?? 0) * servings) || 0,
+        fiber: ((nps.fiber ?? 0) * servings) || 0,
+        sugar: ((nps.sugar ?? 0) * servings),
+        saturatedFat: ((nps.saturatedFat ?? 0) * servings),
+        sodium: ((nps.sodium ?? 0) * servings),
       };
 
       const mealId = await logRecipeAsMealFb(
@@ -153,6 +158,10 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
         mealNutrition,
         recipe.name
       );
+
+      // Refresh today's meals so the new recipe-meal appears immediately
+      const mealStoreState = useMealStore.getState();
+      await mealStoreState.loadTodayMeals(recipe.userId);
 
       // Update timesUsed count
       const updatedTimesUsed = recipe.timesUsed + 1;

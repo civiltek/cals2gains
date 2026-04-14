@@ -1,5 +1,8 @@
 ﻿// Cals2Gains - Type Definitions
 
+export type GoalMode = 'lose_fat' | 'gain_muscle' | 'recomp' | 'maintain' | 'mini_cut' | 'lean_bulk';
+export type NutritionMode = 'simple' | 'advanced';
+
 export interface User {
   uid: string;
   email: string | null;
@@ -12,7 +15,16 @@ export interface User {
   subscriptionExpiresAt: Date | null;
   goals: UserGoals;
   profile: UserProfile;
+  onboardingCompleted?: boolean;
   language: 'es' | 'en';
+
+  // Goal mode & nutrition mode
+  goalMode?: GoalMode;
+  nutritionMode?: NutritionMode;
+  adaptiveMode?: boolean;
+  tdee?: number;
+  bmr?: number;
+  weight?: number;
 }
 
 export interface UserProfile {
@@ -61,6 +73,7 @@ export interface Meal {
   userId: string;
   timestamp: Date;
   photoUri: string;
+  photoUrl?: string; // Firebase Storage public URL (works on web & cross-device)
   dishName: string;
   dishNameEs: string;
   dishNameEn: string;
@@ -98,6 +111,7 @@ export interface FoodAnalysisResult {
   dishNameEn: string;
   confidence: number;
   estimatedWeight: number;
+  estimatedWeightRange?: string; // e.g. "220-280g"
   ingredients: string[];
   clarifyingQuestions: ClarifyingQuestion[];
   nutritionPer100g: Nutrition;
@@ -146,7 +160,7 @@ export interface FoodItem {
   servingUnit: string;
   nutritionPer100g: Nutrition;
   nutritionPerServing: Nutrition;
-  source: 'openfoodfacts' | 'usda' | 'custom' | 'ai';
+  source: 'openfoodfacts' | 'usda' | 'custom' | 'ai' | 'local';
   verified: boolean;
 }
 

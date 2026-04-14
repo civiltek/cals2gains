@@ -4,7 +4,7 @@
  * Cals2Gains React Native app
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,8 +17,10 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
-import { COLORS } from '../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useColors } from '../store/themeStore';
 import { useUserStore } from '../store/userStore';
 
 // ============================================================================
@@ -39,6 +41,10 @@ interface ModeFeature {
 
 export default function NutritionModeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const C = useColors();
+  const { t } = useTranslation();
+  const styles = useMemo(() => createStyles(C), [C]);
   const { nutritionMode, setNutritionMode } = useUserStore();
 
   const [selectedMode, setSelectedMode] = useState<NutritionMode>(
@@ -74,17 +80,17 @@ export default function NutritionModeScreen() {
   };
 
   const features: ModeFeature[] = [
-    { name: 'Calorías', simple: true, advanced: true },
-    { name: 'Proteína', simple: true, advanced: true },
-    { name: 'Carbohidratos', simple: false, advanced: true },
-    { name: 'Grasas', simple: false, advanced: true },
-    { name: 'Micronutrientes (azúcar, sat. grasa, sodio)', simple: false, advanced: true },
-    { name: 'Análisis de macros detallado', simple: false, advanced: true },
-    { name: 'Gráficos y tendencias', simple: false, advanced: true },
-    { name: 'Sistema de recetas completo', simple: false, advanced: true },
-    { name: 'Motor adaptativo de objetivos', simple: false, advanced: true },
-    { name: 'Registro simplificado (foto + confirmar)', simple: true, advanced: false },
-    { name: 'Interfaz minimalista', simple: true, advanced: false },
+    { name: t('nutritionMode.featureCalories'), simple: true, advanced: true },
+    { name: t('nutritionMode.featureProtein'), simple: true, advanced: true },
+    { name: t('nutritionMode.featureCarbs'), simple: false, advanced: true },
+    { name: t('nutritionMode.featureFat'), simple: false, advanced: true },
+    { name: t('nutritionMode.featureMicro'), simple: false, advanced: true },
+    { name: t('nutritionMode.featureDetailedMacros'), simple: false, advanced: true },
+    { name: t('nutritionMode.featureCharts'), simple: false, advanced: true },
+    { name: t('nutritionMode.featureRecipes'), simple: false, advanced: true },
+    { name: t('nutritionMode.featureAdaptive'), simple: false, advanced: true },
+    { name: t('nutritionMode.featureSimpleLog'), simple: true, advanced: false },
+    { name: t('nutritionMode.featureMinimalUI'), simple: true, advanced: false },
   ];
 
   return (
@@ -94,16 +100,21 @@ export default function NutritionModeScreen() {
       contentContainerStyle={styles.contentContainer}
     >
       {/* HEADER */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={28} color={COLORS.primary} />
+      <View style={[styles.header, { paddingTop: insets.top + 8, zIndex: 10 }]}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          activeOpacity={0.6}
+          style={{ padding: 4 }}
+        >
+          <Ionicons name="chevron-back" size={28} color={C.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Modo de Nutrición</Text>
+        <Text style={styles.headerTitle}>{t('nutritionMode.title')}</Text>
         <View style={{ width: 28 }} />
       </View>
 
       <Text style={styles.subtitle}>
-        Elige el nivel de detalle que mejor se adapte a ti
+        {t('nutritionMode.subtitle')}
       </Text>
 
       {/* MODE TOGGLE */}
@@ -124,9 +135,9 @@ export default function NutritionModeScreen() {
             <View style={styles.modeIconContainer}>
               <Text style={styles.modeEmoji}>🟢</Text>
             </View>
-            <Text style={styles.modeTitle}>Modo Simple</Text>
+            <Text style={styles.modeTitle}>{t('nutritionMode.simple')}</Text>
             <Text style={styles.modeDescription}>
-              Solo calorías y proteína. Perfecto para empezar.
+              {t('nutritionMode.simpleDesc')}
             </Text>
 
             {selectedMode === 'simple' && (
@@ -134,7 +145,7 @@ export default function NutritionModeScreen() {
                 <Ionicons
                   name="checkmark-circle"
                   size={24}
-                  color={COLORS.primary}
+                  color={C.primary}
                 />
               </View>
             )}
@@ -157,9 +168,9 @@ export default function NutritionModeScreen() {
             <View style={styles.modeIconContainer}>
               <Text style={styles.modeEmoji}>🟣</Text>
             </View>
-            <Text style={styles.modeTitle}>Modo Avanzado</Text>
+            <Text style={styles.modeTitle}>{t('nutritionMode.advanced')}</Text>
             <Text style={styles.modeDescription}>
-              Macros completos, micronutrientes y análisis profundo.
+              {t('nutritionMode.advancedDesc')}
             </Text>
 
             {selectedMode === 'advanced' && (
@@ -167,7 +178,7 @@ export default function NutritionModeScreen() {
                 <Ionicons
                   name="checkmark-circle"
                   size={24}
-                  color={COLORS.secondary}
+                  color={C.primary}
                 />
               </View>
             )}
@@ -177,7 +188,7 @@ export default function NutritionModeScreen() {
 
       {/* FEATURE COMPARISON TABLE */}
       <View style={styles.comparisonContainer}>
-        <Text style={styles.comparisonTitle}>Comparativa de Funciones</Text>
+        <Text style={styles.comparisonTitle}>{t('nutritionMode.comparison')}</Text>
 
         {features.map((feature, idx) => (
           <View key={idx} style={styles.featureRow}>
@@ -188,7 +199,7 @@ export default function NutritionModeScreen() {
                   <Ionicons
                     name="checkmark-circle"
                     size={20}
-                    color={COLORS.primary}
+                    color={C.primary}
                   />
                 )}
               </View>
@@ -197,7 +208,7 @@ export default function NutritionModeScreen() {
                   <Ionicons
                     name="checkmark-circle"
                     size={20}
-                    color={COLORS.secondary}
+                    color={C.primary}
                   />
                 )}
               </View>
@@ -206,8 +217,8 @@ export default function NutritionModeScreen() {
         ))}
 
         <View style={styles.tableHeader}>
-          <Text style={styles.modeLabel}>Simple</Text>
-          <Text style={styles.modeLabel}>Avanzado</Text>
+          <Text style={styles.modeLabel}>{t('nutritionMode.simple')}</Text>
+          <Text style={styles.modeLabel}>{t('nutritionMode.advanced')}</Text>
         </View>
       </View>
 
@@ -216,13 +227,13 @@ export default function NutritionModeScreen() {
         <Ionicons
           name="information-circle"
           size={24}
-          color={COLORS.primary}
+          color={C.primary}
           style={styles.infoIcon}
         />
         <View style={styles.recommendationContent}>
-          <Text style={styles.recommendationTitle}>Recomendación</Text>
+          <Text style={styles.recommendationTitle}>{t('nutritionMode.recommendation')}</Text>
           <Text style={styles.recommendationText}>
-            Para principiantes recomendamos Modo Simple. Puedes cambiar cuando quieras.
+            {t('nutritionMode.recommendationText')}
           </Text>
         </View>
       </View>
@@ -236,7 +247,7 @@ export default function NutritionModeScreen() {
         onPress={handleApply}
         activeOpacity={0.8}
       >
-        <Text style={styles.applyButtonText}>Aplicar</Text>
+        <Text style={styles.applyButtonText}>{t('nutritionMode.apply')}</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>
     </ScrollView>
@@ -247,181 +258,183 @@ export default function NutritionModeScreen() {
 // STYLES
 // ============================================================================
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  contentContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 32,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 24,
-  },
+function createStyles(C: any) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: C.surface,
+    },
+    contentContainer: {
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 32,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: C.text,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: C.textSecondary,
+      marginBottom: 24,
+    },
 
-  // MODE TOGGLE
-  modeToggleContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
-  },
-  modeCard: {
-    flex: 1,
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 2,
-    backgroundColor: '#f9f9f9',
-  },
-  simpleModeCard: {
-    borderColor: COLORS.primary + '40',
-  },
-  advancedModeCard: {
-    borderColor: COLORS.secondary + '40',
-  },
-  modeCardSelected: {
-    backgroundColor: '#f5f5f5',
-  },
-  modeButton: {
-    padding: 16,
-    alignItems: 'center',
-  },
-  modeIconContainer: {
-    marginBottom: 8,
-  },
-  modeEmoji: {
-    fontSize: 32,
-  },
-  modeTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  modeDescription: {
-    fontSize: 12,
-    color: '#888',
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-  checkmark: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-  },
+    // MODE TOGGLE
+    modeToggleContainer: {
+      flexDirection: 'row',
+      gap: 12,
+      marginBottom: 24,
+    },
+    modeCard: {
+      flex: 1,
+      borderRadius: 12,
+      overflow: 'hidden',
+      borderWidth: 2,
+      backgroundColor: C.surface,
+    },
+    simpleModeCard: {
+      borderColor: C.primary + '40',
+    },
+    advancedModeCard: {
+      borderColor: C.primary + '40',
+    },
+    modeCardSelected: {
+      backgroundColor: C.surfaceLight,
+    },
+    modeButton: {
+      padding: 16,
+      alignItems: 'center',
+    },
+    modeIconContainer: {
+      marginBottom: 8,
+    },
+    modeEmoji: {
+      fontSize: 32,
+    },
+    modeTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+      marginBottom: 4,
+    },
+    modeDescription: {
+      fontSize: 12,
+      color: C.textSecondary,
+      textAlign: 'center',
+      lineHeight: 16,
+    },
+    checkmark: {
+      position: 'absolute',
+      top: 8,
+      right: 8,
+    },
 
-  // COMPARISON TABLE
-  comparisonContainer: {
-    marginBottom: 24,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 12,
-    padding: 16,
-  },
-  comparisonTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 12,
-  },
-  featureRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  featureName: {
-    flex: 1,
-    fontSize: 12,
-    color: COLORS.text,
-  },
-  featureChecks: {
-    flexDirection: 'row',
-    gap: 20,
-    marginLeft: 12,
-  },
-  checkCell: {
-    width: 30,
-    alignItems: 'center',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 20,
-    marginTop: 12,
-    paddingTop: 8,
-    borderTopWidth: 2,
-    borderTopColor: '#e0e0e0',
-  },
-  modeLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#666',
-    width: 30,
-    textAlign: 'center',
-  },
+    // COMPARISON TABLE
+    comparisonContainer: {
+      marginBottom: 24,
+      backgroundColor: C.surface,
+      borderRadius: 12,
+      padding: 16,
+    },
+    comparisonTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+      marginBottom: 12,
+    },
+    featureRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: C.border,
+    },
+    featureName: {
+      flex: 1,
+      fontSize: 12,
+      color: C.text,
+    },
+    featureChecks: {
+      flexDirection: 'row',
+      gap: 20,
+      marginLeft: 12,
+    },
+    checkCell: {
+      width: 30,
+      alignItems: 'center',
+    },
+    tableHeader: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      gap: 20,
+      marginTop: 12,
+      paddingTop: 8,
+      borderTopWidth: 2,
+      borderTopColor: C.border,
+    },
+    modeLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: C.textSecondary,
+      width: 30,
+      textAlign: 'center',
+    },
 
-  // RECOMMENDATION
-  recommendationCard: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.primary + '10',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 20,
-  },
-  infoIcon: {
-    marginRight: 12,
-    marginTop: 2,
-  },
-  recommendationContent: {
-    flex: 1,
-  },
-  recommendationTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.primary,
-    marginBottom: 4,
-  },
-  recommendationText: {
-    fontSize: 12,
-    color: COLORS.primary,
-    lineHeight: 16,
-  },
+    // RECOMMENDATION
+    recommendationCard: {
+      flexDirection: 'row',
+      backgroundColor: C.primary + '10',
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 20,
+    },
+    infoIcon: {
+      marginRight: 12,
+      marginTop: 2,
+    },
+    recommendationContent: {
+      flex: 1,
+    },
+    recommendationTitle: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: C.primary,
+      marginBottom: 4,
+    },
+    recommendationText: {
+      fontSize: 12,
+      color: C.primary,
+      lineHeight: 16,
+    },
 
-  // APPLY BUTTON
-  applyButton: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 14,
-    borderRadius: 12,
-    gap: 8,
-    marginTop: 8,
-  },
-  applyButtonSimple: {
-    backgroundColor: COLORS.primary,
-  },
-  applyButtonAdvanced: {
-    backgroundColor: COLORS.secondary,
-  },
-  applyButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-});
+    // APPLY BUTTON
+    applyButton: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 14,
+      borderRadius: 12,
+      gap: 8,
+      marginTop: 8,
+    },
+    applyButtonSimple: {
+      backgroundColor: C.primary,
+    },
+    applyButtonAdvanced: {
+      backgroundColor: C.primary,
+    },
+    applyButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: C.white,
+    },
+  });
+}

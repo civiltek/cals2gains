@@ -10,22 +10,19 @@ import {
   FlatList,
   PanResponder,
   GestureResponderEvent,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useMealPlanStore } from '../store/mealPlanStore';
+import { useMealStore } from '../store/mealStore';
+import { useUserStore } from '../store/userStore';
 import { PlannedMeal, MealType } from '../types';
-import { COLORS } from '../theme';
-
-const DAYS_ES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-const MEAL_TYPES_ES: Record<MealType, string> = {
-  breakfast: 'Desayuno',
-  lunch: 'Almuerzo',
-  dinner: 'Cena',
-  snack: 'Snack',
-};
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+import { useColors } from '../store/themeStore';
 
 const MEAL_ORDER: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
 
@@ -41,8 +38,16 @@ interface AddMealModalState {
 }
 
 export default function MealPlanScreen() {
+  const C = useColors();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const MEAL_TYPES_ES: Record<string, string> = {
+    breakfast: t('home.breakfast'),
+    lunch: t('home.lunch'),
+    dinner: t('home.dinner'),
+    snack: t('home.snack'),
+  };
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [addMealModal, setAddMealModal] = useState<AddMealModalState>({
     visible: false,
@@ -51,6 +56,9 @@ export default function MealPlanScreen() {
     meal: PlannedMeal;
     visible: boolean;
   }>({ meal: null, visible: false });
+
+  const { addMeal } = useMealStore();
+  const { user } = useUserStore();
 
   const {
     currentPlan,
@@ -87,6 +95,7 @@ export default function MealPlanScreen() {
   const weekDays = getWeekDays();
   const dayMeals = getDayMeals(selectedDate);
   const dayNutrition = getDayNutrition(selectedDate);
+  const DAYS = [t('mealPlan.dayMon'), t('mealPlan.dayTue'), t('mealPlan.dayWed'), t('mealPlan.dayThu'), t('mealPlan.dayFri'), t('mealPlan.daySat'), t('mealPlan.daySun')];
 
   const handlePreviousWeek = () => {
     const newDate = new Date(selectedDate);
@@ -118,21 +127,21 @@ export default function MealPlanScreen() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setAddMealModal({ visible: false });
     // Navigate to recipe selection
-    router.push('/(tabs)/recipes');
+    router.push('/recipes');
   };
 
   const handleAddMealFromTemplate = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setAddMealModal({ visible: false });
-    // Navigate to meal templates
-    router.push('/(tabs)/templates');
+    // Navigate to quick-add (no templates screen exists)
+    router.push('/quick-add');
   };
 
   const handleSearchFood = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setAddMealModal({ visible: false });
     // Navigate to food search
-    router.push('/(tabs)/search');
+    router.push('/food-search');
   };
 
   const handleRemoveMeal = (mealId: string) => {
@@ -150,10 +159,49 @@ export default function MealPlanScreen() {
     setLongPressedMeal({ meal, visible: true });
   };
 
+  const handleLogMeal = async (meal: PlannedMeal) => {
+    const mealName = (meal as any).name || meal.customName || t('mealPlan.plannedMeal');
+    try {
+      const nutrition = meal.nutrition || { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
+      await addMeal({
+        userId: user?.uid || '',
+        timestamp: new Date(),
+        photoUri: '',
+        dishName: mealName,
+        dishNameEs: mealName,
+        dishNameEn: mealName,
+        ingredients: (meal as any).ingredients || [],
+        portionDescription: `${meal.servings || 1} ${t('mealPlan.portion')}`,
+        estimatedWeight: 0,
+        nutrition: {
+          calories: Math.round(nutrition.calories || 0),
+          protein: Math.round(nutrition.protein || 0),
+          carbs: Math.round(nutrition.carbs || 0),
+          fat: Math.round(nutrition.fat || 0),
+          fiber: Math.round(nutrition.fiber || 0),
+        },
+        mealType: meal.mealType,
+        aiConfidence: 1,
+      });
+
+      // Mark as completed in the plan
+      if (!meal.completed) {
+        toggleMealCompleted(meal.id);
+      }
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(t('mealPlan.registered'), t('mealPlan.addedToHistory', { mealName }));
+    } catch (error: any) {
+      console.error('Failed to log planned meal:', error);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('mealPlan.logError'), error?.message || t('mealPlan.saveError'));
+    }
+  };
+
   const handleGenerateGroceryList = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     await generateGroceryList('user-placeholder');
-    router.push('/(tabs)/grocery-list');
+    router.push('/grocery-list');
   };
 
   const mealSlots: MealSlot[] = MEAL_ORDER.map((mealType) => ({
@@ -170,24 +218,24 @@ export default function MealPlanScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: C.background }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Plan Semanal</Text>
+      <View style={[styles.header, { borderBottomColor: C.border }]}>
+        <Text style={[styles.title, { color: C.bone }]}>{t('mealPlan.weeklyPlan')}</Text>
         <View style={styles.weekNav}>
           <TouchableOpacity
             onPress={handlePreviousWeek}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           >
-            <Ionicons name="chevron-back" size={24} color={COLORS.violet} />
+            <Ionicons name="chevron-back" size={24} color={C.violet} />
           </TouchableOpacity>
-          <Text style={styles.weekLabel}>
-            {weekDays[0].toLocaleDateString('es-ES', {
+          <Text style={[styles.weekLabel, { color: C.textSecondary }]}>
+            {weekDays[0].toLocaleDateString(i18n.language === 'es' ? 'es-ES' : 'en-US', {
               month: 'short',
               day: 'numeric',
             })}{' '}
             -{' '}
-            {weekDays[6].toLocaleDateString('es-ES', {
+            {weekDays[6].toLocaleDateString(i18n.language === 'es' ? 'es-ES' : 'en-US', {
               month: 'short',
               day: 'numeric',
             })}
@@ -196,7 +244,7 @@ export default function MealPlanScreen() {
             onPress={handleNextWeek}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           >
-            <Ionicons name="chevron-forward" size={24} color={COLORS.violet} />
+            <Ionicons name="chevron-forward" size={24} color={C.violet} />
           </TouchableOpacity>
         </View>
       </View>
@@ -213,14 +261,16 @@ export default function MealPlanScreen() {
             style={[
               styles.dayButton,
               isSelected(date) && styles.dayButtonActive,
+              { backgroundColor: isSelected(date) ? C.violet : C.card, borderColor: isSelected(date) ? C.violet : C.border },
             ]}
             onPress={() => handleSelectDay(date)}
           >
-            <Text style={styles.dayButtonText}>{DAYS_ES[index]}</Text>
+            <Text style={[styles.dayButtonText, { color: C.textSecondary }]}>{DAYS[index]}</Text>
             <Text
               style={[
                 styles.dayDate,
                 isSelected(date) && styles.dayDateActive,
+                { color: isSelected(date) ? C.background : C.bone },
               ]}
             >
               {date.getDate()}
@@ -235,9 +285,9 @@ export default function MealPlanScreen() {
         showsVerticalScrollIndicator={false}
       >
         {mealSlots.map((slot) => (
-          <View key={slot.mealType} style={styles.mealCard}>
-            <View style={styles.mealHeader}>
-              <Text style={styles.mealTypeLabel}>
+          <View key={slot.mealType} style={[styles.mealCard, { backgroundColor: C.card, borderColor: C.border }]}>
+            <View style={[styles.mealHeader, { backgroundColor: C.cardHover }]}>
+              <Text style={[styles.mealTypeLabel, { color: C.violet }]}>
                 {MEAL_TYPES_ES[slot.mealType]}
               </Text>
             </View>
@@ -263,16 +313,29 @@ export default function MealPlanScreen() {
                       {slot.meal.name}
                     </Text>
                     {slot.meal.nutrition && (
-                      <Text style={styles.mealMacros}>
-                        {Math.round(slot.meal.nutrition.calories)} cal •{' '}
-                        {Math.round(slot.meal.nutrition.protein)}g P •{' '}
-                        {Math.round(slot.meal.nutrition.carbs)}g C •{' '}
-                        {Math.round(slot.meal.nutrition.fat)}g F
+                      <Text style={[styles.mealMacros, { color: C.textSecondary }]}>
+                        {Math.round(slot.meal.nutrition?.calories ?? 0)} cal •{' '}
+                        {Math.round(slot.meal.nutrition?.protein ?? 0)}g P •{' '}
+                        {Math.round(slot.meal.nutrition?.carbs ?? 0)}g C •{' '}
+                        {Math.round(slot.meal.nutrition?.fat ?? 0)}g F
                       </Text>
                     )}
                   </View>
 
                   <View style={styles.mealActions}>
+                    {!slot.meal.completed && (
+                      <TouchableOpacity
+                        onPress={() => handleLogMeal(slot.meal)}
+                        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                        style={{ marginRight: 8 }}
+                      >
+                        <Ionicons
+                          name="checkmark-circle"
+                          size={22}
+                          color={C.success || '#4CAF50'}
+                        />
+                      </TouchableOpacity>
+                    )}
                     <TouchableOpacity
                       onPress={() => handleRemoveMeal(slot.meal.id)}
                       hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -280,7 +343,7 @@ export default function MealPlanScreen() {
                       <Ionicons
                         name="close-circle"
                         size={20}
-                        color={COLORS.coral}
+                        color={C.coral}
                       />
                     </TouchableOpacity>
                   </View>
@@ -291,8 +354,8 @@ export default function MealPlanScreen() {
                 style={styles.emptySlot}
                 onPress={() => handleOpenAddMeal(slot.mealType)}
               >
-                <Ionicons name="add-circle-outline" size={28} color={COLORS.violet} />
-                <Text style={styles.emptySlotText}>Agregar comida</Text>
+                <Ionicons name="add-circle-outline" size={28} color={C.violet} />
+                <Text style={[styles.emptySlotText, { color: C.violet }]}>{t('mealPlan.addFood')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -300,32 +363,32 @@ export default function MealPlanScreen() {
       </ScrollView>
 
       {/* Daily Nutrition Summary */}
-      <View style={styles.nutritionSummary}>
+      <View style={[styles.nutritionSummary, { backgroundColor: C.card, borderTopColor: C.border }]}>
         <View style={styles.nutritionRow}>
           <View style={styles.nutritionItem}>
-            <Text style={styles.nutritionLabel}>Cal</Text>
-            <Text style={styles.nutritionValue}>
+            <Text style={[styles.nutritionLabel, { color: C.textSecondary }]}>Cal</Text>
+            <Text style={[styles.nutritionValue, { color: C.violet }]}>
               {Math.round(dayNutrition.calories)}
             </Text>
           </View>
           <View style={styles.nutritionDivider} />
           <View style={styles.nutritionItem}>
-            <Text style={styles.nutritionLabel}>Proteína</Text>
-            <Text style={styles.nutritionValue}>
+            <Text style={[styles.nutritionLabel, { color: C.textSecondary }]}>{t('nutrition.protein')}</Text>
+            <Text style={[styles.nutritionValue, { color: C.violet }]}>
               {Math.round(dayNutrition.protein)}g
             </Text>
           </View>
           <View style={styles.nutritionDivider} />
           <View style={styles.nutritionItem}>
-            <Text style={styles.nutritionLabel}>Carbos</Text>
-            <Text style={styles.nutritionValue}>
+            <Text style={[styles.nutritionLabel, { color: C.textSecondary }]}>{t('quickAdd.carbs')}</Text>
+            <Text style={[styles.nutritionValue, { color: C.violet }]}>
               {Math.round(dayNutrition.carbs)}g
             </Text>
           </View>
           <View style={styles.nutritionDivider} />
           <View style={styles.nutritionItem}>
-            <Text style={styles.nutritionLabel}>Grasas</Text>
-            <Text style={styles.nutritionValue}>
+            <Text style={[styles.nutritionLabel, { color: C.textSecondary }]}>{t('nutrition.fat')}</Text>
+            <Text style={[styles.nutritionValue, { color: C.violet }]}>
               {Math.round(dayNutrition.fat)}g
             </Text>
           </View>
@@ -337,8 +400,8 @@ export default function MealPlanScreen() {
         style={styles.groceryButton}
         onPress={handleGenerateGroceryList}
       >
-        <Ionicons name="list" size={20} color={COLORS.bone} />
-        <Text style={styles.groceryButtonText}>Generar Lista de Compras</Text>
+        <Ionicons name="list" size={20} color={C.bone} />
+        <Text style={[styles.groceryButtonText, { color: C.background }]}>{t('mealPlan.generateGroceryList')}</Text>
       </TouchableOpacity>
 
       {/* Add Meal Modal */}
@@ -349,13 +412,13 @@ export default function MealPlanScreen() {
         onRequestClose={() => setAddMealModal({ visible: false })}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: C.card }]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Agregar Comida</Text>
+              <Text style={[styles.modalTitle, { color: C.bone }]}>{t('mealPlan.addMealTitle')}</Text>
               <TouchableOpacity
                 onPress={() => setAddMealModal({ visible: false })}
               >
-                <Ionicons name="close" size={24} color={COLORS.bone} />
+                <Ionicons name="close" size={24} color={C.bone} />
               </TouchableOpacity>
             </View>
 
@@ -363,27 +426,27 @@ export default function MealPlanScreen() {
               style={styles.modalOption}
               onPress={handleAddMealFromRecipe}
             >
-              <Ionicons name="book" size={24} color={COLORS.violet} />
-              <Text style={styles.modalOptionText}>Desde Recetas</Text>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
+              <Ionicons name="book" size={24} color={C.violet} />
+              <Text style={[styles.modalOptionText, { color: C.bone }]}>{t('mealPlan.fromRecipes')}</Text>
+              <Ionicons name="chevron-forward" size={20} color={C.textSecondary} />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.modalOption}
               onPress={handleAddMealFromTemplate}
             >
-              <Ionicons name="layers" size={24} color={COLORS.violet} />
-              <Text style={styles.modalOptionText}>Desde Plantillas</Text>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
+              <Ionicons name="layers" size={24} color={C.violet} />
+              <Text style={[styles.modalOptionText, { color: C.bone }]}>{t('mealPlan.fromTemplates')}</Text>
+              <Ionicons name="chevron-forward" size={20} color={C.textSecondary} />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.modalOption}
               onPress={handleSearchFood}
             >
-              <Ionicons name="search" size={24} color={COLORS.violet} />
-              <Text style={styles.modalOptionText}>Buscar Alimento</Text>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
+              <Ionicons name="search" size={24} color={C.violet} />
+              <Text style={[styles.modalOptionText, { color: C.bone }]}>{t('mealPlan.searchFood')}</Text>
+              <Ionicons name="chevron-forward" size={20} color={C.textSecondary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -400,28 +463,41 @@ export default function MealPlanScreen() {
           }
         >
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View style={[styles.modalContent, { backgroundColor: C.card }]}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{longPressedMeal.meal.name}</Text>
+                <Text style={[styles.modalTitle, { color: C.bone }]}>{longPressedMeal.meal.name}</Text>
                 <TouchableOpacity
                   onPress={() =>
                     setLongPressedMeal({ ...longPressedMeal, visible: false })
                   }
                 >
-                  <Ionicons name="close" size={24} color={COLORS.bone} />
+                  <Ionicons name="close" size={24} color={C.bone} />
                 </TouchableOpacity>
               </View>
+
+              {!longPressedMeal.meal.completed && (
+                <TouchableOpacity
+                  style={styles.modalOption}
+                  onPress={() => {
+                    setLongPressedMeal({ ...longPressedMeal, visible: false });
+                    handleLogMeal(longPressedMeal.meal);
+                  }}
+                >
+                  <Ionicons name="checkmark-circle" size={24} color={C.success || '#4CAF50'} />
+                  <Text style={[styles.modalOptionText, { color: C.bone }]}>{t('mealPlan.logMeal')}</Text>
+                </TouchableOpacity>
+              )}
 
               <TouchableOpacity
                 style={styles.modalOption}
                 onPress={() => {
                   // Move to another day
                   setLongPressedMeal({ ...longPressedMeal, visible: false });
-                  router.push('/(tabs)/meal-plan');
+                  router.push('/meal-plan');
                 }}
               >
-                <Ionicons name="copy" size={24} color={COLORS.violet} />
-                <Text style={styles.modalOptionText}>Copiar a otro día</Text>
+                <Ionicons name="copy" size={24} color={C.violet} />
+                <Text style={[styles.modalOptionText, { color: C.bone }]}>{t('mealPlan.copyToAnotherDay')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -431,9 +507,9 @@ export default function MealPlanScreen() {
                   setLongPressedMeal({ ...longPressedMeal, visible: false });
                 }}
               >
-                <Ionicons name="trash" size={24} color={COLORS.coral} />
-                <Text style={[styles.modalOptionText, { color: COLORS.coral }]}>
-                  Eliminar
+                <Ionicons name="trash" size={24} color={C.coral} />
+                <Text style={[styles.modalOptionText, { color: C.coral }]}>
+                  {t('common.delete')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -447,18 +523,15 @@ export default function MealPlanScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: COLORS.bone,
     marginBottom: 12,
   },
   weekNav: {
@@ -467,7 +540,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   weekLabel: {
-    color: COLORS.textSecondary,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -480,29 +552,24 @@ const styles = StyleSheet.create({
     width: 56,
     height: 60,
     borderRadius: 12,
-    backgroundColor: COLORS.card,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   dayButtonActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
+    borderWidth: 1,
   },
   dayButtonText: {
-    color: COLORS.textSecondary,
     fontSize: 12,
     fontWeight: '600',
     marginBottom: 4,
   },
   dayDate: {
-    color: COLORS.bone,
     fontSize: 16,
     fontWeight: 'bold',
   },
   dayDateActive: {
-    color: COLORS.background,
+    fontWeight: 'bold',
   },
   mealsContainer: {
     flex: 1,
@@ -512,18 +579,14 @@ const styles = StyleSheet.create({
   mealCard: {
     marginBottom: 12,
     borderRadius: 12,
-    backgroundColor: COLORS.card,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   mealHeader: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: COLORS.cardHover,
   },
   mealTypeLabel: {
-    color: COLORS.violet,
     fontSize: 12,
     fontWeight: '700',
     textTransform: 'uppercase',
@@ -543,7 +606,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mealName: {
-    color: COLORS.bone,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
@@ -552,7 +614,6 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   mealMacros: {
-    color: COLORS.textSecondary,
     fontSize: 12,
   },
   mealActions: {
@@ -566,14 +627,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   emptySlotText: {
-    color: COLORS.violet,
     fontSize: 14,
     fontWeight: '600',
   },
   nutritionSummary: {
-    backgroundColor: COLORS.card,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
@@ -587,27 +645,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   nutritionLabel: {
-    color: COLORS.textSecondary,
     fontSize: 12,
     fontWeight: '500',
     marginBottom: 4,
   },
   nutritionValue: {
-    color: COLORS.violet,
     fontSize: 16,
     fontWeight: 'bold',
   },
   nutritionDivider: {
     width: 1,
     height: 24,
-    backgroundColor: COLORS.border,
   },
   groceryButton: {
     marginHorizontal: 16,
     marginBottom: 16,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: COLORS.violet,
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -615,7 +669,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   groceryButtonText: {
-    color: COLORS.background,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -625,7 +678,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: COLORS.card,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingTop: 20,
@@ -641,7 +693,6 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: COLORS.bone,
   },
   modalOption: {
     flexDirection: 'row',
@@ -649,14 +700,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 12,
     marginBottom: 8,
-    backgroundColor: COLORS.cardHover,
     borderRadius: 12,
     gap: 12,
   },
   modalOptionText: {
     flex: 1,
-    color: COLORS.bone,
     fontSize: 14,
     fontWeight: '600',
   },
 });
+

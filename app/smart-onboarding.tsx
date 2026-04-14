@@ -4,7 +4,7 @@
  * Cals2Gains React Native app
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -20,8 +20,9 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
-import { COLORS } from '../theme';
+import { useColors } from '../store/themeStore';
 import { useUserStore } from '../store/userStore';
 import PersonalEngine from '../services/personalEngine';
 
@@ -64,79 +65,81 @@ interface OnboardingData {
   reminderTime: string;
 }
 
-const GOAL_CARDS: GoalCard[] = [
+// Goal cards - labels and descriptions will use t() in Step0_Goals
+const GOAL_CARDS_METADATA: Array<{ id: GoalMode; emoji: string; labelKey: string; descKey: string }> = [
   {
     id: 'lose_fat',
-    label: 'Perder Grasa',
     emoji: '🔥',
-    description: 'Reducir peso corporal manteniendo músculo',
+    labelKey: 'goalModes.loseFat',
+    descKey: 'goalModes.loseFatDesc',
   },
   {
     id: 'gain_muscle',
-    label: 'Ganar Músculo',
     emoji: '💪',
-    description: 'Aumentar masa muscular de forma controlada',
+    labelKey: 'goalModes.gainMuscle',
+    descKey: 'goalModes.gainMuscleDesc',
   },
   {
     id: 'recomp',
-    label: 'Recomposición',
     emoji: '⚖️',
-    description: 'Cambiar composición corporal (perder y ganar)',
+    labelKey: 'goalModes.recomp',
+    descKey: 'goalModes.recompDesc',
   },
   {
     id: 'maintain',
-    label: 'Mantener',
     emoji: '🎯',
-    description: 'Mantener peso actual y salud',
+    labelKey: 'goalModes.maintain',
+    descKey: 'goalModes.maintainDesc',
   },
   {
     id: 'mini_cut',
-    label: 'Mini Cut',
     emoji: '⚡',
-    description: 'Pérdida rápida controlada por corto tiempo',
+    labelKey: 'goalModes.miniCut',
+    descKey: 'goalModes.miniCutDesc',
   },
   {
     id: 'lean_bulk',
-    label: 'Lean Bulk',
     emoji: '🚀',
-    description: 'Ganancia controlada con mínima grasa',
+    labelKey: 'goalModes.leanBulk',
+    descKey: 'goalModes.leanBulkDesc',
   },
 ];
 
-const ACTIVITY_CARDS: ActivityCard[] = [
+// Activity cards - labels and descriptions will use t() in Step2_Activity
+const ACTIVITY_CARDS_METADATA: Array<{ id: ActivityLevel; emoji: string; labelKey: string; descKey: string; mealsPerDay: number }> = [
   {
     id: 'sedentary',
-    label: 'Sedentario',
     emoji: '💼',
-    description: 'Poco ejercicio, vida mayormente sedentaria',
+    labelKey: 'activityLevels.sedentary',
+    descKey: 'activityLevels.sedentaryDesc',
     mealsPerDay: 3,
   },
   {
     id: 'lightly_active',
-    label: 'Ligeramente activo',
     emoji: '🚶',
-    description: '1-3 días de ejercicio por semana',
+    labelKey: 'activityLevels.lightlyActive',
+    descKey: 'activityLevels.lightlyActiveDesc',
     mealsPerDay: 3,
   },
   {
     id: 'moderately_active',
-    label: 'Moderadamente activo',
     emoji: '🏋️',
-    description: '3-5 días de ejercicio por semana',
+    labelKey: 'activityLevels.moderatelyActive',
+    descKey: 'activityLevels.moderatelyActiveDesc',
     mealsPerDay: 4,
   },
   {
     id: 'very_active',
-    label: 'Muy activo',
     emoji: '⚽',
-    description: '6-7 días de ejercicio por semana',
+    labelKey: 'activityLevels.veryActive',
+    descKey: 'activityLevels.veryActiveDesc',
     mealsPerDay: 4,
   },
   {
     id: 'athlete',
-    label: 'Atleta',
     emoji: '🏆',
-    description: 'Entrenamiento intenso diario',
+    labelKey: 'activityLevels.athlete',
+    descKey: 'activityLevels.athleteDesc',
     mealsPerDay: 5,
   },
 ];
@@ -147,7 +150,10 @@ const ACTIVITY_CARDS: ActivityCard[] = [
 
 export default function SmartOnboardingScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { setOnboardingComplete, setUserGoals } = useUserStore();
+  const C = useColors();
+  const styles = useMemo(() => createStyles(C), [C]);
 
   const [currentStep, setCurrentStep] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -230,29 +236,29 @@ export default function SmartOnboardingScreen() {
         scrollEventThrottle={16}
       >
         {currentStep === 0 && (
-          <Step0_Goals data={data} updateData={updateData} />
+          <Step0_Goals data={data} updateData={updateData} t={t} styles={styles} C={C} />
         )}
         {currentStep === 1 && (
-          <Step1_PersonalInfo data={data} updateData={updateData} />
+          <Step1_PersonalInfo data={data} updateData={updateData} t={t} styles={styles} C={C} />
         )}
         {currentStep === 2 && (
-          <Step2_Activity data={data} updateData={updateData} />
+          <Step2_Activity data={data} updateData={updateData} t={t} styles={styles} C={C} />
         )}
         {currentStep === 3 && (
-          <Step3_EatingHabits data={data} updateData={updateData} />
+          <Step3_EatingHabits data={data} updateData={updateData} t={t} styles={styles} C={C} />
         )}
         {currentStep === 4 && (
-          <Step4_NutritionMode data={data} updateData={updateData} />
+          <Step4_NutritionMode data={data} updateData={updateData} t={t} styles={styles} C={C} />
         )}
         {currentStep === 5 && (
-          <Step5_Reminders data={data} updateData={updateData} />
+          <Step5_Reminders data={data} updateData={updateData} t={t} styles={styles} C={C} />
         )}
         {currentStep === 6 && (
-          <Step6_Summary data={data} />
+          <Step6_Summary data={data} t={t} styles={styles} C={C} />
         )}
 
         <View style={styles.stepIndicator}>
-          <Text style={styles.stepText}>Paso {currentStep + 1} de 7</Text>
+          <Text style={styles.stepText}>{t('onboarding.stepOf', { current: currentStep + 1, total: 7 })}</Text>
         </View>
       </ScrollView>
 
@@ -262,7 +268,7 @@ export default function SmartOnboardingScreen() {
           style={styles.skipButton}
           onPress={handleSkip}
         >
-          <Text style={styles.skipButtonText}>Saltar</Text>
+          <Text style={styles.skipButtonText}>{t('onboarding.skip')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -271,12 +277,12 @@ export default function SmartOnboardingScreen() {
           activeOpacity={0.8}
         >
           <Text style={styles.nextButtonText}>
-            {currentStep === 6 ? 'Empezar' : 'Siguiente'}
+            {currentStep === 6 ? t('onboarding.start') : t('common.next')}
           </Text>
           <Ionicons
             name={currentStep === 6 ? 'checkmark' : 'arrow-forward'}
             size={20}
-            color="#fff"
+            color="#FFFFFF"
             style={styles.buttonIcon}
           />
         </TouchableOpacity>
@@ -289,13 +295,13 @@ export default function SmartOnboardingScreen() {
 // STEP COMPONENTS
 // ============================================================================
 
-const Step0_Goals = ({ data, updateData }: any) => (
+const Step0_Goals = ({ data, updateData, t, styles, C }: any) => (
   <View style={styles.stepContainer}>
-    <Text style={styles.stepTitle}>¿Cuál es tu objetivo?</Text>
-    <Text style={styles.stepSubtitle}>Elige el que mejor represente tu meta</Text>
+    <Text style={styles.stepTitle}>{t('onboarding.goal')}</Text>
+    <Text style={styles.stepSubtitle}>{t('goalModes.subtitle')}</Text>
 
     <View style={styles.goalGrid}>
-      {GOAL_CARDS.map(goal => (
+      {GOAL_CARDS_METADATA.map(goal => (
         <TouchableOpacity
           key={goal.id}
           style={[
@@ -306,20 +312,20 @@ const Step0_Goals = ({ data, updateData }: any) => (
           activeOpacity={0.7}
         >
           <Text style={styles.goalEmoji}>{goal.emoji}</Text>
-          <Text style={styles.goalLabel}>{goal.label}</Text>
-          <Text style={styles.goalDescription}>{goal.description}</Text>
+          <Text style={styles.goalLabel}>{t(goal.labelKey)}</Text>
+          <Text style={styles.goalDescription}>{t(goal.descKey)}</Text>
         </TouchableOpacity>
       ))}
     </View>
   </View>
 );
 
-const Step1_PersonalInfo = ({ data, updateData }: any) => (
+const Step1_PersonalInfo = ({ data, updateData, t, styles, C }: any) => (
   <View style={styles.stepContainer}>
-    <Text style={styles.stepTitle}>Cuéntanos sobre ti</Text>
+    <Text style={styles.stepTitle}>{t('onboarding.step1')}</Text>
 
     <View style={styles.infoSection}>
-      <Text style={styles.label}>Género</Text>
+      <Text style={styles.label}>{t('onboarding.gender')}</Text>
       <View style={styles.genderButtons}>
         {['male', 'female'].map(gender => (
           <TouchableOpacity
@@ -333,7 +339,7 @@ const Step1_PersonalInfo = ({ data, updateData }: any) => (
             <Ionicons
               name={gender === 'male' ? 'male' : 'female'}
               size={24}
-              color={data.gender === gender ? '#fff' : COLORS.primary}
+              color={data.gender === gender ? '#FFFFFF' : C.primary}
             />
             <Text
               style={[
@@ -341,44 +347,44 @@ const Step1_PersonalInfo = ({ data, updateData }: any) => (
                 data.gender === gender && styles.genderButtonTextActive,
               ]}
             >
-              {gender === 'male' ? 'Hombre' : 'Mujer'}
+              {gender === 'male' ? t('onboarding.male') : t('onboarding.female')}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <Text style={styles.label}>Edad</Text>
+      <Text style={styles.label}>{t('onboarding.age')}</Text>
       <View style={styles.ageInputContainer}>
         <TouchableOpacity
           onPress={() => updateData({ age: Math.max(15, (data.age || 25) - 1) })}
         >
-          <Ionicons name="remove-circle" size={28} color={COLORS.primary} />
+          <Ionicons name="remove-circle" size={28} color={C.primary} />
         </TouchableOpacity>
         <Text style={styles.ageValue}>{data.age || 25}</Text>
         <TouchableOpacity
           onPress={() => updateData({ age: Math.min(100, (data.age || 25) + 1) })}
         >
-          <Ionicons name="add-circle" size={28} color={COLORS.primary} />
+          <Ionicons name="add-circle" size={28} color={C.primary} />
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.label}>Altura (cm)</Text>
-      <Text style={styles.sliderValue}>{data.height} cm</Text>
+      <Text style={styles.label}>{t('onboarding.height')}</Text>
+      <Text style={styles.sliderValue}>{data.height} {t('common.cm')}</Text>
       {/* In production, use actual Slider component */}
 
-      <Text style={styles.label}>Peso (kg)</Text>
-      <Text style={styles.sliderValue}>{data.weight} kg</Text>
+      <Text style={styles.label}>{t('onboarding.weight')}</Text>
+      <Text style={styles.sliderValue}>{data.weight} {t('common.kg')}</Text>
       {/* In production, use actual Slider component */}
     </View>
   </View>
 );
 
-const Step2_Activity = ({ data, updateData }: any) => (
+const Step2_Activity = ({ data, updateData, t, styles, C }: any) => (
   <View style={styles.stepContainer}>
-    <Text style={styles.stepTitle}>Tu nivel de actividad</Text>
-    <Text style={styles.stepSubtitle}>¿Cuánto ejercicio haces?</Text>
+    <Text style={styles.stepTitle}>{t('onboarding.step3')}</Text>
+    <Text style={styles.stepSubtitle}>{t('onboarding.activityLevel')}</Text>
 
-    {ACTIVITY_CARDS.map(activity => (
+    {ACTIVITY_CARDS_METADATA.map(activity => (
       <TouchableOpacity
         key={activity.id}
         style={[
@@ -394,9 +400,9 @@ const Step2_Activity = ({ data, updateData }: any) => (
         <View style={styles.activityContent}>
           <Text style={styles.activityEmoji}>{activity.emoji}</Text>
           <View style={styles.activityText}>
-            <Text style={styles.activityLabel}>{activity.label}</Text>
+            <Text style={styles.activityLabel}>{t(activity.labelKey)}</Text>
             <Text style={styles.activityDescription}>
-              {activity.description}
+              {t(activity.descKey)}
             </Text>
           </View>
         </View>
@@ -404,7 +410,7 @@ const Step2_Activity = ({ data, updateData }: any) => (
           <Ionicons
             name="checkmark-circle"
             size={24}
-            color={COLORS.primary}
+            color={C.primary}
           />
         )}
       </TouchableOpacity>
@@ -412,12 +418,12 @@ const Step2_Activity = ({ data, updateData }: any) => (
   </View>
 );
 
-const Step3_EatingHabits = ({ data, updateData }: any) => (
+const Step3_EatingHabits = ({ data, updateData, t, styles, C }: any) => (
   <View style={styles.stepContainer}>
-    <Text style={styles.stepTitle}>¿Cómo comes normalmente?</Text>
+    <Text style={styles.stepTitle}>{t('onboarding.howDoYouEat')}</Text>
 
     <View style={styles.habitSection}>
-      <Text style={styles.label}>¿Cuántas comidas al día?</Text>
+      <Text style={styles.label}>{t('onboarding.mealsPerDay')}</Text>
       <View style={styles.mealButtons}>
         {[2, 3, 4, 5].map(meals => (
           <TouchableOpacity
@@ -440,12 +446,12 @@ const Step3_EatingHabits = ({ data, updateData }: any) => (
         ))}
       </View>
 
-      <Text style={styles.label}>¿Cocinas o comes fuera?</Text>
+      <Text style={styles.label}>{t('onboarding.cookOrEatOut')}</Text>
       <Text style={styles.sliderValue}>
-        {data.cooksAtHome}% cocinas en casa
+        {data.cooksAtHome}% {t('common.cookAtHome')}
       </Text>
 
-      <Text style={styles.label}>¿Sigues alguna dieta?</Text>
+      <Text style={styles.label}>{t('onboarding.followDiet')}</Text>
       {(['keto', 'vegan', 'vegetarian', 'gluten_free', 'none'] as const).map(diet => (
         <TouchableOpacity
           key={diet}
@@ -461,7 +467,17 @@ const Step3_EatingHabits = ({ data, updateData }: any) => (
               data.dietaryPreference === diet && styles.dietButtonTextActive,
             ]}
           >
-            {diet === 'keto' ? 'Keto' : diet === 'vegan' ? 'Vegano' : diet === 'vegetarian' ? 'Vegetariano' : diet === 'gluten_free' ? 'Sin gluten' : 'Ninguna'}
+            {t(
+              diet === 'keto'
+                ? 'dietaryPreferences.keto'
+                : diet === 'vegan'
+                ? 'dietaryPreferences.vegan'
+                : diet === 'vegetarian'
+                ? 'dietaryPreferences.vegetarian'
+                : diet === 'gluten_free'
+                ? 'dietaryPreferences.glutenFree'
+                : 'dietaryPreferences.none'
+            )}
           </Text>
         </TouchableOpacity>
       ))}
@@ -469,9 +485,9 @@ const Step3_EatingHabits = ({ data, updateData }: any) => (
   </View>
 );
 
-const Step4_NutritionMode = ({ data, updateData }: any) => (
+const Step4_NutritionMode = ({ data, updateData, t, styles, C }: any) => (
   <View style={styles.stepContainer}>
-    <Text style={styles.stepTitle}>Modo de Nutrición</Text>
+    <Text style={styles.stepTitle}>{t('onboarding.nutritionMode')}</Text>
 
     <View style={styles.modeToggleContainer}>
       {(['simple', 'advanced'] as const).map(mode => (
@@ -487,12 +503,12 @@ const Step4_NutritionMode = ({ data, updateData }: any) => (
             {mode === 'simple' ? '🟢' : '🟣'}
           </Text>
           <Text style={styles.modeTitle}>
-            {mode === 'simple' ? 'Modo Simple' : 'Modo Avanzado'}
+            {mode === 'simple' ? t('onboarding.simpleMode') : t('onboarding.advancedMode')}
           </Text>
           <Text style={styles.modeCardDescription}>
             {mode === 'simple'
-              ? 'Solo calorías y proteína'
-              : 'Macros completos y análisis profundo'}
+              ? t('onboarding.simpleModeDesc')
+              : t('onboarding.advancedModeDesc')}
           </Text>
         </TouchableOpacity>
       ))}
@@ -500,48 +516,48 @@ const Step4_NutritionMode = ({ data, updateData }: any) => (
   </View>
 );
 
-const Step5_Reminders = ({ data, updateData }: any) => (
+const Step5_Reminders = ({ data, updateData, t, styles, C }: any) => (
   <View style={styles.stepContainer}>
-    <Text style={styles.stepTitle}>Recordatorios</Text>
+    <Text style={styles.stepTitle}>{t('onboarding.reminders')}</Text>
 
     <View style={styles.reminderRow}>
       <View>
-        <Text style={styles.label}>Recordatorios de comidas</Text>
+        <Text style={styles.label}>{t('onboarding.mealReminders')}</Text>
         <Text style={styles.reminderDesc}>
-          Notificaciones para registrar tus comidas
+          {t('onboarding.mealRemindersDesc')}
         </Text>
       </View>
       <Switch
         value={data.mealReminders}
         onValueChange={val => updateData({ mealReminders: val })}
-        trackColor={{ false: '#ccc', true: COLORS.primary + '50' }}
-        thumbColor={data.mealReminders ? COLORS.primary : '#fff'}
+        trackColor={{ false: '#ccc', true: C.primary + '50' }}
+        thumbColor={data.mealReminders ? C.primary : '#FFFFFF'}
       />
     </View>
 
     <View style={styles.reminderRow}>
       <View>
-        <Text style={styles.label}>Recordatorios de agua</Text>
+        <Text style={styles.label}>{t('onboarding.waterReminders')}</Text>
         <Text style={styles.reminderDesc}>
-          Notificaciones para beber agua
+          {t('onboarding.waterRemindersDesc')}
         </Text>
       </View>
       <Switch
         value={data.waterReminders}
         onValueChange={val => updateData({ waterReminders: val })}
-        trackColor={{ false: '#ccc', true: COLORS.primary + '50' }}
-        thumbColor={data.waterReminders ? COLORS.primary : '#fff'}
+        trackColor={{ false: '#ccc', true: C.primary + '50' }}
+        thumbColor={data.waterReminders ? C.primary : '#FFFFFF'}
       />
     </View>
 
     {(data.mealReminders || data.waterReminders) && (
       <View style={styles.timePickerContainer}>
-        <Text style={styles.label}>Hora de recordatorios</Text>
+        <Text style={styles.label}>{t('onboarding.reminderTime')}</Text>
         <View style={styles.timeInputContainer}>
           <Ionicons
             name="time"
             size={20}
-            color={COLORS.primary}
+            color={C.primary}
             style={styles.timeIcon}
           />
           <Text style={styles.timeValue}>{data.reminderTime}</Text>
@@ -551,54 +567,56 @@ const Step5_Reminders = ({ data, updateData }: any) => (
   </View>
 );
 
-const Step6_Summary = ({ data }: any) => {
+const Step6_Summary = ({ data, t, styles, C }: any) => {
   const goals = calculateGoals(data);
 
   return (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>¡Todo listo!</Text>
-      <Text style={styles.stepSubtitle}>Aquí está tu plan personalizado</Text>
+      <Text style={styles.stepTitle}>{t('onboarding.allSet')}</Text>
+      <Text style={styles.stepSubtitle}>{t('onboarding.personalizedPlan')}</Text>
 
       <View style={styles.summaryCard}>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Objetivo</Text>
+          <Text style={styles.summaryLabel}>{t('onboarding.summary.goal')}</Text>
           <Text style={styles.summaryValue}>
-            {data.goal === 'lose_fat'
-              ? 'Perder Grasa'
-              : data.goal === 'gain_muscle'
-              ? 'Ganar Músculo'
-              : 'Otro'}
+            {t(
+              data.goal === 'lose_fat'
+                ? 'goalModes.loseFat'
+                : data.goal === 'gain_muscle'
+                ? 'goalModes.gainMuscle'
+                : 'common.other'
+            )}
           </Text>
         </View>
 
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Calorías diarias</Text>
+          <Text style={styles.summaryLabel}>{t('onboarding.summary.dailyCalories')}</Text>
           <Text style={styles.summaryValue}>{goals.dailyCalories} kcal</Text>
         </View>
 
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Proteína</Text>
+          <Text style={styles.summaryLabel}>{t('onboarding.summary.protein')}</Text>
           <Text style={styles.summaryValue}>{goals.proteinGrams}g</Text>
         </View>
 
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Carbohidratos</Text>
+          <Text style={styles.summaryLabel}>{t('onboarding.summary.carbs')}</Text>
           <Text style={styles.summaryValue}>{goals.carbsGrams}g</Text>
         </View>
 
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Grasas</Text>
+          <Text style={styles.summaryLabel}>{t('onboarding.summary.fats')}</Text>
           <Text style={styles.summaryValue}>{goals.fatGrams}g</Text>
         </View>
 
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Tiempo estimado</Text>
-          <Text style={styles.summaryValue}>8-12 semanas</Text>
+          <Text style={styles.summaryLabel}>{t('onboarding.summary.estimatedTime')}</Text>
+          <Text style={styles.summaryValue}>{t('onboarding.summary.timeframe')}</Text>
         </View>
       </View>
 
       <Text style={styles.finalNote}>
-        Puedes ajustar estos valores en tu perfil en cualquier momento.
+        {t('onboarding.summary.adjustNote')}
       </Text>
     </View>
   );
@@ -656,20 +674,21 @@ function calculateGoals(data: OnboardingData) {
 // STYLES
 // ============================================================================
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  progressBarContainer: {
-    height: 4,
-    backgroundColor: '#e0e0e0',
-    overflow: 'hidden',
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: COLORS.primary,
-  },
+function createStyles(C: any) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: C.surface,
+    },
+    progressBarContainer: {
+      height: 4,
+      backgroundColor: C.border,
+      overflow: 'hidden',
+    },
+    progressBar: {
+      height: '100%',
+      backgroundColor: C.primary,
+    },
   scrollView: {
     flex: 1,
   },
@@ -680,15 +699,15 @@ const styles = StyleSheet.create({
   stepContainer: {
     marginBottom: 32,
   },
-  stepTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: 8,
-  },
+    stepTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: C.text,
+      marginBottom: 8,
+    },
   stepSubtitle: {
     fontSize: 14,
-    color: '#888',
+    color: C.textSecondary,
     marginBottom: 20,
   },
 
@@ -700,30 +719,30 @@ const styles = StyleSheet.create({
   },
   goalCard: {
     width: '48%',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: C.surface,
     borderRadius: 12,
     padding: 12,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: C.border,
   },
-  goalCardSelected: {
-    backgroundColor: COLORS.primary + '10',
-    borderColor: COLORS.primary,
-  },
+    goalCardSelected: {
+      backgroundColor: C.primary + '10',
+      borderColor: C.primary,
+    },
   goalEmoji: {
     fontSize: 32,
     marginBottom: 8,
   },
-  goalLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
+    goalLabel: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: C.text,
+      marginBottom: 4,
+    },
   goalDescription: {
     fontSize: 11,
-    color: '#888',
+    color: C.textSecondary,
     textAlign: 'center',
   },
 
@@ -731,12 +750,12 @@ const styles = StyleSheet.create({
   infoSection: {
     gap: 20,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 8,
-  },
+    label: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+      marginBottom: 8,
+    },
   genderButtons: {
     flexDirection: 'row',
     gap: 12,
@@ -749,21 +768,21 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: C.surface,
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: C.border,
   },
-  genderButtonActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  genderButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
+    genderButtonActive: {
+      backgroundColor: C.primary,
+      borderColor: C.primary,
+    },
+    genderButtonText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: C.text,
+    },
   genderButtonTextActive: {
-    color: '#fff',
+    color: C.surface,
   },
   ageInputContainer: {
     flexDirection: 'row',
@@ -771,36 +790,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 20,
   },
-  ageValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.primary,
-    minWidth: 60,
-    textAlign: 'center',
-  },
-  sliderValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.primary,
-    marginBottom: 12,
-  },
+    ageValue: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: C.primary,
+      minWidth: 60,
+      textAlign: 'center',
+    },
+    sliderValue: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.primary,
+      marginBottom: 12,
+    },
 
   // STEP 2: ACTIVITY
   activityCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: C.surface,
     borderRadius: 10,
     padding: 12,
     marginBottom: 10,
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: C.border,
   },
-  activityCardSelected: {
-    backgroundColor: COLORS.primary + '10',
-    borderColor: COLORS.primary,
-  },
+    activityCardSelected: {
+      backgroundColor: C.primary + '10',
+      borderColor: C.primary,
+    },
   activityContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -813,14 +832,14 @@ const styles = StyleSheet.create({
   activityText: {
     flex: 1,
   },
-  activityLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
+    activityLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+    },
   activityDescription: {
     fontSize: 12,
-    color: '#888',
+    color: C.textSecondary,
     marginTop: 2,
   },
 
@@ -836,43 +855,43 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     borderRadius: 8,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: C.surface,
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: C.border,
     alignItems: 'center',
   },
-  mealButtonActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  mealButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
+    mealButtonActive: {
+      backgroundColor: C.primary,
+      borderColor: C.primary,
+    },
+    mealButtonText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+    },
   mealButtonTextActive: {
-    color: '#fff',
+    color: C.surface,
   },
   dietButton: {
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: C.surface,
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: C.border,
     marginBottom: 8,
   },
-  dietButtonActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  dietButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
+    dietButtonActive: {
+      backgroundColor: C.primary,
+      borderColor: C.primary,
+    },
+    dietButtonText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: C.text,
+    },
   dietButtonTextActive: {
-    color: '#fff',
+    color: C.surface,
   },
 
   // STEP 4: NUTRITION MODE
@@ -882,30 +901,30 @@ const styles = StyleSheet.create({
   },
   modeCard: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: C.surface,
     borderRadius: 12,
     padding: 14,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: C.border,
   },
-  modeCardActive: {
-    backgroundColor: COLORS.primary + '10',
-    borderColor: COLORS.primary,
-  },
+    modeCardActive: {
+      backgroundColor: C.primary + '10',
+      borderColor: C.primary,
+    },
   modeEmoji: {
     fontSize: 32,
     marginBottom: 8,
   },
-  modeTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 4,
-  },
+    modeTitle: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: C.text,
+      marginBottom: 4,
+    },
   modeCardDescription: {
     fontSize: 11,
-    color: '#888',
+    color: C.textSecondary,
     textAlign: 'center',
   },
 
@@ -916,11 +935,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: C.border,
   },
   reminderDesc: {
     fontSize: 12,
-    color: '#888',
+    color: C.textSecondary,
     marginTop: 2,
   },
   timePickerContainer: {
@@ -929,7 +948,7 @@ const styles = StyleSheet.create({
   timeInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: C.surface,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -937,40 +956,40 @@ const styles = StyleSheet.create({
   timeIcon: {
     marginRight: 10,
   },
-  timeValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.primary,
-  },
+    timeValue: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: C.primary,
+    },
 
   // STEP 6: SUMMARY
-  summaryCard: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary,
-    padding: 16,
-    marginBottom: 16,
-  },
+    summaryCard: {
+      backgroundColor: C.surface,
+      borderRadius: 12,
+      borderLeftWidth: 4,
+      borderLeftColor: C.primary,
+      padding: 16,
+      marginBottom: 16,
+    },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: C.border,
   },
   summaryLabel: {
     fontSize: 14,
-    color: '#666',
+    color: C.textSecondary,
   },
-  summaryValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.primary,
-  },
+    summaryValue: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.primary,
+    },
   finalNote: {
     fontSize: 12,
-    color: '#888',
+    color: C.textSecondary,
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -982,7 +1001,7 @@ const styles = StyleSheet.create({
   },
   stepText: {
     fontSize: 12,
-    color: '#aaa',
+    color: C.textSecondary,
   },
 
   // BUTTONS
@@ -991,38 +1010,39 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: '#fff',
+    backgroundColor: C.surface,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: C.border,
   },
   skipButton: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: C.surface,
     alignItems: 'center',
   },
   skipButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#999',
+    color: C.textSecondary,
   },
-  nextButton: {
-    flex: 2,
-    flexDirection: 'row',
-    paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
+    nextButton: {
+      flex: 2,
+      flexDirection: 'row',
+      paddingVertical: 12,
+      borderRadius: 10,
+      backgroundColor: C.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+    },
   nextButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fff',
+    color: C.surface,
   },
-  buttonIcon: {
-    marginLeft: 4,
-  },
-});
+    buttonIcon: {
+      marginLeft: 4,
+    },
+  });
+}

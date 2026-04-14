@@ -244,7 +244,7 @@ export class AdaptiveMacroEngine {
         description: 'Lose body fat while preserving muscle',
         descriptionEs: 'Pierde grasa corporal preservando músculo',
         emoji: '🔥',
-        duration: '12-16 weeks',
+        duration: '12-16 semanas',
       },
       gain_muscle: {
         calorieFactor: 1.1, // +10% TDEE
@@ -254,7 +254,7 @@ export class AdaptiveMacroEngine {
         description: 'Build muscle with clean surplus',
         descriptionEs: 'Construye músculo con superávit limpio',
         emoji: '💪',
-        duration: '8-12 weeks',
+        duration: '8-12 semanas',
       },
       recomp: {
         calorieFactor: 1.0, // Maintenance
@@ -264,7 +264,7 @@ export class AdaptiveMacroEngine {
         description: 'Build muscle while losing fat',
         descriptionEs: 'Construye músculo mientras pierdes grasa',
         emoji: '♻️',
-        duration: '10-14 weeks',
+        duration: '10-14 semanas',
       },
       maintain: {
         calorieFactor: 1.0, // Maintenance
@@ -283,7 +283,7 @@ export class AdaptiveMacroEngine {
         description: 'Rapid fat loss in 4-6 weeks',
         descriptionEs: 'Pérdida rápida de grasa en 4-6 semanas',
         emoji: '✂️',
-        duration: '4-6 weeks',
+        duration: '4-6 semanas',
       },
       lean_bulk: {
         calorieFactor: 1.05, // +5% TDEE
@@ -293,7 +293,7 @@ export class AdaptiveMacroEngine {
         description: 'Moderate muscle gain with minimal fat',
         descriptionEs: 'Ganancia moderada de músculo con mínima grasa',
         emoji: '📈',
-        duration: '10-12 weeks',
+        duration: '10-12 semanas',
       },
     };
 

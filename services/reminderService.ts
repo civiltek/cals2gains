@@ -1,177 +1,156 @@
 // ============================================
 // Cals2Gains - Reminder Service
+// Safe wrapper: works even if expo-notifications
+// is not yet installed (graceful fallback).
 // ============================================
 
-import * as Notifications from 'expo-notifications';
-import { Reminder } from '../types';
+import { Platform } from 'react-native';
 
-// Configure notification behavior
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
-
-/**
- * Schedule a push notification reminder using expo-notifications
- * @param reminder The reminder configuration
- * @returns Promise resolving to the notification ID
- */
-export async function scheduleReminder(reminder: Reminder): Promise<string> {
-  try {
-    const [hours, minutes] = reminder.time.split(':').map(Number);
-
-    // Create a trigger for the specified time
-    const trigger = new Date();
-    trigger.setHours(hours, minutes, 0, 0);
-
-    // If the time has already passed today, schedule for tomorrow
-    if (trigger < new Date()) {
-      trigger.setDate(trigger.getDate() + 1);
-    }
-
-    const notificationId = await Notifications.scheduleNotificationAsync({
-      content: {
-        title: reminder.title,
-        body: reminder.body,
-        data: {
-          reminderId: reminder.id,
-          type: reminder.type,
-        },
-      },
-      trigger,
-    });
-
-    return notificationId;
-  } catch (error) {
-    console.error('Failed to schedule reminder:', error);
-    throw error;
-  }
+// ---- Dynamic import with fallback ----
+let Notifications: typeof import('expo-notifications') | null = null;
+try {
+  Notifications = require('expo-notifications');
+} catch {
+  console.warn('[ReminderService] expo-notifications not installed — reminders disabled');
 }
 
-/**
- * Cancel a specific reminder by its notification ID
- * @param reminderId The notification ID returned from scheduleReminder
- */
-export async function cancelReminder(reminderId: string): Promise<void> {
-  try {
-    await Notifications.cancelNotificationAsync(reminderId);
-  } catch (error) {
-    console.error('Failed to cancel reminder:', error);
-    throw error;
-  }
+// Configure notification behavior (only if available)
+if (Notifications) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
 }
 
-/**
- * Cancel all scheduled reminders
- */
-export async function cancelAllReminders(): Promise<void> {
-  try {
-    await Notifications.cancelAllNotificationsAsync();
-  } catch (error) {
-    console.error('Failed to cancel all reminders:', error);
-    throw error;
-  }
+// ---- Types ----
+
+export type ReminderKey = 'meals' | 'water' | 'weight' | 'fasting';
+
+export interface ReminderConfig {
+  key: ReminderKey;
+  enabled: boolean;
+  time: string; // "HH:mm"
+  notificationId?: string;
 }
 
-/**
- * Get default set of reminders for a user
- * @returns Array of default reminders
- */
-export function getDefaultReminders(): Reminder[] {
-  return [
-    {
-      id: 'meal_log_breakfast',
-      userId: '',
-      type: 'meal_log',
-      enabled: true,
-      time: '08:00',
-      days: [0, 1, 2, 3, 4, 5, 6], // Every day
-      title: 'Log Breakfast',
-      body: 'Time to log your breakfast meal',
-    },
-    {
-      id: 'meal_log_lunch',
-      userId: '',
-      type: 'meal_log',
-      enabled: true,
-      time: '13:00',
-      days: [0, 1, 2, 3, 4, 5, 6], // Every day
-      title: 'Log Lunch',
-      body: 'Time to log your lunch meal',
-    },
-    {
-      id: 'meal_log_dinner',
-      userId: '',
-      type: 'meal_log',
-      enabled: true,
-      time: '20:00',
-      days: [0, 1, 2, 3, 4, 5, 6], // Every day
-      title: 'Log Dinner',
-      body: 'Time to log your dinner meal',
-    },
-    {
-      id: 'water_reminder',
-      userId: '',
-      type: 'water',
-      enabled: true,
-      time: '10:00',
-      days: [0, 1, 2, 3, 4, 5, 6], // Every day (represents 2-hour intervals starting at 10am)
-      title: 'Drink Water',
-      body: 'Remember to stay hydrated',
-    },
-    {
-      id: 'weight_check',
-      userId: '',
-      type: 'weight',
-      enabled: true,
-      time: '07:00',
-      days: [0, 1, 2, 3, 4, 5, 6], // Every day
-      title: 'Log Weight',
-      body: 'Time to record your weight',
-    },
-  ];
-}
+// ---- Permissions ----
 
-/**
- * Request notification permissions from the user
- * @returns Promise resolving to true if permissions granted, false otherwise
- */
 export async function requestNotificationPermissions(): Promise<boolean> {
+  if (!Notifications) return false;
   try {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('reminders', {
+        name: 'Recordatorios',
+        importance: Notifications.AndroidImportance.HIGH,
+        vibrationPattern: [0, 250, 250, 250],
+        sound: 'default',
+      });
+    }
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    if (existingStatus === 'granted') return true;
+
     const { status } = await Notifications.requestPermissionsAsync();
     return status === 'granted';
   } catch (error) {
-    console.error('Failed to request notification permissions:', error);
+    console.error('[ReminderService] Permission request failed:', error);
     return false;
   }
 }
 
-/**
- * Check if notifications are already enabled
- * @returns Promise resolving to the permission status
- */
 export async function getNotificationPermissions(): Promise<boolean> {
+  if (!Notifications) return false;
   try {
     const settings = await Notifications.getPermissionsAsync();
     return settings.granted;
-  } catch (error) {
-    console.error('Failed to check notification permissions:', error);
+  } catch {
     return false;
   }
 }
 
-/**
- * Get all scheduled notifications
- * @returns Promise resolving to array of scheduled notifications
- */
-export async function getScheduledNotifications(): Promise<Notifications.NotificationRequest[]> {
+// ---- Schedule / Cancel ----
+
+export async function scheduleDailyReminder(
+  key: ReminderKey,
+  time: string,
+  title: string,
+  body: string,
+): Promise<string> {
+  if (!Notifications) {
+    console.warn('[ReminderService] Cannot schedule — expo-notifications not installed');
+    return `mock-${key}-${Date.now()}`;
+  }
+
+  const [hour, minute] = time.split(':').map(Number);
+
+  const notificationId = await Notifications.scheduleNotificationAsync({
+    content: {
+      title,
+      body,
+      data: { reminderKey: key },
+      sound: 'default',
+      ...(Platform.OS === 'android' && { channelId: 'reminders' }),
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour,
+      minute,
+    },
+  });
+
+  return notificationId;
+}
+
+export async function cancelReminder(notificationId: string): Promise<void> {
+  if (!Notifications) return;
+  try {
+    await Notifications.cancelNotificationAsync(notificationId);
+  } catch (error) {
+    console.error('[ReminderService] Cancel failed:', error);
+  }
+}
+
+export async function cancelAllReminders(): Promise<void> {
+  if (!Notifications) return;
+  try {
+    await Notifications.cancelAllNotificationsAsync();
+  } catch (error) {
+    console.error('[ReminderService] Cancel all failed:', error);
+  }
+}
+
+export async function getScheduledNotifications() {
+  if (!Notifications) return [];
   try {
     return await Notifications.getAllScheduledNotificationsAsync();
-  } catch (error) {
-    console.error('Failed to get scheduled notifications:', error);
+  } catch {
     return [];
+  }
+}
+
+// ---- Notification content helpers ----
+
+interface NotificationContent {
+  title: string;
+  body: string;
+}
+
+export function getReminderContent(
+  key: ReminderKey,
+  t: (k: string) => string,
+): NotificationContent {
+  switch (key) {
+    case 'meals':
+      return { title: t('reminders.mealsTitle'), body: t('reminders.mealsBody') };
+    case 'water':
+      return { title: t('reminders.waterTitle'), body: t('reminders.waterBody') };
+    case 'weight':
+      return { title: t('reminders.weightTitle'), body: t('reminders.weightBody') };
+    case 'fasting':
+      return { title: t('reminders.fastingTitle'), body: t('reminders.fastingBody') };
+    default:
+      return { title: 'Cals2Gains', body: '' };
   }
 }

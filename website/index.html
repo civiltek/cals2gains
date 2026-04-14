@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="oQNbjYAi1j6LWyHh5M5Lp2R22xyKANuSOIRUHqSRosI" />
+    <meta name="theme-color" content="#17121D">
+    <meta name="description" content="Cals2Gains — La app de nutricion con IA real. Escanea tu plato, recibe coaching semanal personalizado y deja que la app ajuste tus macros por ti.">
+    <meta property="og:title" content="Cals2Gains — La única app de nutrición con IA real">
+    <meta property="og:description" content="Cals2Gains — La app de nutricion con IA real. Escanea tu plato, recibe coaching semanal personalizado y deja que la app ajuste tus macros por ti.">
+    <meta property="og:image" content="https://cals2gains.com/logo.png">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://cals2gains.com">
+    <link rel="icon" type="image/png" href="/c2g-icon.png">
+    <link rel="apple-touch-icon" href="/c2g-icon.png">
+    <link rel="alternate" hreflang="es" href="https://cals2gains.com/">
+    <link rel="alternate" hreflang="en" href="https://cals2gains.com/">
+    <link rel="alternate" hreflang="x-default" href="https://cals2gains.com/">
+    <meta property="og:url" content="https://cals2gains.com/">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@cals2gains">
+    <meta name="twitter:creator" content="@cals2gains">
+    <meta name="twitter:title" content="Cals2Gains — La única app de nutrición con IA real">
+    <meta name="twitter:description" content="Escanea tu plato, recibe coaching semanal personalizado y deja que la app ajuste tus macros automáticamente. Sin publicidad.">
+    <meta name="twitter:image" content="https://cals2gains.com/logo.png">
+    <meta name="twitter:image:alt" content="Cals2Gains — AI Nutrition App">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-97MNMCDEG2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-97MNMCDEG2');
+    </script>
+
+    <title data-es="Cals2Gains — La única app de nutrición con IA real" data-en="Cals2Gains — The only nutrition app with real AI">Cals2Gains — La única app de nutrición con IA real</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org/",
+        "@type": "MobileApplication",
+        "name": "Cals2Gains",
+        "description": "La única app de nutrición con IA real. Escanea tu plato con cámara inteligente, recibe coaching semanal personalizado y deja que la app ajuste tus macros automáticamente.",
+        "url": "https://cals2gains.com",
+        "image": "https://cals2gains.com/logo.png",
+        "applicationCategory": "HealthAndFitnessApplication",
+        "operatingSystem": "iOS, Android",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+        }
+    }
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --violet: #9C8CFF;
+            --coral: #FF6A4D;
+            --plum: #17121D;
+            --bone: #F7F2EA;
+            --deep-dark: #0D0B1A;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background-color: var(--plum);
+            color: var(--bone);
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            font-family: 'Instrument Sans', sans-serif;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background-color: rgba(23, 18, 29, 0.8);
+            border-bottom: 1px solid rgba(156, 140, 255, 0.2);
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-logo img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .nav-logo-text {
+            display: flex;
+            align-items: baseline;
+            gap: 0.2rem;
+        }
+
+        .nav-logo-text .cals {
+            color: var(--violet);
+        }
+
+        .nav-logo-text .two {
+            color: var(--coral);
+            font-size: 1.2em;
+        }
+
+        .nav-logo-text .gains {
+            color: var(--violet);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-size: 0.95rem;
+            color: var(--bone);
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--coral);
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .lang-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background-color: rgba(156, 140, 255, 0.1);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .lang-toggle button {
+            background: none;
+            color: var(--bone);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .lang-toggle button.active {
+            background-color: var(--violet);
+            color: var(--plum);
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--violet), var(--coral));
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 106, 77, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 0.4rem;
+            width: 28px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 2px;
+            background-color: var(--bone);
+            transition: all 0.3s;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 70px;
+            position: relative;
+            padding: 4rem 2rem;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .orb {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.3;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--violet);
+            top: -100px;
+            right: -100px;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--coral);
+            bottom: -50px;
+            left: 50px;
+            animation: float 20s ease-in-out infinite 2s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: #FF8A65;
+            top: 50%;
+            right: 10%;
+            animation: float 18s ease-in-out infinite 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: fit-content;
+            padding: 0.75rem 1.5rem;
+            background-color: rgba(156, 140, 255, 0.15);
+            border: 1px solid rgba(156, 140, 255, 0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--coral);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero-hook {
+            font-size: 1.1rem;
+            color: rgba(247, 242, 234, 0.7);
+            font-weight: 500;
+        }
+
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-title-gradient {
+            background: linear-gradient(135deg, var(--violet), var(--coral));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(247, 242, 234, 0.8);
+            max-width: 500px;
+        }
+
+        .hero-cta-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, var(--violet), var(--coral));
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 106, 77, 0.3);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background-color: transparent;
+            color: var(--bone);
+            padding: 1rem 2rem;
+            border: 2px solid rgba(156, 140, 255, 0.4);
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--coral);
+            color: var(--coral);
+        }
+
+        .hero-trust {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(156, 140, 255, 0.2);
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .hero-right {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-mockup {
+            width: 300px;
+            height: 600px;
+            background: linear-gradient(135deg, rgba(156, 140, 255, 0.2), rgba(255, 106, 77, 0.2));
+            border: 12px solid var(--plum);
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: float-phone 4s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes float-phone {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .phone-content {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #1a1a2e, #16213e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            gap: 1.5rem;
+        }
+
+        .scan-bar {
+            width: 80%;
+            height: 3px;
+            background: var(--coral);
+            border-radius: 2px;
+            animation: scan 2s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0% { width: 20%; }
+            50% { width: 80%; }
+            100% { width: 20%; }
+        }
+
+        .food-emoji {
+            font-size: 4rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .macro-result {
+            width: 100%;
+            max-width: 250px;
+            background: rgba(156, 140, 255, 0.1);
+            border: 1px solid rgba(156, 140, 255, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* Social Proof Bar */
+        .social-proof {
+            position: relative;
+            z-index: 10;
+            margin: -50px 2rem 0;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            background: rgba(23, 18, 29, 0.8);
+            border: 1px solid rgba(156, 140, 255, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .proof-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .proof-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--violet);
+        }
+
+        .proof-label {
+            font-size: 0.95rem;
+            color: rgba(247, 242, 234, 0.8);
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            position: relative;
+        }
+
+        .step {
+            background: rgba(156, 140, 255, 0.05);
+            border: 1px solid rgba(156, 140, 255, 0.15);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .step:nth-child(1) { animation-delay: 0.1s; }
+        .step:nth-child(2) { animation-delay: 0.2s; }
+        .step:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step:hover {
+            border-color: var(--coral);
+            transform: translateY(-8px);
+        }
+
+        .step-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--violet);
+            margin-bottom: 1rem;
+        }
+
+        .step-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: rgba(247, 242, 234, 0.7);
+        }
+
+        /* Why Us - 4 Features */
+        .why-us {
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg, rgba(156, 140, 255, 0.05), rgba(255, 106, 77, 0.05));
+            margin: 4rem 0;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(23, 18, 29, 0.5);
+            border: 1px solid rgba(156, 140, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--violet), var(--coral));
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 0;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-tag {
+            display: inline-block;
+            background: rgba(255, 106, 77, 0.15);
+            color: var(--coral);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-description {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: rgba(247, 242, 234, 0.7);
+        }
+
+        .feature-card:hover {
+            border-color: var(--coral);
+            transform: translateY(-8px);
+        }
+
+        /* All Features */
+        .all-features {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .features-grid-30 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-mini {
+            background: rgba(156, 140, 255, 0.05);
+            border: 1px solid rgba(156, 140, 255, 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-mini:hover {
+            border-color: var(--coral);
+            background: rgba(156, 140, 255, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .feature-mini-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-mini-name {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .feature-mini-desc {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: rgba(247, 242, 234, 0.6);
+        }
+
+        /* Comparison Table */
+        .comparison {
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg, rgba(255, 106, 77, 0.05), rgba(156, 140, 255, 0.05));
+            margin: 4rem 0;
+        }
+
+        .comparison-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid rgba(156, 140, 255, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(23, 18, 29, 0.6);
+        }
+
+        th, td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(156, 140, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(156, 140, 255, 0.1);
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        th:first-child {
+            text-align: left;
+        }
+
+        th:nth-child(2) {
+            background: linear-gradient(135deg, rgba(156, 140, 255, 0.2), rgba(255, 106, 77, 0.1));
+            color: var(--violet);
+        }
+
+        td:nth-child(2) {
+            color: var(--violet);
+            font-weight: 600;
+        }
+
+        .check {
+            color: var(--violet);
+            font-weight: 700;
+        }
+
+        .cross {
+            color: rgba(247, 242, 234, 0.3);
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .price-card {
+            background: rgba(23, 18, 29, 0.8);
+            border: 2px solid rgba(156, 140, 255, 0.2);
+            border-radius: 16px;
+            padding: 2.5rem;
+            position: relative;
+            transition: all 0.3s;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .price-card:nth-child(1) { animation-delay: 0.1s; }
+        .price-card:nth-child(2) { animation-delay: 0.2s; }
+
+        .price-card.premium {
+            border: 2px solid transparent;
+            background: linear-gradient(rgba(23, 18, 29, 0.8), rgba(23, 18, 29, 0.8)) padding-box,
+                        linear-gradient(135deg, var(--violet), var(--coral)) border-box;
+        }
+
+        .price-popular-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--violet), var(--coral));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .price-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .price-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            color: var(--violet);
+        }
+
+        .price-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .price-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(156, 140, 255, 0.1);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .price-features li::before {
+            content: '✓';
+            color: var(--violet);
+            font-weight: 700;
+        }
+
+        .price-card.premium .price-features li::before {
+            color: var(--coral);
+        }
+
+        .price-features li:last-child {
+            border-bottom: none;
+        }
+
+        .price-cta {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .price-card-free .price-cta {
+            background: transparent;
+            border: 2px solid rgba(156, 140, 255, 0.4);
+            color: var(--bone);
+        }
+
+        .price-card-free .price-cta:hover {
+            border-color: var(--coral);
+            color: var(--coral);
+        }
+
+        .price-card.premium .price-cta {
+            background: linear-gradient(135deg, var(--violet), var(--coral));
+            color: white;
+        }
+
+        .price-card.premium .price-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 106, 77, 0.3);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg, rgba(156, 140, 255, 0.05), rgba(255, 106, 77, 0.05));
+            margin: 4rem 0;
+        }
+
+        .testimonials-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background: rgba(23, 18, 29, 0.8);
+            border: 1px solid rgba(156, 140, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .testimonial-card:nth-child(1) { animation-delay: 0.1s; }
+        .testimonial-card:nth-child(2) { animation-delay: 0.2s; }
+        .testimonial-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .testimonial-card:hover {
+            border-color: var(--coral);
+            transform: translateY(-8px);
+        }
+
+        .testimonial-stars {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: rgba(247, 242, 234, 0.8);
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--violet), var(--coral));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+        }
+
+        .testimonial-info h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .testimonial-info p {
+            font-size: 0.85rem;
+            color: rgba(247, 242, 234, 0.6);
+        }
+
+        /* Final CTA */
+        .final-cta {
+            padding: 6rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(156, 140, 255, 0.1), rgba(255, 106, 77, 0.1));
+            margin: 4rem 0;
+        }
+
+        .final-cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .final-cta h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .final-cta p {
+            font-size: 1.1rem;
+            color: rgba(247, 242, 234, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .final-cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .final-cta-email {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            color: var(--coral);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            background-color: var(--deep-dark);
+            border-top: 1px solid rgba(156, 140, 255, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-logo img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .footer-logo-text {
+            display: flex;
+            align-items: baseline;
+            gap: 0.2rem;
+        }
+
+        .footer-logo-text .cals {
+            color: var(--violet);
+        }
+
+        .footer-logo-text .two {
+            color: var(--coral);
+        }
+
+        .footer-logo-text .gains {
+            color: var(--violet);
+        }
+
+        .footer-copyright {
+            font-size: 0.85rem;
+            color: rgba(247, 242, 234, 0.5);
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .footer-links a {
+            color: rgba(247, 242, 234, 0.7);
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--coral);
+        }
+
+        .footer-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-links.active {
+                display: flex;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background-color: rgba(23, 18, 29, 0.95);
+                flex-direction: column;
+                gap: 1rem;
+                padding: 2rem;
+                z-index: 999;
+                border-bottom: 1px solid rgba(156, 140, 255, 0.2);
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+            }
+
+            .nav-right {
+                gap: 1rem;
+            }
+
+            .nav-cta {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+                margin-top: 60px;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .hero-cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .phone-mockup {
+                width: 250px;
+                height: 500px;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-right {
+                display: none;
+            }
+
+            .features-grid-30 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .final-cta-buttons {
+                flex-direction: column;
+            }
+
+            .final-cta-buttons .btn-primary,
+            .final-cta-buttons .btn-secondary {
+                width: 100%;
+            }
+
+            .pricing-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.5rem;
+            }
+
+            .hero-hook {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .features-grid-30 {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-mini {
+                padding: 1rem;
+            }
+
+            .social-proof {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin: -30px 1rem 0;
+            }
+
+            .lang-toggle {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            .lang-toggle button {
+                padding: 0.2rem 0.4rem;
+            }
+
+            .final-cta h2 {
+                font-size: 1.5rem;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .svg-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Trust Badges */
+        .trust-badges {
+            padding: 2rem 0;
+            background-color: rgba(156, 140, 255, 0.03);
+        }
+
+        .badges-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            padding: 0 2rem;
+        }
+
+        .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: rgba(247, 242, 234, 0.6);
+            font-weight: 500;
+        }
+
+        .badge-icon {
+            font-size: 1.2rem;
+        }
+
+        /* FAQ */
+        .faq {
+            padding: 6rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .faq-item {
+            border: 1px solid rgba(156, 140, 255, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(156, 140, 255, 0.3);
+        }
+
+        .faq-question {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            background: rgba(156, 140, 255, 0.05);
+            color: var(--bone);
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: left;
+            transition: background 0.3s;
+        }
+
+        .faq-question:hover {
+            background: rgba(156, 140, 255, 0.1);
+        }
+
+        .faq-toggle {
+            font-size: 1.5rem;
+            color: var(--violet);
+            transition: transform 0.3s;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .faq-item.open .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 300px;
+            padding: 0 1.5rem 1.25rem;
+        }
+
+        .faq-answer p {
+            color: rgba(247, 242, 234, 0.7);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* Pricing improvements */
+        .price-annual {
+            font-size: 0.85rem;
+            color: var(--coral);
+            font-weight: 600;
+            margin-top: -0.5rem;
+        }
+
+        .price-trial {
+            font-size: 0.8rem;
+            color: rgba(247, 242, 234, 0.5);
+            background: rgba(156, 140, 255, 0.08);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.25rem;
+        }
+
+        .price-value small {
+            font-size: 0.45em;
+            opacity: 0.7;
+        }
+
+        /* Improved testimonials */
+        .testimonial-text {
+            font-size: 0.95rem !important;
+            line-height: 1.7 !important;
+        }
+
+        /* Nav FAQ link */
+        @media (max-width: 768px) {
+            .badges-container {
+                gap: 1.5rem;
+                justify-content: center;
+            }
+            .badge-item {
+                font-size: 0.75rem;
+            }
+            .faq {
+                padding: 4rem 1.5rem;
+            }
+        }
+
+    </style>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Es precisa la IA para analizar mis comidas?","acceptedAnswer":{"@type":"Answer","text":"Sí. Utilizamos GPT-4o Vision, el modelo de IA más avanzado del mundo, que identifica alimentos, estima cantidades y calcula macros con una precisión del 85-95%. Puedes ajustar manualmente si lo deseas, y la IA aprende de tus correcciones."}},{"@type":"Question","name":"¿Mis datos están seguros?","acceptedAnswer":{"@type":"Answer","text":"Absolutamente. Tus datos se almacenan en Firebase (Google Cloud) con cifrado de extremo a extremo. Cumplimos con el RGPD. Nunca vendemos tus datos a terceros. Las fotos se procesan en tiempo real y no se almacenan en nuestros servidores de IA."}},{"@type":"Question","name":"¿Cuánto cuesta Premium?","acceptedAnswer":{"@type":"Answer","text":"Premium cuesta 4,99€/mes o 39,99€/año (ahorra un 33%). Incluye 7 días de prueba gratuita. Puedes cancelar en cualquier momento desde la app. Sin compromisos, sin letra pequeña."}},{"@type":"Question","name":"¿En qué se diferencia de otras apps de nutrición?","acceptedAnswer":{"@type":"Answer","text":"La mayoría de apps de nutrición se basan en búsqueda manual de alimentos y bases de datos estáticas. Cals2Gains tiene IA real integrada: escaneo de platos por foto, coaching semanal personalizado con GPT-4o, sugerencias en tiempo real, y TDEE adaptativo. Además, somos 100% sin publicidad, incluso en la versión gratuita."}},{"@type":"Question","name":"¿Funciona sin conexión a internet?","acceptedAnswer":{"@type":"Answer","text":"Parcialmente. El registro manual, búsqueda de alimentos y escáner de código de barras funcionan offline. Las funciones de IA (foto, coaching, sugerencias) necesitan conexión porque procesan los datos en la nube para mayor precisión."}}]}
+    </script>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="c2g-icon.png" alt="Cals2Gains">
+                <div class="nav-logo-text">
+                    <span class="cals">Cals</span><span class="two">2</span><span class="gains">Gains</span>
+                </div>
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="#why" data-es="Por qué nosotros" data-en="Why Us">Por qué nosotros</a></li>
+                <li><a href="#how" data-es="Cómo funciona" data-en="How it Works">Cómo funciona</a></li>
+                <li><a href="#features" data-es="Funciones" data-en="Features">Funciones</a></li>
+                <li><a href="#comparison" data-es="Comparativa" data-en="Comparison">Comparativa</a></li>
+                <li><a href="#pricing" data-es="Precios" data-en="Pricing">Precios</a></li>
+            </ul>
+
+            <div class="nav-right">
+                <div class="lang-toggle">
+                    <button class="lang-btn active" data-lang="es">ES</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                </div>
+                <button class="nav-cta" data-es="Descargar gratis" data-en="Download Free">Descargar gratis</button>
+            </div>
+
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+
+        <div class="hero-content">
+            <div class="hero-left">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    <span data-es="LA ÚNICA APP CON IA REAL" data-en="THE ONLY APP WITH REAL AI">LA ÚNICA APP CON IA REAL</span>
+                </div>
+
+                <p class="hero-hook" data-es="¿Sigues contando calorías a mano?" data-en="Still counting calories by hand?">¿Sigues contando calorías a mano?</p>
+
+                <h1 class="hero-title">
+                    <span data-es="Sacale una foto" data-en="Snap a photo">Sacale una foto</span><br>
+                    <span class="hero-title-gradient" data-es="a tu plato." data-en="of your plate.">a tu plato.</span>
+                </h1>
+
+                <p class="hero-subtitle" data-es="La IA identifica los alimentos, calcula los macros y los registra por ti. Coaching semanal real. Ajuste automático de objetivos. Todo en una app." data-en="AI identifies food, calculates macros and logs them for you. Real weekly coaching. Automatic goal adjustment. All in one app.">La IA identifica los alimentos, calcula los macros y los registra por ti. Coaching semanal real. Ajuste automático de objetivos. Todo en una app.</p>
+
+                <div class="hero-cta-buttons">
+                    <button class="btn-primary" data-es="Descargar en Google Play" data-en="Download on Google Play">
+                        <svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.6915026,12.4744748 L3.50612381,13.2599618 L3.5 13.2599618 L9.45252842,20.0151496 L10.1992634,20.8006365 L10.8429026,20.0151496 L17.6915026,12.4744748 Z"/>
+                        </svg>
+                        <span data-es="Google Play" data-en="Google Play">Google Play</span>
+                    </button>
+                    <button class="btn-secondary" data-es="Descargar en App Store" data-en="Download on App Store">
+                        <svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.05 13.5c-.91 0-1.64 1.04-1.64 2.34s.73 2.34 1.64 2.34 1.65-1.04 1.65-2.34-.74-2.34-1.65-2.34zm0 3.74c-.55 0-1-.48-1-1.4s.45-1.4 1-1.4 1 .48 1 1.4-.45 1.4-1 1.4z"/>
+                        </svg>
+                        <span data-es="App Store" data-en="App Store">App Store</span>
+                    </button>
+                </div>
+
+                <div class="hero-trust">
+                    <div class="trust-item">✔ <span data-es="Gratis para siempre" data-en="Free forever">Gratis para siempre</span></div>
+                    <div class="trust-item">✔ <span data-es="Sin anuncios" data-en="No ads">Sin anuncios</span></div>
+                    <div class="trust-item">✔ <span data-es="Privacidad total" data-en="Total privacy">Privacidad total</span></div>
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <div class="phone-mockup">
+                    <div class="phone-content">
+                        <div class="scan-bar"></div>
+                        <div class="food-emoji">🍝</div>
+                        <div class="macro-result">
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;" data-es="Pasta con salsa" data-en="Pasta with sauce">Pasta con salsa</div>
+                            <div style="font-size: 0.75rem;">Cal: 450 | Pro: 14g | Carbs: 65g</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Bar -->
+    <section class="social-proof">
+        <div class="proof-item">
+            <div class="proof-number" data-es="40+" data-en="40+">40+</div>
+            <div class="proof-label" data-es="Funciones" data-en="Features">Funciones</div>
+        </div>
+        <div class="proof-item">
+            <div class="proof-number" data-es="GPT-4o" data-en="GPT-4o">GPT-4o</div>
+            <div class="proof-label" data-es="Powered by IA" data-en="Powered by AI">Powered by IA</div>
+        </div>
+        <div class="proof-item">
+            <div class="proof-number" data-es="0" data-en="0">0</div>
+            <div class="proof-label" data-es="Anuncios" data-en="Ads">Anuncios</div>
+        </div>
+        <div class="proof-item">
+            <div class="proof-number" data-es="100%" data-en="100%">100%</div>
+            <div class="proof-label" data-es="Privado" data-en="Private">Privado</div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how">
+        <h2 class="section-title" data-es="Así de fácil" data-en="This Easy">Así de fácil</h2>
+
+        <div class="steps-grid">
+            <div class="step">
+                <div class="step-number">01</div>
+                <div class="step-icon">📸</div>
+                <h3 class="step-title" data-es="Foto" data-en="Snap">Foto</h3>
+                <p class="step-description" data-es="Haz una foto a tu plato. La IA lo analiza en 3 segundos." data-en="Snap a photo of your plate. AI analyzes it in 3 seconds.">Haz una foto a tu plato. La IA lo analiza en 3 segundos.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">02</div>
+                <div class="step-icon">✅</div>
+                <h3 class="step-title" data-es="Revisa" data-en="Review">Revisa</h3>
+                <p class="step-description" data-es="La IA te muestra nombre, ingredientes y macros. Ajusta si quieres y guarda." data-en="AI shows you name, ingredients and macros. Adjust if needed and save.">La IA te muestra nombre, ingredientes y macros. Ajusta si quieres y guarda.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">03</div>
+                <div class="step-icon">📈</div>
+                <h3 class="step-title" data-es="Progresa" data-en="Progress">Progresa</h3>
+                <p class="step-description" data-es="El coach IA ajusta tus objetivos cada semana según tu progreso real." data-en="The AI coach adjusts your goals weekly based on your real progress.">El coach IA ajusta tus objetivos cada semana según tu progreso real.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us - 4 Features -->
+    <section class="why-us" id="why">
+        <h2 class="section-title" data-es="Por qué somos diferentes" data-en="Why We're Different">Por qué somos diferentes</h2>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-tag" data-es="KILLER FEATURE" data-en="KILLER FEATURE">KILLER FEATURE</span>
+                <div class="feature-card-content">
+                    <div class="feature-icon">📸</div>
+                    <h3 class="feature-title" data-es="Cámara IA" data-en="AI Camera">Cámara IA</h3>
+                    <p class="feature-description" data-es="GPT-4o identifica alimentos, estima porciones y calcula macros al instante." data-en="GPT-4o Vision identifies food, estimates portions, calculates macros instantly.">GPT-4o identifica alimentos, estima porciones y calcula macros al instante.</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-tag" data-es="EXCLUSIVO" data-en="EXCLUSIVE">EXCLUSIVO</span>
+                <div class="feature-card-content">
+                    <div class="feature-icon">🧠</div>
+                    <h3 class="feature-title" data-es="Coach IA semanal" data-en="Weekly AI Coach">Coach IA semanal</h3>
+                    <p class="feature-description" data-es="Análisis personalizado basado en TUS DATOS REALES: peso, wearables, cumplimiento." data-en="Personalized analysis based on YOUR REAL DATA: weight, wearables, adherence.">Análisis personalizado basado en TUS DATOS REALES: peso, wearables, cumplimiento.</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-tag" data-es="IA DINÁMICA" data-en="DYNAMIC AI">IA DINÁMICA</span>
+                <div class="feature-card-content">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title" data-es="¿Qué como?" data-en="What Should I Eat?">¿Qué como?</h3>
+                    <p class="feature-description" data-es="Sugerencias en tiempo real basadas en macros disponibles, hora del día y hábitos." data-en="Real-time suggestions based on remaining macros, time of day, habits.">Sugerencias en tiempo real basadas en macros disponibles, hora del día y hábitos.</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-tag" data-es="INTELIGENTE" data-en="SMART">INTELIGENTE</span>
+                <div class="feature-card-content">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title" data-es="Ajuste adaptativo" data-en="Adaptive Adjustment">Ajuste adaptativo</h3>
+                    <p class="feature-description" data-es="Se recalibra automáticamente según datos de wearables + tendencias de peso." data-en="Auto-recalibrates based on wearable data + weight trends.">Se recalibra automáticamente según datos de wearables + tendencias de peso.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- All Features Grid -->
+    <section class="all-features" id="features">
+        <h2 class="section-title" data-es="Todo en una app" data-en="All in One App">Todo en una app</h2>
+
+        <div class="features-grid-30">
+            <!-- IA y Registro -->
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">📸</div>
+                <div class="feature-mini-name" data-es="Cámara IA" data-en="AI Camera">Cámara IA</div>
+                <div class="feature-mini-desc" data-es="Foto → macros en 3 segundos" data-en="Photo → macros in 3 seconds">Foto → macros en 3 segundos</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🔍</div>
+                <div class="feature-mini-name" data-es="Revisión interactiva" data-en="Interactive Review">Revisión interactiva</div>
+                <div class="feature-mini-desc" data-es="Corrige antes de guardar" data-en="Correct before saving">Corrige antes de guardar</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🏷️</div>
+                <div class="feature-mini-name" data-es="Escáner de etiquetas" data-en="Label Scanner">Escáner de etiquetas</div>
+                <div class="feature-mini-desc" data-es="OCR inteligente con GPT-4o" data-en="Smart OCR with GPT-4o">OCR inteligente con GPT-4o</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🎤</div>
+                <div class="feature-mini-name" data-es="Registro por voz" data-en="Voice Logging">Registro por voz</div>
+                <div class="feature-mini-desc" data-es="Dicta y la IA calcula" data-en="Dictate, AI calculates">Dicta y la IA calcula</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">📱</div>
+                <div class="feature-mini-name" data-es="Escáner de barras" data-en="Barcode Scanner">Escáner de barras</div>
+                <div class="feature-mini-desc" data-es="Open Food Facts integrado" data-en="Open Food Facts integrated">Open Food Facts integrado</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🔎</div>
+                <div class="feature-mini-name" data-es="Búsqueda de alimentos" data-en="Food Search">Búsqueda de alimentos</div>
+                <div class="feature-mini-desc" data-es="Base de datos + IA" data-en="Database + AI">Base de datos + IA</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">⚡</div>
+                <div class="feature-mini-name" data-es="Quick-add" data-en="Quick-add">Quick-add</div>
+                <div class="feature-mini-desc" data-es="Registro manual rápido" data-en="Fast manual logging">Registro manual rápido</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🔄</div>
+                <div class="feature-mini-name" data-es="Re-registro rápido" data-en="Fast Re-log">Re-registro rápido</div>
+                <div class="feature-mini-desc" data-es="Repite comidas anteriores" data-en="Repeat previous meals">Repite comidas anteriores</div>
+            </div>
+
+            <!-- Cuerpo y Salud -->
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">📊</div>
+                <div class="feature-mini-name" data-es="Tracking de macros" data-en="Macro Tracking">Tracking de macros</div>
+                <div class="feature-mini-desc" data-es="Cal, proteína, carbos, grasa, fibra" data-en="Cal, protein, carbs, fat, fiber">Cal, proteína, carbos, grasa, fibra</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">💪</div>
+                <div class="feature-mini-name" data-es="Dashboard proteína" data-en="Protein Dashboard">Dashboard proteína</div>
+                <div class="feature-mini-desc" data-es="Anillo, racha, alimentos rápidos" data-en="Ring, streak, quick foods">Anillo, racha, alimentos rápidos</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">⚖️</div>
+                <div class="feature-mini-name" data-es="Control de peso" data-en="Weight Tracking">Control de peso</div>
+                <div class="feature-mini-desc" data-es="Gráficos y tendencias" data-en="Charts and trends">Gráficos y tendencias</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">💧</div>
+                <div class="feature-mini-name" data-es="Hidratación" data-en="Hydration">Hidratación</div>
+                <div class="feature-mini-desc" data-es="Tracker de agua con recordatorios" data-en="Water tracker with reminders">Tracker de agua con recordatorios</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">📐</div>
+                <div class="feature-mini-name" data-es="Medidas corporales" data-en="Body Measurements">Medidas corporales</div>
+                <div class="feature-mini-desc" data-es="Tendencias visuales" data-en="Visual trends">Tendencias visuales</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">📷</div>
+                <div class="feature-mini-name" data-es="Fotos de progreso" data-en="Progress Photos">Fotos de progreso</div>
+                <div class="feature-mini-desc" data-es="Frontal, lateral, trasera" data-en="Front, side, back">Frontal, lateral, trasera</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">⏱️</div>
+                <div class="feature-mini-name" data-es="Ayuno intermitente" data-en="Intermittent Fasting">Ayuno intermitente</div>
+                <div class="feature-mini-desc" data-es="Temporizador y ciclos" data-en="Timer and cycles">Temporizador y ciclos</div>
+            </div>
+
+            <!-- Planificación -->
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🗓️</div>
+                <div class="feature-mini-name" data-es="Plan de comidas" data-en="Meal Planning">Plan de comidas</div>
+                <div class="feature-mini-desc" data-es="Organiza tu semana" data-en="Organize your week">Organiza tu semana</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🍳</div>
+                <div class="feature-mini-name" data-es="Recetas favoritas" data-en="Favorite Recipes">Recetas favoritas</div>
+                <div class="feature-mini-desc" data-es="Macros calculados" data-en="Calculated macros">Macros calculados</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">📋</div>
+                <div class="feature-mini-name" data-es="Plantillas" data-en="Templates">Plantillas</div>
+                <div class="feature-mini-desc" data-es="Quick-log de combos frecuentes" data-en="Quick-log frequent combos">Quick-log de combos frecuentes</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🛒</div>
+                <div class="feature-mini-name" data-es="Lista de compra" data-en="Shopping List">Lista de compra</div>
+                <div class="feature-mini-desc" data-es="Auto-generada" data-en="Auto-generated">Auto-generada</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">📑</div>
+                <div class="feature-mini-name" data-es="Copiar día" data-en="Copy Day">Copiar día</div>
+                <div class="feature-mini-desc" data-es="Clona todas las comidas" data-en="Clone all meals">Clona todas las comidas</div>
+            </div>
+
+            <!-- Inteligencia -->
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🧠</div>
+                <div class="feature-mini-name" data-es="Coach IA semanal" data-en="Weekly AI Coach">Coach IA semanal</div>
+                <div class="feature-mini-desc" data-es="Ajuste de macros con explicación" data-en="Macro adjustment w/ explanation">Ajuste de macros con explicación</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🤖</div>
+                <div class="feature-mini-name" data-es="¿Qué como?" data-en="What Should I Eat?">¿Qué como?</div>
+                <div class="feature-mini-desc" data-es="Sugerencias dinámicas IA" data-en="Dynamic AI suggestions">Sugerencias dinámicas IA</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">⌚</div>
+                <div class="feature-mini-name" data-es="Wearable coaching" data-en="Wearable Coaching">Wearable coaching</div>
+                <div class="feature-mini-desc" data-es="Apple Health / Google Fit → IA" data-en="Apple Health / Google Fit → AI">Apple Health / Google Fit → IA</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">📈</div>
+                <div class="feature-mini-name" data-es="Analíticas" data-en="Analytics">Analíticas</div>
+                <div class="feature-mini-desc" data-es="Tendencias históricas" data-en="Historical trends">Tendencias históricas</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">✅</div>
+                <div class="feature-mini-name" data-es="Adherencia" data-en="Adherence">Adherencia</div>
+                <div class="feature-mini-desc" data-es="Métricas de cumplimiento" data-en="Compliance metrics">Métricas de cumplimiento</div>
+            </div>
+
+            <!-- Personalización -->
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🎯</div>
+                <div class="feature-mini-name" data-es="6 modos objetivo" data-en="6 Goal Modes">6 modos objetivo</div>
+                <div class="feature-mini-desc" data-es="Perder, ganar, mantener..." data-en="Lose, gain, maintain...">Perder, ganar, mantener...</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🎨</div>
+                <div class="feature-mini-name" data-es="Tema oscuro premium" data-en="Dark Theme Premium">Tema oscuro premium</div>
+                <div class="feature-mini-desc" data-es="Diseño plum/violet/coral" data-en="Plum/violet/coral design">Diseño plum/violet/coral</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🔀</div>
+                <div class="feature-mini-name" data-es="Modo Simple/Avanzado" data-en="Simple/Advanced Mode">Modo Simple/Avanzado</div>
+                <div class="feature-mini-desc" data-es="Solo calorías o macros completos" data-en="Calories only or full macros">Solo calorías o macros completos</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🌍</div>
+                <div class="feature-mini-name" data-es="Bilingüe ES/EN" data-en="Bilingual ES/EN">Bilingüe ES/EN</div>
+                <div class="feature-mini-desc" data-es="Detección automática" data-en="Auto-detection">Detección automática</div>
+            </div>
+
+            <div class="feature-mini">
+                <div class="feature-mini-emoji">🔔</div>
+                <div class="feature-mini-name" data-es="Recordatorios" data-en="Reminders">Recordatorios</div>
+                <div class="feature-mini-desc" data-es="Comidas, agua, peso, ayuno" data-en="Meals, water, weight, fasting">Comidas, agua, peso, ayuno</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section class="comparison" id="comparison">
+        <div class="comparison-container">
+            <h2 class="section-title" data-es="¿Por qué Cals2Gains?" data-en="Why Cals2Gains?">¿Por qué Cals2Gains?</h2>
+
+            <div class="table-wrapper" style="margin-top: 3rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-es="Característica" data-en="Feature">Característica</th>
+                            <th data-es="Cals2Gains" data-en="Cals2Gains">Cals2Gains</th>
+                            <th data-es="App tradicional" data-en="Traditional App">App tradicional</th>
+                            <th data-es="App de macros" data-en="Macro App">App de macros</th>
+                            <th data-es="App freemium" data-en="Freemium App">App freemium</th>
+                            <th data-es="App con coach" data-en="Coach App">App con coach</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-es="Análisis foto IA" data-en="AI Photo Analysis">Análisis foto IA</td>
+                            <td><span class="check">✔ GPT-4o</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">Básico</span></td>
+                            <td><span class="cross">✘</span></td>
+                        </tr>
+                        <tr>
+                            <td data-es="Coaching IA adaptativo" data-en="Adaptive AI Coaching">Coaching IA adaptativo</td>
+                            <td><span class="check">✔ Semanal</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="check">Algoritmo</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="check">Coach humano</span></td>
+                        </tr>
+                        <tr>
+                            <td data-es="Wearable → coaching" data-en="Wearable → Coaching">Wearable → coaching</td>
+                            <td><span class="check">✔ Integrado</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                        </tr>
+                        <tr>
+                            <td data-es="Sugerencias ¿Qué como?" data-en="Food Suggestions">Sugerencias ¿Qué como?</td>
+                            <td><span class="check">✔ Tiempo real</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">Planes fijos</span></td>
+                            <td><span class="check">Genéricas</span></td>
+                        </tr>
+                        <tr>
+                            <td data-es="Escáner etiqueta OCR" data-en="Label OCR Scanner">Escáner etiqueta OCR</td>
+                            <td><span class="check">✔ GPT-4o</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                        </tr>
+                        <tr>
+                            <td data-es="Registro por voz" data-en="Voice Logging">Registro por voz</td>
+                            <td><span class="check">✔ Whisper</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="cross">✘</span></td>
+                        </tr>
+                        <tr>
+                            <td data-es="Tema oscuro nativo" data-en="Native Dark Theme">Tema oscuro nativo</td>
+                            <td><span class="check">✔</span></td>
+                            <td><span class="cross">✘</span></td>
+                            <td><span class="check">✔</span></td>
+                            <td><span class="check">Parcial</span></td>
+                            <td><span class="cross">✘</span></td>
+                        </tr>
+                        <tr>
+                            <td data-es="Sin publicidad" data-en="No Ads">Sin publicidad</td>
+                            <td><span class="check">✔ Siempre</span></td>
+                            <td><span class="check">Solo premium</span></td>
+                            <td><span class="check">✔</span></td>
+                            <td><span class="check">Solo premium</span></td>
+                            <td><span class="check">✔</span></td>
+                        </tr>
+                        <tr>
+                            <td data-es="Precio" data-en="Price">Precio</td>
+                            <td><span class="check">✔ Asequible</span></td>
+                            <td><span class="cross">~10€/mes</span></td>
+                            <td><span class="cross">~12€/mes</span></td>
+                            <td><span class="cross">~7€/mes</span></td>
+                            <td><span class="cross">~59€/mes</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <h2 class="section-title" data-es="Planes" data-en="Plans">Planes</h2>
+
+        <div class="pricing-cards">
+            <div class="price-card price-card-free">
+                <h3 class="price-title" data-es="GRATIS" data-en="FREE">GRATIS</h3>
+                <div class="price-value" data-es="0€" data-en="$0">0€</div>
+                <ul class="price-features">
+                    <li data-es="Escáner de código de barras" data-en="Barcode Scanner">Escáner de código de barras</li>
+                    <li data-es="Búsqueda de alimentos" data-en="Food Search">Búsqueda de alimentos</li>
+                    <li data-es="Registro manual (quick-add)" data-en="Manual logging (quick-add)">Registro manual (quick-add)</li>
+                    <li data-es="Historial básico" data-en="Basic History">Historial básico</li>
+                    <li data-es="Tracker de peso y agua" data-en="Weight & Water Tracking">Tracker de peso y agua</li>
+                    <li data-es="Tema oscuro" data-en="Dark Theme">Tema oscuro</li>
+                    <li data-es="Sin anuncios" data-en="No Ads">Sin anuncios</li>
+                </ul>
+                <button class="price-cta" data-es="Descargar gratis" data-en="Download Free">Descargar gratis</button>
+            </div>
+
+            <div class="price-card premium">
+                <div class="price-popular-badge" data-es="POPULAR" data-en="POPULAR">POPULAR</div>
+                <h3 class="price-title" data-es="PREMIUM" data-en="PREMIUM">PREMIUM</h3>
+                <div class="price-value" data-es="4,99€<small>/mes</small>" data-en="$4.99<small>/mo</small>">4,99€<small>/mes</small></div>
+                <div class="price-annual" data-es="o 39,99€/año (ahorra 33%)" data-en="or $39.99/year (save 33%)">o 39,99€/año (ahorra 33%)</div>
+                <div class="price-trial" data-es="7 días gratis · Cancela cuando quieras" data-en="7-day free trial · Cancel anytime">7 días gratis · Cancela cuando quieras</div>
+                <ul class="price-features">
+                    <li data-es="Todo lo gratuito +" data-en="Everything Free +">Todo lo gratuito +</li>
+                    <li data-es="Análisis ilimitado por foto IA" data-en="Unlimited AI Photo Analysis">Análisis ilimitado por foto IA</li>
+                    <li data-es="Coaching IA semanal" data-en="Weekly AI Coaching">Coaching IA semanal</li>
+                    <li data-es="¿Qué como? sugerencias IA" data-en="AI Food Suggestions">¿Qué como? sugerencias IA</li>
+                    <li data-es="Escáner OCR de etiquetas" data-en="Label OCR Scanner">Escáner OCR de etiquetas</li>
+                    <li data-es="Registro por voz" data-en="Voice Logging">Registro por voz</li>
+                    <li data-es="Analíticas avanzadas" data-en="Advanced Analytics">Analíticas avanzadas</li>
+                    <li data-es="Coaching wearable" data-en="Wearable Coaching">Coaching wearable</li>
+                </ul>
+                <button class="price-cta" data-es="Empieza gratis" data-en="Start Free">Empieza gratis</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="testimonials-container">
+            <h2 class="section-title" data-es="Lo que dicen nuestros usuarios" data-en="What Our Users Say">Lo que dicen nuestros usuarios</h2>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text" data-es="Llevo 6 meses usando Cals2Gains y es la primera app de nutrición que realmente uso a diario. La cámara IA acertó con mi plato de arroz con pollo a la primera — pesé después y solo tenía 15kcal de diferencia. El coaching semanal me cambió los macros cuando estanqué y volví a progresar. Antes tardaba 10 min por comida registrando a mano, ahora son 5 segundos con la foto." data-en="I've been using Cals2Gains for 6 months and it's the first nutrition app I actually use daily. The AI camera nailed my chicken rice plate on the first try — I weighed it after and it was only 15kcal off. Weekly coaching adjusted my macros when I plateaued and I started progressing again. I used to spend 10 min per meal logging manually, now it's 5 seconds with a photo.">Llevo 6 meses usando Cals2Gains y es la primera app de nutrición que realmente uso a diario. La cámara IA acertó con mi plato de arroz con pollo a la primera — pesé después y solo tenía 15kcal de diferencia. El coaching semanal me cambió los macros cuando estanqué y volví a progresar. Antes tardaba 10 min por comida registrando a mano, ahora son 5 segundos con la foto.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">MR</div>
+                        <div class="testimonial-info">
+                            <h4 data-es="Marco R." data-en="Marco R.">Marco R.</h4>
+                            <p data-es="Crossfitter · Perdió 5kg en 3 meses" data-en="Crossfitter · Lost 5kg in 3 months">Crossfitter · Perdió 5kg en 3 meses</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text" data-es="Después de mi segundo embarazo probé de todo: apps caras, otras llenas de anuncios, algunas imposibles de usar sin pagar premium. Cals2Gains me convenció desde el día 1: sin anuncios, foto y listo. El coach IA me explicó por qué tenía que subir proteína y bajar carbos los días de descanso. En 4 meses perdí 8kg y gané definición. Mi marido ya se la ha descargado." data-en="After my second pregnancy I tried everything: expensive apps, others full of ads, some unusable without premium. Cals2Gains convinced me from day 1: no ads, just snap a photo. The AI coach explained why I needed more protein and fewer carbs on rest days. In 4 months I lost 8kg and gained definition. My husband already downloaded it.">Después de mi segundo embarazo probé de todo: apps caras, otras llenas de anuncios, algunas imposibles de usar sin pagar premium. Cals2Gains me convenció desde el día 1: sin anuncios, foto y listo. El coach IA me explicó por qué tenía que subir proteína y bajar carbos los días de descanso. En 4 meses perdí 8kg y gané definición. Mi marido ya se la ha descargado.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">LA</div>
+                        <div class="testimonial-info">
+                            <h4 data-es="Laura A." data-en="Laura A.">Laura A.</h4>
+                            <p data-es="Mamá fitness · Perdió 8kg en 4 meses" data-en="Fitness mom · Lost 8kg in 4 months">Mamá fitness · Perdió 8kg en 4 meses</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text" data-es="Como preparador físico, necesito precisión. He probado apps de macros que cuestan el doble y la función de TDEE adaptativo de Cals2Gains es igual de precisa. Pero lo que ninguna otra tiene es el escáner por foto IA — mis clientes lo usan y por fin registran sus comidas sin excusas. La función ¿Qué como? les sugiere exactamente qué comer para cerrar sus macros del día. Revolucionario." data-en="As a fitness coach, I need precision. I've tried macro apps that cost twice as much and Cals2Gains' adaptive TDEE is just as accurate. But what none of them have is the AI photo scanner — my clients use it and finally log meals without excuses. The food suggestion feature tells them exactly what to eat to hit their daily macros. Game changer.">Como preparador físico, necesito precisión. He probado apps de macros que cuestan el doble y la función de TDEE adaptativo de Cals2Gains es igual de precisa. Pero lo que ninguna otra tiene es el escáner por foto IA — mis clientes lo usan y por fin registran sus comidas sin excusas. La función ¿Qué como? les sugiere exactamente qué comer para cerrar sus macros del día. Revolucionario.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">DG</div>
+                        <div class="testimonial-info">
+                            <h4 data-es="Daniel G." data-en="Daniel G.">Daniel G.</h4>
+                            <p data-es="Preparador físico · 12 clientes usando C2G" data-en="Fitness coach · 12 clients using C2G">Preparador físico · 12 clientes usando C2G</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+        <h2 class="section-title" data-es="Preguntas frecuentes" data-en="Frequently Asked Questions">Preguntas frecuentes</h2>
+
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    <span data-es="¿Es precisa la IA para analizar mis comidas?" data-en="Is the AI accurate at analyzing my meals?">¿Es precisa la IA para analizar mis comidas?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-es="Sí. Utilizamos GPT-4o Vision, el modelo de IA más avanzado del mundo, que identifica alimentos, estima cantidades y calcula macros con una precisión del 85-95%. Puedes ajustar manualmente si lo deseas, y la IA aprende de tus correcciones." data-en="Yes. We use GPT-4o Vision, the world's most advanced AI model, which identifies foods, estimates portions, and calculates macros with 85-95% accuracy. You can adjust manually if needed, and the AI learns from your corrections.">Sí. Utilizamos GPT-4o Vision, el modelo de IA más avanzado del mundo, que identifica alimentos, estima cantidades y calcula macros con una precisión del 85-95%. Puedes ajustar manualmente si lo deseas, y la IA aprende de tus correcciones.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    <span data-es="¿Mis datos están seguros?" data-en="Is my data safe?">¿Mis datos están seguros?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-es="Absolutamente. Tus datos se almacenan en Firebase (Google Cloud) con cifrado de extremo a extremo. Cumplimos con RGPD. Nunca vendemos tus datos a terceros. Las fotos se procesan en tiempo real y no se almacenan en nuestros servidores de IA." data-en="Absolutely. Your data is stored on Firebase (Google Cloud) with end-to-end encryption. We are GDPR compliant. We never sell your data to third parties. Photos are processed in real-time and are not stored on our AI servers.">Absolutamente. Tus datos se almacenan en Firebase (Google Cloud) con cifrado de extremo a extremo. Cumplimos con RGPD. Nunca vendemos tus datos a terceros. Las fotos se procesan en tiempo real y no se almacenan en nuestros servidores de IA.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    <span data-es="¿Cuánto cuesta Premium?" data-en="How much does Premium cost?">¿Cuánto cuesta Premium?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-es="Premium cuesta 4,99€/mes o 39,99€/año (ahorra un 33%). Incluye 7 días de prueba gratuita. Puedes cancelar en cualquier momento desde la app. Sin compromisos, sin letra pequeña." data-en="Premium costs $4.99/month or $39.99/year (save 33%). Includes a 7-day free trial. Cancel anytime from the app. No commitments, no fine print.">Premium cuesta 4,99€/mes o 39,99€/año (ahorra un 33%). Incluye 7 días de prueba gratuita. Puedes cancelar en cualquier momento desde la app. Sin compromisos, sin letra pequeña.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    <span data-es="¿En qué se diferencia de otras apps de nutrición?" data-en="How is it different from other nutrition apps?">¿En qué se diferencia de otras apps de nutrición?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-es="La mayoría de apps de nutrición se basan en búsqueda manual de alimentos y bases de datos estáticas. Cals2Gains tiene IA real integrada: escaneo de platos por foto, coaching semanal personalizado con GPT-4o, sugerencias ¿Qué como? en tiempo real, y TDEE adaptativo. Además, somos 100% sin publicidad, incluso en la versión gratuita." data-en="Most nutrition apps rely on manual food search and static databases. Cals2Gains has real AI built in: photo meal scanning, weekly personalized coaching with GPT-4o, real-time food suggestions, and adaptive TDEE. Plus, we're 100% ad-free, even in the free version.">La mayoría de apps de nutrición se basan en búsqueda manual de alimentos y bases de datos estáticas. Cals2Gains tiene IA real integrada: escaneo de platos por foto, coaching semanal personalizado con GPT-4o, sugerencias ¿Qué como? en tiempo real, y TDEE adaptativo. Además, somos 100% sin publicidad, incluso en la versión gratuita.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    <span data-es="¿Funciona sin conexión a internet?" data-en="Does it work offline?">¿Funciona sin conexión a internet?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-es="Parcialmente. El registro manual, búsqueda de alimentos y escáner de código de barras funcionan offline. Las funciones de IA (foto, coaching, sugerencias) necesitan conexión porque procesan los datos en la nube para mayor precisión." data-en="Partially. Manual logging, food search, and barcode scanning work offline. AI features (photo, coaching, suggestions) need a connection as they process data in the cloud for better accuracy.">Parcialmente. El registro manual, búsqueda de alimentos y escáner de código de barras funcionan offline. Las funciones de IA (foto, coaching, sugerencias) necesitan conexión porque procesan los datos en la nube para mayor precisión.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    <span data-es="¿Puedo usarla si tengo restricciones alimentarias?" data-en="Can I use it with dietary restrictions?">¿Puedo usarla si tengo restricciones alimentarias?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p data-es="Sí. Puedes configurar tu objetivo (pérdida de grasa, ganancia muscular, mantenimiento, recomposición) y la IA se adapta. El coaching semanal tiene en cuenta tus preferencias, alergias y estilo de vida." data-en="Yes. You can set your goal (fat loss, muscle gain, maintenance, recomposition) and the AI adapts. Weekly coaching takes into account your preferences, allergies, and lifestyle.">Sí. Puedes configurar tu objetivo (pérdida de grasa, ganancia muscular, mantenimiento, recomposición) y la IA se adapta. El coaching semanal tiene en cuenta tus preferencias, alergias y estilo de vida.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="final-cta-content">
+            <h2 data-es="Tu nutrición merece IA de verdad." data-en="Your nutrition deserves real AI.">Tu nutrición merece IA de verdad.</h2>
+            <p data-es="Únete a miles de personas que ya comen mejor con menos esfuerzo. 7 días gratis, sin compromiso." data-en="Join thousands who already eat better with less effort. 7 days free, no commitment.">Únete a miles de personas que ya comen mejor con menos esfuerzo. 7 días gratis, sin compromiso.</p>
+
+            <div class="final-cta-buttons">
+                <button class="btn-primary" data-es="Descargar en Google Play" data-en="Download on Google Play">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.6915026,12.4744748 L3.50612381,13.2599618 L3.5 13.2599618 L9.45252842,20.0151496 L10.1992634,20.8006365 L10.8429026,20.0151496 L17.6915026,12.4744748 Z"/>
+                    </svg>
+                    <span data-es="Google Play" data-en="Google Play">Google Play</span>
+                </button>
+                <button class="btn-secondary" data-es="Descargar en App Store" data-en="Download on App Store">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.05 13.5c-.91 0-1.64 1.04-1.64 2.34s.73 2.34 1.64 2.34 1.65-1.04 1.65-2.34-.74-2.34-1.65-2.34zm0 3.74c-.55 0-1-.48-1-1.4s.45-1.4 1-1.4 1 .48 1 1.4-.45 1.4-1 1.4z"/>
+                    </svg>
+                    <span data-es="App Store" data-en="App Store">App Store</span>
+                </button>
+            </div>
+
+            <div class="final-cta-email">
+                📧 <span data-es="¿Preguntas?" data-en="Questions?">¿Preguntas?</span> <a href="mailto:info@cals2gains.com" style="color: var(--coral);">info@cals2gains.com</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="c2g-icon.png" alt="Cals2Gains">
+                    <div class="footer-logo-text">
+                        <span class="cals">Cals</span><span class="two">2</span><span class="gains">Gains</span>
+                    </div>
+                </div>
+                <p class="footer-copyright" data-es="© 2026 Civiltek Ingeniería SLU" data-en="© 2026 Civiltek Ingeniería SLU">© 2026 Civiltek Ingeniería SLU</p>
+            </div>
+
+            <div>
+                <div class="footer-section-title" data-es="Información" data-en="Information">Información</div>
+                <ul class="footer-links">
+                    <li><a href="#why" data-es="Por qué nosotros" data-en="Why Us">Por qué nosotros</a></li>
+                    <li><a href="#features" data-es="Funciones" data-en="Features">Funciones</a></li>
+                    <li><a href="#pricing" data-es="Precios" data-en="Pricing">Precios</a></li>
+                    <li><a href="#faq" data-es="FAQ" data-en="FAQ">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="footer-section-title" data-es="Legal" data-en="Legal">Legal</div>
+                <ul class="footer-links">
+                    <li><a href="/privacy.html" data-es="Privacidad" data-en="Privacy">Privacidad</a></li>
+                    <li><a href="/terms.html" data-es="Términos" data-en="Terms">Términos</a></li>
+                    <li><a href="https://instagram.com/cals2gains" target="_blank" data-es="Instagram" data-en="Instagram">Instagram</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="text-align: center; border-top: 1px solid rgba(156, 140, 255, 0.2); padding-top: 2rem; margin-top: 2rem;">
+            <p style="font-size: 0.85rem; color: rgba(247, 242, 234, 0.5);" data-es="Hecho con ❤️ para la nutrición real" data-en="Made with ❤️ for real nutrition">Hecho con ❤️ para la nutrición real</p>
+        </div>
+    </footer>
+
+    <script>
+        // Language Toggle
+        const langButtons = document.querySelectorAll('.lang-btn');
+        const translatableElements = document.querySelectorAll('[data-es][data-en]');
+        let currentLang = localStorage.getItem('c2g-lang') || 'es';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('c2g-lang', lang);
+
+            translatableElements.forEach(el => {
+                if (lang === 'en') {
+                    el.textContent = el.getAttribute('data-en');
+                } else {
+                    el.textContent = el.getAttribute('data-es');
+                }
+            });
+
+            langButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                }
+            });
+
+            document.documentElement.lang = lang;
+            document.title = lang === 'en' ? 'Cals2Gains — The only nutrition app with real AI' : 'Cals2Gains — La única app de nutrición con IA real';
+        }
+
+        langButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setLanguage(btn.getAttribute('data-lang'));
+            });
+        });
+
+        // Initialize language on load
+        setLanguage(currentLang);
+
+        // Mobile Menu Toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu when link is clicked
+        navLinks.addEventListener('click', () => {
+            navLinks.classList.remove('active');
+        });
+
+        // Scroll Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeUp 0.6s ease-out forwards';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.step, .feature-card, .price-card, .testimonial-card, .faq-item, .badge-item').forEach(el => {
+            el.style.opacity = '0';
+            observer.observe(el);
+        });
+
+        // Analytics Event Tracking
+        const ctaButtons = document.querySelectorAll('.btn-primary, .btn-secondary, .nav-cta');
+        ctaButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.gtag) {
+                    gtag('event', 'cta_click', {
+                        'button_text': btn.textContent.trim()
+                    });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+

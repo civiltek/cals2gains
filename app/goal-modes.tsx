@@ -15,7 +15,9 @@ import {
   Switch,
   ActivityIndicator,
 } from 'react-native';
-import { COLORS, BRAND_COLORS, BRAND_FONTS } from '../theme';
+import { useTranslation } from 'react-i18next';
+import { BRAND_COLORS, BRAND_FONTS } from '../theme';
+import { useColors } from '../store/themeStore';
 import { useUserStore } from '../store/userStore';
 import { AdaptiveMacroEngine, GoalMode } from '../services/adaptiveMacroEngine';
 import type { GoalModeConfig } from '../services/adaptiveMacroEngine';
@@ -27,9 +29,9 @@ import type { GoalModeConfig } from '../services/adaptiveMacroEngine';
 interface GoalModeOption {
   mode: GoalMode;
   emoji: string;
-  nameEs: string;
-  descriptionEs: string;
-  macroSummary: string;
+  nameKey: string;
+  descriptionKey: string;
+  macroSummaryKey: string;
 }
 
 interface CalculatedGoals {
@@ -47,44 +49,44 @@ const GOAL_MODES: GoalModeOption[] = [
   {
     mode: 'lose_fat',
     emoji: '🔥',
-    nameEs: 'Perder grasa',
-    descriptionEs: 'Déficit de 20% para pérdida rápida de grasa',
-    macroSummary: 'Alta proteína, carbos moderados',
+    nameKey: 'goalModes.loseFat',
+    descriptionKey: 'goalModes.loseFatDesc',
+    macroSummaryKey: 'goalModes.loseFatMacro',
   },
   {
     mode: 'gain_muscle',
     emoji: '💪',
-    nameEs: 'Ganar músculo',
-    descriptionEs: 'Superávit de 10% para ganancia limpia',
-    macroSummary: 'Alta proteína, carbos elevados',
+    nameKey: 'goalModes.gainMuscle',
+    descriptionKey: 'goalModes.gainMuscleDesc',
+    macroSummaryKey: 'goalModes.gainMuscleMacro',
   },
   {
     mode: 'recomp',
     emoji: '♻️',
-    nameEs: 'Recomposición',
-    descriptionEs: 'Mantener peso, ganar músculo y perder grasa',
-    macroSummary: 'Proteína muy alta, balance calórico',
+    nameKey: 'goalModes.recomp',
+    descriptionKey: 'goalModes.recompDesc',
+    macroSummaryKey: 'goalModes.recompMacro',
   },
   {
     mode: 'maintain',
     emoji: '⚖️',
-    nameEs: 'Mantenimiento',
-    descriptionEs: 'Mantener peso actual y rendimiento',
-    macroSummary: 'Proteína moderada, balance flexible',
+    nameKey: 'goalModes.maintain',
+    descriptionKey: 'goalModes.maintainDesc',
+    macroSummaryKey: 'goalModes.maintainMacro',
   },
   {
     mode: 'mini_cut',
     emoji: '✂️',
-    nameEs: 'Mini corte',
-    descriptionEs: 'Déficit de 25% por 4-6 semanas',
-    macroSummary: 'Proteína máxima, carbos mínimos',
+    nameKey: 'goalModes.miniCut',
+    descriptionKey: 'goalModes.miniCutDesc',
+    macroSummaryKey: 'goalModes.miniCutMacro',
   },
   {
     mode: 'lean_bulk',
     emoji: '📈',
-    nameEs: 'Lean bulk',
-    descriptionEs: 'Superávit de 5% para ganancia limpia',
-    macroSummary: 'Proteína alta, carbos altos',
+    nameKey: 'goalModes.leanBulk',
+    descriptionKey: 'goalModes.leanBulkDesc',
+    macroSummaryKey: 'goalModes.leanBulkMacro',
   },
 ];
 
@@ -99,6 +101,8 @@ interface GoalModesScreenProps {
 export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
   onGoalsUpdated,
 }) => {
+  const { t } = useTranslation();
+  const C = useColors();
   const {
     user,
     updateUserGoals,
@@ -215,7 +219,7 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
 
   const renderGoalModeCard = ({ item }: { item: GoalModeOption }) => {
     const isSelected = selectedMode === item.mode;
-    const borderColor = isSelected ? BRAND_COLORS.primary : COLORS.border;
+    const borderColor = isSelected ? C.primary : C.border;
     const borderWidth = isSelected ? 3 : 1;
 
     return (
@@ -225,16 +229,16 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
           {
             borderColor,
             borderWidth,
-            backgroundColor: isSelected ? COLORS.surfaceSelected : COLORS.surface,
+            backgroundColor: isSelected ? C.cardElevated : C.card,
           },
         ]}
         onPress={() => handleModeSelect(item.mode)}
         activeOpacity={0.7}
       >
         <Text style={styles.emoji}>{item.emoji}</Text>
-        <Text style={styles.modeName}>{item.nameEs}</Text>
-        <Text style={styles.modeDescription}>{item.descriptionEs}</Text>
-        <Text style={styles.macroSummary}>{item.macroSummary}</Text>
+        <Text style={[styles.modeName, { color: C.text }]}>{t(item.nameKey)}</Text>
+        <Text style={[styles.modeDescription, { color: C.textMuted }]}>{t(item.descriptionKey)}</Text>
+        <Text style={[styles.macroSummary, { color: C.primary }]}>{t(item.macroSummaryKey)}</Text>
       </TouchableOpacity>
     );
   };
@@ -250,15 +254,15 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: C.background }]}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.contentContainer}
     >
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Objetivo</Text>
-        <Text style={styles.headerSubtitle}>
-          Elige tu objetivo nutricional
+      <View style={[styles.header, { borderBottomColor: C.border }]}>
+        <Text style={[styles.headerTitle, { color: C.text }]}>{t('goalModes.title')}</Text>
+        <Text style={[styles.headerSubtitle, { color: C.textSecondary }]}>
+          {t('goalModes.subtitle')}
         </Text>
       </View>
 
@@ -278,55 +282,55 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
       {/* Mode Details & Macro Preview */}
       {modeConfig && calculatedGoals && (
         <View style={styles.previewSection}>
-          <Text style={styles.sectionTitle}>Tu plan personalizado</Text>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('goalModes.personalizedPlan')}</Text>
 
           {/* Goal Summary */}
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryTitle}>{modeConfig.description}</Text>
+          <View style={[styles.summaryCard, { backgroundColor: C.card, borderLeftColor: C.primary }]}>
+            <Text style={[styles.summaryTitle, { color: C.text }]}>{modeConfig.descriptionEs || modeConfig.description}</Text>
             {modeConfig.duration && (
-              <Text style={styles.summaryDuration}>
-                Duración recomendada: {modeConfig.duration}
+              <Text style={[styles.summaryDuration, { color: C.textSecondary }]}>
+                {t('goalModes.recommendedDuration', { duration: modeConfig.duration.replace('weeks', 'semanas') })}
               </Text>
             )}
           </View>
 
           {/* Macro Distribution Preview */}
-          <View style={styles.macroPreviewCard}>
-            <Text style={styles.macroPreviewTitle}>Distribución de macros</Text>
+          <View style={[styles.macroPreviewCard, { backgroundColor: C.card }]}>
+            <Text style={[styles.macroPreviewTitle, { color: C.text }]}>{t('goalModes.macroDistribution')}</Text>
 
             {/* Macro Bars */}
             <View style={styles.macroBarsContainer}>
-              <View style={styles.macroBar}>
+              <View style={[styles.macroBar, { backgroundColor: C.background }]}>
                 <View
                   style={[
                     styles.macroBarFill,
                     {
                       width: `${macroDistribution.proteinPct}%`,
-                      backgroundColor: BRAND_COLORS.primary,
+                      backgroundColor: C.primary,
                     },
                   ]}
                 />
               </View>
 
-              <View style={styles.macroBar}>
+              <View style={[styles.macroBar, { backgroundColor: C.background }]}>
                 <View
                   style={[
                     styles.macroBarFill,
                     {
                       width: `${macroDistribution.carbsPct}%`,
-                      backgroundColor: '#FFA500',
+                      backgroundColor: C.carbs,
                     },
                   ]}
                 />
               </View>
 
-              <View style={styles.macroBar}>
+              <View style={[styles.macroBar, { backgroundColor: C.background }]}>
                 <View
                   style={[
                     styles.macroBarFill,
                     {
                       width: `${macroDistribution.fatPct}%`,
-                      backgroundColor: '#FF6B6B',
+                      backgroundColor: C.fat,
                     },
                   ]}
                 />
@@ -335,38 +339,38 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
 
             {/* Macro Values */}
             <View style={styles.macroValuesGrid}>
-              <View style={styles.macroValue}>
-                <Text style={styles.macroLabel}>Calorías</Text>
-                <Text style={styles.macroNumber}>{calculatedGoals.calories}</Text>
-                <Text style={styles.macroUnit}>kcal/día</Text>
+              <View style={[styles.macroValue, { backgroundColor: C.background }]}>
+                <Text style={[styles.macroLabel, { color: C.textSecondary }]}>{t('goalModes.calories')}</Text>
+                <Text style={[styles.macroNumber, { color: C.text }]}>{calculatedGoals.calories}</Text>
+                <Text style={[styles.macroUnit, { color: C.textSecondary }]}>{t('goalModes.perDay')}</Text>
               </View>
 
-              <View style={styles.macroValue}>
-                <Text style={styles.macroLabel}>Proteína</Text>
-                <Text style={[styles.macroNumber, { color: BRAND_COLORS.primary }]}>
+              <View style={[styles.macroValue, { backgroundColor: C.background }]}>
+                <Text style={[styles.macroLabel, { color: C.textSecondary }]}>{t('goalModes.protein')}</Text>
+                <Text style={[styles.macroNumber, { color: C.primary }]}>
                   {calculatedGoals.protein}g
                 </Text>
-                <Text style={styles.macroUnit}>
+                <Text style={[styles.macroUnit, { color: C.textSecondary }]}>
                   {macroDistribution.proteinPct}%
                 </Text>
               </View>
 
-              <View style={styles.macroValue}>
-                <Text style={styles.macroLabel}>Carbohidratos</Text>
-                <Text style={[styles.macroNumber, { color: '#FFA500' }]}>
+              <View style={[styles.macroValue, { backgroundColor: C.background }]}>
+                <Text style={[styles.macroLabel, { color: C.textSecondary }]}>{t('goalModes.carbohydrates')}</Text>
+                <Text style={[styles.macroNumber, { color: C.carbs }]}>
                   {calculatedGoals.carbs}g
                 </Text>
-                <Text style={styles.macroUnit}>
+                <Text style={[styles.macroUnit, { color: C.textSecondary }]}>
                   {macroDistribution.carbsPct}%
                 </Text>
               </View>
 
-              <View style={styles.macroValue}>
-                <Text style={styles.macroLabel}>Grasas</Text>
-                <Text style={[styles.macroNumber, { color: '#FF6B6B' }]}>
+              <View style={[styles.macroValue, { backgroundColor: C.background }]}>
+                <Text style={[styles.macroLabel, { color: C.textSecondary }]}>{t('goalModes.fats')}</Text>
+                <Text style={[styles.macroNumber, { color: C.fat }]}>
                   {calculatedGoals.fat}g
                 </Text>
-                <Text style={styles.macroUnit}>
+                <Text style={[styles.macroUnit, { color: C.textSecondary }]}>
                   {macroDistribution.fatPct}%
                 </Text>
               </View>
@@ -374,21 +378,21 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
           </View>
 
           {/* Adaptive Mode Toggle */}
-          <View style={styles.adaptiveToggleCard}>
+          <View style={[styles.adaptiveToggleCard, { backgroundColor: C.card }]}>
             <View style={styles.adaptiveToggleContent}>
               <View>
-                <Text style={styles.adaptiveToggleTitle}>
-                  Ajuste adaptativo
+                <Text style={[styles.adaptiveToggleTitle, { color: C.text }]}>
+                  {t('goalModes.adaptiveAdjust')}
                 </Text>
-                <Text style={styles.adaptiveToggleDescription}>
-                  Ajusta automáticamente tus objetivos según tu progreso
+                <Text style={[styles.adaptiveToggleDescription, { color: C.textSecondary }]}>
+                  {t('goalModes.adaptiveDesc')}
                 </Text>
               </View>
               <Switch
                 value={adaptiveEnabled}
                 onValueChange={setAdaptiveEnabled}
-                trackColor={{ false: COLORS.border, true: BRAND_COLORS.primary }}
-                thumbColor={adaptiveEnabled ? BRAND_COLORS.accent : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: C.primary }}
+                thumbColor={adaptiveEnabled ? C.accent : C.textSecondary}
               />
             </View>
           </View>
@@ -397,6 +401,7 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
           <TouchableOpacity
             style={[
               styles.applyButton,
+              { backgroundColor: C.primary },
               loading && styles.applyButtonDisabled,
             ]}
             onPress={handleApplyGoals}
@@ -404,9 +409,9 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
             activeOpacity={0.8}
           >
             {loading ? (
-              <ActivityIndicator color={COLORS.white} size="small" />
+              <ActivityIndicator color={C.white} size="small" />
             ) : (
-              <Text style={styles.applyButtonText}>Aplicar objetivos</Text>
+              <Text style={[styles.applyButtonText, { color: C.white }]}>{t('goalModes.applyGoals')}</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -422,7 +427,6 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   contentContainer: {
     paddingBottom: 40,
@@ -431,19 +435,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 24,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
     marginBottom: 24,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.text,
     marginBottom: 8,
     fontFamily: BRAND_FONTS.bold,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: COLORS.textSecondary,
     fontFamily: BRAND_FONTS.regular,
   },
   gridContainer: {
@@ -462,7 +463,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 12,
     borderRadius: 12,
-    backgroundColor: COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -473,21 +473,18 @@ const styles = StyleSheet.create({
   modeName: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
     textAlign: 'center',
     marginBottom: 4,
     fontFamily: BRAND_FONTS.semibold,
   },
   modeDescription: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
+    fontSize: 13,
     textAlign: 'center',
     marginBottom: 8,
     fontFamily: BRAND_FONTS.regular,
   },
   macroSummary: {
     fontSize: 11,
-    color: BRAND_COLORS.primary,
     textAlign: 'center',
     fontFamily: BRAND_FONTS.regular,
   },
@@ -497,32 +494,26 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
     marginBottom: 12,
     fontFamily: BRAND_FONTS.semibold,
   },
   summaryCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderLeftWidth: 4,
-    borderLeftColor: BRAND_COLORS.primary,
   },
   summaryTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
     marginBottom: 4,
     fontFamily: BRAND_FONTS.semibold,
   },
   summaryDuration: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     fontFamily: BRAND_FONTS.regular,
   },
   macroPreviewCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -530,7 +521,6 @@ const styles = StyleSheet.create({
   macroPreviewTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
     marginBottom: 16,
     fontFamily: BRAND_FONTS.semibold,
   },
@@ -540,7 +530,6 @@ const styles = StyleSheet.create({
   },
   macroBar: {
     height: 24,
-    backgroundColor: COLORS.background,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -555,31 +544,26 @@ const styles = StyleSheet.create({
   },
   macroValue: {
     flex: 0.48,
-    backgroundColor: COLORS.background,
     borderRadius: 8,
     padding: 12,
     alignItems: 'center',
   },
   macroLabel: {
     fontSize: 11,
-    color: COLORS.textSecondary,
     marginBottom: 4,
     fontFamily: BRAND_FONTS.regular,
   },
   macroNumber: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
     fontFamily: BRAND_FONTS.bold,
   },
   macroUnit: {
     fontSize: 10,
-    color: COLORS.textSecondary,
     marginTop: 2,
     fontFamily: BRAND_FONTS.regular,
   },
   adaptiveToggleCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -592,17 +576,14 @@ const styles = StyleSheet.create({
   adaptiveToggleTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
     marginBottom: 4,
     fontFamily: BRAND_FONTS.semibold,
   },
   adaptiveToggleDescription: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     fontFamily: BRAND_FONTS.regular,
   },
   applyButton: {
-    backgroundColor: BRAND_COLORS.primary,
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 20,
@@ -615,7 +596,6 @@ const styles = StyleSheet.create({
   applyButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.white,
     fontFamily: BRAND_FONTS.semibold,
   },
 });

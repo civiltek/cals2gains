@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cals2Gains — Growth & Marketing Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+    <script src="c2g_metrics.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+        :root {
+            --signal-violet: #9C8CFF;
+            --signal-coral: #FF6A4D;
+            --carbon-plum: #17121D;
+            --bone: #F7F2EA;
+            --deep-dark: #0D0B1A;
+            --card-bg: #1E1829;
+            --card-border: #2A2236;
+            --text-primary: #F7F2EA;
+            --text-secondary: #9E95A9;
+            --text-muted: #6B6278;
+            --positive: #4ADE80;
+            --negative: #F87171;
+            --warning: #FBBF24;
+            --neutral: #9E95A9;
+            --gap: 16px;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--deep-dark);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: var(--gap);
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--carbon-plum) 0%, #241C30 100%);
+            border: 1px solid var(--card-border);
+            padding: 24px 28px;
+            border-radius: var(--radius);
+            margin-bottom: var(--gap);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 16px; }
+
+        .logo-mark {
+            width: 40px; height: 40px;
+            background: conic-gradient(var(--signal-violet) 0deg, #B8AAFF 120deg, var(--signal-violet) 240deg, transparent 240deg, transparent 360deg);
+            border-radius: 50%;
+            position: relative;
+        }
+        .logo-mark::after {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px;
+            width: 20px; height: 20px;
+            background: var(--carbon-plum);
+            border-radius: 50%;
+        }
+
+        .header-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--signal-violet);
+        }
+        .header-title span { color: var(--signal-coral); font-size: 18px; }
+        .header-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+        .phase-badge {
+            background: rgba(156, 140, 255, 0.15);
+            color: var(--signal-violet);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(156, 140, 255, 0.3);
+        }
+
+        .date-display {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Navigation tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: var(--gap);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 4px;
+            border: 1px solid var(--card-border);
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+        .nav-tab:hover { color: var(--text-primary); background: rgba(156, 140, 255, 0.1); }
+        .nav-tab.active {
+            background: var(--signal-violet);
+            color: var(--deep-dark);
+        }
+
+        /* Tab content */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* KPI row */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            transition: border-color 0.2s;
+        }
+        .kpi-card:hover { border-color: var(--signal-violet); }
+
+        .kpi-icon {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        .kpi-icon.violet { background: rgba(156, 140, 255, 0.15); }
+        .kpi-icon.coral { background: rgba(255, 106, 77, 0.15); }
+        .kpi-icon.green { background: rgba(74, 222, 128, 0.15); }
+        .kpi-icon.yellow { background: rgba(251, 191, 36, 0.15); }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .kpi-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .kpi-change.positive { color: var(--positive); }
+        .kpi-change.negative { color: var(--negative); }
+        .kpi-change.neutral { color: var(--neutral); }
+
+        .kpi-target {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Chart containers */
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .chart-container canvas { max-height: 280px; }
+
+        /* Full width chart */
+        .chart-full { grid-column: 1 / -1; }
+
+        /* Data table */
+        .table-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            overflow-x: auto;
+            margin-bottom: var(--gap);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .table-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table thead th {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+        .data-table thead th:hover { color: var(--signal-violet); }
+
+        .data-table tbody td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(42, 34, 54, 0.5);
+            color: var(--text-primary);
+        }
+        .data-table tbody tr:hover { background: rgba(156, 140, 255, 0.05); }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-dot.green { background: var(--positive); }
+        .status-dot.yellow { background: var(--warning); }
+        .status-dot.red { background: var(--negative); }
+        .status-dot.gray { background: var(--neutral); }
+
+        /* Progress bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(156, 140, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        .progress-bar .fill.violet { background: var(--signal-violet); }
+        .progress-bar .fill.coral { background: var(--signal-coral); }
+        .progress-bar .fill.green { background: var(--positive); }
+
+        /* Section title */
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--signal-violet);
+            margin-bottom: var(--gap);
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        /* Checklist */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(42, 34, 54, 0.5);
+            font-size: 13px;
+        }
+        .checklist-item:last-child { border-bottom: none; }
+
+        .check-icon {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+        .check-icon.done { background: var(--positive); color: var(--deep-dark); }
+        .check-icon.pending { background: var(--card-border); color: var(--text-muted); }
+        .check-icon.wip { background: var(--warning); color: var(--deep-dark); }
+
+        /* Input mode for editable data */
+        .editable-value {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            width: 120px;
+            padding: 2px 4px;
+            transition: border-color 0.2s;
+        }
+        .editable-value:hover { border-color: var(--card-border); }
+        .editable-value:focus {
+            outline: none;
+            border-color: var(--signal-violet);
+            background: rgba(156, 140, 255, 0.05);
+        }
+
+        .edit-hint {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Footer */
+        .dashboard-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .dashboard-footer a { color: var(--signal-violet); text-decoration: none; }
+
+        /* Alert box */
+        .alert-box {
+            background: rgba(156, 140, 255, 0.08);
+            border: 1px solid rgba(156, 140, 255, 0.2);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: var(--gap);
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .alert-box .alert-icon { font-size: 16px; flex-shrink: 0; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-header { flex-direction: column; align-items: flex-start; }
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            .chart-row { grid-template-columns: 1fr; }
+            .nav-tabs { overflow-x: auto; }
+        }
+
+        @media print {
+            body { background: white; color: #212529; }
+            .nav-tabs { display: none; }
+            .tab-content { display: block !important; page-break-inside: avoid; }
+            .kpi-card, .chart-container, .table-section { border: 1px solid #dee2e6; box-shadow: none; background: white; }
+            .dashboard-header { background: #212529 !important; }
+        }
+
+        /* Tooltip */
+        .info-tip {
+            position: relative;
+            display: inline-flex;
+            cursor: help;
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-left: 4px;
+        }
+        .info-tip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--carbon-plum);
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 10;
+            border: 1px solid var(--card-border);
+        }
+
+        /* Editable table cell */
+        .editable-cell {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+            padding: 2px 4px;
+            width: 80px;
+            border-radius: 4px;
+        }
+        .editable-cell:hover { border-color: var(--card-border); }
+        .editable-cell:focus { outline: none; border-color: var(--signal-violet); background: rgba(156, 140, 255, 0.05); }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <div class="logo-mark"></div>
+                <div>
+                    <div class="header-title">Cals<span>2</span>Gains — Growth Dashboard</div>
+                    <div class="header-subtitle">Control de crecimiento y campañas de marketing</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="phase-badge">Pre-Lanzamiento</div>
+                <div class="date-display" id="current-date"></div>
+                <div class="date-display" id="last-updated" style="font-size:11px;color:var(--text-muted);"></div>
+            </div>
+        </header>
+
+        <!-- NAVIGATION -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('overview')">Resumen</button>
+            <button class="nav-tab" onclick="switchTab('prelaunch')">Pre-Lanzamiento</button>
+            <button class="nav-tab" onclick="switchTab('marketing')">Marketing</button>
+            <button class="nav-tab" onclick="switchTab('product')">Producto</button>
+            <button class="nav-tab" onclick="switchTab('revenue')">Revenue</button>
+            <button class="nav-tab" onclick="switchTab('okrs')">OKRs Q2 2026</button>
+        </div>
+
+        <!-- ============ TAB: RESUMEN ============ -->
+        <div class="tab-content active" id="tab-overview">
+            <div class="alert-box">
+                <span class="alert-icon">💡</span>
+                <div>
+                    <strong>Dashboard interactivo</strong> — Haz clic en los valores de los KPIs para editarlos directamente.
+                    Los datos se guardan automáticamente en tu navegador mientras la pestaña esté abierta.
+                    Para empezar, actualiza los números cada semana con tus datos reales.
+                </div>
+            </div>
+
+            <div class="section-title">North Star Metric</div>
+            <div class="kpi-row" style="grid-template-columns: 1fr;">
+                <div class="kpi-card" style="text-align:center; border-color: var(--signal-violet);">
+                    <div class="kpi-label">Usuarios en lista de espera + seguidores IG totales</div>
+                    <div class="kpi-value" id="ns-value" style="font-size:42px; color: var(--signal-violet);">0</div>
+                    <div class="kpi-target">Objetivo pre-lanzamiento: 1.000 antes de publicar en stores</div>
+                </div>
+            </div>
+
+            <div class="section-title">KPIs principales — Semana actual</div>
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon violet">📱</div>
+                    <div class="kpi-label">Seguidores IG (total)</div>
+                    <div class="kpi-value" id="kpi-ig-total">0</div>
+                    <div class="kpi-change neutral" id="kpi-ig-total-change">—</div>
+                    <div class="kpi-target">@cals2gains + @cals2gains_es</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon coral">🌐</div>
+                    <div class="kpi-label">Visitas landing / semana</div>
+                    <div class="kpi-value" id="kpi-landing">0</div>
+                    <div class="kpi-change neutral" id="kpi-landing-change">—</div>
+                    <div class="kpi-target">cals2gains.com</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">📋</div>
+                    <div class="kpi-label">Lista de espera</div>
+                    <div class="kpi-value" id="kpi-waitlist">0</div>
+                    <div class="kpi-change neutral" id="kpi-waitlist-change">—</div>
+                    <div class="kpi-target">Emails registrados</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon yellow">🎬</div>
+                    <div class="kpi-label">Reels publicados</div>
+                    <div class="kpi-value" id="kpi-reels">0</div>
+                    <div class="kpi-change neutral" id="kpi-reels-change">—</div>
+                    <div class="kpi-target">Total acumulado</div>
+                </div>
+            </div>
+
+            <!-- Overview Charts -->
+            <div class="chart-row">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Crecimiento de audiencia (semanal)</div>
+                            <div class="chart-subtitle">Seguidores IG + lista de espera acumulados</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-audience-growth"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Engagement rate Instagram</div>
+                            <div class="chart-subtitle">(Likes + comentarios + guardados) / alcance</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-engagement"></canvas>
+                </div>
+            </div>
+
+            <!-- Readiness checklist -->
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="table-title">Checklist de Lanzamiento</div>
+                    <div style="font-size:12px; color: var(--text-muted);" id="checklist-progress"></div>
+                </div>
+                <div id="launch-checklist"></div>
+            </div>
+        </div>
+
+        <!-- ============ TAB: PRE-LANZAMIENTO ============ -->
+        <div class="tab-content" id="tab-prelaunch">
+            <div class="section-title">Métricas de Pre-Lanzamiento</div>
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon violet">📸</div>
+                    <div class="kpi-label">@cals2gains (EN)</div>
+                    <div class="kpi-value" id="kpi-ig-en">0</div>
+                    <div class="kpi-change neutral" id="kpi-ig-en-change">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon coral">📸</div>
+                    <div class="kpi-label">@cals2gains_es (ES)</div>
+                    <div class="kpi-value" id="kpi-ig-es">0</div>
+                    <div class="kpi-change neutral" id="kpi-ig-es-change">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">🔗</div>
+                    <div class="kpi-label">Clics en bio link</div>
+                    <div class="kpi-value" id="kpi-bio-clicks">0</div>
+                    <div class="kpi-change neutral" id="kpi-bio-clicks-change">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon yellow">💬</div>
+                    <div class="kpi-label">Comentarios influencers / día</div>
+                    <div class="kpi-value" id="kpi-comments-day">0</div>
+                    <div class="kpi-target">Objetivo: 90/día (3 perfiles × 30)</div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Crecimiento semanal de seguidores</div>
+                            <div class="chart-subtitle">Nuevos seguidores por semana, por cuenta</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-followers-weekly"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Fuentes de tráfico a landing</div>
+                            <div class="chart-subtitle">De dónde vienen las visitas a cals2gains.com</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-traffic-sources"></canvas>
+                </div>
+            </div>
+
+            <!-- Weekly data entry table -->
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="table-title">Registro semanal de métricas</div>
+                    <div>
+                        <button onclick="addWeekRow()" style="background: var(--signal-violet); color: var(--deep-dark); border:none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">+ Añadir semana</button>
+                    </div>
+                </div>
+                <table class="data-table" id="weekly-table">
+                    <thead>
+                        <tr>
+                            <th>Semana</th>
+                            <th>Seg. EN</th>
+                            <th>Seg. ES</th>
+                            <th>Visitas web</th>
+                            <th>Lista espera</th>
+                            <th>Reels pub.</th>
+                            <th>Eng. rate %</th>
+                            <th>Comentarios inf.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="weekly-tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============ TAB: MARKETING ============ -->
+        <div class="tab-content" id="tab-marketing">
+            <div class="section-title">Métricas de Marketing</div>
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon violet">📊</div>
+                    <div class="kpi-label">Alcance total / semana</div>
+                    <div class="kpi-value" id="kpi-reach">0</div>
+                    <div class="kpi-change neutral" id="kpi-reach-change">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon coral">❤️</div>
+                    <div class="kpi-label">Engagement rate medio</div>
+                    <div class="kpi-value" id="kpi-eng-rate">0%</div>
+                    <div class="kpi-change neutral" id="kpi-eng-rate-change">—</div>
+                    <div class="kpi-target">Objetivo: >5%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">🔄</div>
+                    <div class="kpi-label">Ratio visitas → waitlist</div>
+                    <div class="kpi-value" id="kpi-conv-rate">0%</div>
+                    <div class="kpi-change neutral" id="kpi-conv-rate-change">—</div>
+                    <div class="kpi-target">Objetivo: >10%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon yellow">💰</div>
+                    <div class="kpi-label">Coste marketing / mes</div>
+                    <div class="kpi-value" id="kpi-mkt-cost">0€</div>
+                    <div class="kpi-change neutral" id="kpi-mkt-cost-change">—</div>
+                    <div class="kpi-target">Orgánico por ahora</div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Rendimiento de contenido por tipo</div>
+                            <div class="chart-subtitle">Engagement medio por tipo de Reel</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-content-performance"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Funnel de conversión</div>
+                            <div class="chart-subtitle">De alcance a registro en lista de espera</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-funnel"></canvas>
+                </div>
+            </div>
+
+            <!-- Content tracking table -->
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="table-title">Tracking de contenido publicado</div>
+                    <div>
+                        <button onclick="addContentRow()" style="background: var(--signal-coral); color: white; border:none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">+ Añadir contenido</button>
+                    </div>
+                </div>
+                <table class="data-table" id="content-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cuenta</th>
+                            <th>Tipo</th>
+                            <th>Tema</th>
+                            <th>Alcance</th>
+                            <th>Likes</th>
+                            <th>Comentarios</th>
+                            <th>Guardados</th>
+                            <th>Compartidos</th>
+                            <th>Eng. %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="content-tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Ads preparation section -->
+            <div class="section-title" style="margin-top: 24px;">Preparación para Ads (futuro)</div>
+            <div class="kpi-row">
+                <div class="kpi-card" style="opacity: 0.5;">
+                    <div class="kpi-icon violet">🎯</div>
+                    <div class="kpi-label">CPI (Coste por instalación)</div>
+                    <div class="kpi-value">—</div>
+                    <div class="kpi-target">Se activará con campañas pagadas</div>
+                </div>
+                <div class="kpi-card" style="opacity: 0.5;">
+                    <div class="kpi-icon coral">📈</div>
+                    <div class="kpi-label">ROAS</div>
+                    <div class="kpi-value">—</div>
+                    <div class="kpi-target">Return on Ad Spend</div>
+                </div>
+                <div class="kpi-card" style="opacity: 0.5;">
+                    <div class="kpi-icon green">🧲</div>
+                    <div class="kpi-label">CAC</div>
+                    <div class="kpi-value">—</div>
+                    <div class="kpi-target">Objetivo: <3€</div>
+                </div>
+                <div class="kpi-card" style="opacity: 0.5;">
+                    <div class="kpi-icon yellow">📊</div>
+                    <div class="kpi-label">Orgánico vs Pagado</div>
+                    <div class="kpi-value">—</div>
+                    <div class="kpi-target">Mix de descargas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ TAB: PRODUCTO ============ -->
+        <div class="tab-content" id="tab-product">
+            <div class="alert-box">
+                <span class="alert-icon">🚀</span>
+                <div>
+                    <strong>Estas métricas se activarán tras el lanzamiento.</strong> La estructura ya está preparada para que empieces
+                    a registrar datos desde el primer día en las stores.
+                </div>
+            </div>
+
+            <div class="section-title">Métricas de Producto (post-lanzamiento)</div>
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon violet">⬇️</div>
+                    <div class="kpi-label">Descargas totales</div>
+                    <div class="kpi-value" id="kpi-downloads">0</div>
+                    <div class="kpi-change neutral" id="kpi-downloads-change">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon coral">✅</div>
+                    <div class="kpi-label">Tasa de activación</div>
+                    <div class="kpi-value" id="kpi-activation">0%</div>
+                    <div class="kpi-change neutral" id="kpi-activation-change">—</div>
+                    <div class="kpi-target">% completa onboarding + 1ª comida</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">📅</div>
+                    <div class="kpi-label">DAU / MAU</div>
+                    <div class="kpi-value" id="kpi-dau-mau">0%</div>
+                    <div class="kpi-change neutral" id="kpi-dau-mau-change">—</div>
+                    <div class="kpi-target">Objetivo: >25%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon yellow">🔁</div>
+                    <div class="kpi-label">Retención D7</div>
+                    <div class="kpi-value" id="kpi-d7">0%</div>
+                    <div class="kpi-change neutral" id="kpi-d7-change">—</div>
+                    <div class="kpi-target">Objetivo: >40%</div>
+                </div>
+            </div>
+
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon violet">📷</div>
+                    <div class="kpi-label">Fotos analizadas / día</div>
+                    <div class="kpi-value" id="kpi-photos">0</div>
+                    <div class="kpi-change neutral">Feature estrella</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon coral">🍽️</div>
+                    <div class="kpi-label">Comidas / usuario / día</div>
+                    <div class="kpi-value" id="kpi-meals">0</div>
+                    <div class="kpi-change neutral">Objetivo: >2.5</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">⏱️</div>
+                    <div class="kpi-label">Tiempo medio registro</div>
+                    <div class="kpi-value" id="kpi-log-time">0s</div>
+                    <div class="kpi-change neutral">Objetivo: <15s con foto</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon yellow">⭐</div>
+                    <div class="kpi-label">Rating stores</div>
+                    <div class="kpi-value" id="kpi-rating">—</div>
+                    <div class="kpi-change neutral">Objetivo: >4.5</div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Descargas diarias</div>
+                            <div class="chart-subtitle">iOS + Android</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-downloads"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Retención por cohorte</div>
+                            <div class="chart-subtitle">D1, D7, D30 por semana de registro</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-retention"></canvas>
+                </div>
+            </div>
+
+            <!-- ASO metrics -->
+            <div class="section-title" style="margin-top: 24px;">ASO — App Store Optimization</div>
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon violet">🍎</div>
+                    <div class="kpi-label">Ranking iOS (Salud/Fitness)</div>
+                    <div class="kpi-value" id="kpi-rank-ios">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">🤖</div>
+                    <div class="kpi-label">Ranking Android (Salud/Fitness)</div>
+                    <div class="kpi-value" id="kpi-rank-android">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon coral">🔍</div>
+                    <div class="kpi-label">Impresiones en búsqueda</div>
+                    <div class="kpi-value" id="kpi-search-imp">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon yellow">📋</div>
+                    <div class="kpi-label">Tasa impresión → descarga</div>
+                    <div class="kpi-value" id="kpi-imp-conv">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ TAB: REVENUE ============ -->
+        <div class="tab-content" id="tab-revenue">
+            <div class="alert-box">
+                <span class="alert-icon">💎</span>
+                <div>
+                    <strong>Revenue se activará con el lanzamiento premium.</strong> Estas métricas se alimentarán
+                    de RevenueCat y las stores. La estructura ya está lista.
+                </div>
+            </div>
+
+            <div class="section-title">Métricas de Revenue (post-lanzamiento)</div>
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon violet">💰</div>
+                    <div class="kpi-label">MRR</div>
+                    <div class="kpi-value" id="kpi-mrr">0€</div>
+                    <div class="kpi-change neutral" id="kpi-mrr-change">Monthly Recurring Revenue</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon coral">💳</div>
+                    <div class="kpi-label">Conversión Free → Premium</div>
+                    <div class="kpi-value" id="kpi-conv-premium">0%</div>
+                    <div class="kpi-change neutral" id="kpi-conv-premium-change">—</div>
+                    <div class="kpi-target">Objetivo: >5%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">👤</div>
+                    <div class="kpi-label">ARPU</div>
+                    <div class="kpi-value" id="kpi-arpu">0€</div>
+                    <div class="kpi-change neutral">Avg Revenue Per User</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon yellow">📉</div>
+                    <div class="kpi-label">Churn rate mensual</div>
+                    <div class="kpi-value" id="kpi-churn">0%</div>
+                    <div class="kpi-change neutral" id="kpi-churn-change">—</div>
+                    <div class="kpi-target">Objetivo: <5%</div>
+                </div>
+            </div>
+
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon violet">🏷️</div>
+                    <div class="kpi-label">LTV</div>
+                    <div class="kpi-value" id="kpi-ltv">0€</div>
+                    <div class="kpi-change neutral">Lifetime Value</div>
+                    <div class="kpi-target">Objetivo: >30€</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon coral">⚖️</div>
+                    <div class="kpi-label">LTV / CAC</div>
+                    <div class="kpi-value" id="kpi-ltv-cac">—</div>
+                    <div class="kpi-change neutral">Objetivo: >10x (orgánico)</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">📊</div>
+                    <div class="kpi-label">Suscriptores activos</div>
+                    <div class="kpi-value" id="kpi-subs">0</div>
+                    <div class="kpi-change neutral" id="kpi-subs-change">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon yellow">🔄</div>
+                    <div class="kpi-label">Trial → Paid</div>
+                    <div class="kpi-value" id="kpi-trial-paid">0%</div>
+                    <div class="kpi-change neutral">7 días trial gratis</div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">MRR mensual</div>
+                            <div class="chart-subtitle">Evolución de ingresos recurrentes</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-mrr"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Distribución de planes</div>
+                            <div class="chart-subtitle">Free vs Mensual vs Anual</div>
+                        </div>
+                    </div>
+                    <canvas id="chart-plans"></canvas>
+                </div>
+            </div>
+
+            <!-- Unit economics -->
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="table-title">Unit Economics</div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Métrica</th>
+                            <th>Valor actual</th>
+                            <th>Objetivo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Coste API OpenAI / análisis de foto</td>
+                            <td>~0,02€</td>
+                            <td><0,03€</td>
+                            <td><span class="status-dot green"></span>OK</td>
+                        </tr>
+                        <tr>
+                            <td>Coste Firebase / usuario / mes</td>
+                            <td>~0€ (Spark)</td>
+                            <td>Escalar a Blaze cuando necesario</td>
+                            <td><span class="status-dot green"></span>OK</td>
+                        </tr>
+                        <tr>
+                            <td>Comisión Apple/Google</td>
+                            <td>15% (small business)</td>
+                            <td>15%</td>
+                            <td><span class="status-dot green"></span>OK</td>
+                        </tr>
+                        <tr>
+                            <td>CAC objetivo</td>
+                            <td>—</td>
+                            <td><3€</td>
+                            <td><span class="status-dot gray"></span>Pendiente</td>
+                        </tr>
+                        <tr>
+                            <td>LTV objetivo</td>
+                            <td>—</td>
+                            <td>>30€</td>
+                            <td><span class="status-dot gray"></span>Pendiente</td>
+                        </tr>
+                        <tr>
+                            <td>LTV/CAC ratio</td>
+                            <td>—</td>
+                            <td>>10x (orgánico)</td>
+                            <td><span class="status-dot gray"></span>Pendiente</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============ TAB: OKRs ============ -->
+        <div class="tab-content" id="tab-okrs">
+            <div class="section-title">OKRs Q2 2026 — Pre-Lanzamiento → Lanzamiento</div>
+
+            <!-- OKR 1 -->
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="table-title" style="color: var(--signal-violet);">O1: Lanzar Cals2Gains en ambas stores con una base de early adopters lista</div>
+                </div>
+                <div id="okr1-items">
+                    <div class="checklist-item">
+                        <div class="check-icon wip">⏳</div>
+                        <div style="flex:1">
+                            <div><strong>KR1:</strong> App publicada en App Store y Google Play antes del 30 de junio</div>
+                            <div class="progress-bar" style="margin-top:6px; width:200px;">
+                                <div class="fill violet" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color: var(--text-muted);">0%</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="check-icon pending">○</div>
+                        <div style="flex:1">
+                            <div><strong>KR2:</strong> 500+ usuarios en lista de espera antes del lanzamiento</div>
+                            <div class="progress-bar" style="margin-top:6px; width:200px;">
+                                <div class="fill coral" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color: var(--text-muted);">0/500</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="check-icon pending">○</div>
+                        <div style="flex:1">
+                            <div><strong>KR3:</strong> 1.000+ seguidores combinados en Instagram antes del lanzamiento</div>
+                            <div class="progress-bar" style="margin-top:6px; width:200px;">
+                                <div class="fill green" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color: var(--text-muted);">0/1.000</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OKR 2 -->
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="table-title" style="color: var(--signal-coral);">O2: Construir una presencia de marca reconocible en el nicho fitness/nutrición</div>
+                </div>
+                <div>
+                    <div class="checklist-item">
+                        <div class="check-icon pending">○</div>
+                        <div style="flex:1">
+                            <div><strong>KR1:</strong> 10 Reels publicados (5 EN + 5 ES) con engagement rate >5%</div>
+                            <div class="progress-bar" style="margin-top:6px; width:200px;">
+                                <div class="fill violet" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color: var(--text-muted);">0/10</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="check-icon pending">○</div>
+                        <div style="flex:1">
+                            <div><strong>KR2:</strong> 2.000+ comentarios de valor en posts de influencers (acumulado Q2)</div>
+                            <div class="progress-bar" style="margin-top:6px; width:200px;">
+                                <div class="fill coral" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color: var(--text-muted);">0/2.000</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="check-icon pending">○</div>
+                        <div style="flex:1">
+                            <div><strong>KR3:</strong> Landing page con tasa de conversión visita→registro >10%</div>
+                            <div class="progress-bar" style="margin-top:6px; width:200px;">
+                                <div class="fill green" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color: var(--text-muted);">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OKR 3 -->
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="table-title" style="color: var(--positive);">O3: Validar product-market fit en las primeras semanas post-lanzamiento</div>
+                </div>
+                <div>
+                    <div class="checklist-item">
+                        <div class="check-icon pending">○</div>
+                        <div style="flex:1">
+                            <div><strong>KR1:</strong> 500 descargas en los primeros 14 días</div>
+                            <div class="progress-bar" style="margin-top:6px; width:200px;">
+                                <div class="fill violet" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color: var(--text-muted);">0/500</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="check-icon pending">○</div>
+                        <div style="flex:1">
+                            <div><strong>KR2:</strong> Retención D7 >40% en la primera cohorte</div>
+                            <div class="progress-bar" style="margin-top:6px; width:200px;">
+                                <div class="fill coral" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color: var(--text-muted);">0%</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="check-icon pending">○</div>
+                        <div style="flex:1">
+                            <div><strong>KR3:</strong> Rating medio >4.5 estrellas en stores</div>
+                            <div class="progress-bar" style="margin-top:6px; width:200px;">
+                                <div class="fill green" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color: var(--text-muted);">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="dashboard-footer">
+            <div>Cals<span style="color: var(--signal-coral);">2</span>Gains Growth Dashboard — Civiltek Ingeniería SLU</div>
+            <div style="margin-top:4px;">Actualiza los datos semanalmente para mantener el control del crecimiento</div>
+        </footer>
+    </div>
+
+    <script>
+        // ==================== DATA STORE ====================
+        const STORE_KEY = 'c2g_dashboard_data';
+
+        // Data loaded from external c2g_metrics.js (auto-updated weekly)
+        const defaultData = (typeof C2G_METRICS !== 'undefined') ? {
+            weeklyMetrics: C2G_METRICS.weeklyMetrics,
+            contentLog: C2G_METRICS.contentLog,
+            kpis: C2G_METRICS.kpis,
+            checklist: C2G_METRICS.checklist,
+            gaWeekly: C2G_METRICS.gaWeekly || [],
+            igDetailed: C2G_METRICS.igDetailed || {},
+            lastUpdated: C2G_METRICS.lastUpdated || null
+        } : {
+            weeklyMetrics: [], contentLog: [], kpis: {},
+            checklist: {}, gaWeekly: [], igDetailed: {}, lastUpdated: null
+        };
+
+        // Always load fresh from C2G_METRICS (updated weekly by scheduled task)
+        let dashData = JSON.parse(JSON.stringify(defaultData));
+
+        function saveData() {
+            // Data persists in c2g_metrics.js, no sessionStorage needed
+        }
+
+        // ==================== NAVIGATION ====================
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ==================== DATE ====================
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        if (dashData.lastUpdated) {
+            const lu = new Date(dashData.lastUpdated);
+            document.getElementById('last-updated').textContent = 'Datos: ' + lu.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        // ==================== CHECKLIST ====================
+        function renderChecklist() {
+            const container = document.getElementById('launch-checklist');
+            let html = '';
+            let done = 0, total = 0;
+
+            for (const [item, status] of Object.entries(dashData.checklist)) {
+                total++;
+                if (status === 'done') done++;
+
+                const iconClass = status === 'done' ? 'done' : status === 'wip' ? 'wip' : 'pending';
+                const iconChar = status === 'done' ? '✓' : status === 'wip' ? '⏳' : '○';
+
+                html += `
+                    <div class="checklist-item" onclick="toggleChecklistItem(this, '${item.replace(/'/g, "\\'")}')" style="cursor:pointer;">
+                        <div class="check-icon ${iconClass}">${iconChar}</div>
+                        <div style="flex:1; ${status === 'done' ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${item}</div>
+                        <div style="font-size:11px; color: var(--text-muted);">${status === 'done' ? 'Hecho' : status === 'wip' ? 'En curso' : 'Pendiente'}</div>
+                    </div>`;
+            }
+            container.innerHTML = html;
+            document.getElementById('checklist-progress').textContent = `${done}/${total} completados (${Math.round(done/total*100)}%)`;
+        }
+
+        function toggleChecklistItem(el, item) {
+            const states = ['pending', 'wip', 'done'];
+            const current = dashData.checklist[item];
+            const next = states[(states.indexOf(current) + 1) % 3];
+            dashData.checklist[item] = next;
+            saveData();
+            renderChecklist();
+        }
+
+        // ==================== WEEKLY TABLE ====================
+        function renderWeeklyTable() {
+            const tbody = document.getElementById('weekly-tbody');
+            let html = '';
+            dashData.weeklyMetrics.forEach((row, i) => {
+                html += `<tr>
+                    <td>${row.week}</td>
+                    <td><input class="editable-cell" type="number" value="${row.igEN}" onchange="updateWeekly(${i},'igEN',this.value)"></td>
+                    <td><input class="editable-cell" type="number" value="${row.igES}" onchange="updateWeekly(${i},'igES',this.value)"></td>
+                    <td><input class="editable-cell" type="number" value="${row.visits}" onchange="updateWeekly(${i},'visits',this.value)"></td>
+                    <td><input class="editable-cell" type="number" value="${row.waitlist}" onchange="updateWeekly(${i},'waitlist',this.value)"></td>
+                    <td><input class="editable-cell" type="number" value="${row.reels}" onchange="updateWeekly(${i},'reels',this.value)"></td>
+                    <td><input class="editable-cell" type="number" step="0.1" value="${row.engRate}" onchange="updateWeekly(${i},'engRate',this.value)"></td>
+                    <td><input class="editable-cell" type="number" value="${row.comments}" onchange="updateWeekly(${i},'comments',this.value)"></td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function updateWeekly(idx, field, value) {
+            dashData.weeklyMetrics[idx][field] = parseFloat(value) || 0;
+            saveData();
+            updateOverviewKPIs();
+            updateCharts();
+        }
+
+        function addWeekRow() {
+            const lastWeek = dashData.weeklyMetrics.length > 0 ? dashData.weeklyMetrics[dashData.weeklyMetrics.length - 1] : null;
+            const now = new Date();
+            const weekNum = getWeekNumber(now);
+            const weekStart = getMonday(now);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            const label = `Sem ${weekNum} (${weekStart.getDate()}-${weekEnd.getDate()} ${weekEnd.toLocaleDateString('es-ES', {month:'short'})})`;
+
+            dashData.weeklyMetrics.push({
+                week: label, igEN: lastWeek ? lastWeek.igEN : 0, igES: lastWeek ? lastWeek.igES : 0,
+                visits: 0, waitlist: lastWeek ? lastWeek.waitlist : 0, reels: lastWeek ? lastWeek.reels : 0,
+                engRate: 0, comments: 0
+            });
+            saveData();
+            renderWeeklyTable();
+        }
+
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        function getMonday(d) {
+            d = new Date(d);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        // ==================== CONTENT TABLE ====================
+        function renderContentTable() {
+            const tbody = document.getElementById('content-tbody');
+            let html = '';
+            dashData.contentLog.forEach((row, i) => {
+                const eng = row.reach > 0 ? (((row.likes + row.comments + row.saves) / row.reach) * 100).toFixed(1) : '0.0';
+                html += `<tr>
+                    <td>${row.date}</td>
+                    <td>${row.account}</td>
+                    <td>${row.type}</td>
+                    <td>${row.topic}</td>
+                    <td><input class="editable-cell" type="number" value="${row.reach}" onchange="updateContent(${i},'reach',this.value)"></td>
+                    <td><input class="editable-cell" type="number" value="${row.likes}" onchange="updateContent(${i},'likes',this.value)"></td>
+                    <td><input class="editable-cell" type="number" value="${row.comments}" onchange="updateContent(${i},'comments',this.value)"></td>
+                    <td><input class="editable-cell" type="number" value="${row.saves}" onchange="updateContent(${i},'saves',this.value)"></td>
+                    <td><input class="editable-cell" type="number" value="${row.shares}" onchange="updateContent(${i},'shares',this.value)"></td>
+                    <td>${eng}%</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function updateContent(idx, field, value) {
+            dashData.contentLog[idx][field] = parseFloat(value) || 0;
+            saveData();
+            renderContentTable();
+        }
+
+        function addContentRow() {
+            const today = new Date().toISOString().split('T')[0];
+            dashData.contentLog.push({
+                date: today, account: '@cals2gains', type: 'Reel', topic: 'Nuevo contenido',
+                reach: 0, likes: 0, comments: 0, saves: 0, shares: 0
+            });
+            saveData();
+            renderContentTable();
+        }
+
+        // ==================== KPI UPDATES ====================
+        function updateOverviewKPIs() {
+            const latest = dashData.weeklyMetrics[dashData.weeklyMetrics.length - 1];
+            const prev = dashData.weeklyMetrics.length > 1 ? dashData.weeklyMetrics[dashData.weeklyMetrics.length - 2] : null;
+
+            if (latest) {
+                const totalIG = latest.igEN + latest.igES;
+                const totalAudience = totalIG + latest.waitlist;
+
+                document.getElementById('ns-value').textContent = totalAudience.toLocaleString();
+                document.getElementById('kpi-ig-total').textContent = totalIG.toLocaleString();
+                document.getElementById('kpi-landing').textContent = latest.visits.toLocaleString();
+                document.getElementById('kpi-waitlist').textContent = latest.waitlist.toLocaleString();
+                document.getElementById('kpi-reels').textContent = latest.reels.toLocaleString();
+                document.getElementById('kpi-ig-en').textContent = latest.igEN.toLocaleString();
+                document.getElementById('kpi-ig-es').textContent = latest.igES.toLocaleString();
+                document.getElementById('kpi-comments-day').textContent = latest.comments;
+                document.getElementById('kpi-eng-rate').textContent = latest.engRate + '%';
+
+                if (prev) {
+                    const prevTotalIG = prev.igEN + prev.igES;
+                    setChange('kpi-ig-total-change', totalIG, prevTotalIG);
+                    setChange('kpi-landing-change', latest.visits, prev.visits);
+                    setChange('kpi-waitlist-change', latest.waitlist, prev.waitlist);
+                    setChange('kpi-reels-change', latest.reels, prev.reels);
+                    setChange('kpi-ig-en-change', latest.igEN, prev.igEN);
+                    setChange('kpi-ig-es-change', latest.igES, prev.igES);
+                }
+
+                if (latest.visits > 0) {
+                    const convRate = ((latest.waitlist / latest.visits) * 100).toFixed(1);
+                    document.getElementById('kpi-conv-rate').textContent = convRate + '%';
+                }
+            }
+        }
+
+        function setChange(elementId, current, previous) {
+            const el = document.getElementById(elementId);
+            if (!el || previous === 0) return;
+            const diff = current - previous;
+            const pct = ((diff / previous) * 100).toFixed(1);
+            const sign = diff >= 0 ? '+' : '';
+            el.textContent = `${sign}${diff} (${sign}${pct}%)`;
+            el.className = `kpi-change ${diff >= 0 ? 'positive' : 'negative'}`;
+        }
+
+        // ==================== CHARTS ====================
+        const COLORS = {
+            violet: '#9C8CFF',
+            coral: '#FF6A4D',
+            green: '#4ADE80',
+            yellow: '#FBBF24',
+            bone: '#F7F2EA',
+            muted: '#6B6278'
+        };
+
+        Chart.defaults.color = '#9E95A9';
+        Chart.defaults.borderColor = 'rgba(42, 34, 54, 0.5)';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        let charts = {};
+
+        function initCharts() {
+            // Audience growth chart
+            const labels = dashData.weeklyMetrics.map(w => w.week);
+            const igENData = dashData.weeklyMetrics.map(w => w.igEN);
+            const igESData = dashData.weeklyMetrics.map(w => w.igES);
+            const waitlistData = dashData.weeklyMetrics.map(w => w.waitlist);
+
+            charts.audienceGrowth = new Chart(document.getElementById('chart-audience-growth'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: '@cals2gains (EN)', data: igENData, borderColor: COLORS.violet, backgroundColor: COLORS.violet + '20', borderWidth: 2, fill: true, tension: 0.3, pointRadius: 4 },
+                        { label: '@cals2gains_es (ES)', data: igESData, borderColor: COLORS.coral, backgroundColor: COLORS.coral + '20', borderWidth: 2, fill: true, tension: 0.3, pointRadius: 4 },
+                        { label: 'Lista de espera', data: waitlistData, borderColor: COLORS.green, backgroundColor: COLORS.green + '20', borderWidth: 2, fill: true, tension: 0.3, pointRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 16 } } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Engagement chart
+            const engData = dashData.weeklyMetrics.map(w => w.engRate);
+            charts.engagement = new Chart(document.getElementById('chart-engagement'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Engagement rate %',
+                        data: engData,
+                        backgroundColor: COLORS.violet + 'AA',
+                        borderColor: COLORS.violet,
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        annotation: {
+                            annotations: {
+                                target: { type: 'line', yMin: 5, yMax: 5, borderColor: COLORS.coral, borderDash: [5, 5], label: { content: 'Objetivo: 5%', display: true } }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { callback: v => v + '%' } }
+                    }
+                }
+            });
+
+            // Followers weekly (pre-launch tab)
+            const newENData = dashData.weeklyMetrics.map((w, i) => i === 0 ? w.igEN : w.igEN - dashData.weeklyMetrics[i-1].igEN);
+            const newESData = dashData.weeklyMetrics.map((w, i) => i === 0 ? w.igES : w.igES - dashData.weeklyMetrics[i-1].igES);
+            charts.followersWeekly = new Chart(document.getElementById('chart-followers-weekly'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Nuevos EN', data: newENData, backgroundColor: COLORS.violet + 'CC', borderRadius: 4 },
+                        { label: 'Nuevos ES', data: newESData, backgroundColor: COLORS.coral + 'CC', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+                }
+            });
+
+            // Traffic sources (placeholder)
+            charts.trafficSources = new Chart(document.getElementById('chart-traffic-sources'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Instagram', 'Directo', 'Google', 'Otros'],
+                    datasets: [{
+                        data: [40, 30, 20, 10],
+                        backgroundColor: [COLORS.violet + 'CC', COLORS.coral + 'CC', COLORS.green + 'CC', COLORS.yellow + 'CC'],
+                        borderColor: '#1E1829',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 12 } } }
+                }
+            });
+
+            // Content performance (marketing tab)
+            charts.contentPerformance = new Chart(document.getElementById('chart-content-performance'), {
+                type: 'bar',
+                data: {
+                    labels: ['Educativo', 'Demo app', 'Tips nutrición', 'Motivacional', 'Behind scenes'],
+                    datasets: [{
+                        label: 'Eng. rate medio %',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: [COLORS.violet + 'CC', COLORS.coral + 'CC', COLORS.green + 'CC', COLORS.yellow + 'CC', COLORS.muted + 'CC'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { callback: v => v + '%' } } }
+                }
+            });
+
+            // Funnel chart (marketing tab)
+            charts.funnel = new Chart(document.getElementById('chart-funnel'), {
+                type: 'bar',
+                data: {
+                    labels: ['Alcance', 'Visitas perfil', 'Clics bio', 'Visitas web', 'Registros'],
+                    datasets: [{
+                        label: 'Usuarios',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: [COLORS.violet + 'CC', COLORS.violet + '99', COLORS.coral + 'CC', COLORS.coral + '99', COLORS.green + 'CC'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { display: true }, beginAtZero: true }, y: { grid: { display: false } } }
+                }
+            });
+
+            // Downloads chart (product tab - placeholder)
+            charts.downloads = new Chart(document.getElementById('chart-downloads'), {
+                type: 'line',
+                data: {
+                    labels: ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5', 'Día 6', 'Día 7'],
+                    datasets: [
+                        { label: 'iOS', data: [0,0,0,0,0,0,0], borderColor: COLORS.violet, borderWidth: 2, tension: 0.3, pointRadius: 3 },
+                        { label: 'Android', data: [0,0,0,0,0,0,0], borderColor: COLORS.green, borderWidth: 2, tension: 0.3, pointRadius: 3 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+                }
+            });
+
+            // Retention chart (product tab - placeholder)
+            charts.retention = new Chart(document.getElementById('chart-retention'), {
+                type: 'bar',
+                data: {
+                    labels: ['D1', 'D7', 'D14', 'D30'],
+                    datasets: [{
+                        label: 'Retención %',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [COLORS.violet + 'CC', COLORS.coral + 'CC', COLORS.green + 'CC', COLORS.yellow + 'CC'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } }
+                }
+            });
+
+            // MRR chart (revenue tab - placeholder)
+            charts.mrr = new Chart(document.getElementById('chart-mrr'), {
+                type: 'line',
+                data: {
+                    labels: ['Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    datasets: [{
+                        label: 'MRR (€)',
+                        data: [0,0,0,0,0,0,0],
+                        borderColor: COLORS.violet,
+                        backgroundColor: COLORS.violet + '20',
+                        borderWidth: 2, fill: true, tension: 0.3, pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { callback: v => v + '€' } } }
+                }
+            });
+
+            // Plans distribution (revenue tab)
+            charts.plans = new Chart(document.getElementById('chart-plans'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Free', 'Mensual', 'Anual'],
+                    datasets: [{
+                        data: [100, 0, 0],
+                        backgroundColor: [COLORS.muted + 'CC', COLORS.violet + 'CC', COLORS.coral + 'CC'],
+                        borderColor: '#1E1829',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 12 } } }
+                }
+            });
+        }
+
+        function updateCharts() {
+            const labels = dashData.weeklyMetrics.map(w => w.week);
+            const igENData = dashData.weeklyMetrics.map(w => w.igEN);
+            const igESData = dashData.weeklyMetrics.map(w => w.igES);
+            const waitlistData = dashData.weeklyMetrics.map(w => w.waitlist);
+            const engData = dashData.weeklyMetrics.map(w => w.engRate);
+
+            // Update audience growth
+            charts.audienceGrowth.data.labels = labels;
+            charts.audienceGrowth.data.datasets[0].data = igENData;
+            charts.audienceGrowth.data.datasets[1].data = igESData;
+            charts.audienceGrowth.data.datasets[2].data = waitlistData;
+            charts.audienceGrowth.update('none');
+
+            // Update engagement
+            charts.engagement.data.labels = labels;
+            charts.engagement.data.datasets[0].data = engData;
+            charts.engagement.update('none');
+
+            // Update followers weekly
+            const newENData = dashData.weeklyMetrics.map((w, i) => i === 0 ? w.igEN : Math.max(0, w.igEN - dashData.weeklyMetrics[i-1].igEN));
+            const newESData = dashData.weeklyMetrics.map((w, i) => i === 0 ? w.igES : Math.max(0, w.igES - dashData.weeklyMetrics[i-1].igES));
+            charts.followersWeekly.data.labels = labels;
+            charts.followersWeekly.data.datasets[0].data = newENData;
+            charts.followersWeekly.data.datasets[1].data = newESData;
+            charts.followersWeekly.update('none');
+        }
+
+        // ==================== INIT ====================
+        function init() {
+            renderChecklist();
+            renderWeeklyTable();
+            renderContentTable();
+            initCharts();
+            updateOverviewKPIs();
+        }
+
+        init();
+    </script>
+</body>
+</html>

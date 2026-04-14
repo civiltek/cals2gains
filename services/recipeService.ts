@@ -4,14 +4,30 @@
 // Handles recipe operations: URL import, scaling, nutrition calculation, grocery generation
 
 import { Recipe, RecipeIngredient, Nutrition, GroceryItem, GroceryCategory } from '../types';
+import { getAppLanguage } from '../utils/language';
 
 const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 /**
- * System prompt for recipe extraction from URL
+ * System prompt for recipe extraction from URL — language-aware
  */
-const RECIPE_EXTRACTION_SYSTEM = `You are an expert culinary AI that extracts recipe information from web pages.
+function getRecipeExtractionSystem(language: 'es' | 'en'): string {
+  if (language === 'es') {
+    return `Eres un experto culinario con IA que extrae información de recetas de páginas web.
+Tu trabajo es parsear el contenido de la receta y extraer datos estructurados con precisión.
+
+REGLAS:
+1. Responde SIEMPRE en JSON válido — sin markdown, sin explicaciones fuera del JSON
+2. TODOS los textos deben estar en ESPAÑOL: nombre de la receta, descripción, nombres de ingredientes, instrucciones, unidades
+3. Si la página está en otro idioma, TRADUCE todo al español
+4. Extrae TODOS los ingredientes con cantidades y unidades
+5. Estima los valores nutricionales basándote en bases de datos USDA e internacionales
+6. Para ingredientes desconocidos, haz estimaciones conservadoras
+7. Extrae tiempos de cocción en minutos`;
+  }
+
+  return `You are an expert culinary AI that extracts recipe information from web pages.
 Your job is to parse recipe content and extract structured data with precision.
 
 RULES:
@@ -21,14 +37,77 @@ RULES:
 4. For unknown ingredients, make conservative estimates
 5. Always provide both English and Spanish names
 6. Extract cooking times in minutes`;
+}
 
 /**
  * Build extraction prompt for recipe URL
  */
 function buildRecipeExtractionPrompt(
   pageContent: string,
-  language: 'es' | 'en' = 'en'
+  language: 'es' | 'en' = getAppLanguage()
 ): string {
+  if (language === 'es') {
+    return `Extrae la receta del siguiente contenido web y devuelve ÚNICAMENTE un objeto JSON con esta estructura EXACTA (sin markdown):
+
+{
+  "name": "Nombre de la receta en español",
+  "nameEs": "Nombre de la receta en español",
+  "nameEn": "Recipe name in English",
+  "description": "Breve descripción en español",
+  "servings": 4,
+  "prepTime": 15,
+  "cookTime": 30,
+  "instructions": [
+    "Paso 1 en español",
+    "Paso 2 en español",
+    "Paso 3 en español"
+  ],
+  "ingredients": [
+    {
+      "name": "nombre del ingrediente en español",
+      "quantity": 100,
+      "unit": "gramos",
+      "nutrition": {
+        "calories": 150,
+        "protein": 5.0,
+        "carbs": 20.0,
+        "fat": 7.0,
+        "fiber": 1.0
+      },
+      "isOptional": false
+    }
+  ],
+  "totalNutrition": {
+    "calories": 600,
+    "protein": 20.0,
+    "carbs": 80.0,
+    "fat": 28.0,
+    "fiber": 4.0
+  },
+  "nutritionPerServing": {
+    "calories": 150,
+    "protein": 5.0,
+    "carbs": 20.0,
+    "fat": 7.0,
+    "fiber": 1.0
+  }
+}
+
+IMPORTANTE:
+- TODOS los textos (name, nameEs, description, ingredients[].name, instructions[], unit) DEBEN estar en ESPAÑOL
+- Si la página original está en inglés u otro idioma, TRADUCE todo al español
+- Las unidades deben estar en español: gramos, ml, tazas, cucharadas, cucharaditas, unidades, etc.
+- servings debe ser un número (típicamente 2-8)
+- prepTime y cookTime en minutos
+- Cada ingrediente DEBE tener quantity, unit y nutrition estimada basada en esa cantidad
+- totalNutrition = suma de todos los valores nutricionales de ingredientes
+- nutritionPerServing = totalNutrition / servings (usa al menos 1 decimal)
+- Si la página no tiene receta, extrae lo que puedas
+
+CONTENIDO DE LA PÁGINA WEB:
+${pageContent}`;
+  }
+
   return `Extract the recipe from this web page content and return ONLY a JSON object with this EXACT structure (no markdown):
 
 {
@@ -93,7 +172,7 @@ ${pageContent}`;
  */
 export async function importRecipeFromUrl(
   url: string,
-  language: 'es' | 'en' = 'en'
+  language: 'es' | 'en' = getAppLanguage()
 ): Promise<Recipe> {
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key not configured');
@@ -141,7 +220,7 @@ export async function importRecipeFromUrl(
         messages: [
           {
             role: 'system',
-            content: RECIPE_EXTRACTION_SYSTEM,
+            content: getRecipeExtractionSystem(language),
           },
           {
             role: 'user',

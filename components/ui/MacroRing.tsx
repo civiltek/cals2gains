@@ -2,10 +2,10 @@
 // Cals2Gains - Macro Ring Chart Component
 // ============================================
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
-import Colors from '../../constants/colors';
+import { useColors } from '../../store/themeStore';
 
 interface MacroRingProps {
   calories: number;
@@ -24,6 +24,8 @@ const MacroRing: React.FC<MacroRingProps> = ({
   fat,
   size = 160,
 }) => {
+  const C = useColors();
+  const styles = useMemo(() => createStyles(C), [C]);
   const strokeWidth = 12;
   const radius = (size - strokeWidth * 2) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -62,7 +64,7 @@ const MacroRing: React.FC<MacroRingProps> = ({
           cx={center}
           cy={center}
           r={radius}
-          stroke={Colors.surface}
+          stroke={C.surface}
           strokeWidth={strokeWidth}
           fill="none"
           rotation="-90"
@@ -76,7 +78,7 @@ const MacroRing: React.FC<MacroRingProps> = ({
             cx={center}
             cy={center}
             r={radius - strokeWidth - 4}
-            stroke={Colors.protein}
+            stroke={C.protein}
             strokeWidth={8}
             fill="none"
             strokeDasharray={`${proteinArc} ${circumference - proteinArc}`}
@@ -88,7 +90,7 @@ const MacroRing: React.FC<MacroRingProps> = ({
             cx={center}
             cy={center}
             r={radius - strokeWidth - 4}
-            stroke={Colors.carbs}
+            stroke={C.carbs}
             strokeWidth={8}
             fill="none"
             strokeDasharray={`${carbsArc} ${circumference - carbsArc}`}
@@ -100,7 +102,7 @@ const MacroRing: React.FC<MacroRingProps> = ({
             cx={center}
             cy={center}
             r={radius - strokeWidth - 4}
-            stroke={Colors.fat}
+            stroke={C.fat}
             strokeWidth={8}
             fill="none"
             strokeDasharray={`${fatArc} ${circumference - fatArc}`}
@@ -114,7 +116,7 @@ const MacroRing: React.FC<MacroRingProps> = ({
           cx={center}
           cy={center}
           r={radius}
-          stroke={isOver ? Colors.error : Colors.accent}
+          stroke={isOver ? C.error : C.accent}
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={`${calorieArc} ${circumference - calorieArc}`}
@@ -137,7 +139,7 @@ const MacroRing: React.FC<MacroRingProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (C: any) => StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -150,20 +152,20 @@ const styles = StyleSheet.create({
   caloriesText: {
     fontSize: 28,
     fontWeight: '700',
-    color: Colors.text,
+    color: C.text,
     lineHeight: 32,
   },
   overText: {
-    color: Colors.error,
+    color: C.error,
   },
   kcalText: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: C.textSecondary,
     marginTop: 2,
   },
   percentText: {
     fontSize: 11,
-    color: Colors.textMuted,
+    color: C.textMuted,
     marginTop: 1,
   },
 });

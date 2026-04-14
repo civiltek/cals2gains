@@ -11,14 +11,22 @@ import {
   ActivityIndicator,
   Linking,
   Platform,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { COLORS } from '../theme';
+import { useTranslation } from 'react-i18next';
+import { useThemeStore, ThemeMode, useColors } from '../store/themeStore';
 import { terraService, TerraProvider, TerraConnection } from '../services/terraService';
 import { inBodyService } from '../services/inBodyService';
+import { changeLanguage, getCurrentLanguageInfo, SUPPORTED_LANGUAGES, LanguageOption } from '../i18n';
+import { useUserStore } from '../store/userStore';
+import { useReminderStore } from '../store/reminderStore';
+import { ReminderKey } from '../services/reminderService';
+import { migrateMealPhotosToFirestore, MigrationResult } from '../services/firebase';
+import { FlatList } from 'react-native';
 
 interface UserSettings {
   nutritionMode: 'simple' | 'advanced';
@@ -47,6 +55,11 @@ interface UserSettings {
 const SettingsScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
+  const { mode: themeMode, setMode: setThemeMode } = useThemeStore();
+  const C = useColors();
+  const user = useUserStore((s) => s.user);
+  const reminderState = useReminderStore();
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState<UserSettings>({
     nutritionMode: 'advanced',
@@ -73,14 +86,17 @@ const SettingsScreen = () => {
   });
 
   const [showMealTimeModal, setShowMealTimeModal] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageOption>(getCurrentLanguageInfo());
   const [showWeightTimeModal, setShowWeightTimeModal] = useState(false);
   const [tempTime, setTempTime] = useState(settings.reminders.mealsTime);
 
-  // Mock user profile data
+  // Real user data from store
   const userProfile = {
-    name: 'Juan García',
-    email: 'juan@example.com',
-    avatar: '👤',
+    name: user?.displayName || t('settings.user'),
+    email: user?.email || '',
+    avatar: user?.photoURL ? null : '👤',
+    photoURL: user?.photoURL || null,
   };
 
   const handleNutritionModeToggle = (mode: 'simple' | 'advanced') => {
@@ -93,15 +109,17 @@ const SettingsScreen = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
   };
 
-  const handleReminderToggle = (key: keyof UserSettings['reminders']) => {
-    setSettings({
-      ...settings,
-      reminders: {
-        ...settings.reminders,
-        [key]: !settings.reminders[key],
-      },
-    });
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
+  const handleReminderToggle = async (key: ReminderKey) => {
+    const success = await reminderState.toggleReminder(key, t);
+    if (success) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
+    } else {
+      // Permission denied — inform user
+      Alert.alert(
+        t('reminders.permissionDeniedTitle'),
+        t('reminders.permissionDeniedBody'),
+      );
+    }
   };
 
   const handleUnitsToggle = () => {
@@ -112,11 +130,11 @@ const SettingsScreen = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
   };
 
-  const handleLanguageToggle = () => {
-    setSettings({
-      ...settings,
-      language: settings.language === 'es' ? 'en' : 'es',
-    });
+  const handleLanguageSelect = async (lang: LanguageOption) => {
+    setSelectedLanguage(lang);
+    await changeLanguage(lang.code);
+    setSettings({ ...settings, language: lang.code as any });
+    setShowLanguageModal(false);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
   };
 
@@ -145,7 +163,7 @@ const SettingsScreen = () => {
           if (authUrl) {
             await Linking.openURL(authUrl);
           } else {
-            Alert.alert('Error', 'No se pudo generar el enlace de autenticación. Inténtalo de nuevo.');
+            Alert.alert('Error', t('settings.authLinkError'));
             setLoading(false);
             return;
           }
@@ -165,13 +183,38 @@ const SettingsScreen = () => {
       });
 
       Alert.alert(
-        'Éxito',
+        t('common.success'),
         isCurrentlyConnected
-          ? `${service} desconectado`
-          : `${service} conectado correctamente`
+          ? t('settings.serviceDisconnected', { service })
+          : t('settings.serviceConnected', { service })
       );
     } catch (error) {
-      Alert.alert('Error', `No se pudo conectar ${service}`);
+      Alert.alert('Error', t('settings.serviceError', { service }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMigratePhotos = async () => {
+    if (!user?.uid) return;
+    setLoading(true);
+    try {
+      const r = await migrateMealPhotosToFirestore(user.uid);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      // Build diagnostic message
+      let msg = `Total: ${r.total} comidas\n`;
+      msg += `Subidas: ${r.migrated}\n`;
+      if (r.alreadySynced > 0) msg += `Ya sincronizadas: ${r.alreadySynced}\n`;
+      if (r.noPhoto > 0) msg += `Sin foto: ${r.noPhoto}\n`;
+      if (r.failed > 0) msg += `Fallidas: ${r.failed}\n`;
+      if (r.errors.length > 0) {
+        msg += `\nErrores:\n${r.errors.slice(0, 3).join('\n')}`;
+      }
+
+      Alert.alert(t('settings.syncPhotos'), msg);
+    } catch (error: any) {
+      Alert.alert('Error', error?.message || t('settingsScreen.photosMigrateFailed'));
     } finally {
       setLoading(false);
     }
@@ -191,10 +234,10 @@ const SettingsScreen = () => {
       // Simulate backup generation
       await new Promise((resolve) => setTimeout(resolve, 1500));
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Éxito', 'Backup completado. Se está compartiendo...');
+      Alert.alert(t('common.success'), t('settingsScreen.backupComplete'));
       // In production, would call ExportService.generateBackup and shareExport
     } catch (error) {
-      Alert.alert('Error', 'No se pudo realizar el backup');
+      Alert.alert('Error', t('settingsScreen.backupFailed'));
     } finally {
       setLoading(false);
     }
@@ -202,23 +245,23 @@ const SettingsScreen = () => {
 
   const handleImportBackup = () => {
     Alert.alert(
-      'Importar Backup',
-      'Selecciona el archivo de backup que deseas restaurar',
+      t('settingsScreen.importBackup'),
+      t('settingsScreen.importDesc'),
       [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Seleccionar archivo', onPress: () => {} },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('settingsScreen.selectFile'), onPress: () => {} },
       ]
     );
   };
 
   const handleLogout = () => {
     Alert.alert(
-      'Cerrar Sesión',
-      '¿Estás seguro de que deseas cerrar sesión?',
+      t('settingsScreen.signOut'),
+      t('settingsScreen.signOutConfirm'),
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Cerrar Sesión',
+          text: t('settingsScreen.signOut'),
           onPress: async () => {
             setLoading(true);
             try {
@@ -237,27 +280,27 @@ const SettingsScreen = () => {
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Eliminar Cuenta',
-      'Esta acción no se puede deshacer. Se eliminarán todos tus datos de forma permanente.',
+      t('settingsScreen.deleteAccount'),
+      t('settingsScreen.deleteWarning'),
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Eliminar Mi Cuenta',
+          text: t('settingsScreen.deleteMyAccount'),
           onPress: () => {
             Alert.alert(
-              'Confirmar Eliminación',
-              'Escribe tu email para confirmar la eliminación de tu cuenta',
+              t('settingsScreen.confirmDeletion'),
+              t('settingsScreen.confirmDeletionDesc'),
               [
-                { text: 'Cancelar', style: 'cancel' },
+                { text: t('common.cancel'), style: 'cancel' },
                 {
-                  text: 'Eliminar',
+                  text: t('common.delete'),
                   style: 'destructive',
                   onPress: async () => {
                     setLoading(true);
                     try {
                       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                       // In production, would handle account deletion
-                      Alert.alert('Éxito', 'Tu cuenta ha sido eliminada permanentemente');
+                      Alert.alert(t('common.success'), t('settingsScreen.accountDeleted'));
                       router.replace('/login');
                     } finally {
                       setLoading(false);
@@ -274,11 +317,11 @@ const SettingsScreen = () => {
   };
 
   const renderSettingItem = (label: string, value?: string | boolean) => (
-    <View style={[styles.settingItem, { borderBottomColor: COLORS.border }]}>
-      <Text style={[styles.settingLabel, { color: COLORS.text }]}>{label}</Text>
+    <View style={[styles.settingItem, { borderBottomColor: C.border }]}>
+      <Text style={[styles.settingLabel, { color: C.text }]}>{label}</Text>
       {value !== undefined && (
-        <Text style={[styles.settingValue, { color: COLORS.textSecondary }]}>
-          {typeof value === 'boolean' ? (value ? 'Activado' : 'Desactivado') : value}
+        <Text style={[styles.settingValue, { color: C.textSecondary }]}>
+          {typeof value === 'boolean' ? (value ? t('common.enabled') : t('common.disabled')) : value}
         </Text>
       )}
     </View>
@@ -288,14 +331,14 @@ const SettingsScreen = () => {
     icon: string,
     label: string,
     onPress: () => void,
-    color: string = COLORS.primary,
+    color: string = C.primary,
     destructive: boolean = false
   ) => (
     <TouchableOpacity
       style={[
         styles.button,
         {
-          backgroundColor: destructive ? COLORS.error : color,
+          backgroundColor: destructive ? C.error : color,
         },
       ]}
       onPress={onPress}
@@ -303,73 +346,82 @@ const SettingsScreen = () => {
       activeOpacity={0.7}
     >
       {loading ? (
-        <ActivityIndicator color={COLORS.surface} />
+        <ActivityIndicator color={C.surface} />
       ) : (
         <>
-          <Ionicons name={icon as any} size={20} color={COLORS.surface} />
-          <Text style={[styles.buttonText, { color: COLORS.surface }]}>{label}</Text>
+          <Ionicons name={icon as any} size={20} color={C.surface} />
+          <Text style={[styles.buttonText, { color: C.surface }]}>{label}</Text>
         </>
       )}
     </TouchableOpacity>
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: COLORS.surface }]}>
+    <View style={[styles.container, { backgroundColor: C.surface }]}>
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: COLORS.text }]}>Ajustes</Text>
+          <Text style={[styles.headerTitle, { color: C.text }]}>{t('common.settings')}</Text>
         </View>
 
         {/* Profile Section */}
         <View style={styles.section}>
-          <View style={[styles.profileCard, { backgroundColor: COLORS.background }]}>
-            <Text style={[styles.profileAvatar, styles.profileAvatarText]}>
-              {userProfile.avatar}
-            </Text>
+          <View style={[styles.profileCard, { backgroundColor: C.background }]}>
+            {userProfile.photoURL ? (
+              <Image
+                source={{ uri: userProfile.photoURL }}
+                style={{ width: 60, height: 60, borderRadius: 30 }}
+              />
+            ) : (
+              <View style={[styles.profileAvatar, { backgroundColor: `${C.primary}30` }]}>
+                <Text style={[styles.profileAvatarText, { color: C.primary }]}>
+                  {userProfile.name?.[0]?.toUpperCase() || '?'}
+                </Text>
+              </View>
+            )}
             <View style={styles.profileInfo}>
-              <Text style={[styles.profileName, { color: COLORS.text }]}>
+              <Text style={[styles.profileName, { color: C.text }]}>
                 {userProfile.name}
               </Text>
-              <Text style={[styles.profileEmail, { color: COLORS.textSecondary }]}>
+              <Text style={[styles.profileEmail, { color: C.textSecondary }]}>
                 {userProfile.email}
               </Text>
             </View>
             <TouchableOpacity
-              style={[styles.editButton, { backgroundColor: COLORS.primary }]}
-              onPress={() => {}}
+              style={[styles.editButton, { backgroundColor: C.primary }]}
+              onPress={() => router.push('/edit-profile')}
             >
-              <Ionicons name="create" size={18} color={COLORS.surface} />
+              <Ionicons name="create" size={18} color={C.surface} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Goal Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Meta</Text>
-          <View style={[styles.sectionContent, { backgroundColor: COLORS.background }]}>
-            {renderSettingItem('Objetivo Actual', 'Pérdida de grasa')}
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.goal')}</Text>
+          <View style={[styles.sectionContent, { backgroundColor: C.background }]}>
+            {renderSettingItem(t('settingsScreen.currentGoal'), t('settings.fatLoss'))}
             <TouchableOpacity
-              style={[styles.changeButton, { backgroundColor: COLORS.primary }]}
+              style={[styles.changeButton, { backgroundColor: C.primary }]}
               onPress={() => router.push('/goal-modes')}
             >
-              <Text style={[styles.changeButtonText, { color: COLORS.surface }]}>Cambiar Meta</Text>
+              <Text style={[styles.changeButtonText, { color: C.surface }]}>{t('common.change')}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Nutrition Mode */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Modo de Nutrición</Text>
-          <View style={[styles.toggleGroup, { backgroundColor: COLORS.background }]}>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.nutritionMode')}</Text>
+          <View style={[styles.toggleGroup, { backgroundColor: C.background }]}>
             <TouchableOpacity
               style={[
                 styles.toggleButton,
                 settings.nutritionMode === 'simple' && {
-                  backgroundColor: COLORS.primary,
+                  backgroundColor: C.primary,
                 },
               ]}
               onPress={() => handleNutritionModeToggle('simple')}
@@ -380,19 +432,19 @@ const SettingsScreen = () => {
                   {
                     color:
                       settings.nutritionMode === 'simple'
-                        ? COLORS.surface
-                        : COLORS.textSecondary,
+                        ? C.surface
+                        : C.textSecondary,
                   },
                 ]}
               >
-                Simple
+                {t('nutritionMode.simple')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
                 styles.toggleButton,
                 settings.nutritionMode === 'advanced' && {
-                  backgroundColor: COLORS.primary,
+                  backgroundColor: C.primary,
                 },
               ]}
               onPress={() => handleNutritionModeToggle('advanced')}
@@ -403,12 +455,12 @@ const SettingsScreen = () => {
                   {
                     color:
                       settings.nutritionMode === 'advanced'
-                        ? COLORS.surface
-                        : COLORS.textSecondary,
+                        ? C.surface
+                        : C.textSecondary,
                   },
                 ]}
               >
-                Avanzado
+                {t('nutritionMode.advanced')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -416,15 +468,15 @@ const SettingsScreen = () => {
 
         {/* Day Type Selection */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Tipo de Día Actual</Text>
-          <View style={[styles.toggleGroup, { backgroundColor: COLORS.background }]}>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.currentDayType')}</Text>
+          <View style={[styles.toggleGroup, { backgroundColor: C.background }]}>
             {(['training', 'rest', 'refeed'] as const).map((type) => (
               <TouchableOpacity
                 key={type}
                 style={[
                   styles.toggleButton,
                   settings.dayType === type && {
-                    backgroundColor: COLORS.primary,
+                    backgroundColor: C.primary,
                   },
                 ]}
                 onPress={() => handleDayTypeChange(type)}
@@ -435,16 +487,16 @@ const SettingsScreen = () => {
                     {
                       color:
                         settings.dayType === type
-                          ? COLORS.surface
-                          : COLORS.textSecondary,
+                          ? C.surface
+                          : C.textSecondary,
                     },
                   ]}
                 >
                   {type === 'training'
-                    ? 'Entrenamiento'
+                    ? t('settings.training')
                     : type === 'rest'
-                      ? 'Descanso'
-                      : 'Recarga'}
+                      ? t('settings.rest')
+                      : t('settings.refeed')}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -453,65 +505,65 @@ const SettingsScreen = () => {
 
         {/* Reminders Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Recordatorios</Text>
-          <View style={[styles.sectionContent, { backgroundColor: COLORS.background }]}>
-            <View style={[styles.reminderItem, { borderBottomColor: COLORS.border }]}>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.reminders')}</Text>
+          <View style={[styles.sectionContent, { backgroundColor: C.background }]}>
+            <View style={[styles.reminderItem, { borderBottomColor: C.border }]}>
               <View style={styles.reminderLabel}>
-                <Ionicons name="restaurant" size={20} color={COLORS.primary} />
-                <Text style={[styles.reminderText, { color: COLORS.text }]}>
-                  Recordatorio de Comidas
+                <Ionicons name="restaurant" size={20} color={C.primary} />
+                <Text style={[styles.reminderText, { color: C.text }]}>
+                  {t('settings.mealReminder')}
                 </Text>
               </View>
               <Switch
-                value={settings.reminders.meals}
+                value={reminderState.reminders.meals.enabled}
                 onValueChange={() => handleReminderToggle('meals')}
-                trackColor={{ false: COLORS.border, true: `${COLORS.primary}40` }}
-                thumbColor={settings.reminders.meals ? COLORS.primary : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: `${C.primary}40` }}
+                thumbColor={reminderState.reminders.meals.enabled ? C.primary : C.textSecondary}
               />
             </View>
 
-            <View style={[styles.reminderItem, { borderBottomColor: COLORS.border }]}>
+            <View style={[styles.reminderItem, { borderBottomColor: C.border }]}>
               <View style={styles.reminderLabel}>
-                <Ionicons name="water" size={20} color={COLORS.secondary} />
-                <Text style={[styles.reminderText, { color: COLORS.text }]}>
-                  Recordatorio de Agua
+                <Ionicons name="water" size={20} color={C.info} />
+                <Text style={[styles.reminderText, { color: C.text }]}>
+                  {t('settings.waterReminder')}
                 </Text>
               </View>
               <Switch
-                value={settings.reminders.water}
+                value={reminderState.reminders.water.enabled}
                 onValueChange={() => handleReminderToggle('water')}
-                trackColor={{ false: COLORS.border, true: `${COLORS.secondary}40` }}
-                thumbColor={settings.reminders.water ? COLORS.secondary : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: `${C.info}40` }}
+                thumbColor={reminderState.reminders.water.enabled ? C.info : C.textSecondary}
               />
             </View>
 
-            <View style={[styles.reminderItem, { borderBottomColor: COLORS.border }]}>
+            <View style={[styles.reminderItem, { borderBottomColor: C.border }]}>
               <View style={styles.reminderLabel}>
-                <Ionicons name="scale" size={20} color={COLORS.accent} />
-                <Text style={[styles.reminderText, { color: COLORS.text }]}>
-                  Recordatorio de Peso
+                <Ionicons name="scale" size={20} color={C.accent} />
+                <Text style={[styles.reminderText, { color: C.text }]}>
+                  {t('settings.weightReminder')}
                 </Text>
               </View>
               <Switch
-                value={settings.reminders.weight}
+                value={reminderState.reminders.weight.enabled}
                 onValueChange={() => handleReminderToggle('weight')}
-                trackColor={{ false: COLORS.border, true: `${COLORS.accent}40` }}
-                thumbColor={settings.reminders.weight ? COLORS.accent : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: `${C.accent}40` }}
+                thumbColor={reminderState.reminders.weight.enabled ? C.accent : C.textSecondary}
               />
             </View>
 
             <View style={styles.reminderItem}>
               <View style={styles.reminderLabel}>
-                <Ionicons name="timer" size={20} color={COLORS.warning} />
-                <Text style={[styles.reminderText, { color: COLORS.text }]}>
-                  Recordatorio de Ayuno
+                <Ionicons name="timer" size={20} color={C.warning} />
+                <Text style={[styles.reminderText, { color: C.text }]}>
+                  {t('settings.fastingReminder')}
                 </Text>
               </View>
               <Switch
-                value={settings.reminders.fasting}
+                value={reminderState.reminders.fasting.enabled}
                 onValueChange={() => handleReminderToggle('fasting')}
-                trackColor={{ false: COLORS.border, true: `${COLORS.warning}40` }}
-                thumbColor={settings.reminders.fasting ? COLORS.warning : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: `${C.warning}40` }}
+                thumbColor={reminderState.reminders.fasting.enabled ? C.warning : C.textSecondary}
               />
             </View>
           </View>
@@ -519,201 +571,211 @@ const SettingsScreen = () => {
 
         {/* Data Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Datos</Text>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.data')}</Text>
           <View style={styles.buttonGroup}>
-            {renderButton('download', 'Exportar Datos', handleExportData)}
-            {renderButton('cloud-download', 'Backup Completo', handleBackup)}
-            {renderButton('cloud-upload', 'Importar Backup', handleImportBackup)}
+            {renderButton('download', t('settingsScreen.exportData'), handleExportData)}
+            {renderButton('cloud-upload', t('settingsScreen.syncPhotos'), handleMigratePhotos)}
+            {renderButton('cloud-download', t('settingsScreen.fullBackup'), handleBackup)}
+            {renderButton('cloud-upload', t('settingsScreen.importBackup'), handleImportBackup)}
           </View>
         </View>
 
         {/* Units Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Unidades</Text>
-          <View style={[styles.sectionContent, { backgroundColor: COLORS.background }]}>
-            <View style={[styles.settingRow, { borderBottomColor: COLORS.border }]}>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.units')}</Text>
+          <View style={[styles.sectionContent, { backgroundColor: C.background }]}>
+            <View style={[styles.settingRow, { borderBottomColor: C.border }]}>
               <View>
-                <Text style={[styles.settingLabel, { color: COLORS.text }]}>Sistema Métrico</Text>
-                <Text style={[styles.settingDescription, { color: COLORS.textSecondary }]}>
+                <Text style={[styles.settingLabel, { color: C.text }]}>{t('settings.metricSystem')}</Text>
+                <Text style={[styles.settingDescription, { color: C.textSecondary }]}>
                   {settings.units === 'metric' ? 'kg, cm' : 'lb, in'}
                 </Text>
               </View>
               <Switch
                 value={settings.units === 'metric'}
                 onValueChange={handleUnitsToggle}
-                trackColor={{ false: COLORS.border, true: `${COLORS.primary}40` }}
-                thumbColor={settings.units === 'metric' ? COLORS.primary : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: `${C.primary}40` }}
+                thumbColor={settings.units === 'metric' ? C.primary : C.textSecondary}
               />
             </View>
           </View>
         </View>
 
-        {/* Language Section */}
+        {/* Appearance & Language Section (Combined) */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Idioma</Text>
-          <View style={[styles.toggleGroup, { backgroundColor: COLORS.background }]}>
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                settings.language === 'es' && { backgroundColor: COLORS.primary },
-              ]}
-              onPress={() => handleLanguageToggle()}
-            >
-              <Text
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.appearanceLanguage')}</Text>
+
+          {/* Theme selector */}
+          <Text style={[styles.subsectionLabel, { color: C.textSecondary }]}>{t('settings.theme')}</Text>
+          <View style={[styles.toggleGroup, { backgroundColor: C.background }]}>
+            {([
+              { key: 'light' as ThemeMode, label: t('settings.light'), icon: 'sunny-outline' as const },
+              { key: 'dark' as ThemeMode, label: t('settings.dark'), icon: 'moon-outline' as const },
+              { key: 'system' as ThemeMode, label: t('settings.system'), icon: 'phone-portrait-outline' as const },
+            ]).map((opt) => (
+              <TouchableOpacity
+                key={opt.key}
                 style={[
-                  styles.toggleButtonText,
-                  {
-                    color:
-                      settings.language === 'es'
-                        ? COLORS.surface
-                        : COLORS.textSecondary,
-                  },
+                  styles.toggleButton,
+                  themeMode === opt.key && { backgroundColor: C.primary },
                 ]}
+                onPress={() => setThemeMode(opt.key)}
               >
-                Español
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                settings.language === 'en' && { backgroundColor: COLORS.primary },
-              ]}
-              onPress={() => handleLanguageToggle()}
-            >
-              <Text
-                style={[
-                  styles.toggleButtonText,
-                  {
-                    color:
-                      settings.language === 'en'
-                        ? COLORS.surface
-                        : COLORS.textSecondary,
-                  },
-                ]}
-              >
-                English
-              </Text>
-            </TouchableOpacity>
+                <Ionicons
+                  name={opt.icon}
+                  size={16}
+                  color={themeMode === opt.key ? C.surface : C.textSecondary}
+                  style={{ marginRight: 6 }}
+                />
+                <Text
+                  style={[
+                    styles.toggleButtonText,
+                    {
+                      color:
+                        themeMode === opt.key
+                          ? C.surface
+                          : C.textSecondary,
+                    },
+                  ]}
+                >
+                  {opt.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
+
+          {/* Language selector */}
+          <Text style={[styles.subsectionLabel, { color: C.textSecondary, marginTop: 16 }]}>{t('settings.language')}</Text>
+          <TouchableOpacity
+            style={[styles.languageSelector, { backgroundColor: C.card, borderColor: C.border }]}
+            onPress={() => setShowLanguageModal(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.languageSelectorFlag}>{selectedLanguage.flag}</Text>
+            <Text style={[styles.languageSelectorLabel, { color: C.text }]}>
+              {selectedLanguage.label}
+            </Text>
+            <Ionicons name="chevron-down" size={18} color={C.textSecondary} />
+          </TouchableOpacity>
         </View>
 
         {/* Connected Services */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Servicios Conectados</Text>
-          <View style={[styles.sectionContent, { backgroundColor: COLORS.background }]}>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.connectedServices')}</Text>
+          <View style={[styles.sectionContent, { backgroundColor: C.background }]}>
             {/* Apple Health (iOS) / Google Health Connect (Android) */}
             {Platform.OS === 'ios' ? (
-              <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+              <View style={[styles.serviceItem, { borderBottomColor: C.border }]}>
                 <View style={styles.serviceInfo}>
-                  <Ionicons name="logo-apple" size={24} color={COLORS.text} />
+                  <Ionicons name="logo-apple" size={24} color={C.text} />
                   <View style={styles.serviceText}>
-                    <Text style={[styles.serviceName, { color: COLORS.text }]}>Apple Health</Text>
-                    <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
-                      {settings.connectedServices.appleHealth ? 'Conectado' : 'No conectado'}
+                    <Text style={[styles.serviceName, { color: C.text }]}>Apple Health</Text>
+                    <Text style={[styles.serviceStatus, { color: C.textSecondary }]}>
+                      {settings.connectedServices.appleHealth ? t('settingsScreen.connected') : t('settingsScreen.notConnected')}
                     </Text>
                   </View>
                 </View>
                 <Switch
                   value={settings.connectedServices.appleHealth}
                   onValueChange={() => handleConnectService('appleHealth')}
-                  trackColor={{ false: COLORS.border, true: `${COLORS.primary}40` }}
-                  thumbColor={settings.connectedServices.appleHealth ? COLORS.primary : COLORS.textSecondary}
+                  trackColor={{ false: C.border, true: `${C.primary}40` }}
+                  thumbColor={settings.connectedServices.appleHealth ? C.primary : C.textSecondary}
                 />
               </View>
             ) : (
-              <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+              <View style={[styles.serviceItem, { borderBottomColor: C.border }]}>
                 <View style={styles.serviceInfo}>
                   <Ionicons name="logo-google" size={24} color="#4285F4" />
                   <View style={styles.serviceText}>
-                    <Text style={[styles.serviceName, { color: COLORS.text }]}>Google Fit</Text>
-                    <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
-                      {settings.connectedServices.googleHealth ? 'Conectado' : 'No conectado'}
+                    <Text style={[styles.serviceName, { color: C.text }]}>Google Fit</Text>
+                    <Text style={[styles.serviceStatus, { color: C.textSecondary }]}>
+                      {settings.connectedServices.googleHealth ? t('settingsScreen.connected') : t('settingsScreen.notConnected')}
                     </Text>
                   </View>
                 </View>
                 <Switch
                   value={settings.connectedServices.googleHealth}
                   onValueChange={() => handleConnectService('googleHealth')}
-                  trackColor={{ false: COLORS.border, true: `${COLORS.primary}40` }}
-                  thumbColor={settings.connectedServices.googleHealth ? COLORS.primary : COLORS.textSecondary}
+                  trackColor={{ false: C.border, true: `${C.primary}40` }}
+                  thumbColor={settings.connectedServices.googleHealth ? C.primary : C.textSecondary}
                 />
               </View>
             )}
 
             {/* Garmin */}
-            <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+            <View style={[styles.serviceItem, { borderBottomColor: C.border }]}>
               <View style={styles.serviceInfo}>
                 <Ionicons name="watch-outline" size={24} color="#007DC3" />
                 <View style={styles.serviceText}>
-                  <Text style={[styles.serviceName, { color: COLORS.text }]}>Garmin</Text>
-                  <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
-                    {settings.connectedServices.garmin ? 'Conectado' : 'No conectado'}
+                  <Text style={[styles.serviceName, { color: C.text }]}>Garmin</Text>
+                  <Text style={[styles.serviceStatus, { color: C.textSecondary }]}>
+                    {settings.connectedServices.garmin ? t('settingsScreen.connected') : t('settingsScreen.notConnected')}
                   </Text>
                 </View>
               </View>
               <Switch
                 value={settings.connectedServices.garmin}
                 onValueChange={() => handleConnectService('garmin')}
-                trackColor={{ false: COLORS.border, true: '#007DC340' }}
-                thumbColor={settings.connectedServices.garmin ? '#007DC3' : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: '#007DC340' }}
+                thumbColor={settings.connectedServices.garmin ? '#007DC3' : C.textSecondary}
               />
             </View>
 
             {/* Fitbit */}
-            <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+            <View style={[styles.serviceItem, { borderBottomColor: C.border }]}>
               <View style={styles.serviceInfo}>
                 <Ionicons name="pulse-outline" size={24} color="#00B0B9" />
                 <View style={styles.serviceText}>
-                  <Text style={[styles.serviceName, { color: COLORS.text }]}>Fitbit</Text>
-                  <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
-                    {settings.connectedServices.fitbit ? 'Conectado' : 'No conectado'}
+                  <Text style={[styles.serviceName, { color: C.text }]}>Fitbit</Text>
+                  <Text style={[styles.serviceStatus, { color: C.textSecondary }]}>
+                    {settings.connectedServices.fitbit ? t('settingsScreen.connected') : t('settingsScreen.notConnected')}
                   </Text>
                 </View>
               </View>
               <Switch
                 value={settings.connectedServices.fitbit}
                 onValueChange={() => handleConnectService('fitbit')}
-                trackColor={{ false: COLORS.border, true: '#00B0B940' }}
-                thumbColor={settings.connectedServices.fitbit ? '#00B0B9' : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: '#00B0B940' }}
+                thumbColor={settings.connectedServices.fitbit ? '#00B0B9' : C.textSecondary}
               />
             </View>
 
             {/* Samsung Health */}
-            <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+            <View style={[styles.serviceItem, { borderBottomColor: C.border }]}>
               <View style={styles.serviceInfo}>
                 <Ionicons name="heart-circle-outline" size={24} color="#1428A0" />
                 <View style={styles.serviceText}>
-                  <Text style={[styles.serviceName, { color: COLORS.text }]}>Samsung Health</Text>
-                  <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
-                    {settings.connectedServices.samsungHealth ? 'Conectado' : 'No conectado'}
+                  <Text style={[styles.serviceName, { color: C.text }]}>Samsung Health</Text>
+                  <Text style={[styles.serviceStatus, { color: C.textSecondary }]}>
+                    {settings.connectedServices.samsungHealth ? t('settingsScreen.connected') : t('settingsScreen.notConnected')}
                   </Text>
                 </View>
               </View>
               <Switch
                 value={settings.connectedServices.samsungHealth}
                 onValueChange={() => handleConnectService('samsungHealth')}
-                trackColor={{ false: COLORS.border, true: '#1428A040' }}
-                thumbColor={settings.connectedServices.samsungHealth ? '#1428A0' : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: '#1428A040' }}
+                thumbColor={settings.connectedServices.samsungHealth ? '#1428A0' : C.textSecondary}
               />
             </View>
 
             {/* Wear OS (Android only) */}
             {Platform.OS === 'android' && (
-              <View style={[styles.serviceItem, { borderBottomColor: COLORS.border }]}>
+              <View style={[styles.serviceItem, { borderBottomColor: C.border }]}>
                 <View style={styles.serviceInfo}>
                   <Ionicons name="watch-outline" size={24} color="#4285F4" />
                   <View style={styles.serviceText}>
-                    <Text style={[styles.serviceName, { color: COLORS.text }]}>Wear OS</Text>
-                    <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
-                      {settings.connectedServices.wearOS ? 'Conectado' : 'No conectado'}
+                    <Text style={[styles.serviceName, { color: C.text }]}>Wear OS</Text>
+                    <Text style={[styles.serviceStatus, { color: C.textSecondary }]}>
+                      {settings.connectedServices.wearOS ? t('settingsScreen.connected') : t('settingsScreen.notConnected')}
                     </Text>
                   </View>
                 </View>
                 <Switch
                   value={settings.connectedServices.wearOS}
                   onValueChange={() => handleConnectService('wearOS')}
-                  trackColor={{ false: COLORS.border, true: '#4285F440' }}
-                  thumbColor={settings.connectedServices.wearOS ? '#4285F4' : COLORS.textSecondary}
+                  trackColor={{ false: C.border, true: '#4285F440' }}
+                  thumbColor={settings.connectedServices.wearOS ? '#4285F4' : C.textSecondary}
                 />
               </View>
             )}
@@ -723,17 +785,17 @@ const SettingsScreen = () => {
               <View style={styles.serviceInfo}>
                 <Ionicons name="body-outline" size={24} color="#E8383D" />
                 <View style={styles.serviceText}>
-                  <Text style={[styles.serviceName, { color: COLORS.text }]}>InBody</Text>
-                  <Text style={[styles.serviceStatus, { color: COLORS.textSecondary }]}>
-                    {settings.connectedServices.inBody ? 'Conectado' : 'No conectado'}
+                  <Text style={[styles.serviceName, { color: C.text }]}>InBody</Text>
+                  <Text style={[styles.serviceStatus, { color: C.textSecondary }]}>
+                    {settings.connectedServices.inBody ? t('settingsScreen.connected') : t('settingsScreen.notConnected')}
                   </Text>
                 </View>
               </View>
               <Switch
                 value={settings.connectedServices.inBody}
                 onValueChange={() => handleConnectService('inBody')}
-                trackColor={{ false: COLORS.border, true: '#E8383D40' }}
-                thumbColor={settings.connectedServices.inBody ? '#E8383D' : COLORS.textSecondary}
+                trackColor={{ false: C.border, true: '#E8383D40' }}
+                thumbColor={settings.connectedServices.inBody ? '#E8383D' : C.textSecondary}
               />
             </View>
           </View>
@@ -741,55 +803,69 @@ const SettingsScreen = () => {
 
         {/* Coach/Share Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Entrenador/Compartir</Text>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.coachShare')}</Text>
           <View style={styles.buttonGroup}>
             {renderButton(
               'person-add',
-              'Conectar con Entrenador',
+              t('settings.connectCoach'),
               handleCoachShare,
-              COLORS.secondary
+              C.accent
             )}
           </View>
         </View>
 
         {/* About Section */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: COLORS.text }]}>Información</Text>
-          <View style={[styles.sectionContent, { backgroundColor: COLORS.background }]}>
-            {renderSettingItem('Versión', 'v1.0.0')}
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.about')}</Text>
+          <View style={[styles.sectionContent, { backgroundColor: C.background }]}>
+            {renderSettingItem(t('settings.version'), 'v1.0.0')}
             <TouchableOpacity
-              style={styles.linkItem}
+              style={[styles.linkItem, { borderBottomColor: C.border }]}
+              onPress={() => router.push('/help')}
+            >
+              <Text style={[styles.linkText, { color: C.primary }]}>{t('common.help')}</Text>
+              <Ionicons name="help-circle-outline" size={20} color={C.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.linkItem, { borderBottomColor: C.border }]}
+              onPress={() => router.push('/about')}
+            >
+              <Text style={[styles.linkText, { color: C.primary }]}>{t('common.about')}</Text>
+              <Ionicons name="information-circle-outline" size={20} color={C.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.linkItem, { borderBottomColor: C.border }]}
               onPress={() =>
                 Linking.openURL('https://cals2gains.com/terms')
               }
             >
-              <Text style={[styles.linkText, { color: COLORS.primary }]}>Términos de Servicio</Text>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.primary} />
+              <Text style={[styles.linkText, { color: C.primary }]}>{t('auth.termsOfService')}</Text>
+              <Ionicons name="chevron-forward" size={20} color={C.primary} />
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.linkItem}
+              style={[styles.linkItem, { borderBottomColor: C.border }]}
               onPress={() =>
                 Linking.openURL('https://cals2gains.com/privacy')
               }
             >
-              <Text style={[styles.linkText, { color: COLORS.primary }]}>Política de Privacidad</Text>
-              <Ionicons name="chevron-forward" size={20} color={COLORS.primary} />
+              <Text style={[styles.linkText, { color: C.primary }]}>{t('auth.privacyPolicy')}</Text>
+              <Ionicons name="chevron-forward" size={20} color={C.primary} />
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.linkItem}
+              style={[styles.linkItem, { borderBottomColor: C.border }]}
               onPress={() =>
                 Linking.openURL('https://apps.apple.com/app/cals2gains')
               }
             >
-              <Text style={[styles.linkText, { color: COLORS.primary }]}>Calificar Aplicación</Text>
-              <Ionicons name="star" size={20} color={COLORS.warning} />
+              <Text style={[styles.linkText, { color: C.primary }]}>{t('settings.rateApp')}</Text>
+              <Ionicons name="star" size={20} color={C.warning} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Logout Button */}
         <View style={styles.section}>
-          {renderButton('log-out', 'Cerrar Sesión', handleLogout, COLORS.warning)}
+          {renderButton('log-out', t('settingsScreen.signOut'), handleLogout, C.warning)}
         </View>
 
         {/* Delete Account Link */}
@@ -797,13 +873,56 @@ const SettingsScreen = () => {
           style={styles.deleteAccountLink}
           onPress={handleDeleteAccount}
         >
-          <Text style={[styles.deleteAccountText, { color: COLORS.error }]}>
-            Eliminar Cuenta
+          <Text style={[styles.deleteAccountText, { color: C.error }]}>
+            {t('settingsScreen.deleteAccount')}
           </Text>
         </TouchableOpacity>
 
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      {/* Language Modal — OUTSIDE ScrollView so it renders as true overlay */}
+      <Modal
+        visible={showLanguageModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowLanguageModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.languageModal, { backgroundColor: C.cardElevated || C.surface }]}>
+            <View style={styles.languageModalHeader}>
+              <Text style={[styles.languageModalTitle, { color: C.text }]}>{t('settings.selectLanguage')}</Text>
+              <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
+                <Ionicons name="close" size={24} color={C.textSecondary} />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={SUPPORTED_LANGUAGES}
+              keyExtractor={(item) => item.code}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.languageModalItem,
+                    { borderBottomColor: C.border },
+                    item.code === selectedLanguage.code && { backgroundColor: `${C.primary}15` },
+                  ]}
+                  onPress={() => handleLanguageSelect(item)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.languageModalFlag}>{item.flag}</Text>
+                  <Text style={[styles.languageModalLabel, { color: C.text }]}>
+                    {item.label}
+                  </Text>
+                  {item.code === selectedLanguage.code && (
+                    <Ionicons name="checkmark-circle" size={22} color={C.primary} />
+                  )}
+                </TouchableOpacity>
+              )}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -923,6 +1042,7 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     flex: 1,
+    flexDirection: 'row',
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10,
@@ -983,7 +1103,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5ea',
   },
   linkText: {
     fontSize: 15,
@@ -1011,6 +1130,75 @@ const styles = StyleSheet.create({
   },
   deleteAccountText: {
     fontSize: 13,
+    fontWeight: '500',
+  },
+
+  // Subsection label
+  subsectionLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+  },
+
+  // Language selector button
+  languageSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    gap: 10,
+  },
+  languageSelectorFlag: {
+    fontSize: 20,
+  },
+  languageSelectorLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '500',
+  },
+
+  // Language modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  languageModal: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 16,
+    paddingBottom: 40,
+    maxHeight: '70%',
+  },
+  languageModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+  },
+  languageModalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  languageModalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    gap: 12,
+  },
+  languageModalFlag: {
+    fontSize: 22,
+  },
+  languageModalLabel: {
+    flex: 1,
+    fontSize: 16,
     fontWeight: '500',
   },
 });

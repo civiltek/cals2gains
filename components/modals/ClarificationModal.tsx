@@ -3,7 +3,7 @@
 // ============================================
 // Asks the user clarifying questions about ingredients in their food
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { ClarifyingQuestion, AnalysisAnswers } from '../../types';
-import Colors from '../../constants/colors';
+import { useColors } from '../../store/themeStore';
 
 interface ClarificationModalProps {
   visible: boolean;
@@ -36,6 +36,8 @@ const ClarificationModal: React.FC<ClarificationModalProps> = ({
   isRefining = false,
 }) => {
   const { t, i18n } = useTranslation();
+  const C = useColors();
+  const styles = useMemo(() => createStyles(C), [C]);
   const [answers, setAnswers] = useState<AnalysisAnswers>({});
 
   const allAnswered = questions.every((q) => answers[q.id] !== undefined);
@@ -71,7 +73,7 @@ const ClarificationModal: React.FC<ClarificationModalProps> = ({
           <View style={styles.header}>
             <View style={styles.handle} />
             <View style={styles.iconContainer}>
-              <Ionicons name="help-circle" size={32} color={Colors.primary} />
+              <Ionicons name="help-circle" size={32} color={C.primary} />
             </View>
             <Text style={styles.title}>{t('analysis.clarifyTitle')}</Text>
             <Text style={styles.subtitle}>
@@ -112,7 +114,7 @@ const ClarificationModal: React.FC<ClarificationModalProps> = ({
                           isSelected && styles.optionCheckSelected,
                         ]}>
                           {isSelected && (
-                            <Ionicons name="checkmark" size={14} color={Colors.white} />
+                            <Ionicons name="checkmark" size={14} color="#FFFFFF" />
                           )}
                         </View>
                         <Text style={[
@@ -137,7 +139,7 @@ const ClarificationModal: React.FC<ClarificationModalProps> = ({
               disabled={isRefining}
             >
               <Text style={styles.skipText}>
-                {i18n.language === 'es' ? 'Saltar' : 'Skip'}
+                {t('common.skip')}
               </Text>
             </TouchableOpacity>
 
@@ -150,13 +152,13 @@ const ClarificationModal: React.FC<ClarificationModalProps> = ({
               disabled={!allAnswered || isRefining}
             >
               {isRefining ? (
-                <ActivityIndicator color={Colors.white} size="small" />
+                <ActivityIndicator color="#FFFFFF" size="small" />
               ) : (
                 <>
                   <Text style={styles.confirmText}>
-                    {i18n.language === 'es' ? 'Confirmar' : 'Confirm'}
+                    {t('common.confirm')}
                   </Text>
-                  <Ionicons name="arrow-forward" size={18} color={Colors.white} />
+                  <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
                 </>
               )}
             </TouchableOpacity>
@@ -167,14 +169,14 @@ const ClarificationModal: React.FC<ClarificationModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (C: any) => StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: Colors.overlay,
+    backgroundColor: C.overlay,
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingBottom: 34,
@@ -183,7 +185,7 @@ const styles = StyleSheet.create({
   handle: {
     width: 40,
     height: 4,
-    backgroundColor: Colors.border,
+    backgroundColor: C.border,
     borderRadius: 2,
     alignSelf: 'center',
     marginBottom: 16,
@@ -194,13 +196,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomColor: C.border,
   },
   iconContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: Colors.primary + '20',
+    backgroundColor: C.primary + '20',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -208,19 +210,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.text,
+    color: C.text,
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: C.textSecondary,
     textAlign: 'center',
     marginBottom: 8,
   },
   dishName: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.primary,
+    color: C.primary,
     textAlign: 'center',
   },
   scrollView: {
@@ -230,11 +232,11 @@ const styles = StyleSheet.create({
   questionContainer: {
     paddingVertical: 20,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomColor: C.border,
   },
   questionNumber: {
     fontSize: 11,
-    color: Colors.textMuted,
+    color: C.textMuted,
     marginBottom: 6,
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -242,7 +244,7 @@ const styles = StyleSheet.create({
   questionText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
+    color: C.text,
     marginBottom: 16,
     lineHeight: 22,
   },
@@ -252,37 +254,37 @@ const styles = StyleSheet.create({
   optionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.background,
+    backgroundColor: C.background,
     borderRadius: 12,
     padding: 14,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
     gap: 12,
   },
   optionButtonSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary + '15',
+    borderColor: C.primary,
+    backgroundColor: C.primary + '15',
   },
   optionCheck: {
     width: 22,
     height: 22,
     borderRadius: 11,
     borderWidth: 2,
-    borderColor: Colors.border,
+    borderColor: C.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
   optionCheckSelected: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    backgroundColor: C.primary,
+    borderColor: C.primary,
   },
   optionText: {
     fontSize: 15,
-    color: Colors.textSecondary,
+    color: C.textSecondary,
     flex: 1,
   },
   optionTextSelected: {
-    color: Colors.text,
+    color: C.text,
     fontWeight: '500',
   },
   actions: {
@@ -296,19 +298,19 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
     alignItems: 'center',
   },
   skipText: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: C.textSecondary,
     fontWeight: '500',
   },
   confirmButton: {
     flex: 2,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: Colors.primary,
+    backgroundColor: C.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -320,7 +322,7 @@ const styles = StyleSheet.create({
   confirmText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.white,
+    color: '#FFFFFF',
   },
 });
 

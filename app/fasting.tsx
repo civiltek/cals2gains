@@ -15,7 +15,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Svg, { Circle } from 'react-native-svg';
-import { COLORS } from '../theme';
+import { useTranslation } from 'react-i18next';
+import { useColors } from '../store/themeStore';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 // Mock store - replace with actual fastingStore
 const fastingStore = {
@@ -62,6 +65,8 @@ interface FastingStats {
 }
 
 export default function FastingScreen() {
+  const C = useColors();
+  const { t } = useTranslation();
   const [activeFast, setActiveFast] = useState<FastingSession | null>(null);
   const [protocols, setProtocols] = useState<FastingProtocol[]>([
     { id: '16-8', label: '16:8', hours: 16 },
@@ -145,7 +150,7 @@ export default function FastingScreen() {
         useNativeDriver: false,
       }).start();
     } catch (error) {
-      Alert.alert('Error', 'No se pudo iniciar el ayuno');
+      Alert.alert('Error', t('fasting.errorStart'));
     }
   };
 
@@ -176,15 +181,15 @@ export default function FastingScreen() {
       const statsData = await fastingStore.getStats();
       setStats(statsData);
 
-      Alert.alert('Éxito', 'Ayuno finalizado. Buen trabajo!');
+      Alert.alert(t('fasting.success'), t('fasting.fastEnded'));
     } catch (error) {
-      Alert.alert('Error', 'No se pudo finalizar el ayuno');
+      Alert.alert('Error', t('fasting.errorEnd'));
     }
   };
 
   const handleCustomProtocol = async () => {
     if (!customHours || isNaN(parseInt(customHours))) {
-      Alert.alert('Error', 'Por favor ingresa un número válido de horas');
+      Alert.alert(t('errors.error'), t('fasting.invalidHours'));
       return;
     }
 
@@ -205,30 +210,30 @@ export default function FastingScreen() {
 
   const getStatusText = (): string => {
     if (!activeFast) {
-      return 'Sin ayuno activo';
+      return t('fasting.noActiveFast');
     }
     if (isFasting) {
       const targetTime =
         activeFast.startTime.getTime() + activeFast.duration * 3600000;
       const now = new Date().getTime();
       if (now < targetTime) {
-        return 'Ayunando...';
+        return t('fasting.fasting');
       } else {
-        return 'Objetivo alcanzado!';
+        return t('fasting.goalReached');
       }
     }
-    return 'Ayuno completado';
+    return t('fasting.completed');
   };
 
   const getStatusColor = (): string => {
-    if (!activeFast) return COLORS.textTertiary;
+    if (!activeFast) return C.textMuted;
     if (isFasting) {
       const targetTime =
         activeFast.startTime.getTime() + activeFast.duration * 3600000;
       const now = new Date().getTime();
-      return now < targetTime ? COLORS.violet : COLORS.coral;
+      return now < targetTime ? C.primary : C.accent;
     }
-    return COLORS.bone;
+    return C.text;
   };
 
   const CircleTimer = () => {
@@ -246,15 +251,15 @@ export default function FastingScreen() {
             cx={100}
             cy={100}
             r={radius}
-            stroke={COLORS.cardHover}
+            stroke={C.surfaceLight}
             strokeWidth={8}
             fill="none"
           />
-          <Animated.Circle
+          <AnimatedCircle
             cx={100}
             cy={100}
             r={radius}
-            stroke={COLORS.violet}
+            stroke={C.primary}
             strokeWidth={8}
             fill="none"
             strokeDasharray={circumference}
@@ -263,14 +268,14 @@ export default function FastingScreen() {
           />
         </Svg>
         <View style={styles.timerText}>
-          <Text style={styles.elapsedHours}>
+          <Text style={[styles.elapsedHours, { color: C.primary }]}>
             {Math.floor(elapsedHours)}h
           </Text>
-          <Text style={styles.elapsedMinutes}>
+          <Text style={[styles.elapsedMinutes, { color: C.textSecondary }]}>
             {Math.floor((elapsedHours % 1) * 60)}m
           </Text>
           {activeFast && (
-            <Text style={styles.targetText}>
+            <Text style={[styles.targetText, { color: C.textMuted }]}>
               / {activeFast.duration}h
             </Text>
           )}
@@ -285,7 +290,8 @@ export default function FastingScreen() {
       <TouchableOpacity
         style={[
           styles.protocolButton,
-          isSelected && styles.protocolButtonActive,
+          { backgroundColor: C.surface, borderColor: C.border },
+          isSelected && { backgroundColor: C.primary, borderColor: C.primary },
         ]}
         onPress={() => {
           setSelectedProtocol(protocol);
@@ -296,7 +302,8 @@ export default function FastingScreen() {
         <Text
           style={[
             styles.protocolText,
-            isSelected && styles.protocolTextActive,
+            { color: C.textSecondary },
+            isSelected && { color: C.background },
           ]}
         >
           {protocol.label}
@@ -317,21 +324,21 @@ export default function FastingScreen() {
     });
 
     return (
-      <View style={styles.sessionCard}>
+      <View style={[styles.sessionCard, { backgroundColor: C.surface, borderColor: C.border }]}>
         <View style={styles.sessionHeader}>
           <View>
-            <Text style={styles.sessionDate}>{dateStr}</Text>
-            <Text style={styles.sessionTime}>{timeStr}</Text>
+            <Text style={[styles.sessionDate, { color: C.text }]}>{dateStr}</Text>
+            <Text style={[styles.sessionTime, { color: C.textSecondary }]}>{timeStr}</Text>
           </View>
           <View style={styles.sessionDuration}>
-            <Text style={styles.sessionDurationValue}>
+            <Text style={[styles.sessionDurationValue, { color: C.primary }]}>
               {Math.round(session.duration * 10) / 10}h
             </Text>
-            <Text style={styles.sessionDurationLabel}>ayuno</Text>
+            <Text style={[styles.sessionDurationLabel, { color: C.textSecondary }]}>{t('fasting.label')}</Text>
           </View>
           {session.completed && (
             <View style={styles.completedBadge}>
-              <Ionicons name="checkmark-circle" size={24} color={COLORS.coral} />
+              <Ionicons name="checkmark-circle" size={24} color={C.accent} />
             </View>
           )}
         </View>
@@ -341,18 +348,18 @@ export default function FastingScreen() {
 
   const EmptySessionsState = () => (
     <View style={styles.emptyState}>
-      <Ionicons name="time" size={48} color={COLORS.textTertiary} />
-      <Text style={styles.emptyStateText}>
-        Inicia tu primer ayuno para ver el historial
+      <Ionicons name="time" size={48} color={C.textMuted} />
+      <Text style={[styles.emptyStateText, { color: C.textMuted }]}>
+        {t('fasting.emptyHistory')}
       </Text>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: C.background }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Ayuno Intermitente</Text>
+          <Text style={[styles.headerTitle, { color: C.text }]}>{t('fasting.title')}</Text>
         </View>
 
         {/* Timer Section */}
@@ -366,28 +373,28 @@ export default function FastingScreen() {
         {/* Start/Stop Button */}
         {!isFasting && (
           <TouchableOpacity
-            style={styles.startButton}
+            style={[styles.startButton, { backgroundColor: C.accent }]}
             onPress={handleStartFast}
           >
-            <Ionicons name="play" size={20} color={COLORS.background} />
-            <Text style={styles.startButtonText}>Iniciar Ayuno</Text>
+            <Ionicons name="play" size={20} color={C.background} />
+            <Text style={[styles.startButtonText, { color: C.background }]}>{t('fasting.startFast')}</Text>
           </TouchableOpacity>
         )}
 
         {isFasting && (
           <TouchableOpacity
-            style={styles.stopButton}
+            style={[styles.stopButton, { backgroundColor: C.primary }]}
             onPress={handleEndFast}
           >
-            <Ionicons name="stop" size={20} color={COLORS.background} />
-            <Text style={styles.stopButtonText}>Finalizar Ayuno</Text>
+            <Ionicons name="stop" size={20} color={C.background} />
+            <Text style={[styles.stopButtonText, { color: C.background }]}>{t('fasting.endFast')}</Text>
           </TouchableOpacity>
         )}
 
         {/* Protocol Selector */}
         <View style={styles.protocolSection}>
           <View style={styles.protocolHeader}>
-            <Text style={styles.sectionTitle}>Protocolo</Text>
+            <Text style={[styles.sectionTitle, { color: C.text }]}>{t('fasting.protocol')}</Text>
             <TouchableOpacity
               onPress={() => setShowCustomProtocol(true)}
               disabled={isFasting}
@@ -395,7 +402,7 @@ export default function FastingScreen() {
               <Ionicons
                 name="add-circle"
                 size={24}
-                color={isFasting ? COLORS.textTertiary : COLORS.violet}
+                color={isFasting ? C.textMuted : C.primary}
               />
             </TouchableOpacity>
           </View>
@@ -418,26 +425,26 @@ export default function FastingScreen() {
         {/* Time Window Config */}
         {selectedProtocol && !selectedProtocol.id.includes('5-2') && (
           <View style={styles.timeWindowSection}>
-            <Text style={styles.sectionTitle}>Ventana de Comida</Text>
+            <Text style={[styles.sectionTitle, { color: C.text }]}>{t('fasting.eatingWindow')}</Text>
             <View style={styles.timeInputRow}>
               <View style={styles.timeInput}>
-                <Text style={styles.timeInputLabel}>Inicio</Text>
+                <Text style={[styles.timeInputLabel, { color: C.textSecondary }]}>{t('fasting.start')}</Text>
                 <TextInput
-                  style={styles.timeInputField}
+                  style={[styles.timeInputField, { backgroundColor: C.surface, borderColor: C.border, color: C.text }]}
                   placeholder="09:00"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textMuted}
                   editable={!isFasting}
                 />
               </View>
               <View style={styles.timeInputDivider}>
-                <Text style={styles.dividerText}>hasta</Text>
+                <Text style={[styles.dividerText, { color: C.textMuted }]}>{t('fasting.until')}</Text>
               </View>
               <View style={styles.timeInput}>
-                <Text style={styles.timeInputLabel}>Fin</Text>
+                <Text style={[styles.timeInputLabel, { color: C.textSecondary }]}>{t('fasting.end')}</Text>
                 <TextInput
-                  style={styles.timeInputField}
+                  style={[styles.timeInputField, { backgroundColor: C.surface, borderColor: C.border, color: C.text }]}
                   placeholder="17:00"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={C.textMuted}
                   editable={!isFasting}
                 />
               </View>
@@ -447,28 +454,28 @@ export default function FastingScreen() {
 
         {/* Stats Section */}
         <View style={styles.statsSection}>
-          <Text style={styles.sectionTitle}>Estadísticas</Text>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('fasting.stats')}</Text>
           <View style={styles.statsGrid}>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>
+            <View style={[styles.statCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+              <Text style={[styles.statValue, { color: C.primary }]}>
                 {stats.averageDuration.toFixed(1)}h
               </Text>
-              <Text style={styles.statLabel}>Promedio</Text>
+              <Text style={[styles.statLabel, { color: C.textSecondary }]}>{t('fasting.averageDuration', { hours: stats.averageDuration.toFixed(1) })}</Text>
             </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>{stats.longestFast}h</Text>
-              <Text style={styles.statLabel}>Máximo</Text>
+            <View style={[styles.statCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+              <Text style={[styles.statValue, { color: C.primary }]}>{stats.longestFast}h</Text>
+              <Text style={[styles.statLabel, { color: C.textSecondary }]}>{t('fasting.longestFast', { hours: stats.longestFast })}</Text>
             </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>{stats.completionRate}%</Text>
-              <Text style={styles.statLabel}>Tasa Éxito</Text>
+            <View style={[styles.statCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+              <Text style={[styles.statValue, { color: C.primary }]}>{stats.completionRate}%</Text>
+              <Text style={[styles.statLabel, { color: C.textSecondary }]}>{t('fasting.successRate', { rate: stats.completionRate })}</Text>
             </View>
           </View>
         </View>
 
         {/* History Section */}
         <View style={styles.historySection}>
-          <Text style={styles.sectionTitle}>Historial</Text>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('fasting.history')}</Text>
           {sessions.length > 0 ? (
             <FlatList
               data={sessions}
@@ -493,15 +500,15 @@ export default function FastingScreen() {
         onRequestClose={() => setShowCustomProtocol(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.customProtocolDialog}>
-            <Text style={styles.dialogTitle}>Crear Protocolo Personalizado</Text>
+          <View style={[styles.customProtocolDialog, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <Text style={[styles.dialogTitle, { color: C.text }]}>{t('fasting.createProtocol')}</Text>
 
             <View style={styles.dialogSection}>
-              <Text style={styles.dialogLabel}>Horas de Ayuno</Text>
+              <Text style={[styles.dialogLabel, { color: C.text }]}>{t('fasting.fastingHours')}</Text>
               <TextInput
-                style={styles.dialogInput}
-                placeholder="p.ej., 14, 16, 18"
-                placeholderTextColor={COLORS.textTertiary}
+                style={[styles.dialogInput, { backgroundColor: C.surfaceLight, borderColor: C.border, color: C.text }]}
+                placeholder={t('fasting.hoursPlaceholder')}
+                placeholderTextColor={C.textMuted}
                 keyboardType="numeric"
                 value={customHours}
                 onChangeText={setCustomHours}
@@ -510,16 +517,16 @@ export default function FastingScreen() {
 
             <View style={styles.dialogButtonRow}>
               <TouchableOpacity
-                style={styles.dialogButton}
+                style={[styles.dialogButton, { backgroundColor: C.surfaceLight, borderColor: C.border }]}
                 onPress={() => setShowCustomProtocol(false)}
               >
-                <Text style={styles.dialogButtonText}>Cancelar</Text>
+                <Text style={[styles.dialogButtonText, { color: C.text }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.dialogButton, styles.dialogButtonPrimary]}
+                style={[styles.dialogButton, { backgroundColor: C.primary, borderColor: C.primary }]}
                 onPress={handleCustomProtocol}
               >
-                <Text style={styles.dialogButtonTextPrimary}>Crear</Text>
+                <Text style={[styles.dialogButtonTextPrimary, { color: C.background }]}>{t('fasting.create')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -532,7 +539,6 @@ export default function FastingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
     paddingTop: 12,
   },
   header: {
@@ -542,7 +548,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.bone,
   },
   timerSection: {
     alignItems: 'center',
@@ -566,16 +571,13 @@ const styles = StyleSheet.create({
   elapsedHours: {
     fontSize: 48,
     fontWeight: '700',
-    color: COLORS.violet,
   },
   elapsedMinutes: {
     fontSize: 18,
-    color: COLORS.textSecondary,
     marginTop: 4,
   },
   targetText: {
     fontSize: 12,
-    color: COLORS.textTertiary,
     marginTop: 8,
   },
   statusText: {
@@ -584,7 +586,6 @@ const styles = StyleSheet.create({
   },
   startButton: {
     flexDirection: 'row',
-    backgroundColor: COLORS.coral,
     marginHorizontal: 16,
     borderRadius: 12,
     paddingVertical: 14,
@@ -597,11 +598,9 @@ const styles = StyleSheet.create({
   startButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.background,
   },
   stopButton: {
     flexDirection: 'row',
-    backgroundColor: COLORS.violet,
     marginHorizontal: 16,
     borderRadius: 12,
     paddingVertical: 14,
@@ -614,7 +613,6 @@ const styles = StyleSheet.create({
   stopButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.background,
   },
   protocolSection: {
     paddingHorizontal: 16,
@@ -629,7 +627,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   protocolGrid: {
     flexDirection: 'row',
@@ -641,22 +638,16 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 8,
     borderRadius: 12,
-    backgroundColor: COLORS.card,
     borderWidth: 1,
-    borderColor: COLORS.border,
     alignItems: 'center',
   },
   protocolButtonActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
   },
   protocolText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.textSecondary,
   },
   protocolTextActive: {
-    color: COLORS.background,
   },
   extraProtocols: {
     flexDirection: 'row',
@@ -678,17 +669,13 @@ const styles = StyleSheet.create({
   },
   timeInputLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     marginBottom: 6,
   },
   timeInputField: {
-    backgroundColor: COLORS.card,
     borderWidth: 1,
-    borderColor: COLORS.border,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    color: COLORS.bone,
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
@@ -698,7 +685,6 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     fontSize: 12,
-    color: COLORS.textTertiary,
   },
   statsSection: {
     paddingHorizontal: 16,
@@ -711,32 +697,26 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: COLORS.card,
     borderRadius: 12,
     padding: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   statValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.violet,
   },
   statLabel: {
     fontSize: 11,
-    color: COLORS.textSecondary,
     marginTop: 6,
   },
   historySection: {
     paddingHorizontal: 16,
   },
   sessionCard: {
-    backgroundColor: COLORS.card,
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   sessionHeader: {
     flexDirection: 'row',
@@ -746,11 +726,9 @@ const styles = StyleSheet.create({
   sessionDate: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   sessionTime: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     marginTop: 2,
   },
   sessionDuration: {
@@ -759,11 +737,9 @@ const styles = StyleSheet.create({
   sessionDurationValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.violet,
   },
   sessionDurationLabel: {
     fontSize: 11,
-    color: COLORS.textSecondary,
     marginTop: 2,
   },
   completedBadge: {
@@ -775,7 +751,6 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     marginTop: 12,
-    color: COLORS.textTertiary,
     fontSize: 14,
     textAlign: 'center',
   },
@@ -786,17 +761,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   customProtocolDialog: {
-    backgroundColor: COLORS.card,
     borderRadius: 16,
     padding: 20,
     marginHorizontal: 24,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   dialogTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.bone,
     marginBottom: 20,
   },
   dialogSection: {
@@ -805,17 +777,13 @@ const styles = StyleSheet.create({
   dialogLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.bone,
     marginBottom: 8,
   },
   dialogInput: {
-    backgroundColor: COLORS.cardHover,
     borderWidth: 1,
-    borderColor: COLORS.border,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    color: COLORS.bone,
     fontSize: 14,
   },
   dialogButtonRow: {
@@ -828,22 +796,16 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
-    backgroundColor: COLORS.cardHover,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   dialogButtonPrimary: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
   },
   dialogButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.bone,
   },
   dialogButtonTextPrimary: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.background,
   },
 });

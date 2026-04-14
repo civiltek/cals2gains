@@ -174,25 +174,118 @@ export const WORDMARK = {
 } as const;
 
 // ============================================
-// LEGACY COMPAT — COLORS object
+// LEGACY COMPAT — COLORS object (MUTABLE / THEME-AWARE)
 // ============================================
-// For backward compatibility with existing screens that use COLORS.xxx
-// New screens should import BRAND_COLORS directly.
+// This object is mutated in-place by themeStore when theme changes.
+// Screens that import COLORS will see updated values on next render cycle.
+// For guaranteed reactivity inside a component, use useColors() from themeStore.
 
-export const COLORS = {
+// Dark palette defaults (matches BRAND_COLORS)
+const DARK_COMPAT = {
   background: BRAND_COLORS.plum,
   card: BRAND_COLORS.card,
   cardHover: BRAND_COLORS.cardHover,
+  cardElevated: BRAND_COLORS.cardElevated,
   violet: BRAND_COLORS.violet,
   coral: BRAND_COLORS.coral,
   bone: BRAND_COLORS.bone,
+  text: BRAND_COLORS.textPrimary,
+  textPrimary: BRAND_COLORS.textPrimary,
   textSecondary: BRAND_COLORS.textSecondary,
   textTertiary: BRAND_COLORS.textTertiary,
+  textMuted: BRAND_COLORS.textTertiary,
   border: BRAND_COLORS.border,
+  borderActive: BRAND_COLORS.borderActive,
+  divider: BRAND_COLORS.divider,
   success: BRAND_COLORS.success,
   warning: BRAND_COLORS.warning,
   error: BRAND_COLORS.error,
-} as const;
+  info: BRAND_COLORS.info,
+  macroProtein: BRAND_COLORS.macroProtein,
+  macroCarbs: BRAND_COLORS.macroCarbs,
+  macroFat: BRAND_COLORS.macroFat,
+  macroFiber: BRAND_COLORS.macroFiber,
+  tabBarBackground: BRAND_COLORS.tabBarBackground,
+  tabBarActive: BRAND_COLORS.tabBarActive,
+  tabBarInactive: BRAND_COLORS.tabBarInactive,
+  overlay: BRAND_COLORS.overlay,
+  white: '#FFFFFF',
+  black: '#000000',
+  transparent: 'transparent',
+  primary: BRAND_COLORS.violet,
+  primaryLight: '#B8ADFF',
+  accent: BRAND_COLORS.coral,
+  surface: BRAND_COLORS.card,
+  surfaceSecondary: BRAND_COLORS.cardHover,
+  surfaceLight: BRAND_COLORS.cardElevated,
+  // Light-mode palette fields (used by themeStore)
+  statusBarStyle: 'light' as 'light' | 'dark',
+  protein: '#F59E0B',
+  carbs: BRAND_COLORS.violet,
+  fat: BRAND_COLORS.coral,
+  fiber: '#34D399',
+  calories: BRAND_COLORS.violet,
+};
+
+// Light palette equivalents
+const LIGHT_COMPAT: typeof DARK_COMPAT = {
+  background: '#F5F2ED',
+  card: '#FFFFFF',
+  cardHover: '#F0ECE6',
+  cardElevated: '#FFFFFF',
+  violet: '#7B6FE0',
+  coral: '#E5553A',
+  bone: '#1A1525',             // Inverted for light mode — used as primary text
+  text: '#1A1525',
+  textPrimary: '#1A1525',
+  textSecondary: '#3D3547',    // ~11:1 on white
+  textTertiary: '#6B6478',     // ~6:1 on white
+  textMuted: '#6B6478',        // ~6:1 on white
+  border: '#E5E0D8',
+  borderActive: 'rgba(123, 111, 224, 0.4)',
+  divider: '#E5E0D8',
+  success: '#059669',
+  warning: '#D97706',
+  error: '#DC2626',
+  info: '#7B6FE0',
+  macroProtein: '#7B6FE0',
+  macroCarbs: '#1A1525',
+  macroFat: '#E5553A',
+  macroFiber: 'rgba(5, 150, 105, 0.5)',
+  tabBarBackground: '#F5F2ED',
+  tabBarActive: '#7B6FE0',
+  tabBarInactive: 'rgba(26,21,37,0.4)',
+  overlay: 'rgba(26,21,37,0.5)',
+  white: '#FFFFFF',
+  black: '#000000',
+  transparent: 'transparent',
+  primary: '#7B6FE0',
+  primaryLight: '#9C8CFF',
+  accent: '#E5553A',
+  surface: '#FFFFFF',
+  surfaceSecondary: '#F0ECE6',
+  surfaceLight: '#FFFFFF',
+  statusBarStyle: 'dark',
+  protein: '#D97706',
+  carbs: '#7B6FE0',
+  fat: '#E5553A',
+  fiber: '#059669',
+  calories: '#7B6FE0',
+};
+
+// Mutable COLORS object — starts as dark, gets swapped by themeStore
+export const COLORS: Record<string, any> = { ...DARK_COMPAT };
+
+/**
+ * Called by themeStore.setMode() to update the mutable COLORS object.
+ * All screens that imported COLORS will see updated values on next render.
+ */
+export function _syncThemeColors(isDark: boolean) {
+  const source = isDark ? DARK_COMPAT : LIGHT_COMPAT;
+  for (const key of Object.keys(source)) {
+    (COLORS as any)[key] = (source as any)[key];
+  }
+}
 
 // ============================================
 // GOOGLE FONTS IMPORT (for landing page / web)

@@ -1,15 +1,58 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ── User profile ──
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+
+    // ── Meals (top-level collection) ──
     match /meals/{mealId} {
       allow read, update, delete: if request.auth != null &&
         request.auth.uid == resource.data.userId;
       allow create: if request.auth != null &&
         request.auth.uid == request.resource.data.userId;
     }
+
+    // ── Meal templates ──
+    match /mealTemplates/{templateId} {
+      allow read, update, delete: if request.auth != null &&
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null &&
+        request.auth.uid == request.resource.data.userId;
+    }
+
+    // ── Weight entries ──
+    match /weightEntries/{entryId} {
+      allow read, update, delete: if request.auth != null &&
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null &&
+        request.auth.uid == request.resource.data.userId;
+    }
+
+    // ── Progress photos ──
+    match /progressPhotos/{photoId} {
+      allow read, update, delete: if request.auth != null &&
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null &&
+        request.auth.uid == request.resource.data.userId;
+    }
+
+    // ── Recipes ──
+    match /recipes/{recipeId} {
+      allow read, update, delete: if request.auth != null &&
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null &&
+        request.auth.uid == request.resource.data.userId;
+    }
+
+    // ── Shopping list (subcollection of user) ──
+    match /users/{userId}/shoppingList/{itemId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── Daily logs (keyed by {userId}_{date}) ──
     match /dailyLogs/{logId} {
       allow read, write: if request.auth != null &&
         logId.matches(request.auth.uid + '_.*');

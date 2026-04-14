@@ -10,16 +10,13 @@ import { useRouter } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 import { useMealStore } from '../store/mealStore';
+import { useColors } from '../store/themeStore';
 import { MealType } from '../types';
 
 const { width: SW } = Dimensions.get('window');
 const LABEL_SIZE = SW * 0.75;
-const C = {
-  bg: '#17121D', card: '#1E1829', violet: '#9C8CFF', coral: '#FF6A4D',
-  bone: '#F7F2EA', sec: 'rgba(247,242,234,0.6)', ter: 'rgba(247,242,234,0.35)',
-  overlay: 'rgba(23,18,29,0.7)',
-};
 
 interface ExtractedNutrition {
   servingSize: number;
@@ -38,6 +35,9 @@ interface ExtractedNutrition {
 }
 
 export default function LabelScannerScreen() {
+  const { t } = useTranslation();
+  const C = useColors();
+  const s = createStyles(C);
   const router = useRouter();
   const [perm, requestPerm] = useCameraPermissions();
   const { addMeal } = useMealStore();
@@ -55,10 +55,10 @@ export default function LabelScannerScreen() {
   const [editedNutrition, setEditedNutrition] = useState<ExtractedNutrition['nutrition'] | null>(null);
 
   const MEAL_OPTIONS: { id: MealType; label: string; icon: string }[] = [
-    { id: 'breakfast', label: 'Desayuno', icon: 'sunny-outline' },
-    { id: 'lunch', label: 'Almuerzo', icon: 'restaurant-outline' },
-    { id: 'dinner', label: 'Cena', icon: 'moon-outline' },
-    { id: 'snack', label: 'Snack', icon: 'cafe-outline' },
+    { id: 'breakfast', label: t('home.breakfast'), icon: 'sunny-outline' },
+    { id: 'lunch', label: t('home.lunch'), icon: 'restaurant-outline' },
+    { id: 'dinner', label: t('home.dinner'), icon: 'moon-outline' },
+    { id: 'snack', label: t('home.snack'), icon: 'cafe-outline' },
   ];
 
   const takePhoto = useCallback(async () => {
@@ -72,7 +72,7 @@ export default function LabelScannerScreen() {
         await extractLabelOCR(photo.base64);
       }
     } catch (err) {
-      Alert.alert('Error', 'No se pudo capturar la foto');
+      Alert.alert('Error', t('labelScanner.captureError'));
       setLoading(false);
     }
   }, [loading]);
@@ -141,10 +141,10 @@ export default function LabelScannerScreen() {
     } catch (err) {
       console.error('OCR error:', err);
       Alert.alert(
-        'Error de OCR',
-        'No se pudo extraer los datos de la etiqueta. Intenta de nuevo.',
+        t('labelScanner.ocrError'),
+        t('labelScanner.extractError'),
         [
-          { text: 'Volver', onPress: () => { setPhase('scanning'); setLoading(false); } },
+          { text: t('common.back'), onPress: () => { setPhase('scanning'); setLoading(false); } },
         ]
       );
     } finally {
@@ -157,7 +157,7 @@ export default function LabelScannerScreen() {
 
     setLoading(true);
     try {
-      const mealName = extracted.productName || 'Alimento escaneado';
+      const mealName = extracted.productName || t('labelScanner.scannedFood');
       const baseCalories = editedNutrition.calories || 0;
       const caloriesWithServings = Math.round(baseCalories * servings);
 
@@ -180,7 +180,7 @@ export default function LabelScannerScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     } catch (err) {
-      Alert.alert('Error', 'No se pudo registrar la comida');
+      Alert.alert('Error', t('labelScanner.logError'));
     } finally {
       setLoading(false);
     }
@@ -209,13 +209,13 @@ export default function LabelScannerScreen() {
       <View style={s.ctr}>
         <View style={s.permCard}>
           <Ionicons name="camera-outline" size={48} color={C.violet} />
-          <Text style={s.permTitle}>Acceso a Camara</Text>
-          <Text style={s.permText}>Necesitamos la camara para escanear etiquetas nutricionales</Text>
+          <Text style={s.permTitle}>{t('labelScanner.cameraAccessTitle')}</Text>
+          <Text style={s.permText}>{t('labelScanner.cameraAccessDescription')}</Text>
           <TouchableOpacity style={s.permBtn} onPress={requestPerm}>
-            <Text style={s.permBtnTxt}>Permitir Acceso</Text>
+            <Text style={s.permBtnTxt}>{t('labelScanner.allowAccess')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text style={[s.permText, { marginTop: 12 }]}>Volver</Text>
+            <Text style={[s.permText, { marginTop: 12 }]}>{t('common.back')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -235,7 +235,7 @@ export default function LabelScannerScreen() {
               <TouchableOpacity onPress={() => router.back()} style={s.closeBtn}>
                 <Ionicons name="close" size={28} color={C.bone} />
               </TouchableOpacity>
-              <Text style={s.hdrTitle}>Escanear Etiqueta</Text>
+              <Text style={s.hdrTitle}>{t('labelScanner.scanLabel')}</Text>
               <View style={{ width: 44 }} />
             </View>
           </View>
@@ -256,11 +256,11 @@ export default function LabelScannerScreen() {
               <ActivityIndicator color={C.violet} size="large" />
             ) : (
               <>
-                <Text style={s.hint}>Apunta a la etiqueta nutricional</Text>
+                <Text style={s.hint}>{t('labelScanner.pointToLabel')}</Text>
                 <TouchableOpacity style={s.captureBtn} onPress={takePhoto}>
                   <View style={s.captureInner} />
                 </TouchableOpacity>
-                <Text style={s.captureText}>Capturar etiqueta</Text>
+                <Text style={s.captureText}>{t('labelScanner.captureLabel')}</Text>
               </>
             )}
           </View>
@@ -279,7 +279,7 @@ export default function LabelScannerScreen() {
           <TouchableOpacity onPress={() => router.back()} style={s.closeBtn}>
             <Ionicons name="close" size={24} color={C.bone} />
           </TouchableOpacity>
-          <Text style={s.hdrTitle}>Confirmar Datos</Text>
+          <Text style={s.hdrTitle}>{t('labelScanner.confirmData')}</Text>
           <View style={{ width: 40 }} />
         </View>
 
@@ -287,15 +287,15 @@ export default function LabelScannerScreen() {
           <View style={s.prodCard}>
             <Text style={s.prodName}>{extracted.productName}</Text>
             <Text style={s.portionInfo}>
-              Porción: {extracted.servingSize}g | {extracted.servingsPerContainer} porciones
+              {t('labelScanner.portion')}: {extracted.servingSize}g | {extracted.servingsPerContainer} {t('labelScanner.servings')}
             </Text>
 
             <View style={s.nutGrid}>
               {[
-                { key: 'calories', val: editedNutrition.calories, label: 'Calorías', unit: 'kcal', color: C.violet },
-                { key: 'protein', val: editedNutrition.protein, label: 'Proteína', unit: 'g', color: C.coral },
-                { key: 'carbs', val: editedNutrition.carbs, label: 'Carbos', unit: 'g' },
-                { key: 'fat', val: editedNutrition.fat, label: 'Grasa', unit: 'g' },
+                { key: 'calories', val: editedNutrition.calories, label: t('nutrition.calories'), unit: 'kcal', color: C.violet },
+                { key: 'protein', val: editedNutrition.protein, label: t('nutrition.protein'), unit: 'g', color: C.coral },
+                { key: 'carbs', val: editedNutrition.carbs, label: t('nutrition.carbs'), unit: 'g' },
+                { key: 'fat', val: editedNutrition.fat, label: t('nutrition.fat'), unit: 'g' },
               ].map((item) => (
                 <View key={item.key} style={[s.nutItem, item.color ? { borderColor: item.color } : {}]}>
                   <Text style={[s.nutVal, item.color ? { color: item.color } : {}]}>
@@ -306,16 +306,16 @@ export default function LabelScannerScreen() {
               ))}
             </View>
 
-            <Text style={s.editLabel}>Editar valores (si es necesario):</Text>
+            <Text style={s.editLabel}>{t('labelScanner.editValues')}</Text>
 
             <View style={s.editGrid}>
               {[
-                { key: 'calories', label: 'Calorías' },
-                { key: 'protein', label: 'Proteína (g)' },
-                { key: 'carbs', label: 'Carbos (g)' },
-                { key: 'fat', label: 'Grasa (g)' },
-                { key: 'fiber', label: 'Fibra (g)' },
-                { key: 'sugar', label: 'Azúcar (g)' },
+                { key: 'calories', label: t('nutrition.calories') },
+                { key: 'protein', label: t('nutrition.proteinUnit') },
+                { key: 'carbs', label: t('nutrition.carbsUnit') },
+                { key: 'fat', label: t('nutrition.fatUnit') },
+                { key: 'fiber', label: t('nutrition.fiberUnit') },
+                { key: 'sugar', label: t('nutrition.sugarUnit') },
               ].map((item) => (
                 <View key={item.key} style={s.editField}>
                   <Text style={s.editFieldLabel}>{item.label}</Text>
@@ -327,14 +327,14 @@ export default function LabelScannerScreen() {
                       [item.key]: parseFloat(v) || 0,
                     })}
                     keyboardType="decimal-pad"
-                    placeholderTextColor={C.ter}
+                    placeholderTextColor={C.textTertiary}
                   />
                 </View>
               ))}
             </View>
 
             <View style={s.srvRow}>
-              <Text style={s.srvLbl}>Porciones registradas:</Text>
+              <Text style={s.srvLbl}>{t('labelScanner.servingsRecorded')}</Text>
               <TouchableOpacity onPress={() => setServings(Math.max(0.5, servings - 0.5))} style={s.srvBtn}>
                 <Ionicons name="remove" size={18} color={C.bone} />
               </TouchableOpacity>
@@ -346,7 +346,7 @@ export default function LabelScannerScreen() {
           </View>
 
           <View style={s.mealTypeSection}>
-            <Text style={s.mealTypeLabel}>Tipo de comida:</Text>
+            <Text style={s.mealTypeLabel}>{t('labelScanner.mealType')}</Text>
             <View style={s.mealTypeGrid}>
               {MEAL_OPTIONS.map((opt) => (
                 <TouchableOpacity
@@ -357,7 +357,7 @@ export default function LabelScannerScreen() {
                   <Ionicons
                     name={opt.icon as any}
                     size={20}
-                    color={mealType === opt.id ? C.bone : C.sec}
+                    color={mealType === opt.id ? C.bone : C.textSecondary}
                   />
                   <Text style={[s.mealTypeText, mealType === opt.id && s.mealTypeTextActive]}>
                     {opt.label}
@@ -371,7 +371,7 @@ export default function LabelScannerScreen() {
         <View style={s.btmActs}>
           <TouchableOpacity style={s.retakeBtn} onPress={handleRetakePhoto}>
             <Ionicons name="camera-outline" size={20} color={C.violet} />
-            <Text style={s.retakeBtnTxt}>Retomar</Text>
+            <Text style={s.retakeBtnTxt}>{t('labelScanner.retake')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[s.logBtn, loading && s.logBtnDisabled]}
@@ -383,7 +383,7 @@ export default function LabelScannerScreen() {
             ) : (
               <>
                 <Ionicons name="checkmark-circle" size={20} color={C.bone} />
-                <Text style={s.logBtnTxt}>Registrar</Text>
+                <Text style={s.logBtnTxt}>{t('labelScanner.logMeal')}</Text>
               </>
             )}
           </TouchableOpacity>
@@ -395,55 +395,57 @@ export default function LabelScannerScreen() {
   return null;
 }
 
-const s = StyleSheet.create({
-  ctr: { flex: 1, backgroundColor: C.bg },
-  hdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 60, paddingBottom: 16 },
-  hdrTitle: { fontSize: 18, fontWeight: '700', color: C.bone },
-  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(247,242,234,0.1)', alignItems: 'center', justifyContent: 'center' },
-  permCard: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40, gap: 16 },
-  permTitle: { fontSize: 22, fontWeight: '700', color: C.bone },
-  permText: { fontSize: 15, color: C.sec, textAlign: 'center', lineHeight: 22 },
-  permBtn: { backgroundColor: C.violet, paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginTop: 8 },
-  permBtnTxt: { fontSize: 16, fontWeight: '700', color: C.bone },
-  ovTop: { flex: 1, backgroundColor: C.overlay },
-  ovCenter: { flexDirection: 'row', height: LABEL_SIZE },
-  ovSide: { flex: 1, backgroundColor: C.overlay },
-  ovBtm: { flex: 1.2, backgroundColor: C.overlay, alignItems: 'center', justifyContent: 'center', gap: 16 },
-  scanHdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 60 },
-  labelArea: { width: LABEL_SIZE, height: LABEL_SIZE, position: 'relative' },
-  corner: { position: 'absolute', width: 30, height: 30, borderColor: C.violet },
-  hint: { fontSize: 15, color: C.sec, textAlign: 'center' },
-  captureBtn: { width: 70, height: 70, borderRadius: 35, backgroundColor: 'rgba(156,140,255,0.3)', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: C.violet },
-  captureInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: C.violet },
-  captureText: { fontSize: 14, fontWeight: '600', color: C.bone },
-  scrollContent: { flex: 1, paddingHorizontal: 0 },
-  prodCard: { backgroundColor: C.card, marginHorizontal: 16, marginTop: 16, marginBottom: 8, borderRadius: 16, padding: 20, gap: 12 },
-  prodName: { fontSize: 20, fontWeight: '700', color: C.bone },
-  portionInfo: { fontSize: 13, color: C.sec },
-  nutGrid: { flexDirection: 'row', gap: 8, marginTop: 16 },
-  nutItem: { flex: 1, alignItems: 'center', paddingVertical: 12, borderRadius: 10, backgroundColor: 'rgba(247,242,234,0.05)', borderWidth: 1, borderColor: 'rgba(247,242,234,0.1)' },
-  nutVal: { fontSize: 18, fontWeight: '700', color: C.bone },
-  nutLbl: { fontSize: 11, color: C.sec, marginTop: 2 },
-  editLabel: { fontSize: 14, fontWeight: '600', color: C.bone, marginTop: 16 },
-  editGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 },
-  editField: { width: '48%' },
-  editFieldLabel: { fontSize: 12, color: C.sec, marginBottom: 6 },
-  editInput: { backgroundColor: 'rgba(247,242,234,0.08)', borderWidth: 1, borderColor: 'rgba(156,140,255,0.2)', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, color: C.bone, fontSize: 14 },
-  srvRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(247,242,234,0.1)' },
-  srvLbl: { fontSize: 14, color: C.sec },
-  srvBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(156,140,255,0.2)', alignItems: 'center', justifyContent: 'center' },
-  srvVal: { fontSize: 20, fontWeight: '700', color: C.bone, minWidth: 36, textAlign: 'center' },
-  mealTypeSection: { marginHorizontal: 16, marginVertical: 16, gap: 12 },
-  mealTypeLabel: { fontSize: 14, fontWeight: '600', color: C.bone },
-  mealTypeGrid: { flexDirection: 'row', gap: 8, justifyContent: 'space-between' },
-  mealTypeBtn: { flex: 1, paddingVertical: 12, paddingHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(247,242,234,0.05)', borderWidth: 1, borderColor: 'rgba(247,242,234,0.1)', alignItems: 'center', gap: 6 },
-  mealTypeBtnActive: { backgroundColor: 'rgba(156,140,255,0.2)', borderColor: C.violet },
-  mealTypeText: { fontSize: 12, color: C.sec },
-  mealTypeTextActive: { color: C.bone, fontWeight: '600' },
-  btmActs: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16, paddingBottom: 34, gap: 12 },
-  retakeBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 12, backgroundColor: C.card, borderWidth: 1, borderColor: 'rgba(156,140,255,0.3)' },
-  retakeBtnTxt: { fontSize: 15, fontWeight: '600', color: C.violet },
-  logBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 12, backgroundColor: C.violet },
-  logBtnDisabled: { opacity: 0.6 },
-  logBtnTxt: { fontSize: 15, fontWeight: '700', color: C.bone },
-});
+function createStyles(C: any) {
+  return StyleSheet.create({
+    ctr: { flex: 1, backgroundColor: C.background },
+    hdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 60, paddingBottom: 16 },
+    hdrTitle: { fontSize: 18, fontWeight: '700', color: C.bone },
+    closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(247,242,234,0.1)', alignItems: 'center', justifyContent: 'center' },
+    permCard: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40, gap: 16 },
+    permTitle: { fontSize: 22, fontWeight: '700', color: C.bone },
+    permText: { fontSize: 15, color: C.textSecondary, textAlign: 'center', lineHeight: 22 },
+    permBtn: { backgroundColor: C.violet, paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginTop: 8 },
+    permBtnTxt: { fontSize: 16, fontWeight: '700', color: C.bone },
+    ovTop: { flex: 1, backgroundColor: C.overlay },
+    ovCenter: { flexDirection: 'row', height: LABEL_SIZE },
+    ovSide: { flex: 1, backgroundColor: C.overlay },
+    ovBtm: { flex: 1.2, backgroundColor: C.overlay, alignItems: 'center', justifyContent: 'center', gap: 16 },
+    scanHdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 60 },
+    labelArea: { width: LABEL_SIZE, height: LABEL_SIZE, position: 'relative' },
+    corner: { position: 'absolute', width: 30, height: 30, borderColor: C.violet },
+    hint: { fontSize: 15, color: C.textSecondary, textAlign: 'center' },
+    captureBtn: { width: 70, height: 70, borderRadius: 35, backgroundColor: 'rgba(156,140,255,0.3)', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: C.violet },
+    captureInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: C.violet },
+    captureText: { fontSize: 14, fontWeight: '600', color: C.bone },
+    scrollContent: { flex: 1, paddingHorizontal: 0 },
+    prodCard: { backgroundColor: C.card, marginHorizontal: 16, marginTop: 16, marginBottom: 8, borderRadius: 16, padding: 20, gap: 12 },
+    prodName: { fontSize: 20, fontWeight: '700', color: C.bone },
+    portionInfo: { fontSize: 13, color: C.textSecondary },
+    nutGrid: { flexDirection: 'row', gap: 8, marginTop: 16 },
+    nutItem: { flex: 1, alignItems: 'center', paddingVertical: 12, borderRadius: 10, backgroundColor: 'rgba(247,242,234,0.05)', borderWidth: 1, borderColor: 'rgba(247,242,234,0.1)' },
+    nutVal: { fontSize: 18, fontWeight: '700', color: C.bone },
+    nutLbl: { fontSize: 11, color: C.textSecondary, marginTop: 2 },
+    editLabel: { fontSize: 14, fontWeight: '600', color: C.bone, marginTop: 16 },
+    editGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 },
+    editField: { width: '48%' },
+    editFieldLabel: { fontSize: 12, color: C.textSecondary, marginBottom: 6 },
+    editInput: { backgroundColor: 'rgba(247,242,234,0.08)', borderWidth: 1, borderColor: 'rgba(156,140,255,0.2)', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, color: C.bone, fontSize: 14 },
+    srvRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(247,242,234,0.1)' },
+    srvLbl: { fontSize: 14, color: C.textSecondary },
+    srvBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(156,140,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+    srvVal: { fontSize: 20, fontWeight: '700', color: C.bone, minWidth: 36, textAlign: 'center' },
+    mealTypeSection: { marginHorizontal: 16, marginVertical: 16, gap: 12 },
+    mealTypeLabel: { fontSize: 14, fontWeight: '600', color: C.bone },
+    mealTypeGrid: { flexDirection: 'row', gap: 8, justifyContent: 'space-between' },
+    mealTypeBtn: { flex: 1, paddingVertical: 12, paddingHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(247,242,234,0.05)', borderWidth: 1, borderColor: 'rgba(247,242,234,0.1)', alignItems: 'center', gap: 6 },
+    mealTypeBtnActive: { backgroundColor: 'rgba(156,140,255,0.2)', borderColor: C.violet },
+    mealTypeText: { fontSize: 12, color: C.textSecondary },
+    mealTypeTextActive: { color: C.bone, fontWeight: '600' },
+    btmActs: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16, paddingBottom: 34, gap: 12 },
+    retakeBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 12, backgroundColor: C.card, borderWidth: 1, borderColor: 'rgba(156,140,255,0.3)' },
+    retakeBtnTxt: { fontSize: 15, fontWeight: '600', color: C.violet },
+    logBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 12, backgroundColor: C.violet },
+    logBtnDisabled: { opacity: 0.6 },
+    logBtnTxt: { fontSize: 15, fontWeight: '700', color: C.bone },
+  });
+}

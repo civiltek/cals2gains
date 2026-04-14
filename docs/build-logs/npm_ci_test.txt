@@ -1,0 +1,89 @@
+npm error code EUSAGE
+npm error
+npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+npm error
+npm error Missing: get-nonce@1.0.1 from lock file
+npm error Missing: nested-error-stacks@2.0.1 from lock file
+npm error Missing: rc@1.2.8 from lock file
+npm error Missing: deep-extend@0.6.0 from lock file
+npm error Missing: ini@1.3.8 from lock file
+npm error Missing: minimist@1.2.8 from lock file
+npm error Missing: strip-json-comments@2.0.1 from lock file
+npm error Missing: is-core-module@2.16.1 from lock file
+npm error Missing: path-parse@1.0.7 from lock file
+npm error Missing: onetime@2.0.1 from lock file
+npm error Missing: mimic-fn@1.2.0 from lock file
+npm error Missing: depd@2.0.0 from lock file
+npm error Missing: destroy@1.2.0 from lock file
+npm error Missing: etag@1.8.1 from lock file
+npm error Missing: fresh@0.5.2 from lock file
+npm error Missing: http-errors@2.0.1 from lock file
+npm error Missing: mime@1.6.0 from lock file
+npm error Missing: range-parser@1.2.1 from lock file
+npm error Missing: setprototypeof@1.2.0 from lock file
+npm error Missing: statuses@2.0.2 from lock file
+npm error Missing: toidentifier@1.0.1 from lock file
+npm error Missing: is-arrayish@0.3.4 from lock file
+npm error Missing: buffer-from@1.1.2 from lock file
+npm error Missing: emoji-regex@8.0.0 from lock file
+npm error Missing: is-fullwidth-code-point@3.0.0 from lock file
+npm error Missing: lines-and-columns@1.2.4 from lock file
+npm error Missing: mz@2.7.0 from lock file
+npm error Missing: any-promise@1.3.0 from lock file
+npm error Missing: thenify-all@1.6.0 from lock file
+npm error Missing: @isaacs/fs-minipass@4.0.1 from lock file
+npm error Missing: chownr@3.0.0 from lock file
+npm error Missing: minizlib@3.1.0 from lock file
+npm error Missing: ansi-escapes@4.3.2 from lock file
+npm error Missing: type-fest@0.21.3 from lock file
+npm error Missing: @jridgewell/source-map@0.3.11 from lock file
+npm error Missing: acorn@8.16.0 from lock file
+npm error Missing: thenify@3.3.1 from lock file
+npm error Missing: is-number@7.0.0 from lock file
+npm error Missing: escalade@3.2.0 from lock file
+npm error Missing: detect-node-es@1.1.0 from lock file
+npm error Missing: is-arguments@1.2.0 from lock file
+npm error Missing: is-generator-function@1.1.2 from lock file
+npm error Missing: is-typed-array@1.1.15 from lock file
+npm error Missing: has-tostringtag@1.0.2 from lock file
+npm error Missing: generator-function@2.0.1 from lock file
+npm error Missing: safe-regex-test@1.1.0 from lock file
+npm error Missing: is-regex@1.2.1 from lock file
+npm error Missing: makeerror@1.0.12 from lock file
+npm error Missing: tmpl@1.0.5 from lock file
+npm error Missing: defaults@1.0.4 from lock file
+npm error Missing: clone@1.0.4 from lock file
+npm error Missing: http-parser-js@0.5.10 from lock file
+npm error Missing: buffer@5.7.1 from lock file
+npm error Missing: punycode@2.3.1 from lock file
+npm error Missing: ieee754@1.2.1 from lock file
+npm error Missing: isexe@2.0.0 from lock file
+npm error Missing: available-typed-arrays@1.0.7 from lock file
+npm error Missing: for-each@0.3.5 from lock file
+npm error Missing: possible-typed-array-names@1.1.0 from lock file
+npm error Missing: is-callable@1.2.7 from lock file
+npm error Missing: imurmurhash@0.1.4 from lock file
+npm error Missing: cliui@8.0.1 from lock file
+npm error Missing: get-caller-file@2.0.5 from lock file
+npm error Missing: @radix-ui/react-focus-guards@1.1.3 from lock file
+npm error Missing: aria-hidden@1.2.6 from lock file
+npm error Missing: @radix-ui/react-use-escape-keydown@1.1.1 from lock file
+npm error
+npm error Clean install a project
+npm error
+npm error Usage:
+npm error npm ci
+npm error
+npm error Options:
+npm error [--install-strategy <hoisted|nested|shallow|linked>] [--legacy-bundling]
+npm error [--global-style] [--omit <dev|optional|peer> [--omit <dev|optional|peer> ...]]
+npm error [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+npm error [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+npm error [--no-bin-links] [--no-fund] [--dry-run]
+npm error [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+npm error [--workspaces] [--include-workspace-root] [--install-links]
+npm error
+npm error aliases: clean-install, ic, install-clean, isntall-clean
+npm error
+npm error Run "npm help ci" for more info
+npm error A complete log of this run can be found in: C:\Users\Judit\AppData\Local\npm-cache\_logs\2026-04-12T19_40_37_519Z-debug-0.log

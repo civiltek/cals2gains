@@ -1,0 +1,43 @@
+Failed to read the app config from the project using "npx expo config" command: npx expo config --json exited with non-zero code: 7.
+Falling back to the version of "@expo/config" shipped with the EAS CLI.
+Resolved "preview" environment for the build. Learn more: https://docs.expo.dev/eas/environment-variables/#setting-the-environment-for-your-builds
+No environment variables with visibility "Plain text" and "Sensitive" found for the "preview" environment on EAS.
+
+
+
+android.versionCode field in app config is ignored when version source is set to remote, but this value will still be in the manifest available via expo-constants. It's recommended to remove this value from app config.
+√ Using remote Android credentials (Expo server)
+√ Using Keystore from configuration: Build Credentials mEy9RZo1o7 (default)
+
+Compressing project files and uploading to EAS Build. Learn more: https://expo.fyi/eas-build-archive
+- Compressing project files\ Compressing project files| Compressing project files/ Compressing project files- Compressing project files\ Compressing project files| Compressing project files/ Compressing project files- Compressing project files\ Compressing project files| Compressing project files/ Compressing project files- Compressing project files\ Compressing project files| Compressing project files√ Compressed project files 3s (8.7 MB)
+- Uploading to EAS Build (0 / 8.7 MB)\ Uploading to EAS Build (127 KB / 8.7 MB)| Uploading to EAS Build (448 KB / 8.7 MB)/ Uploading to EAS Build (511 KB / 8.7 MB)- Uploading to EAS Build (576 KB / 8.7 MB)\ Uploading to EAS Build (1.9 MB / 8.7 MB)| Uploading to EAS Build (5.1 MB / 8.7 MB)/ Uploading to EAS Build (5.4 MB / 8.7 MB)- Uploading to EAS Build (7.2 MB / 8.7 MB)\ Uploading to EAS Build (8.7 MB / 8.7 MB)| Uploading to EAS Build (8.7 MB / 8.7 MB)/ Uploading to EAS Build (8.7 MB / 8.7 MB)√ Uploaded to EAS 1s
+- Computing project fingerprint× Failed to compute project fingerprint
+⏩ To skip this step, set the environment variable: EAS_SKIP_AUTO_FINGERPRINT=1
+Cannot find module 'isexe'
+Require stack:
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\which\which.js
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\cross-spawn\lib\util\resolveCommand.js
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\cross-spawn\lib\parse.js
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\cross-spawn\index.js
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\@expo\spawn-async\build\spawnAsync.js
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\@expo\fingerprint\build\ProjectWorkflow.js
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\@expo\fingerprint\build\Options.js
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\@expo\fingerprint\build\Fingerprint.js
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\@expo\fingerprint\build\index.js
+- C:\Users\Judit\Documents\Cals2Gains\node_modules\expo\fingerprint.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\build\fingerprint\cli.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\build\build\build.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\build\build\android\build.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\build\build\runBuildAndSubmit.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\build\commands\build\index.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\node_modules\@oclif\core\lib\module-loader.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\node_modules\@oclif\core\lib\help\index.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\node_modules\@oclif\core\lib\errors\handle.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\node_modules\@oclif\core\lib\errors\index.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\node_modules\@oclif\core\lib\config\config.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\node_modules\@oclif\core\lib\config\index.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\node_modules\@oclif\core\lib\command.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\node_modules\@oclif\core\lib\index.js
+- C:\Users\Judit\AppData\Roaming\npm\node_modules\eas-cli\bin\run
+    Error: build command failed.

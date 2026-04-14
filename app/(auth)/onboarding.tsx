@@ -1,7 +1,7 @@
 // ============================================
 // Cals2Gains - Enhanced Onboarding (7 Steps)
 // ============================================
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput,
   Dimensions, Alert, ActivityIndicator, Platform,
@@ -10,49 +10,119 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
+import { useColors } from '../../store/themeStore';
 import { useUserStore } from '../../store/userStore';
+import { markOnboardingCompleted } from '../../services/firebase';
 import { calculateGoalsFromPreset, getPresetById, MACRO_PRESETS } from '../../constants/macroPresets';
 
 const { width: SW } = Dimensions.get('window');
-const C = {
-  bg: '#17121D', card: '#1E1829', violet: '#9C8CFF', coral: '#FF6A4D',
-  bone: '#F7F2EA', sec: 'rgba(247,242,234,0.6)', ter: 'rgba(247,242,234,0.35)',
-  border: 'rgba(156,140,255,0.15)', success: '#4ADE80',
-};
 
 const TOTAL_STEPS = 7;
 const GENDERS = [
-  { id: 'male', label: 'Hombre', icon: 'male-outline' },
-  { id: 'female', label: 'Mujer', icon: 'female-outline' },
+  { id: 'male', labelKey: 'onboarding.male', icon: 'male-outline' },
+  { id: 'female', labelKey: 'onboarding.female', icon: 'female-outline' },
 ];
 const GOALS = [
-  { id: 'lose_weight', label: 'Perder grasa', icon: 'trending-down', desc: 'Deficit calorico controlado' },
-  { id: 'gain_muscle', label: 'Ganar musculo', icon: 'barbell-outline', desc: 'Superavit con alto proteina' },
-  { id: 'recomposition', label: 'Recomposicion', icon: 'swap-horizontal-outline', desc: 'Perder grasa y ganar musculo' },
-  { id: 'improve_health', label: 'Mejorar salud', icon: 'heart-outline', desc: 'Mantenimiento equilibrado' },
+  { id: 'lose_weight', labelKey: 'onboarding.loseFat', icon: 'trending-down', descKey: 'onboarding.loseFatDesc' },
+  { id: 'gain_muscle', labelKey: 'onboarding.gainMuscle', icon: 'barbell-outline', descKey: 'onboarding.gainMuscleDesc' },
+  { id: 'recomposition', labelKey: 'onboarding.recomposition', icon: 'swap-horizontal-outline', descKey: 'onboarding.recompositionDesc' },
+  { id: 'improve_health', labelKey: 'onboarding.improveHealth', icon: 'heart-outline', descKey: 'onboarding.maintainDesc' },
 ];
 const RATES = [
-  { id: 'slow', label: 'Lento', desc: '~0.25 kg/sem', kcal: 250 },
-  { id: 'moderate', label: 'Moderado', desc: '~0.5 kg/sem', kcal: 500 },
-  { id: 'fast', label: 'Rapido', desc: '~0.75 kg/sem', kcal: 750 },
+  { id: 'slow', labelKey: 'onboarding.slow', desc: '~0.25 kg/sem', kcal: 250 },
+  { id: 'moderate', labelKey: 'onboarding.moderate', desc: '~0.5 kg/sem', kcal: 500 },
+  { id: 'fast', labelKey: 'onboarding.fast', desc: '~0.75 kg/sem', kcal: 750 },
 ];
 const ACTIVITIES = [
-  { id: 'sedentary', label: 'Sedentario', mult: 1.2, desc: 'Oficina, poco movimiento' },
-  { id: 'light', label: 'Ligero', mult: 1.375, desc: '1-3 dias ejercicio/sem' },
-  { id: 'moderate', label: 'Moderado', mult: 1.55, desc: '3-5 dias ejercicio/sem' },
-  { id: 'active', label: 'Activo', mult: 1.725, desc: '6-7 dias ejercicio/sem' },
-  { id: 'very_active', label: 'Muy activo', mult: 1.9, desc: 'Atleta o trabajo fisico' },
+  { id: 'sedentario', labelKey: 'onboarding.sedentary', mult: 1.2, descKey: 'onboarding.sedentaryDesc' },
+  { id: 'light', labelKey: 'onboarding.lightlyActive', mult: 1.375, descKey: 'onboarding.lightlyActiveDesc' },
+  { id: 'moderate', labelKey: 'onboarding.moderatelyActive', mult: 1.55, descKey: 'onboarding.moderatelyActiveDesc' },
+  { id: 'active', labelKey: 'onboarding.veryActive', mult: 1.725, descKey: 'onboarding.veryActiveDesc' },
+  { id: 'very_active', labelKey: 'onboarding.extremelyActive', mult: 1.9, descKey: 'onboarding.extremelyActiveDesc' },
 ];
 const EXPERIENCE = [
-  { id: 'beginner', label: 'Principiante', desc: '<1 ano entrenando' },
-  { id: 'intermediate', label: 'Intermedio', desc: '1-3 anos entrenando' },
-  { id: 'advanced', label: 'Avanzado', desc: '>3 anos entrenando' },
+  { id: 'beginner', labelKey: 'onboarding.beginner', descKey: 'onboarding.beginnerDesc' },
+  { id: 'intermediate', labelKey: 'onboarding.intermediate', descKey: 'onboarding.intermediateDesc' },
+  { id: 'advanced', labelKey: 'onboarding.advanced', descKey: 'onboarding.advancedDesc' },
 ];
 
+function createStyles(C: any) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: C.background },
+    progressContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 60, gap: 12 },
+    backBtn: { padding: 4 },
+    progressBar: { flex: 1, height: 4, backgroundColor: C.text + '10', borderRadius: 2, overflow: 'hidden' },
+    progressFill: { height: '100%', backgroundColor: C.primary, borderRadius: 2 },
+    stepIndicator: { fontSize: 13, color: C.textSecondary, fontWeight: '600' },
+    scrollContent: { paddingBottom: 100 },
+    stepContent: { padding: 20 },
+    stepTitle: { fontSize: 26, fontWeight: '800', color: C.text, marginBottom: 6 },
+    stepDesc: { fontSize: 15, color: C.textSecondary, marginBottom: 20, lineHeight: 22, includeFontPadding: false },
+    label: { fontSize: 13, fontWeight: '700', color: C.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: 16 },
+    input: { backgroundColor: C.card, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 18, fontWeight: '600', color: C.text, borderWidth: 1, borderColor: C.border },
+    inputRow: { flexDirection: 'row', gap: 12 },
+    optionRow: { flexDirection: 'row', gap: 10 },
+    optionCard: { flex: 1, alignItems: 'center', paddingVertical: 16, borderRadius: 12, backgroundColor: C.card, borderWidth: 1, borderColor: 'transparent', gap: 6 },
+    optionActive: { borderColor: C.primary, backgroundColor: C.primary + '20' },
+    optionLabel: { fontSize: 14, fontWeight: '600', color: C.textSecondary },
+    optionLabelActive: { color: C.primary },
+    listOption: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 12, padding: 16, marginBottom: 8, borderWidth: 1, borderColor: 'transparent' },
+    listOptionActive: { borderColor: C.primary, backgroundColor: C.primary + '15' },
+    listOptionTitle: { fontSize: 16, fontWeight: '600', color: C.textSecondary },
+    listOptionDesc: { fontSize: 13, color: C.textTertiary, marginTop: 2 },
+    multText: { fontSize: 14, fontWeight: '700', color: C.primary },
+    dayBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'transparent' },
+    dayBtnActive: { borderColor: C.primary, backgroundColor: C.primary + '20' },
+    dayTxt: { fontSize: 16, fontWeight: '700', color: C.textSecondary },
+    goalCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: 'transparent', gap: 14 },
+    goalCardActive: { borderColor: C.primary, backgroundColor: C.primary + '12' },
+    goalIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: C.text + '05', alignItems: 'center', justifyContent: 'center' },
+    goalTitle: { fontSize: 16, fontWeight: '700', color: C.textSecondary },
+    goalDesc: { fontSize: 13, color: C.textTertiary, marginTop: 2 },
+    rateCard: { flex: 1, alignItems: 'center', paddingVertical: 14, borderRadius: 10, backgroundColor: C.card, borderWidth: 1, borderColor: 'transparent', gap: 4 },
+    rateCardActive: { borderColor: C.primary, backgroundColor: C.primary + '20' },
+    rateName: { fontSize: 14, fontWeight: '700', color: C.textSecondary },
+    rateDesc: { fontSize: 11, color: C.textTertiary },
+    presetCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: 'transparent', gap: 12 },
+    presetCardActive: { borderColor: C.primary, backgroundColor: C.primary + '12' },
+    presetName: { fontSize: 16, fontWeight: '700', color: C.textSecondary },
+    presetDesc: { fontSize: 12, color: C.textTertiary, marginTop: 2 },
+    presetBar: { flexDirection: 'row', height: 6, borderRadius: 3, overflow: 'hidden', marginTop: 8, gap: 2 },
+    presetSeg: { borderRadius: 3 },
+    presetPcts: { fontSize: 11, color: C.textTertiary, marginTop: 4 },
+    integrationCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: 'transparent', gap: 14 },
+    integrationCardActive: { borderColor: C.success, backgroundColor: C.success + '10' },
+    integrationName: { fontSize: 16, fontWeight: '700', color: C.text },
+    integrationDesc: { fontSize: 13, color: C.textSecondary, marginTop: 2 },
+    connectBadge: { backgroundColor: C.text + '08', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+    connectText: { fontSize: 12, fontWeight: '600', color: C.textSecondary },
+    summaryCard: { backgroundColor: C.card, borderRadius: 16, padding: 20, gap: 12 },
+    summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    summaryLabel: { fontSize: 14, color: C.textSecondary },
+    summaryValue: { fontSize: 18, fontWeight: '700', color: C.text },
+    summaryNote: { fontSize: 14, fontWeight: '600', color: C.textTertiary },
+    summaryDivider: { height: 1, backgroundColor: C.border },
+    macroSummary: { flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 8 },
+    macroItem: { alignItems: 'center', gap: 4 },
+    macroValue: { fontSize: 22, fontWeight: '800', color: C.text },
+    macroLabel: { fontSize: 12, color: C.textSecondary },
+    bottomBar: { paddingHorizontal: 20, paddingVertical: 16, paddingBottom: 34, backgroundColor: C.background },
+    nextBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: C.primary, paddingVertical: 16, borderRadius: 14 },
+    nextBtnDisabled: { opacity: 0.4 },
+    nextBtnText: { fontSize: 17, fontWeight: '700', color: C.white },
+    finishBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: C.accent, paddingVertical: 16, borderRadius: 14 },
+    finishBtnText: { fontSize: 17, fontWeight: '700', color: C.white },
+  });
+}
+
 export default function OnboardingScreen() {
+  const C = useColors();
   const router = useRouter();
-  const { updateProfile, completeOnboarding } = useUserStore();
+  const { t, i18n } = useTranslation();
+  const { updateProfile, user, loadUserData } = useUserStore();
   const scrollRef = useRef<ScrollView>(null);
+  const s = useMemo(() => createStyles(C), [C]);
 
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -113,26 +183,66 @@ export default function OnboardingScreen() {
     : tdee;
 
   const proteinMin = (goal === 'gain_muscle' || experience === 'advanced') ? 2.0 : 1.6;
-  const macros = calculateGoalsFromPreset(preset, Math.max(1200, goalCalories));
+  const presetConfig = getPresetById(preset) || MACRO_PRESETS[0];
+  const macros = calculateGoalsFromPreset(presetConfig, Math.max(1200, goalCalories));
   const adjustedProtein = Math.max(macros.protein, Math.round(numWeight * proteinMin));
+
+  // Map onboarding activity IDs to ActivityLevel type
+  const activityLevelMap: Record<string, string> = {
+    sedentary: 'sedentary',
+    light: 'lightly_active',
+    moderate: 'moderately_active',
+    active: 'very_active',
+    very_active: 'extremely_active',
+  };
+
+  // Map onboarding goal IDs to FitnessGoal type
+  const fitnessGoalMap: Record<string, string> = {
+    lose_weight: 'lose_weight',
+    gain_muscle: 'gain_muscle',
+    recomposition: 'maintain_weight',
+    improve_health: 'improve_health',
+  };
 
   // Finish onboarding
   const handleFinish = async () => {
     setLoading(true);
     try {
-      await updateProfile({
-        age: numAge, weight: numWeight, height: numHeight, gender,
-        goal, activityLevel: activity,
-        calorieGoal: Math.max(1200, goalCalories),
-        proteinGoal: adjustedProtein,
-        carbGoal: macros.carbs,
-        fatGoal: macros.fat,
-      });
-      await completeOnboarding();
+      const finalCalories = Math.max(1200, goalCalories);
+      const finalProtein = isNaN(adjustedProtein) ? Math.round(numWeight * proteinMin) : adjustedProtein;
+      const finalCarbs = isNaN(macros.carbs) ? Math.round((finalCalories * 0.4) / 4) : macros.carbs;
+      const finalFat = isNaN(macros.fat) ? Math.round((finalCalories * 0.3) / 9) : macros.fat;
+
+      await updateProfile(
+        {
+          age: numAge,
+          weight: numWeight,
+          height: numHeight,
+          gender: gender as 'male' | 'female' | 'other',
+          goal: (fitnessGoalMap[goal] || 'maintain_weight') as any,
+          activityLevel: (activityLevelMap[activity] || 'moderately_active') as any,
+        },
+        {
+          calories: finalCalories,
+          protein: finalProtein,
+          carbs: finalCarbs,
+          fat: finalFat,
+          fiber: 30,
+        }
+      );
+
+      // Mark onboarding as completed in Firestore
+      if (user?.uid) {
+        await markOnboardingCompleted(user.uid);
+        // Reload user data so the route guard sees onboardingCompleted = true
+        await loadUserData(user.uid);
+      }
+
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.replace('/(tabs)');
+      router.replace('/');
     } catch (error) {
-      Alert.alert('Error', 'No se pudo guardar tu perfil');
+      console.error('Onboarding save error:', error);
+      Alert.alert(t('errors.error'), t('onboarding.saveFailed'));
     } finally {
       setLoading(false);
     }
@@ -158,33 +268,33 @@ export default function OnboardingScreen() {
 
   const renderStep0 = () => (
     <View style={s.stepContent}>
-      <Text style={s.stepTitle}>Datos basicos</Text>
-      <Text style={s.stepDesc}>Para calcular tus necesidades calorias</Text>
+      <Text style={s.stepTitle}>{t('onboarding.basicData')}</Text>
+      <Text style={s.stepDesc}>{t('onboarding.basicDataDesc')}</Text>
 
-      <Text style={s.label}>Genero</Text>
+      <Text style={s.label}>{t('onboarding.gender')}</Text>
       <View style={s.optionRow}>
         {GENDERS.map(g => (
           <TouchableOpacity key={g.id} style={[s.optionCard, gender === g.id && s.optionActive]}
             onPress={() => setGender(g.id)}>
-            <Ionicons name={g.icon as any} size={24} color={gender === g.id ? C.bone : C.sec} />
-            <Text style={[s.optionLabel, gender === g.id && s.optionLabelActive]}>{g.label}</Text>
+            <Ionicons name={g.icon as any} size={24} color={gender === g.id ? C.primary : C.textSecondary} />
+            <Text style={[s.optionLabel, gender === g.id && s.optionLabelActive]}>{t(g.labelKey)}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <Text style={s.label}>Edad</Text>
-      <TextInput style={s.input} placeholder="25" placeholderTextColor={C.ter}
+      <Text style={s.label}>{t('onboarding.age')}</Text>
+      <TextInput style={s.input} placeholder={t('onboarding.age')} placeholderTextColor={C.textSecondary}
         value={age} onChangeText={setAge} keyboardType="number-pad" />
 
       <View style={s.inputRow}>
         <View style={{ flex: 1 }}>
-          <Text style={s.label}>Peso (kg)</Text>
-          <TextInput style={s.input} placeholder="75" placeholderTextColor={C.ter}
+          <Text style={s.label}>{t('onboarding.weight')}</Text>
+          <TextInput style={s.input} placeholder={t('onboarding.weight')} placeholderTextColor={C.textSecondary}
             value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={s.label}>Altura (cm)</Text>
-          <TextInput style={s.input} placeholder="175" placeholderTextColor={C.ter}
+          <Text style={s.label}>{t('onboarding.height')}</Text>
+          <TextInput style={s.input} placeholder={t('onboarding.height')} placeholderTextColor={C.textSecondary}
             value={height} onChangeText={setHeight} keyboardType="number-pad" />
         </View>
       </View>
@@ -193,71 +303,71 @@ export default function OnboardingScreen() {
 
   const renderStep1 = () => (
     <View style={s.stepContent}>
-      <Text style={s.stepTitle}>Composicion corporal</Text>
-      <Text style={s.stepDesc}>Para ajustar mejor tus macros</Text>
+      <Text style={s.stepTitle}>{t('onboarding.bodyComposition')}</Text>
+      <Text style={s.stepDesc}>{t('onboarding.bodyCompositionDesc')}</Text>
 
-      <Text style={s.label}>Experiencia de entrenamiento</Text>
+      <Text style={s.label}>{t('onboarding.trainingExperience')}</Text>
       {EXPERIENCE.map(e => (
         <TouchableOpacity key={e.id} style={[s.listOption, experience === e.id && s.listOptionActive]}
           onPress={() => setExperience(e.id)}>
           <View>
-            <Text style={[s.listOptionTitle, experience === e.id && { color: C.bone }]}>{e.label}</Text>
-            <Text style={s.listOptionDesc}>{e.desc}</Text>
+            <Text style={[s.listOptionTitle, experience === e.id && { color: C.primary }]}>{t(e.labelKey)}</Text>
+            <Text style={s.listOptionDesc}>{t(e.descKey)}</Text>
           </View>
-          {experience === e.id && <Ionicons name="checkmark-circle" size={22} color={C.violet} />}
+          {experience === e.id && <Ionicons name="checkmark-circle" size={22} color={C.primary} />}
         </TouchableOpacity>
       ))}
 
-      <Text style={s.label}>Dias de entrenamiento / semana</Text>
+      <Text style={s.label}>{t('onboarding.trainingDays')}</Text>
       <View style={s.optionRow}>
         {['2','3','4','5','6'].map(d => (
           <TouchableOpacity key={d} style={[s.dayBtn, trainingDays === d && s.dayBtnActive]}
             onPress={() => setTrainingDays(d)}>
-            <Text style={[s.dayTxt, trainingDays === d && { color: C.bone }]}>{d}</Text>
+            <Text style={[s.dayTxt, trainingDays === d && { color: C.primary }]}>{d}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <Text style={s.label}>% Grasa corporal (opcional)</Text>
-      <TextInput style={s.input} placeholder="Ej: 18" placeholderTextColor={C.ter}
+      <Text style={s.label}>{t('onboarding.bodyFatOptional')}</Text>
+      <TextInput style={s.input} placeholder={t('onboarding.bodyFatOptional')} placeholderTextColor={C.textSecondary}
         value={bodyFat} onChangeText={setBodyFat} keyboardType="decimal-pad" />
     </View>
   );
 
   const renderStep2 = () => (
     <View style={s.stepContent}>
-      <Text style={s.stepTitle}>Tu objetivo</Text>
-      <Text style={s.stepDesc}>Elegimos la estrategia adecuada</Text>
+      <Text style={s.stepTitle}>{t('onboarding.yourGoal')}</Text>
+      <Text style={s.stepDesc}>{t('onboarding.goalDesc')}</Text>
 
       {GOALS.map(g => (
         <TouchableOpacity key={g.id} style={[s.goalCard, goal === g.id && s.goalCardActive]}
           onPress={() => setGoal(g.id)}>
-          <View style={[s.goalIcon, goal === g.id && { backgroundColor: `${C.violet}30` }]}>
-            <Ionicons name={g.icon as any} size={24} color={goal === g.id ? C.violet : C.sec} />
+          <View style={[s.goalIcon, goal === g.id && { backgroundColor: C.primary + '30' }]}>
+            <Ionicons name={g.icon as any} size={24} color={goal === g.id ? C.primary : C.textSecondary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[s.goalTitle, goal === g.id && { color: C.bone }]}>{g.label}</Text>
-            <Text style={s.goalDesc}>{g.desc}</Text>
+            <Text style={[s.goalTitle, goal === g.id && { color: C.primary }]}>{t(g.labelKey)}</Text>
+            <Text style={s.goalDesc}>{t(g.descKey)}</Text>
           </View>
-          {goal === g.id && <Ionicons name="checkmark-circle" size={22} color={C.violet} />}
+          {goal === g.id && <Ionicons name="checkmark-circle" size={22} color={C.primary} />}
         </TouchableOpacity>
       ))}
 
       {(goal === 'lose_weight' || goal === 'gain_muscle') && (
         <>
-          <Text style={[s.label, { marginTop: 16 }]}>Ritmo</Text>
+          <Text style={[s.label, { marginTop: 16 }]}>{t('onboarding.rate')}</Text>
           <View style={s.optionRow}>
             {RATES.map(r => (
               <TouchableOpacity key={r.id} style={[s.rateCard, rate === r.id && s.rateCardActive]}
                 onPress={() => setRate(r.id)}>
-                <Text style={[s.rateName, rate === r.id && { color: C.bone }]}>{r.label}</Text>
+                <Text style={[s.rateName, rate === r.id && { color: C.primary }]}>{t(r.labelKey)}</Text>
                 <Text style={s.rateDesc}>{r.desc}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <Text style={s.label}>Peso objetivo (kg, opcional)</Text>
-          <TextInput style={s.input} placeholder="Ej: 70" placeholderTextColor={C.ter}
+          <Text style={s.label}>{t('onboarding.targetWeight')}</Text>
+          <TextInput style={s.input} placeholder={t('onboarding.exTargetWeight')} placeholderTextColor={C.textSecondary}
             value={targetWeight} onChangeText={setTargetWeight} keyboardType="decimal-pad" />
         </>
       )}
@@ -266,17 +376,17 @@ export default function OnboardingScreen() {
 
   const renderStep3 = () => (
     <View style={s.stepContent}>
-      <Text style={s.stepTitle}>Nivel de actividad</Text>
-      <Text style={s.stepDesc}>Sin contar entrenamiento dedicado</Text>
+      <Text style={s.stepTitle}>{t('onboarding.activityLevel')}</Text>
+      <Text style={s.stepDesc}>{t('onboarding.activityExcluding')}</Text>
       {ACTIVITIES.map(a => (
         <TouchableOpacity key={a.id} style={[s.listOption, activity === a.id && s.listOptionActive]}
           onPress={() => setActivity(a.id)}>
           <View style={{ flex: 1 }}>
-            <Text style={[s.listOptionTitle, activity === a.id && { color: C.bone }]}>{a.label}</Text>
-            <Text style={s.listOptionDesc}>{a.desc}</Text>
+            <Text style={[s.listOptionTitle, activity === a.id && { color: C.primary }]}>{t(a.labelKey)}</Text>
+            <Text style={s.listOptionDesc}>{t(a.descKey)}</Text>
           </View>
           <Text style={s.multText}>x{a.mult}</Text>
-          {activity === a.id && <Ionicons name="checkmark-circle" size={22} color={C.violet} style={{ marginLeft: 8 }} />}
+          {activity === a.id && <Ionicons name="checkmark-circle" size={22} color={C.primary} style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
       ))}
     </View>
@@ -284,24 +394,24 @@ export default function OnboardingScreen() {
 
   const renderStep4 = () => (
     <View style={s.stepContent}>
-      <Text style={s.stepTitle}>Distribucion de macros</Text>
-      <Text style={s.stepDesc}>Elige un perfil o personaliza despues</Text>
+      <Text style={s.stepTitle}>{t('onboarding.macroDistribution')}</Text>
+      <Text style={s.stepDesc}>{t('onboarding.macroDistributionDesc')}</Text>
       {MACRO_PRESETS.filter(p => p.id !== 'custom').map(p => {
         const isSel = preset === p.id;
         return (
           <TouchableOpacity key={p.id} style={[s.presetCard, isSel && s.presetCardActive]}
             onPress={() => setPreset(p.id)}>
             <View style={{ flex: 1 }}>
-              <Text style={[s.presetName, isSel && { color: C.bone }]}>{p.name}</Text>
-              <Text style={s.presetDesc}>{p.description}</Text>
+              <Text style={[s.presetName, isSel && { color: C.primary }]}>{i18n.language === 'es' ? p.nameEs : p.nameEn}</Text>
+              <Text style={s.presetDesc}>{i18n.language === 'es' ? p.descriptionEs : p.descriptionEn}</Text>
               <View style={s.presetBar}>
-                <View style={[s.presetSeg, { flex: p.proteinPct, backgroundColor: C.coral }]} />
-                <View style={[s.presetSeg, { flex: p.carbsPct, backgroundColor: C.violet }]} />
-                <View style={[s.presetSeg, { flex: p.fatPct, backgroundColor: C.bone + '40' }]} />
+                <View style={[s.presetSeg, { flex: p.proteinPct, backgroundColor: C.accent }]} />
+                <View style={[s.presetSeg, { flex: p.carbsPct, backgroundColor: C.primary }]} />
+                <View style={[s.presetSeg, { flex: p.fatPct, backgroundColor: C.text + '40' }]} />
               </View>
-              <Text style={s.presetPcts}>P {p.proteinPct}% · C {p.carbsPct}% · G {p.fatPct}%</Text>
+              <Text style={s.presetPcts}>P {Math.round(p.proteinPct * 100)}% · C {Math.round(p.carbsPct * 100)}% · G {Math.round(p.fatPct * 100)}%</Text>
             </View>
-            {isSel && <Ionicons name="checkmark-circle" size={22} color={C.violet} />}
+            {isSel && <Ionicons name="checkmark-circle" size={22} color={C.primary} />}
           </TouchableOpacity>
         );
       })}
@@ -310,101 +420,162 @@ export default function OnboardingScreen() {
 
   const renderStep5 = () => (
     <View style={s.stepContent}>
-      <Text style={s.stepTitle}>Integraciones de salud</Text>
-      <Text style={s.stepDesc}>Conecta tus dispositivos para mejor precision</Text>
+      <Text style={s.stepTitle}>{t('onboarding.healthIntegrations')}</Text>
+      <Text style={s.stepDesc}>{t('onboarding.healthIntegrationsDesc')}</Text>
 
       <TouchableOpacity style={[s.integrationCard, healthConnected && s.integrationCardActive]}
         onPress={() => {
-          Alert.alert('Proximamente',
+          Alert.alert(t('onboarding.comingSoon'),
             Platform.OS === 'ios'
-              ? 'La integracion con Apple Health estara disponible en la proxima version.'
-              : 'La integracion con Google Health Connect estara disponible en la proxima version.');
+              ? t('onboarding.comingSoon')
+              : t('onboarding.comingSoon'));
         }}>
         <Ionicons name={Platform.OS === 'ios' ? 'heart' : 'fitness'} size={28}
-          color={healthConnected ? C.success : C.sec} />
+          color={healthConnected ? C.success : C.textSecondary} />
         <View style={{ flex: 1 }}>
           <Text style={s.integrationName}>
             {Platform.OS === 'ios' ? 'Apple Health' : 'Google Health Connect'}
           </Text>
           <Text style={s.integrationDesc}>
-            Pasos, calorias activas, ejercicio y peso
+            {t('onboarding.exerciseMovement')}
           </Text>
         </View>
         <View style={[s.connectBadge, healthConnected && { backgroundColor: C.success + '20' }]}>
           <Text style={[s.connectText, healthConnected && { color: C.success }]}>
-            {healthConnected ? 'Conectado' : 'Proximamente'}
+            {healthConnected ? t('onboarding.connected') : t('onboarding.comingSoon')}
           </Text>
         </View>
       </TouchableOpacity>
 
       <TouchableOpacity style={s.integrationCard} onPress={() => {
-        Alert.alert('InBody', 'La integracion con InBody para composicion corporal avanzada estara disponible proximamente. Usaremos la API de Terra para sincronizar tus datos.');
+        Alert.alert('InBody', t('onboarding.comingSoon'));
       }}>
-        <Ionicons name="body-outline" size={28} color={C.sec} />
+        <Ionicons name="body-outline" size={28} color={C.textSecondary} />
         <View style={{ flex: 1 }}>
           <Text style={s.integrationName}>InBody</Text>
-          <Text style={s.integrationDesc}>Composicion corporal avanzada via Terra API</Text>
+          <Text style={s.integrationDesc}>{t('onboarding.bodyCompositionDesc')}</Text>
         </View>
         <View style={s.connectBadge}>
-          <Text style={s.connectText}>Proximamente</Text>
+          <Text style={s.connectText}>{t('onboarding.comingSoon')}</Text>
         </View>
       </TouchableOpacity>
 
       <Text style={[s.stepDesc, { marginTop: 16 }]}>
-        Puedes conectar estos servicios mas tarde desde Ajustes
+        {t('onboarding.connectLater')}
       </Text>
     </View>
   );
 
-  const renderStep6 = () => (
-    <View style={s.stepContent}>
-      <Text style={s.stepTitle}>Resumen de tus objetivos</Text>
-      <Text style={s.stepDesc}>Revisa antes de empezar</Text>
+  const renderStep6 = () => {
+    const bmrRounded = Math.round(bmr);
+    const activityBonus = tdee - bmrRounded;
+    const calorieAdjustment = Math.max(1200, goalCalories) - tdee;
+    const adjustmentLabel = calorieAdjustment < 0 ? t('onboarding.deficitApplied') : calorieAdjustment > 0 ? t('onboarding.surplusApplied') : t('onboarding.noAdjustment');
+    const adjustmentColor = calorieAdjustment < 0 ? C.accent : calorieAdjustment > 0 ? C.success : C.textSecondary;
+    const activityItem = ACTIVITIES.find(a => a.id === activity);
+    const activityLabel = activityItem ? t(activityItem.labelKey) : t('onboarding.moderate');
 
-      <View style={s.summaryCard}>
-        <View style={s.summaryRow}>
-          <Text style={s.summaryLabel}>TDEE estimado</Text>
-          <Text style={s.summaryValue}>{tdee} kcal</Text>
-        </View>
-        <View style={s.summaryRow}>
-          <Text style={s.summaryLabel}>Objetivo calorico</Text>
-          <Text style={[s.summaryValue, { color: C.violet, fontSize: 22 }]}>
-            {Math.max(1200, goalCalories)} kcal
-          </Text>
-        </View>
-        <View style={s.summaryDivider} />
-        <View style={s.macroSummary}>
-          <View style={s.macroItem}>
-            <Text style={[s.macroValue, { color: C.coral }]}>{adjustedProtein}g</Text>
-            <Text style={s.macroLabel}>Proteina</Text>
-          </View>
-          <View style={s.macroItem}>
-            <Text style={[s.macroValue, { color: C.violet }]}>{macros.carbs}g</Text>
-            <Text style={s.macroLabel}>Carbos</Text>
-          </View>
-          <View style={s.macroItem}>
-            <Text style={s.macroValue}>{macros.fat}g</Text>
-            <Text style={s.macroLabel}>Grasa</Text>
-          </View>
-        </View>
-        <View style={s.summaryDivider} />
-        <View style={s.summaryRow}>
-          <Text style={s.summaryLabel}>Proteina minima</Text>
-          <Text style={s.summaryNote}>{proteinMin}g/kg ({Math.round(numWeight * proteinMin)}g)</Text>
-        </View>
-        {bodyFat && (
+    return (
+      <View style={s.stepContent}>
+        <Text style={s.stepTitle}>{t('onboarding.goalSummary')}</Text>
+        <Text style={s.stepDesc}>{t('onboarding.goalSummaryDesc')}</Text>
+
+        {/* TDEE Breakdown */}
+        <View style={s.summaryCard}>
+          <Text style={[s.summaryLabel, { fontWeight: '700', fontSize: 13, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }]}>{t('onboarding.calorieBreakdown')}</Text>
+
+          {/* BMR */}
           <View style={s.summaryRow}>
-            <Text style={s.summaryLabel}>Grasa corporal</Text>
-            <Text style={s.summaryNote}>{bodyFat}%</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 16 }}>🔋</Text>
+              <View>
+                <Text style={[s.summaryLabel, { fontSize: 13 }]}>{t('onboarding.bmrLabel')}</Text>
+                <Text style={[s.summaryNote, { fontSize: 11 }]}>{t('onboarding.restExpenditure')}</Text>
+              </View>
+            </View>
+            <Text style={[s.summaryValue, { fontSize: 16 }]}>{bmrRounded} kcal</Text>
           </View>
-        )}
-      </View>
 
-      <Text style={[s.stepDesc, { marginTop: 12, fontSize: 13 }]}>
-        Estos valores se ajustaran semanalmente segun tu progreso
-      </Text>
-    </View>
-  );
+          {/* Activity */}
+          <View style={s.summaryRow}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 16 }}>🏃</Text>
+              <View>
+                <Text style={[s.summaryLabel, { fontSize: 13 }]}>{t('onboarding.activityLabel', { level: activityLabel.toLowerCase() })}</Text>
+                <Text style={[s.summaryNote, { fontSize: 11 }]}>{t('onboarding.exerciseMovement')}</Text>
+              </View>
+            </View>
+            <Text style={[s.summaryValue, { fontSize: 16 }]}>+{activityBonus} kcal</Text>
+          </View>
+
+          <View style={[s.summaryDivider, { marginVertical: 4 }]} />
+
+          {/* TDEE Total */}
+          <View style={s.summaryRow}>
+            <Text style={[s.summaryLabel, { fontWeight: '700' }]}>{t('onboarding.tdeeTotal')}</Text>
+            <Text style={[s.summaryValue, { fontSize: 18 }]}>{tdee} kcal</Text>
+          </View>
+
+          {/* Adjustment */}
+          {calorieAdjustment !== 0 && (
+            <View style={s.summaryRow}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text style={{ fontSize: 16 }}>{calorieAdjustment < 0 ? '📉' : '📈'}</Text>
+                <Text style={[s.summaryLabel, { fontSize: 13 }]}>{adjustmentLabel}</Text>
+              </View>
+              <Text style={[s.summaryValue, { fontSize: 16, color: adjustmentColor }]}>
+                {calorieAdjustment > 0 ? '+' : ''}{calorieAdjustment} kcal
+              </Text>
+            </View>
+          )}
+
+          <View style={[s.summaryDivider, { marginVertical: 4 }]} />
+
+          {/* Final Goal */}
+          <View style={s.summaryRow}>
+            <Text style={[s.summaryLabel, { fontWeight: '700' }]}>{t('onboarding.calorieGoal')}</Text>
+            <Text style={[s.summaryValue, { color: C.primary, fontSize: 22 }]}>
+              {Math.max(1200, goalCalories)} kcal
+            </Text>
+          </View>
+        </View>
+
+        {/* Macros Card */}
+        <View style={[s.summaryCard, { marginTop: 12 }]}>
+          <Text style={[s.summaryLabel, { fontWeight: '700', fontSize: 13, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }]}>{t('onboarding.macroDistTitle')}</Text>
+          <View style={s.macroSummary}>
+            <View style={s.macroItem}>
+              <Text style={[s.macroValue, { color: C.accent }]}>{adjustedProtein}g</Text>
+              <Text style={s.macroLabel}>{t('nutrition.protein')}</Text>
+            </View>
+            <View style={s.macroItem}>
+              <Text style={[s.macroValue, { color: C.primary }]}>{macros.carbs}g</Text>
+              <Text style={s.macroLabel}>{t('nutrition.carbs')}</Text>
+            </View>
+            <View style={s.macroItem}>
+              <Text style={[s.macroValue, { color: '#FFD700' }]}>{macros.fat}g</Text>
+              <Text style={s.macroLabel}>{t('nutrition.fat')}</Text>
+            </View>
+          </View>
+          <View style={s.summaryDivider} />
+          <View style={s.summaryRow}>
+            <Text style={s.summaryLabel}>{t('onboarding.proteinMin')}</Text>
+            <Text style={s.summaryNote}>{proteinMin}g/kg ({Math.round(numWeight * proteinMin)}g)</Text>
+          </View>
+          {bodyFat && (
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>{t('onboarding.bodyFat')}</Text>
+              <Text style={s.summaryNote}>{bodyFat}%</Text>
+            </View>
+          )}
+        </View>
+
+        <Text style={[s.stepDesc, { marginTop: 12, fontSize: 13 }]}>
+          {t('onboarding.adjustWeekly')}
+        </Text>
+      </View>
+    );
+  };
 
   const renderCurrentStep = () => {
     switch (step) {
@@ -428,7 +599,7 @@ export default function OnboardingScreen() {
       {/* Progress bar */}
       <View style={s.progressContainer}>
         <TouchableOpacity onPress={goBack} style={s.backBtn}>
-          <Ionicons name="arrow-back" size={22} color={C.bone} />
+          <Ionicons name="arrow-back" size={22} color={C.white} />
         </TouchableOpacity>
         <View style={s.progressBar}>
           <View style={[s.progressFill, { width: `${((step + 1) / TOTAL_STEPS) * 100}%` }]} />
@@ -449,17 +620,17 @@ export default function OnboardingScreen() {
             onPress={goNext}
             disabled={!canProceed()}
           >
-            <Text style={s.nextBtnText}>Continuar</Text>
-            <Ionicons name="arrow-forward" size={20} color={C.bone} />
+            <Text style={s.nextBtnText}>{t('onboarding.continue')}</Text>
+            <Ionicons name="arrow-forward" size={20} color={C.white} />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity style={s.finishBtn} onPress={handleFinish} disabled={loading}>
             {loading ? (
-              <ActivityIndicator color={C.bone} />
+              <ActivityIndicator color={C.white} />
             ) : (
               <>
-                <Ionicons name="rocket-outline" size={20} color={C.bone} />
-                <Text style={s.finishBtnText}>Empezar mi viaje</Text>
+                <Ionicons name="rocket-outline" size={20} color={C.white} />
+                <Text style={s.finishBtnText}>{t('onboarding.startJourney')}</Text>
               </>
             )}
           </TouchableOpacity>
@@ -469,73 +640,3 @@ export default function OnboardingScreen() {
   );
 }
 
-// ============================================
-// STYLES
-// ============================================
-
-const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.bg },
-  progressContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 60, gap: 12 },
-  backBtn: { padding: 4 },
-  progressBar: { flex: 1, height: 4, backgroundColor: 'rgba(247,242,234,0.1)', borderRadius: 2, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: C.violet, borderRadius: 2 },
-  stepIndicator: { fontSize: 13, color: C.sec, fontWeight: '600' },
-  scrollContent: { paddingBottom: 100 },
-  stepContent: { padding: 20 },
-  stepTitle: { fontSize: 26, fontWeight: '800', color: C.bone, marginBottom: 6 },
-  stepDesc: { fontSize: 15, color: C.sec, marginBottom: 20, lineHeight: 22 },
-  label: { fontSize: 13, fontWeight: '700', color: C.sec, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: 16 },
-  input: { backgroundColor: C.card, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 18, fontWeight: '600', color: C.bone, borderWidth: 1, borderColor: C.border },
-  inputRow: { flexDirection: 'row', gap: 12 },
-  optionRow: { flexDirection: 'row', gap: 10 },
-  optionCard: { flex: 1, alignItems: 'center', paddingVertical: 16, borderRadius: 12, backgroundColor: C.card, borderWidth: 1, borderColor: 'transparent', gap: 6 },
-  optionActive: { borderColor: C.violet, backgroundColor: C.violet + '20' },
-  optionLabel: { fontSize: 14, fontWeight: '600', color: C.sec },
-  optionLabelActive: { color: C.bone },
-  listOption: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 12, padding: 16, marginBottom: 8, borderWidth: 1, borderColor: 'transparent' },
-  listOptionActive: { borderColor: C.violet, backgroundColor: C.violet + '15' },
-  listOptionTitle: { fontSize: 16, fontWeight: '600', color: C.sec },
-  listOptionDesc: { fontSize: 13, color: C.ter, marginTop: 2 },
-  multText: { fontSize: 14, fontWeight: '700', color: C.violet },
-  dayBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'transparent' },
-  dayBtnActive: { borderColor: C.violet, backgroundColor: C.violet + '20' },
-  dayTxt: { fontSize: 16, fontWeight: '700', color: C.sec },
-  goalCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: 'transparent', gap: 14 },
-  goalCardActive: { borderColor: C.violet, backgroundColor: C.violet + '12' },
-  goalIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: 'rgba(247,242,234,0.05)', alignItems: 'center', justifyContent: 'center' },
-  goalTitle: { fontSize: 16, fontWeight: '700', color: C.sec },
-  goalDesc: { fontSize: 13, color: C.ter, marginTop: 2 },
-  rateCard: { flex: 1, alignItems: 'center', paddingVertical: 14, borderRadius: 10, backgroundColor: C.card, borderWidth: 1, borderColor: 'transparent', gap: 4 },
-  rateCardActive: { borderColor: C.violet, backgroundColor: C.violet + '20' },
-  rateName: { fontSize: 14, fontWeight: '700', color: C.sec },
-  rateDesc: { fontSize: 11, color: C.ter },
-  presetCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: 'transparent', gap: 12 },
-  presetCardActive: { borderColor: C.violet, backgroundColor: C.violet + '12' },
-  presetName: { fontSize: 16, fontWeight: '700', color: C.sec },
-  presetDesc: { fontSize: 12, color: C.ter, marginTop: 2 },
-  presetBar: { flexDirection: 'row', height: 6, borderRadius: 3, overflow: 'hidden', marginTop: 8, gap: 2 },
-  presetSeg: { borderRadius: 3 },
-  presetPcts: { fontSize: 11, color: C.ter, marginTop: 4 },
-  integrationCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: 'transparent', gap: 14 },
-  integrationCardActive: { borderColor: C.success, backgroundColor: C.success + '10' },
-  integrationName: { fontSize: 16, fontWeight: '700', color: C.bone },
-  integrationDesc: { fontSize: 13, color: C.sec, marginTop: 2 },
-  connectBadge: { backgroundColor: 'rgba(247,242,234,0.08)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
-  connectText: { fontSize: 12, fontWeight: '600', color: C.sec },
-  summaryCard: { backgroundColor: C.card, borderRadius: 16, padding: 20, gap: 12 },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  summaryLabel: { fontSize: 14, color: C.sec },
-  summaryValue: { fontSize: 18, fontWeight: '700', color: C.bone },
-  summaryNote: { fontSize: 14, fontWeight: '600', color: C.ter },
-  summaryDivider: { height: 1, backgroundColor: C.border },
-  macroSummary: { flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 8 },
-  macroItem: { alignItems: 'center', gap: 4 },
-  macroValue: { fontSize: 22, fontWeight: '800', color: C.bone },
-  macroLabel: { fontSize: 12, color: C.sec },
-  bottomBar: { paddingHorizontal: 20, paddingVertical: 16, paddingBottom: 34, backgroundColor: C.bg },
-  nextBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: C.violet, paddingVertical: 16, borderRadius: 14 },
-  nextBtnDisabled: { opacity: 0.4 },
-  nextBtnText: { fontSize: 17, fontWeight: '700', color: C.bone },
-  finishBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: C.coral, paddingVertical: 16, borderRadius: 14 },
-  finishBtnText: { fontSize: 17, fontWeight: '700', color: C.bone },
-});

@@ -1,0 +1,20 @@
+Failed to read the app config from the project using "npx expo config" command: npx expo config --json exited with non-zero code: 7.
+Falling back to the version of "@expo/config" shipped with the EAS CLI.
+Resolved "preview" environment for the build. Learn more: https://docs.expo.dev/eas/environment-variables/#setting-the-environment-for-your-builds
+No environment variables with visibility "Plain text" and "Sensitive" found for the "preview" environment on EAS.
+Environment variables loaded from the "preview" build profile "env" configuration: EAS_SKIP_AUTO_FINGERPRINT.
+
+
+
+android.versionCode field in app config is ignored when version source is set to remote, but this value will still be in the manifest available via expo-constants. It's recommended to remove this value from app config.
+√ Using remote Android credentials (Expo server)
+√ Using Keystore from configuration: Build Credentials mEy9RZo1o7 (default)
+
+Compressing project files and uploading to EAS Build. Learn more: https://expo.fyi/eas-build-archive
+- Compressing project files\ Compressing project files| Compressing project files/ Compressing project files- Compressing project files\ Compressing project files| Compressing project files/ Compressing project files- Compressing project files\ Compressing project files| Compressing project files/ Compressing project files- Compressing project files\ Compressing project files√ Compressed project files 2s (8.7 MB)
+- Uploading to EAS Build (0 / 8.7 MB)\ Uploading to EAS Build (192 KB / 8.7 MB)| Uploading to EAS Build (512 KB / 8.7 MB)/ Uploading to EAS Build (512 KB / 8.7 MB)- Uploading to EAS Build (576 KB / 8.7 MB)\ Uploading to EAS Build (3.5 MB / 8.7 MB)| Uploading to EAS Build (5.4 MB / 8.7 MB)/ Uploading to EAS Build (5.8 MB / 8.7 MB)- Uploading to EAS Build (8.7 MB / 8.7 MB)\ Uploading to EAS Build (8.7 MB / 8.7 MB)| Uploading to EAS Build (8.7 MB / 8.7 MB)/ Uploading to EAS Build (8.7 MB / 8.7 MB)√ Uploaded to EAS 1s
+Skipping project fingerprint
+
+See logs: https://expo.dev/accounts/civiltek/projects/cals2gains/builds/404abd98-bbea-43f8-a6dc-31c3b65b2eed
+
+BUILD11_DONE  

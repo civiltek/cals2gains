@@ -13,7 +13,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { COLORS } from '../theme';
+import { useTranslation } from 'react-i18next';
+import { useColors } from '../store/themeStore';
 
 // Mock store imports
 import { mealStore } from '../store/mealStore';
@@ -47,6 +48,9 @@ interface YesterdayMeal extends Meal {
 }
 
 export default function FastRelog() {
+  const { t } = useTranslation();
+  const C = useColors();
+  const styles = createStyles(C);
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [yesterdayMeals, setYesterdayMeals] = useState<YesterdayMeal[]>([]);
@@ -65,7 +69,7 @@ export default function FastRelog() {
     setYesterdayMeals([
       {
         id: 'y1',
-        name: 'Huevos Revueltos',
+        name: t('fastRelog.scrambledEggs'),
         calories: 250,
         protein: 18,
         carbs: 12,
@@ -74,7 +78,7 @@ export default function FastRelog() {
       },
       {
         id: 'y2',
-        name: 'Tostadas Integrales',
+        name: t('fastRelog.wholeWheatToast'),
         calories: 180,
         protein: 6,
         carbs: 32,
@@ -83,7 +87,7 @@ export default function FastRelog() {
       },
       {
         id: 'y3',
-        name: 'Pechuga de Pollo',
+        name: t('fastRelog.chickenBreast'),
         calories: 280,
         protein: 52,
         carbs: 0,
@@ -92,7 +96,7 @@ export default function FastRelog() {
       },
       {
         id: 'y4',
-        name: 'Arroz Blanco',
+        name: t('fastRelog.whiteRice'),
         calories: 206,
         protein: 4,
         carbs: 45,
@@ -101,7 +105,7 @@ export default function FastRelog() {
       },
       {
         id: 'y5',
-        name: 'Batido Whey Protein',
+        name: t('fastRelog.wheyProteinShake'),
         calories: 150,
         protein: 25,
         carbs: 8,
@@ -114,7 +118,7 @@ export default function FastRelog() {
     setFavoriteMeals([
       {
         id: 'f1',
-        name: 'Pechuga de Pollo',
+        name: t('fastRelog.chickenBreast'),
         calories: 280,
         protein: 52,
         carbs: 0,
@@ -123,7 +127,7 @@ export default function FastRelog() {
       },
       {
         id: 'f2',
-        name: 'Batido Whey Protein',
+        name: t('fastRelog.wheyProteinShake'),
         calories: 150,
         protein: 25,
         carbs: 8,
@@ -132,7 +136,7 @@ export default function FastRelog() {
       },
       {
         id: 'f3',
-        name: 'Huevos Revueltos',
+        name: t('fastRelog.scrambledEggs'),
         calories: 250,
         protein: 18,
         carbs: 12,
@@ -141,7 +145,7 @@ export default function FastRelog() {
       },
       {
         id: 'f4',
-        name: 'Yogur Griego',
+        name: t('fastRelog.greekYogurt'),
         calories: 120,
         protein: 20,
         carbs: 6,
@@ -150,7 +154,7 @@ export default function FastRelog() {
       },
       {
         id: 'f5',
-        name: 'Atún Enlatado',
+        name: t('fastRelog.cannedTuna'),
         calories: 200,
         protein: 42,
         carbs: 0,
@@ -159,7 +163,7 @@ export default function FastRelog() {
       },
       {
         id: 'f6',
-        name: 'Arroz Blanco',
+        name: t('fastRelog.whiteRice'),
         calories: 206,
         protein: 4,
         carbs: 45,
@@ -172,103 +176,103 @@ export default function FastRelog() {
     setFrequentMeals([
       {
         id: 'freq1',
-        name: 'Pechuga de Pollo',
+        name: t('fastRelog.chickenBreast'),
         calories: 280,
         protein: 52,
         carbs: 0,
         fat: 6,
         usageCount: 142,
-        lastUsed: 'Hoy',
+        lastUsed: t('common.today'),
       },
       {
         id: 'freq2',
-        name: 'Batido Whey Protein',
+        name: t('fastRelog.wheyProteinShake'),
         calories: 150,
         protein: 25,
         carbs: 8,
         fat: 2,
         usageCount: 118,
-        lastUsed: 'Hoy',
+        lastUsed: t('common.today'),
       },
       {
         id: 'freq3',
-        name: 'Arroz Blanco',
+        name: t('fastRelog.whiteRice'),
         calories: 206,
         protein: 4,
         carbs: 45,
         fat: 0,
         usageCount: 112,
-        lastUsed: 'Ayer',
+        lastUsed: t('common.yesterday'),
       },
       {
         id: 'freq4',
-        name: 'Huevos Revueltos',
+        name: t('fastRelog.scrambledEggs'),
         calories: 250,
         protein: 18,
         carbs: 12,
         fat: 16,
         usageCount: 96,
-        lastUsed: 'Ayer',
+        lastUsed: t('common.yesterday'),
       },
       {
         id: 'freq5',
-        name: 'Atún Enlatado',
+        name: t('fastRelog.cannedTuna'),
         calories: 200,
         protein: 42,
         carbs: 0,
         fat: 1,
         usageCount: 90,
-        lastUsed: 'Hace 2 días',
+        lastUsed: t('fastRelog.daysAgo', { count: 2 }),
       },
       {
         id: 'freq6',
-        name: 'Queso Cottage',
+        name: t('fastRelog.cottageCheese'),
         calories: 140,
         protein: 28,
         carbs: 4,
         fat: 3,
         usageCount: 78,
-        lastUsed: 'Hace 2 días',
+        lastUsed: t('fastRelog.daysAgo', { count: 2 }),
       },
       {
         id: 'freq7',
-        name: 'Yogur Griego',
+        name: t('fastRelog.greekYogurt'),
         calories: 120,
         protein: 20,
         carbs: 6,
         fat: 2,
         usageCount: 76,
-        lastUsed: 'Hace 3 días',
+        lastUsed: t('fastRelog.daysAgo', { count: 3 }),
       },
       {
         id: 'freq8',
-        name: 'Avena con Leche',
+        name: t('fastRelog.oatmealWithMilk'),
         calories: 280,
         protein: 12,
         carbs: 48,
         fat: 6,
         usageCount: 64,
-        lastUsed: 'Hace 3 días',
+        lastUsed: t('fastRelog.daysAgo', { count: 3 }),
       },
       {
         id: 'freq9',
-        name: 'Almendras',
+        name: t('fastRelog.almonds'),
         calories: 200,
         protein: 7,
         carbs: 7,
         fat: 17,
         usageCount: 58,
-        lastUsed: 'Hace 4 días',
+        lastUsed: t('fastRelog.daysAgo', { count: 4 }),
       },
       {
         id: 'freq10',
-        name: 'Banana',
+        name: t('fastRelog.banana'),
         calories: 105,
         protein: 1,
         carbs: 27,
         fat: 0,
         usageCount: 54,
-        lastUsed: 'Hace 4 días',
+        lastUsed: t('fastRelog.daysAgo', { count: 4 }),
       },
     ]);
 
@@ -276,12 +280,12 @@ export default function FastRelog() {
     setMealStacks([
       {
         id: 'stack1',
-        name: 'Desayuno Proteico',
+        name: t('fastRelog.proteinBreakfast'),
         category: 'breakfast',
         items: [
           {
             id: 'si1',
-            name: 'Huevos Revueltos (3)',
+            name: `${t('fastRelog.scrambledEggs')} (3)`,
             calories: 250,
             protein: 18,
             carbs: 12,
@@ -289,7 +293,7 @@ export default function FastRelog() {
           },
           {
             id: 'si2',
-            name: 'Tostadas Integrales (2)',
+            name: `${t('fastRelog.wholeWheatToast')} (2)`,
             calories: 180,
             protein: 6,
             carbs: 32,
@@ -297,7 +301,7 @@ export default function FastRelog() {
           },
           {
             id: 'si3',
-            name: 'Aguacate (½)',
+            name: `${t('fastRelog.avocado')} (½)`,
             calories: 120,
             protein: 1,
             carbs: 6,
@@ -309,12 +313,12 @@ export default function FastRelog() {
       },
       {
         id: 'stack2',
-        name: 'Almuerzo Musculación',
+        name: t('fastRelog.muscleLunch'),
         category: 'postworkout',
         items: [
           {
             id: 'si4',
-            name: 'Pechuga de Pollo (150g)',
+            name: `${t('fastRelog.chickenBreast')} (150g)`,
             calories: 280,
             protein: 52,
             carbs: 0,
@@ -322,7 +326,7 @@ export default function FastRelog() {
           },
           {
             id: 'si5',
-            name: 'Arroz Blanco (1 taza)',
+            name: `${t('fastRelog.whiteRice')} (1 ${t('fastRelog.cup')})`,
             calories: 206,
             protein: 4,
             carbs: 45,
@@ -330,7 +334,7 @@ export default function FastRelog() {
           },
           {
             id: 'si6',
-            name: 'Brócoli (150g)',
+            name: `${t('fastRelog.broccoli')} (150g)`,
             calories: 52,
             protein: 5,
             carbs: 10,
@@ -342,12 +346,12 @@ export default function FastRelog() {
       },
       {
         id: 'stack3',
-        name: 'Post-Entreno',
+        name: t('fastRelog.postWorkout'),
         category: 'postworkout',
         items: [
           {
             id: 'si7',
-            name: 'Batido Whey Protein (30g)',
+            name: `${t('fastRelog.wheyProteinShake')} (30g)`,
             calories: 150,
             protein: 25,
             carbs: 8,
@@ -355,7 +359,7 @@ export default function FastRelog() {
           },
           {
             id: 'si8',
-            name: 'Banana',
+            name: t('fastRelog.banana'),
             calories: 105,
             protein: 1,
             carbs: 27,
@@ -363,7 +367,7 @@ export default function FastRelog() {
           },
           {
             id: 'si9',
-            name: 'Almendras (30g)',
+            name: `${t('fastRelog.almonds')} (30g)`,
             calories: 200,
             protein: 7,
             carbs: 7,
@@ -406,8 +410,8 @@ export default function FastRelog() {
     setReloggedCount(reloggedCount + 1);
 
     Alert.alert(
-      'Registrado',
-      `${meal.name} (+${meal.calories} kcal)\nProteína: ${meal.protein}g`,
+      t('fastRelog.mealLogged'),
+      `${meal.name} (+${meal.calories} kcal)\n${t('fastRelog.protein')}: ${meal.protein}g`,
       [{ text: 'OK', onPress: () => {} }],
       { cancelable: true }
     );
@@ -418,8 +422,8 @@ export default function FastRelog() {
     setReloggedCount(reloggedCount + 1);
 
     Alert.alert(
-      'Comida Registrada',
-      `${stack.name} (+${stack.totalCalories} kcal)\nProteína: ${stack.totalProtein}g`,
+      t('fastRelog.mealLogged'),
+      `${stack.name} (+${stack.totalCalories} kcal)\n${t('fastRelog.protein')}: ${stack.totalProtein}g`,
       [{ text: 'OK', onPress: () => {} }],
       { cancelable: true }
     );
@@ -431,8 +435,8 @@ export default function FastRelog() {
     const totalProtein = yesterdayMeals.reduce((acc, meal) => acc + meal.protein, 0);
 
     Alert.alert(
-      'Día Completo Copiado',
-      `${yesterdayMeals.length} comidas (${totalCalories} kcal)\nProteína: ${totalProtein}g`,
+      t('fastRelog.fullDayCopied'),
+      `${yesterdayMeals.length} ${t('fastRelog.meals')} (${totalCalories} kcal)\n${t('fastRelog.protein')}: ${totalProtein}g`,
       [{ text: 'OK', onPress: () => {} }],
       { cancelable: true }
     );
@@ -441,8 +445,8 @@ export default function FastRelog() {
   const handleDone = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
-      'Listo',
-      `Se han registrado ${reloggedCount} comidas hoy`,
+      t('fastRelog.done'),
+      t('fastRelog.mealsLoggedToday', { count: reloggedCount }),
       [{ text: 'OK', onPress: () => {} }],
       { cancelable: true }
     );
@@ -451,13 +455,13 @@ export default function FastRelog() {
   const renderYesterdaySection = () => (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Mismo que Ayer</Text>
+        <Text style={styles.sectionTitle}>{t('fastRelog.sameAsYesterday')}</Text>
         <TouchableOpacity
           style={styles.copyAllButton}
           onPress={handleCopyAllYesterday}
         >
-          <Ionicons name="copy" size={14} color={COLORS.primary} />
-          <Text style={styles.copyAllText}>Copiar Todo</Text>
+          <Ionicons name="copy" size={14} color={C.primary} />
+          <Text style={styles.copyAllText}>{t('fastRelog.copyAll')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -467,10 +471,10 @@ export default function FastRelog() {
           if (typeMeals.length === 0) return null;
 
           const mealTypeLabels: Record<string, string> = {
-            breakfast: 'Desayuno',
-            lunch: 'Almuerzo',
-            snack: 'Snack',
-            dinner: 'Cena',
+            breakfast: t('home.breakfast'),
+            lunch: t('home.lunch'),
+            snack: t('home.snack'),
+            dinner: t('home.dinner'),
           };
 
           return (
@@ -493,7 +497,7 @@ export default function FastRelog() {
                       style={styles.repeatButton}
                       onPress={() => handleQuickLog(meal)}
                     >
-                      <Text style={styles.repeatButtonText}>Repetir</Text>
+                      <Text style={styles.repeatButtonText}>{t('fastRelog.repeat')}</Text>
                     </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
@@ -507,7 +511,7 @@ export default function FastRelog() {
 
   const renderFavoritesSection = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Favoritos</Text>
+      <Text style={styles.sectionTitle}>{t('fastRelog.favorites')}</Text>
       <View style={styles.gridContainer}>
         {filteredFavoriteMeals.map((meal) => (
           <TouchableOpacity
@@ -516,7 +520,7 @@ export default function FastRelog() {
             onPress={() => handleQuickLog(meal)}
           >
             <View style={styles.favoriteCardContent}>
-              <Ionicons name="star" size={20} color={COLORS.warning} style={styles.starIcon} />
+              <Ionicons name="star" size={20} color={C.warning} style={styles.starIcon} />
               <Text style={styles.favoriteMealName}>{meal.name}</Text>
               <Text style={styles.favoriteMealCalories}>{meal.calories} kcal</Text>
               <Text style={styles.favoriteMealProtein}>+{meal.protein}g P</Text>
@@ -529,7 +533,7 @@ export default function FastRelog() {
 
   const renderFrequentSection = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Comidas Frecuentes</Text>
+      <Text style={styles.sectionTitle}>{t('fastRelog.frequentMeals')}</Text>
       <View style={styles.frequentContainer}>
         {filteredFrequentMeals.map((meal, index) => (
           <TouchableOpacity
@@ -561,7 +565,7 @@ export default function FastRelog() {
 
   const renderStacksSection = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Combinaciones Comunes</Text>
+      <Text style={styles.sectionTitle}>{t('fastRelog.commonCombinations')}</Text>
       <View style={styles.stacksContainer}>
         {filteredStacks.map((stack) => (
           <TouchableOpacity
@@ -596,7 +600,7 @@ export default function FastRelog() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Registro Rápido</Text>
+        <Text style={styles.headerTitle}>{t('fastRelog.title')}</Text>
         <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
           <Ionicons name="checkmark" size={20} color="#fff" />
         </TouchableOpacity>
@@ -604,17 +608,17 @@ export default function FastRelog() {
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={18} color={COLORS.textSecondary} style={styles.searchIcon} />
+        <Ionicons name="search" size={18} color={C.textSecondary} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Buscar comidas..."
-          placeholderTextColor={COLORS.textSecondary}
+          placeholder={t('fastRelog.searchPlaceholder')}
+          placeholderTextColor={C.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <Ionicons name="close-circle" size={18} color={COLORS.textSecondary} />
+            <Ionicons name="close-circle" size={18} color={C.textSecondary} />
           </TouchableOpacity>
         )}
       </View>
@@ -622,9 +626,9 @@ export default function FastRelog() {
       <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
         {/* Relogged count indicator */}
         {reloggedCount > 0 && (
-          <View style={[styles.card, { backgroundColor: COLORS.success + '15' }]}>
-            <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
-            <Text style={[styles.reloggedText, { color: COLORS.success }]}>
+          <View style={[styles.card, { backgroundColor: C.success + '15' }]}>
+            <Ionicons name="checkmark-circle" size={20} color={C.success} />
+            <Text style={[styles.reloggedText, { color: C.success }]}>
               {reloggedCount} {reloggedCount === 1 ? 'comida registrada' : 'comidas registradas'}
             </Text>
           </View>
@@ -641,10 +645,10 @@ export default function FastRelog() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(C: any) { return StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: C.background,
   },
   header: {
     flexDirection: 'row',
@@ -653,18 +657,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: C.border,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: C.text,
   },
   doneButton: {
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: C.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -676,9 +680,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     height: 40,
     borderRadius: 8,
-    backgroundColor: COLORS.surface,
+    backgroundColor: C.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: C.border,
   },
   searchIcon: {
     marginRight: 8,
@@ -686,7 +690,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: COLORS.text,
+    color: C.text,
   },
   content: {
     flex: 1,
@@ -701,7 +705,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: C.border,
   },
   reloggedText: {
     fontSize: 13,
@@ -719,7 +723,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: C.text,
   },
   copyAllButton: {
     flexDirection: 'row',
@@ -728,12 +732,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
-    backgroundColor: COLORS.primary + '10',
+    backgroundColor: C.primary + '10',
   },
   copyAllText: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: C.primary,
   },
   mealTypeGroup: {
     gap: 12,
@@ -744,14 +748,14 @@ const styles = StyleSheet.create({
   mealTypeLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
     marginBottom: 4,
   },
   yesterdayMealCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: C.surface,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: C.border,
     overflow: 'hidden',
   },
   mealCardContent: {
@@ -767,24 +771,24 @@ const styles = StyleSheet.create({
   mealCardName: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
+    color: C.text,
     marginBottom: 2,
   },
   mealCardMacros: {
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
   },
   repeatButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
-    backgroundColor: COLORS.primary + '20',
+    backgroundColor: C.primary + '20',
     marginLeft: 12,
   },
   repeatButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: C.primary,
   },
   gridContainer: {
     flexDirection: 'row',
@@ -794,10 +798,10 @@ const styles = StyleSheet.create({
   },
   favoriteMealCard: {
     width: (width - 48) / 2,
-    backgroundColor: COLORS.surface,
+    backgroundColor: C.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: C.border,
     overflow: 'hidden',
   },
   favoriteCardContent: {
@@ -811,25 +815,25 @@ const styles = StyleSheet.create({
   favoriteMealName: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.text,
+    color: C.text,
     textAlign: 'center',
     marginBottom: 6,
   },
   favoriteMealCalories: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: C.primary,
   },
   favoriteMealProtein: {
     fontSize: 11,
-    color: COLORS.success,
+    color: C.success,
     marginTop: 2,
   },
   frequentContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: C.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: C.border,
     overflow: 'hidden',
   },
   frequentMealCard: {
@@ -841,7 +845,7 @@ const styles = StyleSheet.create({
   },
   frequentMealCardBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: C.border,
   },
   frequentCardLeft: {
     flexDirection: 'row',
@@ -852,7 +856,7 @@ const styles = StyleSheet.create({
   frequentRank: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: C.primary,
     minWidth: 24,
   },
   frequentCardInfo: {
@@ -861,12 +865,12 @@ const styles = StyleSheet.create({
   frequentMealName: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
+    color: C.text,
     marginBottom: 2,
   },
   frequentMealMeta: {
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
   },
   frequentCardRight: {
     alignItems: 'center',
@@ -874,21 +878,21 @@ const styles = StyleSheet.create({
   frequentMealCalories: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: C.primary,
   },
   frequentMealUnit: {
     fontSize: 10,
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
     marginTop: 2,
   },
   stacksContainer: {
     gap: 12,
   },
   stackCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: C.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: C.border,
     padding: 12,
   },
   stackCardHeader: {
@@ -900,10 +904,10 @@ const styles = StyleSheet.create({
   stackCardName: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
+    color: C.text,
   },
   stackBadge: {
-    backgroundColor: COLORS.primary + '20',
+    backgroundColor: C.primary + '20',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -911,10 +915,10 @@ const styles = StyleSheet.create({
   stackBadgeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: C.primary,
   },
   stackCardItems: {
-    backgroundColor: COLORS.background,
+    backgroundColor: C.background,
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -923,7 +927,7 @@ const styles = StyleSheet.create({
   },
   stackItemText: {
     fontSize: 11,
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
   },
   stackCardFooter: {
     flexDirection: 'row',
@@ -933,14 +937,14 @@ const styles = StyleSheet.create({
   stackTotalCal: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: C.primary,
   },
   stackTotalProtein: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.success,
+    color: C.success,
   },
   bottomSpacing: {
     height: 20,
   },
-});
+}); }

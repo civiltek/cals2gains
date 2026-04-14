@@ -1,0 +1,210 @@
+CALS2GAINS INSTAGRAM POSTS - SPANISH ACCOUNT
+Generated: 2026-04-11
+Specifications: 1080x1080px PNG, Dark Mode Aesthetic, Modern Fitness/Tech
+
+===========================================
+POST LIBRARY MANIFEST
+===========================================
+
+POST 1: 01_searching_foods.png
+Title: ¿Sigues buscando alimentos a mano en 2026?
+Type: Cover slide for carousel
+Focus: Provocative headline questioning manual food entry
+Visual Elements: Coral accent circle, camera icon visual, gradient background
+Design Style: Dark purple to dark gradient with accent highlights
+CTA: "Hay una mejor forma..."
+
+POST 2: 02_black_box.png
+Title: Tu app te dice 1800 kcal. ¿De dónde sale?
+Type: Cover slide
+Focus: Question-style, transparency theme
+Visual Elements: Black box visualization, large question mark in coral
+Design Style: Dark purple to dark vertical gradient, mystery/unknown theme
+CTA: "Cals2Gains es transparente"
+
+POST 3: 03_myth_carbs.png
+Title: MITO: Los Carbohidratos Engordan
+Type: Static post
+Focus: Educational myth-busting
+Visual Elements: Split design - left (red) vs right (green), X mark and checkmark
+Design Style: Dark background with indigo gradient, red/green contrast boxes
+Components: MITO box with X mark | HECHO box with checkmark
+
+POST 4: 04_how_many_apps.png
+Title: ¿Cuántas apps necesitas?
+Type: Cover slide
+Focus: Unified solution value proposition
+Visual Elements: 4 app icons vs 1 unified C2G icon, "VS" in center
+Design Style: Dark purple to dark horizontal gradient
+Benefit Messaging: Multiple apps vs single integrated solution
+
+POST 5: 05_count_to_know.png
+Title: No cuentas para sufrir. Cuentas para SABER.
+Type: Motivational static post
+Focus: Empowerment messaging
+Visual Elements: Bold typography, decorative circles with glow effect
+Design Style: Dark gradient with coral and violet accent circles
+Emotional Appeal: Shift from suffering to knowledge/empowerment
+
+POST 6: 06_big_reveal.png
+Title: CALS2GAINS — Bienvenido al futuro del tracking
+Type: BIG REVEAL cover slide
+Focus: Launch/major announcement
+Visual Elements: Large CALS2GAINS text, coral underline, multi-color accents
+Design Style: Complex gradient (indigo top → coral bottom), dramatic effect
+Prominence: Most visually impactful design using all brand colors
+
+POST 7: 07_comparison.png
+Title: Tu app vs Cals2Gains
+Type: Comparison slide
+Focus: Feature and benefit comparison
+Visual Elements: Split design - red X marks vs green checkmarks, vertical divider
+Design Style: Dark gradient with violet divider
+Content: 4 comparison points per side (Speed, Clarity, Tech, Integration)
+
+POST 8: 08_photo_to_macros.png
+Title: 📸 Foto → Macros en 3 segundos
+Type: Feature highlight
+Focus: AI photo recognition feature
+Visual Elements: 3-step process flow (camera → food → macro breakdown)
+Design Style: Dark background with accent boxes and arrows
+Design Flow: Photo (coral) → Food (orange) → Macros (green) with arrows
+
+POST 9: 09_ai_coach.png
+Title: Coach IA que se adapta a TI
+Type: Feature highlight
+Focus: AI personalization technology
+Visual Elements: Brain/neural network visualization with circles and connections
+Design Style: Dark background with indigo gradient and violet network
+Tech Feel: Interconnected circles showing AI adaptation
+
+POST 10: 10_five_modes.png
+Title: 5 modos de objetivo: ¿Cuál es el tuyo?
+Type: Feature grid
+Focus: Goal mode selection/customization
+Visual Elements: 5 mode boxes in different brand colors
+Modes Shown:
+  - Recomposición (coral)
+  - Mini Corte (orange)
+  - Volumen Limpio (violet)
+  - Déficit (indigo)
+  - Mantenimiento (green)
+Design Style: Dark gradient with 5 colored accent boxes
+CTA: "¿Listo para tu cambio?"
+
+POST 11: 11_weekly_recap.png
+Title: Tu semana en 30 segundos
+Type: Weekly recap concept
+Focus: Dashboard visualization and stats
+Visual Elements: Bar chart with 7-day breakdown, summary stats
+Design Style: Dark purple to dark horizontal gradient
+Data Display: Daily bars (Mon-Sun) with consistency metric
+
+POST 12: 12_coming_soon.png
+Title: Disponible próximamente
+Type: Coming soon / CTA post
+Focus: Launch announcement and waitlist sign-up
+Visual Elements: Hourglass emoji, large circular emphasis, app store hints
+Design Style: Complex gradient (indigo to dark), center-focused design
+CTA: "Únete a nuestro waitlist" + "🔗 cals2gains.com"
+
+===========================================
+DESIGN SPECIFICATIONS
+===========================================
+
+Color Palette:
+  Primary: Signal Coral (#FF6A4D)
+  Secondary: Violet/Indigo (#9C8CFF, #6366F1)
+  Accent: Orange (#FF9800)
+  Dark Background: Carbon Plum (#17121D)
+  Light Text: Bone (#F7F2EA)
+  Supporting: Accent Green (#4ADE80), Accent Red (#EF4444)
+
+Typography:
+  Font Family: DejaVu Sans Bold (Outfit Bold simulation)
+  Headlines: 56-120px, Bold weight, Light text color
+  Labels: 32-48px, Bold weight
+  Body: 28-44px, Regular weight
+  All text chosen for mobile readability (minimum 24pt effective)
+
+Design Elements Used Across Posts:
+  ✓ Dark mode aesthetic (dark purple gradient backgrounds)
+  ✓ Accent circles (decorative and functional)
+  ✓ Accent boxes (feature highlighting)
+  ✓ Gradient backgrounds (3 types: vertical, horizontal, diagonal)
+  ✓ Bold typography hierarchy
+  ✓ Emoji integration (camera, brain, hourglass, etc.)
+  ✓ Color-coded messaging (red=bad, green=good)
+  ✓ Watermark: @cals2gains in coral at bottom right
+
+Brand Consistency:
+  ✓ Every post includes @cals2gains watermark
+  ✓ Consistent use of brand color hierarchy
+  ✓ Modern fitness/tech aesthetic throughout
+  ✓ Spanish language copy (native market focus)
+  ✓ Dark mode suitable for evening engagement
+  ✓ Professional, polished appearance
+  ✓ Geometric shapes and clean lines
+
+===========================================
+USAGE GUIDELINES
+===========================================
+
+Posting Strategy:
+1. Use Post 6 (Big Reveal) as hero/announcement post
+2. Posts 1-5: Top-of-funnel awareness content
+3. Posts 7-10: Feature education and product highlights
+4. Post 11: Engagement (weekly recap template)
+5. Post 12: Waitlist/CTA post
+
+Carousel Considerations:
+  - Posts 1, 2, 4 are designed as carousel covers
+  - Can be paired with feature detail slides
+  - Question-format posts encourage saves/shares
+
+Engagement Tactics:
+  - Post 2 (Black Box) invites discussion in comments
+  - Post 3 (Myth) is educational, highly shareable
+  - Post 5 is emotional, high engagement potential
+  - Post 10 (5 Modes) creates personalization interest
+
+Scheduling Recommendation:
+  - Week 1: Posts 1-3 (awareness + education)
+  - Week 2: Posts 4-6 (features + big reveal)
+  - Week 3: Posts 7-9 (comparisons + features)
+  - Week 4: Posts 10-12 (customization + CTA)
+
+Content Rotation:
+  - 12 posts = 3 weeks of daily content
+  - Reuse in carousels with additional slide content
+  - Remix with different copy (A/B testing)
+  - Update with seasonal/timely angles
+
+===========================================
+FILE SPECIFICATIONS
+===========================================
+
+Location: /sessions/nice-quirky-cerf/mnt/macrolens/instagram/posts_es/
+Format: PNG (8-bit RGB, non-interlaced)
+Dimensions: 1080x1080px (Instagram square format)
+File Size Range: 38-95KB per post
+Average Size: 53KB
+Total Library Size: 638KB
+
+Optimization: Suitable for direct upload to Instagram
+Quality: High-resolution, mobile-optimized
+Colors: True RGB (no color space issues)
+Transparency: None (solid backgrounds - Instagram-safe)
+
+===========================================
+GENERATION DETAILS
+===========================================
+
+Generated by: Cals2Gains Instagram Post Generator (Python + Pillow)
+Script: generate_posts.py
+Date: 2026-04-11 02:48-02:49
+Font System: DejaVu Sans Bold (system default)
+Image Library: PIL/Pillow 10.x
+Processing Time: <1 minute for all 12 posts
+
+===========================================

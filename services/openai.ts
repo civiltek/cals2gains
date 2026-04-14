@@ -4,6 +4,7 @@
 // Uses GPT-4o Vision to analyze food photos and estimate nutritional content
 
 import { FoodAnalysisResult, AnalysisAnswers, MealType } from '../types';
+import { getAppLanguage } from '../utils/language';
 
 const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
@@ -16,28 +17,51 @@ Your job is to analyze food photos with extreme precision and provide accurate n
 
 RULES:
 1. Always respond in valid JSON only — no markdown, no explanation outside JSON
-2. Estimate portion sizes based on visual cues: plate size, utensils, hand/finger references if visible, typical serving sizes
-3. Be conservative with estimates — it's better to slightly underestimate than overestimate
-4. For complex dishes, identify ALL significant ingredients
-5. Only ask clarifying questions for ingredients that significantly affect calories/macros (>20 calories difference)
-6. Maximum 3 clarifying questions
-7. Nutritional values should be based on standard food databases (USDA, BEDCA)
-8. Always provide BOTH English and Spanish names for dishes
-9. Confidence should reflect certainty in food identification (0.5-1.0)`;
+2. For complex dishes, identify ALL significant ingredients
+3. Only ask clarifying questions for ingredients that significantly affect calories/macros (>20 calories difference)
+4. Maximum 3 clarifying questions
+5. Nutritional values should be based on standard food databases (USDA, BEDCA)
+6. Always provide BOTH English and Spanish names for dishes
+7. Confidence should reflect certainty in food identification (0.5-1.0)
+
+CRITICAL — WEIGHT ESTIMATION GUIDELINES:
+You tend to OVERESTIMATE portion weights. Apply these calibration rules strictly:
+- A standard dinner plate is 26cm diameter. A dessert/side plate is 19cm. Use plate size as a ruler.
+- A smartphone lying next to food is ~15cm long — use it as reference if visible.
+- A fork is ~19cm, a tablespoon head is ~4cm wide. Use utensils as size references.
+- For packaged/bar foods: a typical cereal bar is 20-30g, a protein bar 40-60g. Do NOT estimate higher unless visually much larger.
+- Single fruits: a medium apple is 150-180g, a medium pear is 170-200g, a banana (peeled) is 100-120g. Err toward the lower end unless clearly large.
+- A slice of bread is 25-35g. A standard sandwich is 50-70g of bread.
+- A chicken breast fillet is 120-180g. A steak is 150-250g depending on thickness.
+- When in doubt, estimate 15-20% LOWER than your first instinct — studies show AI vision consistently overestimates food portions.
+- Provide an estimatedWeightRange (e.g. "20-30g") so the user can adjust.
+- Your estimatedWeight should be the MIDPOINT of your range, not the upper bound.`;
 
 /**
  * Initial food analysis prompt
  */
-function buildAnalysisPrompt(language: 'es' | 'en' = 'es'): string {
-  return `Analyze this food photo and return ONLY a JSON object with this EXACT structure (no markdown):
+function buildAnalysisPrompt(language: 'es' | 'en' = getAppLanguage(), userContext?: string): string {
+  const contextBlock = userContext?.trim()
+    ? `\n\nIMPORTANT — USER CONTEXT (treat as authoritative, override visual guesses with this info):
+"${userContext.trim()}"
+Use this context to correct your analysis. For example:
+- "yogur griego light" → use low-fat greek yogurt nutritional values
+- "2 yemas y 5 claras" → calculate egg nutrition accordingly (not whole eggs)
+- "sin aceite" → do not count oil/fat from cooking
+- "integral" → use whole-grain nutritional values
+The user knows what they ate — trust their description over your visual estimate when they conflict.\n`
+    : '';
+
+  return `Analyze this food photo and return ONLY a JSON object with this EXACT structure (no markdown):${contextBlock}
 
 {
   "dishName": "English dish name",
   "dishNameEs": "Nombre en español",
   "dishNameEn": "English dish name",
   "confidence": 0.9,
-  "estimatedWeight": 300,
-  "estimatedWeightNote": "Based on standard dinner plate, approximately 300g",
+  "estimatedWeight": 250,
+  "estimatedWeightRange": "220-280g",
+  "estimatedWeightNote": "Based on standard dinner plate (26cm), portion covers ~40% of plate surface",
   "ingredients": ["ingredient1", "ingredient2", "ingredient3"],
   "mealType": "breakfast|lunch|dinner|snack",
   "clarifyingQuestions": [
@@ -81,7 +105,8 @@ IMPORTANT:
 function buildRefinementPrompt(
   originalAnalysis: FoodAnalysisResult,
   answers: AnalysisAnswers,
-  language: 'es' | 'en' = 'es'
+  language: 'es' | 'en' = getAppLanguage(),
+  userContext?: string
 ): string {
   const answersText = Object.entries(answers)
     .map(([id, answer]) => {
@@ -90,9 +115,13 @@ function buildRefinementPrompt(
     })
     .join('\n');
 
+  const contextBlock = userContext?.trim()
+    ? `\nUser also provided this context (treat as authoritative): "${userContext.trim()}"\n`
+    : '';
+
   return `Based on the food photo previously analyzed as "${originalAnalysis.dishNameEn}" and the following additional information:
 
-${answersText}
+${answersText}${contextBlock}
 
 Recalculate the nutritional information and return ONLY a JSON object with this structure:
 {
@@ -129,7 +158,8 @@ Fill in accurate nutritional values based on ALL the ingredient information now 
  */
 export async function analyzeFoodPhoto(
   imageBase64: string,
-  language: 'es' | 'en' = 'es'
+  language: 'es' | 'en' = getAppLanguage(),
+  userContext?: string
 ): Promise<FoodAnalysisResult> {
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key not configured');
@@ -161,7 +191,7 @@ export async function analyzeFoodPhoto(
             },
             {
               type: 'text',
-              text: buildAnalysisPrompt(language),
+              text: buildAnalysisPrompt(language, userContext),
             },
           ],
         },
@@ -171,7 +201,16 @@ export async function analyzeFoodPhoto(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(`OpenAI API error: ${response.status} - ${JSON.stringify(error)}`);
+    const errorMsg = error?.error?.message || JSON.stringify(error);
+    console.error(`[OpenAI] API error ${response.status}:`, errorMsg);
+    if (response.status === 401) {
+      throw new Error('API key inválida o expirada. Revisa EXPO_PUBLIC_OPENAI_API_KEY en .env');
+    } else if (response.status === 429) {
+      throw new Error('Límite de uso de OpenAI alcanzado. Revisa tu cuenta de facturación.');
+    } else if (response.status === 400) {
+      throw new Error(`Error en la petición: ${errorMsg}`);
+    }
+    throw new Error(`Error OpenAI (${response.status}): ${errorMsg}`);
   }
 
   const data = await response.json();
@@ -197,6 +236,7 @@ export async function analyzeFoodPhoto(
       dishNameEn: result.dishNameEn || result.dishName || 'Unknown food',
       confidence: Math.min(Math.max(result.confidence || 0.7, 0), 1),
       estimatedWeight: result.estimatedWeight || 200,
+      estimatedWeightRange: result.estimatedWeightRange || undefined,
       ingredients: result.ingredients || [],
       clarifyingQuestions: result.clarifyingQuestions || [],
       nutritionPer100g: result.nutritionPer100g || {
@@ -229,7 +269,8 @@ export async function refineAnalysis(
   imageBase64: string,
   originalAnalysis: FoodAnalysisResult,
   answers: AnalysisAnswers,
-  language: 'es' | 'en' = 'es'
+  language: 'es' | 'en' = getAppLanguage(),
+  userContext?: string
 ): Promise<FoodAnalysisResult> {
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key not configured');
@@ -261,7 +302,7 @@ export async function refineAnalysis(
             },
             {
               type: 'text',
-              text: buildRefinementPrompt(originalAnalysis, answers, language),
+              text: buildRefinementPrompt(originalAnalysis, answers, language, userContext),
             },
           ],
         },
@@ -301,4 +342,154 @@ function detectMealType(): MealType {
   if (hour >= 11 && hour < 16) return 'lunch';
   if (hour >= 19 && hour < 23) return 'dinner';
   return 'snack';
+}
+
+// ============================================
+// "¿Qué como?" AI Meal Suggestions
+// ============================================
+
+export interface AIMealSuggestion {
+  name: string;
+  nameEs: string;
+  nameEn: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  prepTime: number;        // minutes
+  difficulty: 'easy' | 'medium' | 'hard';
+  reason: string;          // why this is suggested (in user's language)
+  ingredients: string[];   // short list of main ingredients
+}
+
+/**
+ * Generate personalized meal suggestions using GPT-4o
+ * Based on remaining macros, time of day, user history, and preferences
+ */
+export async function generateAIMealSuggestions(params: {
+  remainingCalories: number;
+  remainingProtein: number;
+  remainingCarbs: number;
+  remainingFat: number;
+  mealType: string;         // breakfast/lunch/dinner/snack
+  frequentFoods: string[];  // user's frequently eaten foods
+  recentMeals: string[];    // names of meals logged in the last few days
+  language: 'es' | 'en';
+  goalMode?: string;        // lose_fat, gain_muscle, etc.
+}): Promise<AIMealSuggestion[]> {
+  if (!OPENAI_API_KEY) {
+    throw new Error('OpenAI API key not configured');
+  }
+
+  const {
+    remainingCalories,
+    remainingProtein,
+    remainingCarbs,
+    remainingFat,
+    mealType,
+    frequentFoods,
+    recentMeals,
+    language,
+    goalMode,
+  } = params;
+
+  const systemPrompt = `You are Cals2Gains, a smart nutrition assistant. Generate personalized meal suggestions that fit the user's remaining macros for the day.
+
+RULES:
+1. Return ONLY valid JSON — no markdown, no explanation
+2. Suggest 5 meals that fit the remaining macros budget
+3. Prioritize meals that are realistic, common, and easy to track
+4. Consider the time of day (meal type) for appropriate suggestions
+5. If the user frequently eats certain foods, include variations of those
+6. Each meal should have accurate nutritional estimates based on USDA/BEDCA databases
+7. Do NOT suggest meals that exceed remaining calories by more than 15%
+8. Language for "name", "reason", and "ingredients": ${language === 'es' ? 'Spanish' : 'English'}
+9. Always provide both nameEs and nameEn regardless of language`;
+
+  const userPrompt = `Suggest 5 meals for the following situation:
+
+REMAINING MACROS FOR TODAY:
+- Calories: ${remainingCalories} kcal
+- Protein: ${remainingProtein}g
+- Carbs: ${remainingCarbs}g
+- Fat: ${remainingFat}g
+
+MEAL TYPE: ${mealType}
+${goalMode ? `FITNESS GOAL: ${goalMode}` : ''}
+${frequentFoods.length > 0 ? `FOODS USER FREQUENTLY EATS: ${frequentFoods.join(', ')}` : ''}
+${recentMeals.length > 0 ? `RECENTLY LOGGED (avoid exact repeats): ${recentMeals.slice(0, 10).join(', ')}` : ''}
+
+Return ONLY a JSON array with exactly 5 objects:
+[
+  {
+    "name": "Meal name in ${language === 'es' ? 'Spanish' : 'English'}",
+    "nameEs": "Nombre en español",
+    "nameEn": "English name",
+    "calories": 350,
+    "protein": 30,
+    "carbs": 25,
+    "fat": 12,
+    "prepTime": 15,
+    "difficulty": "easy",
+    "reason": "Short reason why this fits (in ${language === 'es' ? 'Spanish' : 'English'})",
+    "ingredients": ["ingredient1", "ingredient2", "ingredient3"]
+  }
+]`;
+
+  const response = await fetch(OPENAI_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      max_tokens: 1200,
+      temperature: 0.8,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    const errorMsg = error?.error?.message || `HTTP ${response.status}`;
+    console.error('[OpenAI] AI suggestions error:', errorMsg);
+    throw new Error(`Error generating suggestions: ${errorMsg}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices[0]?.message?.content;
+
+  if (!content) {
+    throw new Error('No response from OpenAI');
+  }
+
+  try {
+    const cleaned = content
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+    const suggestions = JSON.parse(cleaned) as AIMealSuggestion[];
+
+    // Validate and normalize
+    return suggestions.slice(0, 5).map((s) => ({
+      name: s.name || s.nameEn || 'Suggestion',
+      nameEs: s.nameEs || s.name || 'Sugerencia',
+      nameEn: s.nameEn || s.name || 'Suggestion',
+      calories: Math.round(s.calories || 0),
+      protein: Math.round(s.protein || 0),
+      carbs: Math.round(s.carbs || 0),
+      fat: Math.round(s.fat || 0),
+      prepTime: s.prepTime || 15,
+      difficulty: s.difficulty || 'easy',
+      reason: s.reason || '',
+      ingredients: s.ingredients || [],
+    }));
+  } catch (parseError) {
+    console.error('[OpenAI] Failed to parse meal suggestions:', content);
+    throw new Error('Failed to parse meal suggestions');
+  }
 }

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   PlannedMeal,
   MealPlan,
@@ -236,6 +237,7 @@ export const useMealPlanStore = create<MealPlanState>()(
       }),
       {
         name: 'meal-plan-store',
+        storage: createJSONStorage(() => AsyncStorage),
       }
     )
   )

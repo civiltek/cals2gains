@@ -1,0 +1,582 @@
+ .claude/worktrees/elastic-poitras                  |    1 +
+ .easignore                                         |   33 +
+ .firebase/hosting.cHVibGlj.cache                   |    9 +-
+ .gitignore                                         |   61 +-
+ C2G_Fase1_Calendario_ES.xlsx                       |  Bin 0 -> 11930 bytes
+ CLAUDE.md                                          |   79 +
+ Claude code/CHANGELOG.md                           |   23 +
+ Claude code/CLAUDE.md                              |  176 +
+ Claude code/README.md                              |  123 +
+ Claude code/agents/app-dev.md                      |   89 +
+ Claude code/agents/finance.md                      |   90 +
+ Claude code/agents/growth.md                       |   60 +
+ Claude code/agents/marketing.md                    |   91 +
+ Claude code/agents/marketing/README.md             |   29 +
+ Claude code/agents/marketing/brand-reviewer.md     |  107 +
+ Claude code/agents/marketing/caption-hashtag.md    |   73 +
+ Claude code/agents/marketing/carousel-designer.md  |   80 +
+ Claude code/agents/marketing/hook-writer.md        |   60 +
+ .../agents/marketing/performance-analyzer.md       |   81 +
+ Claude code/agents/marketing/reels-scriptwriter.md |   71 +
+ Claude code/agents/marketing/trend-scout.md        |   87 +
+ Claude code/agents/marketing/viral-strategist.md   |   58 +
+ Claude code/agents/ops.md                          |   57 +
+ Claude code/agents/research.md                     |   34 +
+ Claude code/agents/web-dev.md                      |   43 +
+ Claude code/commands/build-app.md                  |   28 +
+ Claude code/commands/deploy-web.md                 |   30 +
+ Claude code/commands/metrics.md                    |   19 +
+ Claude code/commands/morning-brief.md              |   34 +
+ Claude code/commands/receipts.md                   |   24 +
+ Claude code/commands/status.md                     |   27 +
+ Claude code/context/ACCOUNTS.md                    |   54 +
+ Claude code/context/BRAND.md                       |   56 +
+ Claude code/context/FINANCES-OVERVIEW.md           |   88 +
+ Claude code/context/MARKETING-BENCHMARKS.md        |  171 +
+ Claude code/context/META-API-SETUP.md              |  474 ++
+ Claude code/context/PROJECT-OVERVIEW.md            |   40 +
+ Claude code/context/TECH-STACK.md                  |   50 +
+ Claude code/context/TREND-INSIGHTS.md              |  174 +
+ Claude code/guardrails/ANTI-PATTERNS.md            |   65 +
+ Claude code/guardrails/ESCALATION.md               |   52 +
+ Claude code/guardrails/RULES.md                    |   84 +
+ Claude code/memory/MEMORY-STRUCTURE.md             |   91 +
+ Claude code/orchestration/CONTENT-PIPELINE.md      |  209 +
+ Claude code/orchestration/HANDOFFS.md              |   76 +
+ Claude code/orchestration/WORKFLOWS.md             |  165 +
+ Claude code/orchestration/scheduled-tasks-map.md   |   56 +
+ .../instagram-comment-replies.md                   |   82 +
+ .../instagram-comments-afternoon.md                |  124 +
+ .../instagram-comments-morning.md                  |  120 +
+ .../scheduled-tasks-prompts/trend-scout.md         |   93 +
+ Claude code/skills/crash-diagnosis/SKILL.md        |   65 +
+ Claude code/skills/download-receipt/SKILL.md       |   67 +
+ Claude code/skills/eas-build/SKILL.md              |   68 +
+ Claude code/skills/publish-post/SKILL.md           |   55 +
+ Claude code/skills/update-dashboard/SKILL.md       |   47 +
+ Claude code/skills/weekly-metrics/SKILL.md         |   56 +
+ _phone_screen.png                                  |  Bin 0 -> 22134 bytes
+ _project-hub/ACCOUNTS.md                           |   57 +
+ _project-hub/BRAND.md                              |   59 +
+ _project-hub/CHANGELOG.md                          |   57 +
+ _project-hub/CONTENT_PLAN.md                       |   69 +
+ _project-hub/FEATURES.md                           |   78 +
+ _project-hub/FINANCES.md                           |  126 +
+ _project-hub/METRICS.md                            |  183 +
+ _project-hub/PROJECT_STATUS.md                     |  109 +
+ _project-hub/SCREENSHOTS.md                        |   55 +
+ _project-hub/SEO_REPORT.md                         |  371 +
+ _project-hub/dashboard.html                        |  683 ++
+ app.json                                           |    8 +-
+ app/(auth)/onboarding.tsx                          |  525 +-
+ app/(auth)/welcome.tsx                             |  535 +-
+ app/(tabs)/_layout.tsx                             |  102 +-
+ app/(tabs)/camera.tsx                              |  328 +-
+ app/(tabs)/history.tsx                             |  129 +-
+ app/(tabs)/index.tsx                               |  886 +-
+ app/(tabs)/profile.tsx                             |  314 +-
+ app/(tabs)/tools.tsx                               |  431 +
+ app/_layout.tsx                                    |  139 +-
+ app/about.tsx                                      |  228 +
+ app/adherence.tsx                                  | 1075 ++-
+ app/ai-review.tsx                                  |  726 +-
+ app/analysis.tsx                                   |  942 ++-
+ app/analytics.tsx                                  |  493 +-
+ app/barcode-scanner.tsx                            |  214 +-
+ app/capture-hub.tsx                                |  574 +-
+ app/coach-share.tsx                                |  583 +-
+ app/edit-meal.tsx                                  |  664 ++
+ app/edit-profile.tsx                               |  506 ++
+ app/export-data.tsx                                |  221 +-
+ app/fast-relog.tsx                                 |  232 +-
+ app/fasting.tsx                                    |  188 +-
+ app/food-search.tsx                                |  252 +-
+ app/food-verification.tsx                          |  394 +-
+ app/goal-modes.tsx                                 |  172 +-
+ app/grocery-list.tsx                               |  452 +-
+ app/help.tsx                                       |  287 +
+ app/index.tsx                                      |   18 +-
+ app/label-scanner.tsx                              |  188 +-
+ app/meal-plan.tsx                                  |  240 +-
+ app/measurements.tsx                               |  313 +-
+ app/nutrition-mode.tsx                             |  427 +-
+ app/nutrition-settings.tsx                         |  860 ++
+ app/paywall.tsx                                    |  480 +-
+ app/progress-photos.tsx                            |  450 +-
+ app/protein-dashboard.tsx                          | 1067 ++-
+ app/quick-add.tsx                                  |  552 +-
+ app/recipes.tsx                                    |  796 +-
+ app/settings.tsx                                   |  650 +-
+ app/shopping-list.tsx                              |  426 +
+ app/smart-onboarding.tsx                           |  544 +-
+ app/training-day.tsx                               |  795 +-
+ app/water-tracker.tsx                              |  362 +
+ app/weekly-coach.tsx                               |  542 +-
+ app/weight-tracker.tsx                             |  156 +-
+ app/what-to-eat.tsx                                | 1563 ++--
+ babel.config.js                                    |    2 +-
+ brand-assets/C2G-Facebook-Cover-820x312.png        |  Bin 0 -> 19159 bytes
+ brand-assets/C2G-Facebook-Cover-EN-820x312.png     |  Bin 0 -> 17357 bytes
+ brand-assets/C2G-Facebook-Cover-ES-820x312.png     |  Bin 0 -> 17329 bytes
+ components/modals/ClarificationModal.tsx           |   68 +-
+ components/ui/MacroBar.tsx                         |  195 +-
+ components/ui/MacroRing.tsx                        |   26 +-
+ components/ui/MealCard.tsx                         |  350 +-
+ constants/colors.ts                                |   70 +-
+ data/spanishFoods.ts                               |  419 +
+ deploy-seo-fixes.bat                               |   15 +
+ docs/Cals2Gains_Dossier_Inversores.docx            |  Bin 0 -> 21576 bytes
+ docs/Cals2Gains_Master_Prompt.md                   |  395 +
+ docs/build-logs/auto_log.txt                       |   12 +
+ docs/build-logs/b64loader.js                       |    1 +
+ .../build-logs/build-output.txt                    |    0
+ docs/build-logs/chrome_full.png                    |  Bin 0 -> 53957 bytes
+ docs/build-logs/chunk_0.txt                        |    1 +
+ docs/build-logs/chunk_1.txt                        |    1 +
+ docs/build-logs/chunk_2.txt                        |    1 +
+ docs/build-logs/chunk_3.txt                        |    1 +
+ docs/build-logs/chunk_4.txt                        |    1 +
+ docs/build-logs/chunk_5.txt                        |    1 +
+ docs/build-logs/chunk_6.txt                        |    1 +
+ docs/build-logs/chunk_7.txt                        |    1 +
+ docs/build-logs/cors_server.py                     |   12 +
+ docs/build-logs/deploy-ga-result.txt               |   17 +
+ docs/build-logs/deploy-gsc-result.txt              |   16 +
+ docs/build-logs/deploy-index-result.txt            |   16 +
+ .../build-logs/deploy-landing-output.txt           |    0
+ .../build-logs/deploy-landing.bat                  |    0
+ .../build-logs/deploy-landing2.bat                 |    0
+ .../build-logs/deploy-output2.txt                  |    0
+ .../build-logs/deploy-result.txt                   |    0
+ .../build-logs/deploy-result2.txt                  |    0
+ .../build-logs/deploy-result3.txt                  |    0
+ docs/build-logs/deploy-seo-result.txt              |   16 +
+ docs/build-logs/deploy-storage-log.txt             |   24 +
+ docs/build-logs/deploy-storage-log2.txt            |    7 +
+ docs/build-logs/deploy-verify-result.txt           |   16 +
+ deploy.zip => docs/build-logs/deploy.zip           |  Bin
+ docs/build-logs/deploy_log.txt                     |   15 +
+ docs/build-logs/dialog_handler.ps1                 |  129 +
+ docs/build-logs/dialog_handler2.ps1                |  137 +
+ docs/build-logs/dialog_handler3.ps1                |   84 +
+ docs/build-logs/dialog_log.txt                     |  Bin 0 -> 700 bytes
+ docs/build-logs/download-logs.bat                  |    3 +
+ docs/build-logs/download-logs.ps1                  |   17 +
+ eas-build.bat => docs/build-logs/eas-build.bat     |    0
+ docs/build-logs/eas-log3.txt                       |    3 +
+ docs/build-logs/eas-log4.txt                       |  248 +
+ docs/build-logs/eas_build10.txt                    |   12 +
+ docs/build-logs/eas_build11.txt                    |   20 +
+ docs/build-logs/eas_build3.txt                     |   16 +
+ docs/build-logs/eas_build4.txt                     |   11 +
+ docs/build-logs/eas_build5.txt                     |   12 +
+ docs/build-logs/eas_build6.txt                     |   43 +
+ docs/build-logs/eas_build7.txt                     |   11 +
+ docs/build-logs/eas_build8.txt                     |   19 +
+ docs/build-logs/eas_build9.txt                     |   11 +
+ .../build-logs/eas_build_log.txt                   |    0
+ .../build-logs/eas_build_log2.txt                  |    0
+ .../build-logs/eas_build_log3.txt                  |    0
+ .../build-logs/eas_build_log4.txt                  |    0
+ docs/build-logs/eas_build_output.txt               |   26 +
+ .../build-logs/eas_init_log.txt                    |    0
+ .../build-logs/eas_install_log.txt                 |    0
+ docs/build-logs/eas_update.txt                     |   15 +
+ .../build-logs/firebase-auth-code.txt              |    0
+ .../build-logs/firebase-auto.bat                   |    0
+ .../build-logs/firebase-deploy.bat                 |    0
+ docs/build-logs/firebase-domain-create.txt         |    1 +
+ docs/build-logs/firebase-domain-info.txt           |    8 +
+ .../build-logs/firebase-login-output.txt           |    0
+ .../build-logs/firebase-login-url.txt              |    0
+ .../build-logs/firebase-login.bat                  |    0
+ docs/build-logs/firebase-reauth-log.txt            |    7 +
+ docs/build-logs/firebase-sites.txt                 |    8 +
+ .../build-logs/firebase-token-output.txt           |    0
+ .../build-logs/firebase-token-result.txt           |    0
+ docs/build-logs/firebase-version.txt               |    1 +
+ .../build-logs/firebase_install_log.txt            |    0
+ .../build-logs/firebase_login.bat                  |    0
+ .../build-logs/firebase_login_log.txt              |    0
+ .../build-logs/firebase_login_log2.txt             |    0
+ .../build-logs/firebase_login_log3.txt             |    0
+ .../build-logs/firebase_login_log4.txt             |    0
+ .../build-logs/firebase_login_log5.txt             |    0
+ .../build-logs/firebase_login_log6.txt             |    0
+ .../build-logs/firebase_login_log7.txt             |    0
+ .../build-logs/fix-and-build.bat                   |    0
+ fix-build.bat => docs/build-logs/fix-build.bat     |    0
+ fix-output.txt => docs/build-logs/fix-output.txt   |    0
+ docs/build-logs/gcloud-auth.txt                    |    7 +
+ docs/build-logs/gcloud-token.txt                   |    1 +
+ docs/build-logs/gcloud-token2.txt                  |    4 +
+ docs/build-logs/get-build-logs.bat                 |    3 +
+ .../build-logs/git-commit-output.txt               |    0
+ git-commit.bat => docs/build-logs/git-commit.bat   |    0
+ .../build-logs/git-push-output.txt                 |    0
+ git-push.bat => docs/build-logs/git-push.bat       |    0
+ .../build-logs/git-remote-check.bat                |    0
+ .../build-logs/git-remote-output.txt               |    0
+ git_commit2.txt => docs/build-logs/git_commit2.txt |    0
+ .../build-logs/git_init_log.txt                    |    0
+ docs/build-logs/http_server.ps1                    |   22 +
+ docs/build-logs/img_viewer.html                    |    4 +
+ .../build-logs/install-and-stage.bat               |    0
+ docs/build-logs/install-log.txt                    |    5 +
+ docs/build-logs/install-log2.txt                   |    5 +
+ docs/build-logs/install-log3.txt                   |    6 +
+ docs/build-logs/install-log4.txt                   |    5 +
+ docs/build-logs/install-log5.txt                   |   12 +
+ docs/build-logs/js_chunk1.txt                      |    1 +
+ docs/build-logs/js_chunk2.txt                      |    1 +
+ docs/build-logs/js_chunk3.txt                      |    1 +
+ .../build-logs/login-y-build.bat                   |    0
+ docs/build-logs/login_log.txt                      |    7 +
+ docs/build-logs/metro-log.txt                      |  Bin 0 -> 33099 bytes
+ .../build-logs/metro_install.txt                   |    0
+ docs/build-logs/npm-install-log.txt                |   37 +
+ docs/build-logs/npm_ci_test.txt                    |   89 +
+ docs/build-logs/npm_install2.txt                   |   17 +
+ .../build-logs/npm_install_log.txt                 |    0
+ .../build-logs/npm_install_log2.txt                |    0
+ pip_log.txt => docs/build-logs/pip_log.txt         |    0
+ docs/build-logs/run-build.bat                      |   17 +
+ .../build-logs/screenshots_log.txt                 |    0
+ docs/build-logs/serve.py                           |    6 +
+ sso-build.bat => docs/build-logs/sso-build.bat     |    0
+ docs/build-logs/temp_b64.txt                       |    1 +
+ docs/build-logs/test_capture.png                   |  Bin 0 -> 21494 bytes
+ tsc_check.txt => docs/build-logs/tsc_check.txt     |    0
+ tsc_check2.txt => docs/build-logs/tsc_check2.txt   |    0
+ docs/build-logs/versions.txt                       |    2 +
+ docs/guides/CHECKLIST-PRUEBAS-IPHONE.md            |  125 +
+ docs/guides/COMO-PROBAR-IPHONE.md                  |   84 +
+ .../guides/GUIA-PUBLICACION.md                     |    0
+ .../guides/GUIA_COMPLETA_SETUP_Y_PUBLICACION.md    |    0
+ docs/guides/TESTING.md                             |   83 +
+ .../guides/store-listing-metadata.md               |    2 +-
+ release-notes.json => docs/release-notes.json      |    0
+ docs/reports/C2G_SEO_Audit_Performance_Report.html |  377 +
+ docs/reports/Cals2Gains_Auditoria_Android.docx     |  Bin 0 -> 45432 bytes
+ docs/reports/c2g_metrics.js                        |   93 +
+ docs/reports/cals2gains_growth_dashboard.html      | 1641 ++++
+ docs/reports/metricas_semana_15_2026-04-11.txt     |   78 +
+ eas-build-output.txt                               |   21 -
+ eas.json                                           |   13 +-
+ finances/Cals2Gains_Finances.xlsx                  |  Bin 0 -> 23981 bytes
+ finances/Cals2Gains_Finances_backup.xlsx           |  Bin 0 -> 15557 bytes
+ finances/Cals2Gains_Finances_pre_update.xlsx       |  Bin 0 -> 15557 bytes
+ finances/dashboard.html                            |  683 ++
+ finances/receipt-collector-report_2026-04-13.txt   |  160 +
+ ...-13_anthropic_receipt-2466-5491-6579_595eur.pdf |  Bin 0 -> 32146 bytes
+ .../receipts/anthropic/Invoice-5RBPQUSE-0001.pdf   |  Bin 0 -> 32251 bytes
+ .../receipts/anthropic/Invoice-5RBPQUSE-0002.pdf   |  Bin 0 -> 31813 bytes
+ .../receipts/anthropic/Invoice-5RBPQUSE-0003.pdf   |  Bin 0 -> 32553 bytes
+ .../receipts/anthropic/Invoice-5RBPQUSE-0004.pdf   |  Bin 0 -> 32105 bytes
+ .../receipts/anthropic/Receipt-2090-6146-8736.pdf  |  Bin 0 -> 33253 bytes
+ .../receipts/anthropic/Receipt-2223-8391-6912.pdf  |  Bin 0 -> 32882 bytes
+ .../receipts/anthropic/Receipt-2276-0916-6675.pdf  |  Bin 0 -> 32950 bytes
+ .../receipts/anthropic/Receipt-2399-9403-0181.pdf  |  Bin 0 -> 33384 bytes
+ ...6-04-10_openai_invoice-872130F5-0003_121usd.txt |    9 +
+ firebase.json                                      |    7 +
+ firestore.indexes.json                             |   53 +
+ firestore.rules                                    |   43 +
+ google-services.json                               |   45 +-
+ hooks/useAdaptiveEngines.ts                        |   74 +
+ i18n/en.ts                                         | 1369 ++-
+ i18n/es.ts                                         | 1394 ++-
+ i18n/index.ts                                      |   71 +-
+ .../Campaign_F1/EN/C2G_F1_01_black_box_EN.png      |  Bin 0 -> 53538 bytes
+ marketing/Campaign_F1/EN/C2G_F1_02_poll_EN.png     |  Bin 0 -> 56950 bytes
+ .../Campaign_F1/EN/C2G_F1_03_myth_carbs_EN.png     |  Bin 0 -> 46764 bytes
+ .../Campaign_F1/EN/C2G_F1_04_apps_2015_EN.png      |  Bin 0 -> 52721 bytes
+ marketing/Campaign_F1/EN/C2G_F1_05_tdee_EN.png     |  Bin 0 -> 42168 bytes
+ marketing/Campaign_F1/EN/C2G_F1_06_60_quit_EN.png  |  Bin 0 -> 52361 bytes
+ marketing/Campaign_F1/EN/C2G_F1_07_4apps_EN.png    |  Bin 0 -> 52049 bytes
+ marketing/Campaign_F1/EN/C2G_F1_08_comments_EN.png |  Bin 0 -> 57643 bytes
+ .../Campaign_F1/EN/C2G_F1_09_macros101_EN.png      |  Bin 0 -> 53819 bytes
+ marketing/Campaign_F1/EN/C2G_F1_10_3seconds_EN.png |  Bin 0 -> 47019 bytes
+ .../Campaign_F1/EN/C2G_F1_11_lose_gain_EN.png      |  Bin 0 -> 53934 bytes
+ marketing/Campaign_F1/EN/C2G_F1_12_14700M_EN.png   |  Bin 0 -> 46733 bytes
+ marketing/Campaign_F1/EN/C2G_F1_13_deficit_EN.png  |  Bin 0 -> 48568 bytes
+ .../EN/C2G_F1_14_something_coming_EN.png           |  Bin 0 -> 47591 bytes
+ marketing/Campaign_F1/EN/C2G_F1_15_protein_EN.png  |  Bin 0 -> 60927 bytes
+ marketing/Campaign_F1/EN/C2G_F1_16_real_ai_EN.png  |  Bin 0 -> 45455 bytes
+ .../Campaign_F1/EN/C2G_F1_17_myth_fasting_EN.png   |  Bin 0 -> 51433 bytes
+ marketing/Campaign_F1/EN/C2G_F1_18_wishlist_EN.png |  Bin 0 -> 58030 bytes
+ .../Campaign_F1/EN/C2G_F1_19_wearables_EN.png      |  Bin 0 -> 57023 bytes
+ .../Campaign_F1/EN/C2G_F1_20_30features_EN.png     |  Bin 0 -> 51845 bytes
+ marketing/Campaign_F1/EN/C2G_F1_21_999month_EN.png |  Bin 0 -> 52381 bytes
+ .../Campaign_F1/EN/C2G_F1_22_coach_x10_EN.png      |  Bin 0 -> 54177 bytes
+ .../Campaign_F1/EN/C2G_F1_23_hydration_EN.png      |  Bin 0 -> 49254 bytes
+ marketing/Campaign_F1/EN/C2G_F1_24_3days_EN.png    |  Bin 0 -> 35235 bytes
+ marketing/Campaign_F1/EN/C2G_F1_25_recomp_EN.png   |  Bin 0 -> 44885 bytes
+ marketing/Campaign_F1/EN/C2G_F1_26_2days_EN.png    |  Bin 0 -> 36778 bytes
+ .../Campaign_F1/EN/C2G_F1_27_goodbye_old_EN.png    |  Bin 0 -> 60366 bytes
+ marketing/Campaign_F1/EN/C2G_F1_28_tomorrow_EN.png |  Bin 0 -> 48722 bytes
+ .../Campaign_F1/EN/C2G_Fase1_Calendario_EN.xlsx    |  Bin 0 -> 11548 bytes
+ marketing/Campaign_F1/EN/schedule_en.json          |  132 +
+ .../Campaign_F1/ES/C2G_F1_01_caja_negra_ES.png     |  Bin 0 -> 47981 bytes
+ marketing/Campaign_F1/ES/C2G_F1_02_encuesta_ES.png |  Bin 0 -> 61109 bytes
+ .../Campaign_F1/ES/C2G_F1_03_mito_carbos_ES.png    |  Bin 0 -> 47728 bytes
+ .../Campaign_F1/ES/C2G_F1_04_apps_2015_ES.png      |  Bin 0 -> 50660 bytes
+ marketing/Campaign_F1/ES/C2G_F1_05_tdee_ES.png     |  Bin 0 -> 40823 bytes
+ .../Campaign_F1/ES/C2G_F1_06_60_abandona_ES.png    |  Bin 0 -> 55977 bytes
+ marketing/Campaign_F1/ES/C2G_F1_07_4apps_ES.png    |  Bin 0 -> 50827 bytes
+ marketing/Campaign_F1/ES/C2G_F1_08_comenta_ES.png  |  Bin 0 -> 59212 bytes
+ .../Campaign_F1/ES/C2G_F1_09_macros101_ES.png      |  Bin 0 -> 53892 bytes
+ .../Campaign_F1/ES/C2G_F1_10_3segundos_ES.png      |  Bin 0 -> 45025 bytes
+ .../Campaign_F1/ES/C2G_F1_11_perder_ganar_ES.png   |  Bin 0 -> 55975 bytes
+ marketing/Campaign_F1/ES/C2G_F1_12_14700M_ES.png   |  Bin 0 -> 53084 bytes
+ marketing/Campaign_F1/ES/C2G_F1_13_deficit_ES.png  |  Bin 0 -> 50140 bytes
+ .../Campaign_F1/ES/C2G_F1_14_algo_viene_ES.png     |  Bin 0 -> 49073 bytes
+ marketing/Campaign_F1/ES/C2G_F1_15_proteina_ES.png |  Bin 0 -> 62352 bytes
+ marketing/Campaign_F1/ES/C2G_F1_16_ia_real_ES.png  |  Bin 0 -> 42361 bytes
+ .../Campaign_F1/ES/C2G_F1_17_mito_ayuno_ES.png     |  Bin 0 -> 48489 bytes
+ .../Campaign_F1/ES/C2G_F1_18_que_quieres_ES.png    |  Bin 0 -> 60501 bytes
+ .../Campaign_F1/ES/C2G_F1_19_wearables_ES.png      |  Bin 0 -> 52764 bytes
+ .../Campaign_F1/ES/C2G_F1_20_30funciones_ES.png    |  Bin 0 -> 54228 bytes
+ marketing/Campaign_F1/ES/C2G_F1_21_999mes_ES.png   |  Bin 0 -> 53400 bytes
+ .../Campaign_F1/ES/C2G_F1_22_coach_x10_ES.png      |  Bin 0 -> 54545 bytes
+ .../Campaign_F1/ES/C2G_F1_23_hidratacion_ES.png    |  Bin 0 -> 48019 bytes
+ .../Campaign_F1/ES/C2G_F1_24_faltan3dias_ES.png    |  Bin 0 -> 34598 bytes
+ marketing/Campaign_F1/ES/C2G_F1_25_recomp_ES.png   |  Bin 0 -> 49058 bytes
+ .../Campaign_F1/ES/C2G_F1_26_faltan2dias_ES.png    |  Bin 0 -> 32864 bytes
+ .../Campaign_F1/ES/C2G_F1_27_adios_antigua_ES.png  |  Bin 0 -> 61937 bytes
+ marketing/Campaign_F1/ES/C2G_F1_28_manana_ES.png   |  Bin 0 -> 46735 bytes
+ marketing/Campaign_F1/ES/design_philosophy.md      |   17 +
+ marketing/brand_temp/C2G-Logo-Dark.png             |  Bin 0 -> 771254 bytes
+ marketing/brand_temp/C2G-Logo-Light.png            |  Bin 0 -> 120210 bytes
+ marketing/brand_temp/C2G-Logomark-2048.png         |  Bin 0 -> 371788 bytes
+ marketing/brand_temp/C2G-Mark-512.png              |  Bin 0 -> 54716 bytes
+ marketing/brand_temp/C2G-Profile-800.png           |  Bin 0 -> 74856 bytes
+ marketing/brand_temp/InstrumentSans-Bold.ttf       |  Bin 0 -> 68084 bytes
+ marketing/brand_temp/InstrumentSans-Regular.ttf    |  Bin 0 -> 68028 bytes
+ marketing/brand_temp/Outfit-Bold.ttf               |  Bin 0 -> 55392 bytes
+ marketing/brand_temp/Outfit-Regular.ttf            |  Bin 0 -> 54912 bytes
+ .../C2G_Calendario_Instagram_2semanas.md           |   67 +
+ marketing/content-calendar/C2G_Calendario_v2.md    |   90 +
+ marketing/content-calendar/C2G_Calendario_v3.md    |   98 +
+ .../C2G_Contenido_Para_Aprobacion.md               |  960 +++
+ .../social_media_calendar_april_2026.md            |  529 ++
+ .../frames/C2G_Demo_Reel_ESTEMP_MPY_wvf_snd.mp4    |  Bin 0 -> 418478 bytes
+ marketing/frames/c2g_01_dashboard.png              |  Bin 0 -> 73070 bytes
+ marketing/frames/dashboard_dark_es.png             |  Bin 0 -> 44318 bytes
+ marketing/frames/f01_dashboard_top.png             |  Bin 0 -> 15639 bytes
+ marketing/frames/f02_dashboard_scroll.png          |  Bin 0 -> 59627 bytes
+ marketing/frames/f03_acciones_rapidas.png          |  Bin 0 -> 63292 bytes
+ marketing/frames/f04_que_como.png                  |  Bin 0 -> 33412 bytes
+ marketing/frames/f05_que_como_scroll.png           |  Bin 0 -> 60918 bytes
+ marketing/frames/f06_dashboard_top2.png            |  Bin 0 -> 49792 bytes
+ marketing/frames/f07_herramientas.png              |  Bin 0 -> 60729 bytes
+ marketing/frames/f08_historial.png                 |  Bin 0 -> 136597 bytes
+ marketing/frames/f09_perfil.png                    |  Bin 0 -> 116314 bytes
+ marketing/frames/history_dark_es.png               |  Bin 0 -> 330058 bytes
+ marketing/frames/new_dashboard.png                 |  Bin 0 -> 71088 bytes
+ marketing/frames/raw_dashboard.png                 |  Bin 0 -> 19037 bytes
+ marketing/frames/raw_historial.png                 |  Bin 0 -> 32148 bytes
+ marketing/frames/s01_dashboard_top.png             |  Bin 0 -> 71088 bytes
+ marketing/frames/s02_dashboard_scroll.png          |  Bin 0 -> 71088 bytes
+ marketing/frames/s03_historial.png                 |  Bin 0 -> 207620 bytes
+ marketing/frames/s04_que_como.png                  |  Bin 0 -> 84657 bytes
+ marketing/frames/s05_ai_review.png                 |  Bin 0 -> 62989 bytes
+ marketing/frames/s06_herramientas.png              |  Bin 0 -> 55790 bytes
+ marketing/frames/s07_perfil.png                    |  Bin 0 -> 65056 bytes
+ marketing/frames/tools_dark_es.png                 |  Bin 0 -> 83255 bytes
+ marketing/frames/verify_t1.png                     |  Bin 0 -> 78436 bytes
+ marketing/frames/verify_t10.png                    |  Bin 0 -> 369237 bytes
+ marketing/frames/verify_t18.png                    |  Bin 0 -> 246648 bytes
+ marketing/frames/verify_t5.png                     |  Bin 0 -> 212877 bytes
+ .../instagram/app_screenshot_home_es_dark.png      |  Bin 0 -> 15565 bytes
+ marketing/instagram/generate_posts.py              |  636 ++
+ marketing/instagram/generate_posts_en.py           |  526 ++
+ marketing/instagram/posts_en/01_manual_logging.png |  Bin 0 -> 51664 bytes
+ marketing/instagram/posts_en/02_black_box.png      |  Bin 0 -> 34555 bytes
+ marketing/instagram/posts_en/03_myth_carbs.png     |  Bin 0 -> 46533 bytes
+ marketing/instagram/posts_en/04_multiple_apps.png  |  Bin 0 -> 24215 bytes
+ marketing/instagram/posts_en/05_motivational.png   |  Bin 0 -> 51355 bytes
+ marketing/instagram/posts_en/06_big_reveal.png     |  Bin 0 -> 55458 bytes
+ marketing/instagram/posts_en/07_comparison.png     |  Bin 0 -> 75366 bytes
+ marketing/instagram/posts_en/08_photo_macros.png   |  Bin 0 -> 61378 bytes
+ marketing/instagram/posts_en/09_ai_coach.png       |  Bin 0 -> 66156 bytes
+ marketing/instagram/posts_en/10_goal_modes.png     |  Bin 0 -> 45442 bytes
+ marketing/instagram/posts_en/11_weekly_recap.png   |  Bin 0 -> 59876 bytes
+ marketing/instagram/posts_en/12_coming_soon.png    |  Bin 0 -> 41359 bytes
+ .../instagram/posts_es/01_searching_foods.png      |  Bin 0 -> 97048 bytes
+ marketing/instagram/posts_es/02_black_box.png      |  Bin 0 -> 99814 bytes
+ marketing/instagram/posts_es/03_myth_carbs.png     |  Bin 0 -> 82248 bytes
+ marketing/instagram/posts_es/04_how_many_apps.png  |  Bin 0 -> 86715 bytes
+ marketing/instagram/posts_es/05_count_to_know.png  |  Bin 0 -> 83978 bytes
+ marketing/instagram/posts_es/06_big_reveal.png     |  Bin 0 -> 43035 bytes
+ marketing/instagram/posts_es/06_big_reveal_v2.png  |  Bin 0 -> 196574 bytes
+ marketing/instagram/posts_es/06_big_reveal_v4.png  |  Bin 0 -> 216527 bytes
+ marketing/instagram/posts_es/07_comparison.png     |  Bin 0 -> 57865 bytes
+ marketing/instagram/posts_es/07_comparison_v2.png  |  Bin 0 -> 121416 bytes
+ marketing/instagram/posts_es/07_macros_v4.png      |  Bin 0 -> 250673 bytes
+ .../instagram/posts_es/08_photo_to_macros.png      |  Bin 0 -> 46106 bytes
+ .../instagram/posts_es/08_photo_to_macros_v2.png   |  Bin 0 -> 93231 bytes
+ .../instagram/posts_es/08_photo_to_macros_v3.png   |  Bin 0 -> 80323 bytes
+ .../instagram/posts_es/08_photo_to_macros_v4.png   |  Bin 0 -> 112960 bytes
+ marketing/instagram/posts_es/09_ai_coach.png       |  Bin 0 -> 95997 bytes
+ marketing/instagram/posts_es/09_ai_coach_v2.png    |  Bin 0 -> 84165 bytes
+ marketing/instagram/posts_es/09_ia_coach_v4.png    |  Bin 0 -> 437785 bytes
+ marketing/instagram/posts_es/10_escaner_v4.png     |  Bin 0 -> 187861 bytes
+ marketing/instagram/posts_es/10_five_modes.png     |  Bin 0 -> 44846 bytes
+ marketing/instagram/posts_es/10_five_modes_v2.png  |  Bin 0 -> 93646 bytes
+ marketing/instagram/posts_es/11_deficit_v4.png     |  Bin 0 -> 430562 bytes
+ marketing/instagram/posts_es/11_weekly_recap.png   |  Bin 0 -> 55356 bytes
+ .../instagram/posts_es/11_weekly_recap_v2.png      |  Bin 0 -> 81176 bytes
+ marketing/instagram/posts_es/12_coming_soon.png    |  Bin 0 -> 42036 bytes
+ marketing/instagram/posts_es/12_coming_soon_v2.png |  Bin 0 -> 146015 bytes
+ marketing/instagram/posts_es/MANIFEST.txt          |  210 +
+ marketing/instagram/posts_es/UPLOAD_GUIDE.txt      |  307 +
+ marketing/instagram/profile/C2G_Logo_Square.png    |  Bin 0 -> 3679 bytes
+ .../instagram/profile/C2G_Profile_Picture.png      |  Bin 0 -> 11618 bytes
+ marketing/instagram/reels/C2G_Demo_Reel_EN.mp4     |  Bin 0 -> 13964122 bytes
+ marketing/instagram/reels/C2G_Demo_Reel_ES.mp4     |  Bin 0 -> 14158470 bytes
+ .../instagram/reels/C2G_Reel06_CameraIA_ES.mp4     |  Bin 0 -> 352164 bytes
+ marketing/instagram/reels/C2G_Reel_CameraIA_EN.mp4 |  Bin 0 -> 1401517 bytes
+ marketing/instagram/reels/C2G_Reel_CameraIA_ES.mp4 |  Bin 0 -> 1896428 bytes
+ .../reels/Cals2Gains_Guiones_Reels_Instagram.docx  |  Bin 0 -> 25506 bytes
+ marketing/instagram/reels/INDICE_SCREENSHOTS.md    |   45 +
+ marketing/instagram/reels/en_dark/01_today.jpg     |  Bin 0 -> 69233 bytes
+ marketing/instagram/reels/en_dark/02_goals.jpg     |  Bin 0 -> 90142 bytes
+ .../instagram/reels/en_dark/04_que_como_full.jpg   |  Bin 0 -> 100010 bytes
+ .../instagram/reels/en_dark/05_scan_result.png     |  Bin 0 -> 18534 bytes
+ marketing/instagram/reels/es_dark/01_today.png     |  Bin 0 -> 30370 bytes
+ marketing/instagram/reels/es_dark/02_goals.png     |  Bin 0 -> 20369 bytes
+ marketing/instagram/reels/es_dark/03_que_como.png  |  Bin 0 -> 18737 bytes
+ .../instagram/reels/es_dark/04_que_como_full.png   |  Bin 0 -> 30926 bytes
+ .../instagram/reels/es_dark/05_scan_result.png     |  Bin 0 -> 18534 bytes
+ .../instagram/screenshots/app_home_es_real.png     |  Bin 0 -> 103978 bytes
+ marketing/instagram/screenshots/cap3.ps1           |   24 +
+ marketing/instagram/screenshots/cap4.ps1           |   40 +
+ marketing/instagram/screenshots/cap_alt.ps1        |   30 +
+ marketing/instagram/screenshots/cap_pwa.ps1        |   25 +
+ marketing/instagram/screenshots/cap_view.ps1       |   27 +
+ marketing/instagram/screenshots/capture.ps1        |   18 +
+ marketing/instagram/screenshots/capture2.ps1       |   44 +
+ marketing/instagram/screenshots/capture_chrome.ps1 |   27 +
+ marketing/instagram/screenshots/check_crop.png     |  Bin 0 -> 147520 bytes
+ .../instagram/screenshots/chrome_acciones.png      |  Bin 0 -> 339430 bytes
+ .../instagram/screenshots/chrome_dashboard.png     |  Bin 0 -> 330793 bytes
+ .../instagram/screenshots/chrome_dashboard_alt.png |  Bin 0 -> 166 bytes
+ .../instagram/screenshots/chrome_herramientas.png  |  Bin 0 -> 339387 bytes
+ .../instagram/screenshots/chrome_historial.png     |  Bin 0 -> 339327 bytes
+ .../screenshots/chrome_historial_bottom.png        |  Bin 0 -> 339150 bytes
+ marketing/instagram/screenshots/chrome_perfil.png  |  Bin 0 -> 339468 bytes
+ .../instagram/screenshots/chrome_test_crop.png     |  Bin 0 -> 147520 bytes
+ marketing/instagram/screenshots/chrome_verify.png  |  Bin 0 -> 305614 bytes
+ marketing/instagram/screenshots/chrome_window.png  |  Bin 0 -> 339005 bytes
+ .../instagram/screenshots/dashboard_es_dark.png    |  Bin 0 -> 45287 bytes
+ marketing/instagram/screenshots/full_screen.png    |  Bin 0 -> 606774 bytes
+ .../instagram/screenshots/fullscreen_dashboard.png |  Bin 0 -> 108160 bytes
+ .../instagram/screenshots/fullscreen_narrow.png    |  Bin 0 -> 36470 bytes
+ .../instagram/screenshots/iphone_01_dashboard.png  |  Bin 0 -> 286183 bytes
+ .../screenshots/iphone_02_historial_top.png        |  Bin 0 -> 286149 bytes
+ .../screenshots/iphone_03_historial_bottom.png     |  Bin 0 -> 285279 bytes
+ .../screenshots/iphone_04_herramientas.png         |  Bin 0 -> 286148 bytes
+ .../instagram/screenshots/iphone_05_perfil.png     |  Bin 0 -> 286151 bytes
+ .../screenshots/iphone_06_acciones_comidas.png     |  Bin 0 -> 286128 bytes
+ marketing/instagram/screenshots/pwa_dashboard.png  |  Bin 0 -> 72877 bytes
+ marketing/instagram/screenshots/pwa_perfil.png     |  Bin 0 -> 63437 bytes
+ marketing/instagram/screenshots/real_dashboard.png |  Bin 0 -> 44779 bytes
+ .../instagram/screenshots/real_herramientas.png    |  Bin 0 -> 22432 bytes
+ .../instagram/screenshots/real_historial_all.png   |  Bin 0 -> 154609 bytes
+ .../screenshots/real_historial_bottom.png          |  Bin 0 -> 154599 bytes
+ .../instagram/screenshots/real_historial_fotos.png |  Bin 0 -> 68694 bytes
+ marketing/instagram/screenshots/silent_cap.ps1     |   25 +
+ marketing/instagram/screenshots/test_dash_540.png  |  Bin 0 -> 39258 bytes
+ marketing/instagram/screenshots/test_dashboard.png |  Bin 0 -> 36487 bytes
+ .../screenshots/generate_screenshots.py            |    4 +-
+ marketing/strategies/C2G_Campaign_Plan_v2.md       |  269 +
+ .../strategies/C2G_Estrategia_Competitiva_v3.md    |   99 +
+ marketing/strategies/C2G_Influencers_Research.md   |  126 +
+ marketing/strategies/C2G_Instagram_Posts_Copies.md |  301 +
+ marketing/strategies/C2G_Instagram_Posts_v2.md     |  382 +
+ marketing/strategies/C2G_Instagram_Posts_v3.md     |  590 ++
+ marketing/strategies/C2G_Instagram_Strategy.md     |   91 +
+ .../strategies/C2G_Plan_Crecimiento_Completo.md    | 2384 ++++++
+ marketing/strategies/C2G_Scheduling_Guide.md       |  644 ++
+ .../strategies/competitive-analysis.md             |    0
+ .../estrategia-comentarios-influencers.html        |  638 ++
+ .../seguimiento-comentarios-influencers.xlsx       |  Bin 0 -> 11225 bytes
+ metro.config.js                                    |   13 +
+ package-lock.json                                  | 8886 ++++++++------------
+ package.json                                       |   20 +-
+ public/c2g-icon.png                                |  Bin 0 -> 10095 bytes
+ public/google937c3016137923f8.html                 |    1 +
+ public/index.html                                  | 2573 +++++-
+ public/index.old.html                              |  553 ++
+ public/landing.html                                | 1965 +++++
+ public/logo.png                                    |  Bin 0 -> 10095 bytes
+ public/robots.txt                                  |    4 +
+ public/sitemap.xml                                 |   24 +
+ services/adaptiveMacroEngine.ts                    |   10 +-
+ services/exportService.ts                          |    2 +-
+ services/firebase.ts                               |  453 +-
+ services/foodDatabase.ts                           |  113 +-
+ services/macroCoach.ts                             |   91 +-
+ services/openai.ts                                 |  229 +-
+ services/recipeService.ts                          |   89 +-
+ services/reminderService.ts                        |  259 +-
+ services/revenuecat.ts                             |   88 +-
+ services/voiceLog.ts                               |    7 +-
+ skills/instagram-commenter.skill                   |  Bin 0 -> 9254 bytes
+ skills/instagram-commenter/SKILL.md                |  205 +
+ .../references/comment-examples.md                 |  155 +
+ skills/instagram-commenter/references/daily-log.md |  422 +
+ .../instagram-commenter/references/influencers.md  |  113 +
+ storage.rules                                      |   13 +
+ store/adaptiveStore.ts                             |  310 +
+ store/analysisStore.ts                             |   30 +
+ store/mealPlanStore.ts                             |    4 +-
+ store/mealStore.ts                                 |  112 +-
+ store/measurementStore.ts                          |    6 +
+ store/progressPhotoStore.ts                        |    6 +
+ store/recipeStore.ts                               |   25 +-
+ store/reminderStore.ts                             |  178 +
+ store/shoppingListStore.ts                         |  228 +
+ store/templateStore.ts                             |    3 +-
+ store/themeStore.ts                                |  184 +
+ store/userStore.ts                                 |  143 +-
+ store/waterStore.ts                                |   50 +-
+ store/weightStore.ts                               |    9 +-
+ theme.ts                                           |  103 +-
+ tools/imap-mcp-server-civiltek/imap_mcp_server.py  |  550 ++
+ tools/imap-mcp-server-civiltek/requirements.txt    |    2 +
+ .../imap_mcp_server.py                             |  550 ++
+ .../requirements.txt                               |    2 +
+ .../imap_mcp_server.py                             |  550 ++
+ .../imap-mcp-server-gmail-judith/requirements.txt  |    2 +
+ tools/imap-mcp-server/.gitignore                   |    4 +
+ tools/imap-mcp-server/config.example.env           |   17 +
+ tools/imap-mcp-server/imap_mcp_server.py           |  550 ++
+ tools/imap-mcp-server/requirements.txt             |    2 +
+ tools/outlook-mcp-server/CREDENTIALS.md            |   59 +
+ tools/outlook-mcp-server/SETUP.md                  |  191 +
+ tools/outlook-mcp-server/authorize.py              |  182 +
+ tools/outlook-mcp-server/requirements.txt          |    5 +
+ tools/outlook-mcp-server/run_server.py             |   25 +
+ tools/outlook-mcp-server/server.py                 |  708 ++
+ tools/telegram-mcp-server/.env.example             |   10 +
+ tools/telegram-mcp-server/.gitignore               |    7 +
+ tools/telegram-mcp-server/README.md                |  138 +
+ tools/telegram-mcp-server/draft_store.py           |  107 +
+ tools/telegram-mcp-server/requirements.txt         |    4 +
+ tools/telegram-mcp-server/server.py                |  355 +
+ tools/telegram-mcp-server/telegram_client.py       |  126 +
+ tools/telegram-mcp-server/test_connection.py       |  158 +
+ tsconfig.json                                      |    8 +-
+ types/index.ts                                     |   16 +-
+ utils/imageUtils.ts                                |   16 +
+ utils/language.ts                                  |   21 +
+ website/cals2gains-landing.html                    |  471 ++
+ .../cals2gains/privacy.html                        |    0
+ .../cals2gains/terms.html                          |    0
+ website/index-prod-original.html                   | 2192 +++++
+ website/index.html                                 | 2205 +++++
+ website/privacy.html                               |   86 +
+ website/terms.html                                 |  125 +
+ website/verificar-search-console.html              |   18 +
+ 581 files changed, 60420 insertions(+), 13681 deletions(-)

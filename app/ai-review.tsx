@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,14 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { COLORS } from '../theme';
+import { useTranslation } from 'react-i18next';
+import { useColors } from '../store/themeStore';
+import { useMealStore } from '../store/mealStore';
+import { useUserStore } from '../store/userStore';
+import { Meal } from '../types';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { canDisplayUri } from '../utils/imageUtils';
 
 const { width } = Dimensions.get('window');
 
@@ -33,9 +40,15 @@ interface NutritionData {
   fiber: number;
 }
 
+// Normalize confidence: accepts 0.0–1.0 (decimal) or 0–100 (percent), always returns 0–100
+const normalizeConfidence = (val: number): number => {
+  if (val <= 1 && val > 0) return Math.round(val * 100);
+  return Math.round(val);
+};
+
 interface AnalysisResult {
   dishName: string;
-  confidence: number;
+  confidence: number; // Always stored as 0–100 after normalization
   ingredients: Ingredient[];
   nutrition: NutritionData;
   portion: number;
@@ -52,10 +65,10 @@ interface RouteParams {
 }
 
 const MEAL_TYPES = [
-  { id: 'breakfast', label: 'Desayuno', icon: 'sunny' },
-  { id: 'lunch', label: 'Almuerzo', icon: 'sunny-outline' },
-  { id: 'dinner', label: 'Cena', icon: 'moon' },
-  { id: 'snack', label: 'Merienda', icon: 'star' },
+  { id: 'breakfast', icon: 'sunny' },
+  { id: 'lunch', icon: 'sunny-outline' },
+  { id: 'dinner', icon: 'moon' },
+  { id: 'snack', icon: 'star' },
 ];
 
 const DATA_SOURCES = [
@@ -64,74 +77,193 @@ const DATA_SOURCES = [
   { id: 'usda', label: 'USDA Database', source: 'USDA' },
 ];
 
-// Mock analysis result
-const MOCK_ANALYSIS: AnalysisResult = {
-  dishName: 'Pollo a la Parrilla con Brócoli',
-  confidence: 85,
-  ingredients: [
-    { id: '1', name: 'Pechuga de Pollo', quantity: 150, unit: 'g' },
-    { id: '2', name: 'Brócoli', quantity: 100, unit: 'g' },
-    { id: '3', name: 'Aceite de Oliva', quantity: 10, unit: 'ml' },
-  ],
-  nutrition: {
-    calories: 380,
-    protein: 45,
-    carbs: 12,
-    fat: 18,
-    fiber: 3,
-  },
-  portion: 260,
-  dataSource: 'OpenAI Vision + USDA',
-  mealType: 'lunch',
-};
+/**
+ * Parse an AnalysisResult from route params.
+ * Handles both `analysisResult` (JSON string of FoodAnalysisResult)
+ * and `mealData` (JSON string of a previous meal for relog/favorite).
+ */
+function parseAnalysisFromParams(params: RouteParams): AnalysisResult {
+  // Try analysisResult first (from camera → analysis flow)
+  if (params.analysisResult) {
+    try {
+      const raw = JSON.parse(params.analysisResult);
+      return {
+        dishName: raw.dishNameEs || raw.dishName || '',
+        confidence: normalizeConfidence(raw.confidence ?? 75),
+        ingredients: (raw.ingredients || []).map((name: string, i: number) => ({
+          id: String(i),
+          name,
+        })),
+        nutrition: raw.totalNutrition || raw.nutritionPer100g || { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
+        portion: raw.estimatedWeight || 200,
+        dataSource: 'OpenAI Vision',
+        mealType: raw.mealType || 'lunch',
+      };
+    } catch (e) {
+      console.warn('Failed to parse analysisResult:', e);
+    }
+  }
+
+  // Try mealData (relog / favorite)
+  if (params.mealData) {
+    try {
+      const meal = JSON.parse(params.mealData);
+      return {
+        dishName: meal.dishNameEs || meal.dishName || '',
+        confidence: normalizeConfidence(meal.aiConfidence ?? 90),
+        ingredients: (meal.ingredients || []).map((name: string, i: number) => ({
+          id: String(i),
+          name,
+          quantity: undefined,
+          unit: 'g',
+        })),
+        nutrition: meal.nutrition || { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
+        portion: meal.estimatedWeight || 200,
+        dataSource: t('aiReview.previousRecord'),
+        mealType: meal.mealType || 'lunch',
+      };
+    } catch (e) {
+      console.warn('Failed to parse mealData:', e);
+    }
+  }
+
+  // Fallback: empty state
+  return {
+    dishName: '',
+    confidence: 0,
+    ingredients: [],
+    nutrition: { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
+    portion: 200,
+    dataSource: '',
+    mealType: 'lunch',
+  };
+}
 
 export default function AIReviewScreen() {
+  const C = useColors();
+  const { t } = useTranslation();
   const route = useRoute<any>();
   const navigation = useNavigation();
-  const params = route.params as RouteParams;
+  const params = (route.params || {}) as RouteParams;
 
-  const [analysis, setAnalysis] = useState<AnalysisResult>(MOCK_ANALYSIS);
-  const [dishName, setDishName] = useState(MOCK_ANALYSIS.dishName);
+  // Determine if we have direct analysis data or need to show meal picker
+  const hasDirectData = !!(params.analysisResult || params.mealData || params.imageBase64);
+
+  const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
+  const [pickerMode, setPickerMode] = useState(!hasDirectData);
+
+  // Meal picker state
+  const user = useUserStore((s) => s.user);
+  const { todayMeals, recentMeals, loadRecentMeals } = useMealStore();
+
+  useEffect(() => {
+    if (pickerMode && user?.uid) {
+      loadRecentMeals(user.uid);
+    }
+  }, [pickerMode, user?.uid]);
+
+  // Get meals with photos for the picker
+  const mealsWithPhotos = React.useMemo(() => {
+    const allMeals = [...todayMeals, ...recentMeals];
+    const seen = new Set<string>();
+    return allMeals
+      .filter((m) => {
+        if (seen.has(m.id)) return false;
+        seen.add(m.id);
+        return m.photoUri && m.photoUri.length > 0;
+      })
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }, [todayMeals, recentMeals]);
+
+  // Build analysis from selected meal or direct params
+  const getAnalysisSource = (): AnalysisResult => {
+    if (selectedMeal) {
+      return {
+        dishName: selectedMeal.dishNameEs || selectedMeal.dishName || '',
+        confidence: normalizeConfidence(selectedMeal.aiConfidence ?? 75),
+        ingredients: (selectedMeal.ingredients || []).map((name, i) => ({
+          id: String(i),
+          name,
+        })),
+        nutrition: selectedMeal.nutrition || { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
+        portion: selectedMeal.estimatedWeight || 200,
+        dataSource: t('aiReview.previousRecord'),
+        mealType: selectedMeal.mealType || 'lunch',
+      };
+    }
+    return parseAnalysisFromParams(params);
+  };
+
+  const initialAnalysis = hasDirectData ? parseAnalysisFromParams(params) : getAnalysisSource();
+  const [analysis, setAnalysis] = useState<AnalysisResult>(initialAnalysis);
+  const [dishName, setDishName] = useState(initialAnalysis.dishName);
   const [ingredients, setIngredients] = useState<Ingredient[]>(
-    MOCK_ANALYSIS.ingredients
+    initialAnalysis.ingredients
   );
-  const [portion, setPortion] = useState(MOCK_ANALYSIS.portion.toString());
+  const [portion, setPortion] = useState(initialAnalysis.portion.toString());
   const [nutrition, setNutrition] = useState<NutritionData>(
-    MOCK_ANALYSIS.nutrition
+    initialAnalysis.nutrition
   );
   const [selectedMealType, setSelectedMealType] = useState<string>(
-    MOCK_ANALYSIS.mealType || 'lunch'
+    initialAnalysis.mealType || 'lunch'
   );
   const [showPerTotal, setShowPerTotal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [newIngredientName, setNewIngredientName] = useState('');
   const [imageBase64] = useState<string>(params?.imageBase64 || '');
 
+  // Handle meal selection from picker
+  const handleSelectMeal = (meal: Meal) => {
+    Haptics.selectionAsync();
+    setSelectedMeal(meal);
+
+    const parsed: AnalysisResult = {
+      dishName: meal.dishNameEs || meal.dishName || '',
+      confidence: normalizeConfidence(meal.aiConfidence ?? 75),
+      ingredients: (meal.ingredients || []).map((name, i) => ({
+        id: String(i),
+        name,
+      })),
+      nutrition: meal.nutrition || { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
+      portion: meal.estimatedWeight || 200,
+      dataSource: t('aiReview.previousRecord'),
+      mealType: meal.mealType || 'lunch',
+    };
+
+    setAnalysis(parsed);
+    setDishName(parsed.dishName);
+    setIngredients(parsed.ingredients);
+    setPortion(parsed.portion.toString());
+    setNutrition(parsed.nutrition);
+    setSelectedMealType(parsed.mealType || 'lunch');
+    setPickerMode(false);
+  };
+
   const getConfidenceBadge = () => {
-    const confidence = analysis.confidence;
+    const confidence = analysis.confidence; // Already normalized to 0–100
     if (confidence >= 80) {
       return {
-        color: COLORS.success,
-        bgColor: `${COLORS.success}20`,
-        label: 'Alta confianza',
+        color: C.success,
+        bgColor: `${C.success}20`,
+        label: t('aiReview.highConfidence'),
         icon: 'checkmark-circle',
-        subtext: '✓ Análisis muy preciso',
+        subtext: t('aiReview.highConfidenceSubtext'),
       };
-    } else if (confidence >= 60) {
+    } else if (confidence >= 50) {
       return {
-        color: COLORS.warning,
-        bgColor: `${COLORS.warning}20`,
-        label: 'Media confianza',
+        color: C.warning,
+        bgColor: `${C.warning}20`,
+        label: t('aiReview.mediumConfidence'),
         icon: 'alert-circle',
-        subtext: '⚠ Revisa los datos',
+        subtext: t('aiReview.mediumConfidenceSubtext'),
       };
     } else {
       return {
-        color: COLORS.error,
-        bgColor: `${COLORS.error}20`,
-        label: 'Baja confianza',
+        color: C.error,
+        bgColor: `${C.error}20`,
+        label: t('aiReview.lowConfidence'),
         icon: 'close-circle',
-        subtext: 'Revisa los datos con cuidado',
+        subtext: t('aiReview.lowConfidenceSubtext'),
       };
     }
   };
@@ -176,15 +308,52 @@ export default function AIReviewScreen() {
   );
 
   const handleConfirmAndSave = async () => {
+    if (!user?.uid) return;
+
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setIsSaving(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSaving(false);
-      // Navigate back with success
+    try {
+      // Sanitize nutrition values — no undefined, NaN, or negative
+      const safeNum = (v: any, fallback = 0): number => {
+        const n = Number(v);
+        return isNaN(n) || n < 0 ? fallback : Math.round(n * 10) / 10;
+      };
+
+      const safePortion = safeNum(portion, 200);
+
+      const mealData = {
+        userId: user.uid,
+        timestamp: new Date(),
+        photoUri: imageBase64 ? `data:image/jpeg;base64,${imageBase64}` : (selectedMeal?.photoUri || ''),
+        dishName: dishName || t('aiReview.mealFallback'),
+        dishNameEs: dishName || t('aiReview.mealFallback'),
+        dishNameEn: dishName || 'Food',
+        ingredients: ingredients.map((i) => i.name).filter(Boolean),
+        portionDescription: `${safePortion}g`,
+        estimatedWeight: safePortion,
+        nutrition: {
+          calories: safeNum(nutrition.calories),
+          protein: safeNum(nutrition.protein),
+          carbs: safeNum(nutrition.carbs),
+          fat: safeNum(nutrition.fat),
+          fiber: safeNum(nutrition.fiber),
+        },
+        mealType: selectedMealType as any,
+        aiConfidence: (analysis.confidence || 75) / 100, // Store as 0-1
+      } as any;
+
+      const { addMeal } = useMealStore.getState();
+      await addMeal(mealData);
+
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.goBack();
-    }, 1500);
+    } catch (error) {
+      console.error('Error saving reviewed meal:', error);
+      setIsSaving(false);
+      const { Alert } = require('react-native');
+      Alert.alert(t('errors.error'), t('errors.saveFailed'));
+    }
   };
 
   const handleDiscard = async () => {
@@ -192,12 +361,23 @@ export default function AIReviewScreen() {
     navigation.goBack();
   };
 
+  const isLowConfidence = analysis.confidence < 80;
+
   const renderIngredient = ({ item }: { item: Ingredient }) => (
-    <View style={styles.ingredientChip}>
+    <View style={[
+      styles.ingredientChip,
+      isLowConfidence && styles.ingredientChipLowConf,
+      { backgroundColor: C.surface, borderColor: isLowConfidence ? `${C.warning}50` : C.border, backgroundColor: isLowConfidence ? `${C.warning}08` : C.surface },
+    ]}>
       <View style={styles.ingredientContent}>
-        <Text style={styles.ingredientName}>{item.name}</Text>
+        <View style={styles.ingredientNameRow}>
+          <Text style={[styles.ingredientName, { color: C.text }]}>{item.name}</Text>
+          {isLowConfidence && (
+            <Text style={[styles.aiSuggestedTag, { color: C.textSecondary, backgroundColor: `${C.warning}15` }]}>{t('aiReview.suggestedByAI')}</Text>
+          )}
+        </View>
         {item.quantity && (
-          <Text style={styles.ingredientQuantity}>
+          <Text style={[styles.ingredientQuantity, { color: C.textSecondary }]}>
             {item.quantity} {item.unit}
           </Text>
         )}
@@ -209,7 +389,7 @@ export default function AIReviewScreen() {
         <Ionicons
           name="close-circle"
           size={18}
-          color={COLORS.textSecondary}
+          color={C.textSecondary}
         />
       </TouchableOpacity>
     </View>
@@ -226,6 +406,7 @@ export default function AIReviewScreen() {
       style={[
         styles.mealTypeButton,
         selectedMealType === mealType.id && styles.mealTypeButtonActive,
+        { backgroundColor: selectedMealType === mealType.id ? `${C.violet}15` : C.surface, borderColor: selectedMealType === mealType.id ? C.violet : C.border },
       ]}
     >
       <Ionicons
@@ -233,8 +414,8 @@ export default function AIReviewScreen() {
         size={20}
         color={
           selectedMealType === mealType.id
-            ? COLORS.violet
-            : COLORS.textSecondary
+            ? C.violet
+            : C.textSecondary
         }
       />
       <Text
@@ -242,21 +423,118 @@ export default function AIReviewScreen() {
           styles.mealTypeButtonLabel,
           selectedMealType === mealType.id &&
             styles.mealTypeButtonLabelActive,
+          { color: selectedMealType === mealType.id ? C.violet : C.textSecondary },
         ]}
       >
-        {mealType.label}
+        {t(`home.${mealType.id}`)}
       </Text>
     </TouchableOpacity>
   );
 
+  // ── Meal Picker Mode ──
+  if (pickerMode) {
+    const MEAL_TYPE_LABELS: Record<string, string> = {
+      breakfast: t('home.breakfast'),
+      lunch: t('home.lunch'),
+      dinner: t('home.dinner'),
+      snack: t('home.snack'),
+    };
+
+    return (
+      <View style={[styles.container, { backgroundColor: C.background }]}>
+        <View style={styles.header}>
+          <Text style={[styles.headerTitle, { color: C.text }]}>{t('aiReview.title')}</Text>
+        </View>
+
+        <View style={[styles.pickerIntro, { backgroundColor: `${C.primary}12`, borderColor: `${C.primary}25` }]}>
+          <Ionicons name="camera-outline" size={20} color={C.primary} />
+          <Text style={[styles.pickerIntroText, { color: C.text }]}>
+            {t('aiReview.pickerIntro')}
+          </Text>
+        </View>
+
+        {mealsWithPhotos.length === 0 ? (
+          <View style={styles.pickerEmpty}>
+            <Ionicons name="images-outline" size={56} color={C.textSecondary} />
+            <Text style={[styles.pickerEmptyTitle, { color: C.text }]}>{t('aiReview.pickerEmptyTitle')}</Text>
+            <Text style={[styles.pickerEmptySubtitle, { color: C.textSecondary }]}>
+              {t('aiReview.pickerEmptySubtitle')}
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={mealsWithPhotos}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.pickerList}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[styles.pickerCard, { backgroundColor: C.card, borderColor: C.border }]}
+                onPress={() => handleSelectMeal(item)}
+                activeOpacity={0.7}
+              >
+                {canDisplayUri(item.photoUri) ? (
+                  <Image source={{ uri: item.photoUri }} style={styles.pickerThumb} />
+                ) : (
+                  <View style={[styles.pickerThumb, styles.pickerThumbPlaceholder, { backgroundColor: C.border }]}>
+                    <Ionicons name="image-outline" size={24} color={C.textSecondary} />
+                  </View>
+                )}
+                <View style={styles.pickerCardContent}>
+                  <Text style={[styles.pickerCardName, { color: C.text }]} numberOfLines={1}>
+                    {item.dishNameEs || item.dishName}
+                  </Text>
+                  <Text style={[styles.pickerCardMeta, { color: C.textSecondary }]}>
+                    {MEAL_TYPE_LABELS[item.mealType] || item.mealType} · {Math.round(item.nutrition?.calories || 0)} kcal
+                  </Text>
+                  <Text style={[styles.pickerCardDate, { color: C.textSecondary }]}>
+                    {format(item.timestamp, "d MMM · HH:mm", { locale: es })}
+                  </Text>
+                </View>
+                <View style={styles.pickerCardRight}>
+                  {(() => {
+                    const conf = normalizeConfidence(item.aiConfidence ?? 0);
+                    const confColor = conf >= 80 ? C.success : conf >= 50 ? C.warning : C.error;
+                    return (
+                      <View style={[styles.pickerConfBadge, { backgroundColor: `${confColor}20` }]}>
+                        <Text style={[styles.pickerConfText, { color: confColor }]}>
+                          {conf > 0 ? `${conf}%` : '--'}
+                        </Text>
+                      </View>
+                    );
+                  })()}
+                  <Ionicons name="chevron-forward" size={18} color={C.textSecondary} />
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+      </View>
+    );
+  }
+
+  // ── Review Mode ──
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: C.background }]}
       showsVerticalScrollIndicator={false}
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Revisión IA</Text>
+        <View style={styles.headerLeft}>
+          {selectedMeal && (
+            <TouchableOpacity
+              onPress={() => {
+                setPickerMode(true);
+                setSelectedMeal(null);
+              }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={styles.backToPicker}
+            >
+              <Ionicons name="arrow-back" size={20} color={C.primary} />
+            </TouchableOpacity>
+          )}
+          <Text style={[styles.headerTitle, { color: C.text }]}>{t('aiReview.title')}</Text>
+        </View>
         <View style={[styles.confidenceBadge, { backgroundColor: confidenceBadge.bgColor }]}>
           <Ionicons
             name={confidenceBadge.icon as any}
@@ -269,11 +547,23 @@ export default function AIReviewScreen() {
         </View>
       </View>
 
+      {/* AI Explanation Banner */}
+      <View style={[styles.aiBanner, { backgroundColor: `${C.primary}12`, borderColor: `${C.primary}25` }]}>
+        <Ionicons name="sparkles" size={16} color={C.primary} />
+        <Text style={[styles.aiBannerText, { color: C.text }]}>
+          {t('aiReview.analysisHint')}
+        </Text>
+      </View>
+
       {/* Image Thumbnail */}
-      {imageBase64 && (
+      {(imageBase64 || canDisplayUri(selectedMeal?.photoUri)) && (
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: `data:image/jpeg;base64,${imageBase64}` }}
+            source={
+              imageBase64
+                ? { uri: `data:image/jpeg;base64,${imageBase64}` }
+                : { uri: selectedMeal!.photoUri }
+            }
             style={styles.imageThumbnail}
           />
         </View>
@@ -281,14 +571,14 @@ export default function AIReviewScreen() {
 
       {/* Confidence Meter */}
       <View style={styles.section}>
-        <View style={styles.confidenceMeterContainer}>
+        <View style={[styles.confidenceMeterContainer, { backgroundColor: C.card, borderColor: C.border }]}>
           <View style={styles.meterLabel}>
-            <Text style={styles.meterLabelText}>Confianza</Text>
+            <Text style={[styles.meterLabelText, { color: C.text }]}>{t('aiReview.confidence')}</Text>
             <Text style={[styles.meterValue, { color: confidenceBadge.color }]}>
               {analysis.confidence}%
             </Text>
           </View>
-          <View style={styles.meterBar}>
+          <View style={[styles.meterBar, { backgroundColor: C.border }]}>
             <View
               style={[
                 styles.meterFill,
@@ -307,22 +597,31 @@ export default function AIReviewScreen() {
 
       {/* Dish Name */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Nombre del Plato</Text>
+        <Text style={[styles.sectionLabel, { color: C.text }]}>{t('aiReview.dishName')}</Text>
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, { backgroundColor: C.surface, borderColor: C.borderLight, color: C.bone }]}
           value={dishName}
           onChangeText={setDishName}
-          placeholder="Nombre de la comida"
-          placeholderTextColor={COLORS.textSecondary}
+          placeholder={t('aiReview.dishNamePlaceholder')}
+          placeholderTextColor={C.textTertiary}
         />
       </View>
 
       {/* Ingredients */}
       <View style={styles.section}>
         <View style={styles.ingredientsHeader}>
-          <Text style={styles.sectionLabel}>Ingredientes</Text>
-          <Text style={styles.ingredientCount}>{ingredients.length}</Text>
+          <Text style={[styles.sectionLabel, { color: C.text }]}>{t('aiReview.ingredients')}</Text>
+          <Text style={[styles.ingredientCount, { color: C.textSecondary, backgroundColor: `${C.violet}15` }]}>{ingredients.length}</Text>
         </View>
+
+        {analysis.confidence < 80 && (
+          <View style={styles.lowConfidenceNote}>
+            <Ionicons name="alert-circle-outline" size={14} color={C.warning} />
+            <Text style={[styles.lowConfidenceNoteText, { color: C.warning }]}>
+              {t('aiReview.mediumConfidence')}
+            </Text>
+          </View>
+        )}
 
         <FlatList
           data={ingredients}
@@ -334,11 +633,11 @@ export default function AIReviewScreen() {
 
         <View style={styles.addIngredientContainer}>
           <TextInput
-            style={styles.ingredientInput}
+            style={[styles.ingredientInput, { backgroundColor: C.surface, borderColor: C.borderLight, color: C.bone }]}
             value={newIngredientName}
             onChangeText={setNewIngredientName}
-            placeholder="Nuevo ingrediente"
-            placeholderTextColor={COLORS.textSecondary}
+            placeholder={t('aiReview.newIngredientPlaceholder')}
+            placeholderTextColor={C.textTertiary}
           />
           <TouchableOpacity
             onPress={handleAddIngredient}
@@ -347,7 +646,7 @@ export default function AIReviewScreen() {
             <Ionicons
               name="add-circle"
               size={24}
-              color={COLORS.violet}
+              color={C.violet}
             />
           </TouchableOpacity>
         </View>
@@ -355,8 +654,8 @@ export default function AIReviewScreen() {
 
       {/* Portion */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Porción (g)</Text>
-        <View style={styles.portionControl}>
+        <Text style={[styles.sectionLabel, { color: C.text }]}>{t('aiReview.portion')}</Text>
+        <View style={[styles.portionControl, { backgroundColor: C.surface, borderColor: C.borderLight }]}>
           <TouchableOpacity
             onPress={() => {
               const newVal = Math.max(10, parseInt(portion) - 50);
@@ -368,12 +667,12 @@ export default function AIReviewScreen() {
             <Ionicons
               name="remove"
               size={24}
-              color={COLORS.violet}
+              color={C.violet}
             />
           </TouchableOpacity>
 
           <TextInput
-            style={styles.portionInput}
+            style={[styles.portionInput, { color: C.violet }]}
             value={portion}
             onChangeText={handlePortionChange}
             keyboardType="numeric"
@@ -391,7 +690,7 @@ export default function AIReviewScreen() {
             <Ionicons
               name="add"
               size={24}
-              color={COLORS.violet}
+              color={C.violet}
             />
           </TouchableOpacity>
         </View>
@@ -400,7 +699,7 @@ export default function AIReviewScreen() {
       {/* Per 100g vs Total Toggle */}
       <View style={styles.section}>
         <View style={styles.toggleContainer}>
-          <Text style={styles.sectionLabel}>Valores</Text>
+          <Text style={[styles.sectionLabel, { color: C.text }]}>{t('aiReview.values')}</Text>
           <View style={styles.toggleButtons}>
             <TouchableOpacity
               onPress={() => {
@@ -410,12 +709,14 @@ export default function AIReviewScreen() {
               style={[
                 styles.toggleButton,
                 !showPerTotal && styles.toggleButtonActive,
+                { backgroundColor: !showPerTotal ? C.violet : C.surface, borderColor: !showPerTotal ? C.violet : C.border },
               ]}
             >
               <Text
                 style={[
                   styles.toggleButtonText,
                   !showPerTotal && styles.toggleButtonTextActive,
+                  { color: !showPerTotal ? C.white : C.textSecondary },
                 ]}
               >
                 Por 100g
@@ -429,12 +730,14 @@ export default function AIReviewScreen() {
               style={[
                 styles.toggleButton,
                 showPerTotal && styles.toggleButtonActive,
+                { backgroundColor: showPerTotal ? C.violet : C.surface, borderColor: showPerTotal ? C.violet : C.border },
               ]}
             >
               <Text
                 style={[
                   styles.toggleButtonText,
                   showPerTotal && styles.toggleButtonTextActive,
+                  { color: showPerTotal ? C.white : C.textSecondary },
                 ]}
               >
                 Total
@@ -446,12 +749,12 @@ export default function AIReviewScreen() {
 
       {/* Nutrition Macros */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Macros</Text>
+        <Text style={[styles.sectionLabel, { color: C.text }]}>Macros</Text>
         <View style={styles.macroGrid}>
-          <View style={styles.macroCard}>
-            <Text style={styles.macroLabel}>Calorías</Text>
+          <View style={[styles.macroCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <Text style={[styles.macroLabel, { color: C.textSecondary }]}>{t('nutrition.calories')}</Text>
             <TextInput
-              style={styles.macroInput}
+              style={[styles.macroInput, { color: C.violet }]}
               value={nutrition.calories.toString()}
               onChangeText={(value) =>
                 handleUpdateNutrition('calories', value)
@@ -459,13 +762,13 @@ export default function AIReviewScreen() {
               keyboardType="numeric"
               textAlign="center"
             />
-            <Text style={styles.macroUnit}>kcal</Text>
+            <Text style={[styles.macroUnit, { color: C.textSecondary }]}>kcal</Text>
           </View>
 
-          <View style={styles.macroCard}>
-            <Text style={styles.macroLabel}>Proteína</Text>
+          <View style={[styles.macroCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <Text style={[styles.macroLabel, { color: C.textSecondary }]}>{t('nutrition.protein')}</Text>
             <TextInput
-              style={styles.macroInput}
+              style={[styles.macroInput, { color: C.violet }]}
               value={nutrition.protein.toString()}
               onChangeText={(value) =>
                 handleUpdateNutrition('protein', value)
@@ -473,50 +776,50 @@ export default function AIReviewScreen() {
               keyboardType="numeric"
               textAlign="center"
             />
-            <Text style={styles.macroUnit}>g</Text>
+            <Text style={[styles.macroUnit, { color: C.textSecondary }]}>g</Text>
           </View>
 
-          <View style={styles.macroCard}>
-            <Text style={styles.macroLabel}>Carbs</Text>
+          <View style={[styles.macroCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <Text style={[styles.macroLabel, { color: C.textSecondary }]}>{t('nutrition.carbs')}</Text>
             <TextInput
-              style={styles.macroInput}
+              style={[styles.macroInput, { color: C.violet }]}
               value={nutrition.carbs.toString()}
               onChangeText={(value) => handleUpdateNutrition('carbs', value)}
               keyboardType="numeric"
               textAlign="center"
             />
-            <Text style={styles.macroUnit}>g</Text>
+            <Text style={[styles.macroUnit, { color: C.textSecondary }]}>g</Text>
           </View>
 
-          <View style={styles.macroCard}>
-            <Text style={styles.macroLabel}>Grasas</Text>
+          <View style={[styles.macroCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <Text style={[styles.macroLabel, { color: C.textSecondary }]}>{t('nutrition.fat')}</Text>
             <TextInput
-              style={styles.macroInput}
+              style={[styles.macroInput, { color: C.violet }]}
               value={nutrition.fat.toString()}
               onChangeText={(value) => handleUpdateNutrition('fat', value)}
               keyboardType="numeric"
               textAlign="center"
             />
-            <Text style={styles.macroUnit}>g</Text>
+            <Text style={[styles.macroUnit, { color: C.textSecondary }]}>g</Text>
           </View>
 
-          <View style={styles.macroCard}>
-            <Text style={styles.macroLabel}>Fibra</Text>
+          <View style={[styles.macroCard, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <Text style={[styles.macroLabel, { color: C.textSecondary }]}>{t('common.fiber')}</Text>
             <TextInput
-              style={styles.macroInput}
+              style={[styles.macroInput, { color: C.violet }]}
               value={nutrition.fiber.toString()}
               onChangeText={(value) => handleUpdateNutrition('fiber', value)}
               keyboardType="numeric"
               textAlign="center"
             />
-            <Text style={styles.macroUnit}>g</Text>
+            <Text style={[styles.macroUnit, { color: C.textSecondary }]}>g</Text>
           </View>
         </View>
       </View>
 
       {/* Meal Type Selector */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Tipo de Comida</Text>
+        <Text style={[styles.sectionLabel, { color: C.text }]}>{t('aiReview.mealType')}</Text>
         <View style={styles.mealTypesContainer}>
           {MEAL_TYPES.map(renderMealTypeButton)}
         </View>
@@ -524,16 +827,16 @@ export default function AIReviewScreen() {
 
       {/* Data Sources */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Fuentes de Datos</Text>
-        <View style={styles.dataSourceCard}>
+        <Text style={[styles.sectionLabel, { color: C.text }]}>{t('aiReview.dataSources')}</Text>
+        <View style={[styles.dataSourceCard, { backgroundColor: `${C.violet}10`, borderColor: `${C.violet}20` }]}>
           <Ionicons
             name="information-circle"
             size={16}
-            color={COLORS.violet}
+            color={C.violet}
           />
           <View style={styles.dataSourceContent}>
-            <Text style={styles.dataSourceTitle}>Análisis Multi-Fuente</Text>
-            <Text style={styles.dataSourceText}>
+            <Text style={[styles.dataSourceTitle, { color: C.text }]}>{t('aiReview.multiSourceAnalysis')}</Text>
+            <Text style={[styles.dataSourceText, { color: C.textSecondary }]}>
               OpenAI Vision + {'\n'}OpenFoodFacts + USDA Database
             </Text>
           </View>
@@ -545,36 +848,36 @@ export default function AIReviewScreen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={handleDiscard}
-            style={styles.discardButton}
+            style={[styles.discardButton, { backgroundColor: C.surface, borderColor: C.violet }]}
             disabled={isSaving}
           >
             <Ionicons
               name="trash-outline"
               size={20}
-              color={COLORS.violet}
+              color={C.violet}
             />
-            <Text style={styles.discardButtonText}>Descartar</Text>
+            <Text style={[styles.discardButtonText, { color: C.violet }]}>{t('common.discard')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleConfirmAndSave}
-            style={styles.confirmButton}
+            style={[styles.confirmButton, { backgroundColor: C.violet }]}
             disabled={isSaving}
           >
             {isSaving ? (
               <ActivityIndicator
                 size="small"
-                color={COLORS.white}
+                color={C.white}
               />
             ) : (
               <>
                 <Ionicons
                   name="checkmark"
                   size={20}
-                  color={COLORS.white}
+                  color={C.white}
                 />
-                <Text style={styles.confirmButtonText}>
-                  Confirmar y Registrar
+                <Text style={[styles.confirmButtonText, { color: C.white }]}>
+                  {t('aiReview.confirmAndRegister')}
                 </Text>
               </>
             )}
@@ -590,7 +893,6 @@ export default function AIReviewScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   header: {
     paddingHorizontal: 16,
@@ -600,11 +902,102 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  backToPicker: {
+    padding: 4,
+  },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.text,
     letterSpacing: -0.5,
+  },
+  // ── Picker styles ──
+  pickerIntro: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 10,
+    padding: 12,
+    gap: 8,
+    borderWidth: 1,
+  },
+  pickerIntroText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  pickerEmpty: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+    paddingTop: 60,
+  },
+  pickerEmptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginTop: 16,
+  },
+  pickerEmptySubtitle: {
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  pickerList: {
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+    gap: 10,
+  },
+  pickerCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    padding: 10,
+    gap: 12,
+    borderWidth: 1,
+  },
+  pickerThumb: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+  },
+  pickerThumbPlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pickerCardContent: {
+    flex: 1,
+  },
+  pickerCardName: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  pickerCardMeta: {
+    fontSize: 12,
+    marginBottom: 2,
+  },
+  pickerCardDate: {
+    fontSize: 11,
+  },
+  pickerCardRight: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  pickerConfBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  pickerConfText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
   confidenceBadge: {
     flexDirection: 'row',
@@ -618,6 +1011,21 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
+  aiBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 10,
+    padding: 12,
+    gap: 8,
+    borderWidth: 1,
+  },
+  aiBannerText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+  },
   imageContainer: {
     paddingHorizontal: 16,
     marginBottom: 12,
@@ -626,18 +1034,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     borderRadius: 12,
-    backgroundColor: COLORS.border,
   },
   section: {
     paddingHorizontal: 16,
     marginVertical: 12,
   },
   confidenceMeterContainer: {
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   meterLabel: {
     flexDirection: 'row',
@@ -648,7 +1053,6 @@ const styles = StyleSheet.create({
   meterLabelText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
   },
   meterValue: {
     fontSize: 16,
@@ -657,7 +1061,6 @@ const styles = StyleSheet.create({
   meterBar: {
     width: '100%',
     height: 8,
-    backgroundColor: COLORS.border,
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 8,
@@ -673,18 +1076,14 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
     marginBottom: 8,
   },
   textInput: {
-    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: COLORS.text,
   },
   ingredientsHeader: {
     flexDirection: 'row',
@@ -694,8 +1093,6 @@ const styles = StyleSheet.create({
   },
   ingredientCount: {
     fontSize: 12,
-    color: COLORS.textSecondary,
-    backgroundColor: `${COLORS.violet}15`,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -704,29 +1101,51 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
+  lowConfidenceNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  lowConfidenceNoteText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
   ingredientChip: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: COLORS.border,
+  },
+  ingredientChipLowConf: {
+    borderWidth: 1,
   },
   ingredientContent: {
     flex: 1,
   },
+  ingredientNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   ingredientName: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
     marginBottom: 2,
+  },
+  aiSuggestedTag: {
+    fontSize: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   ingredientQuantity: {
     fontSize: 11,
-    color: COLORS.textSecondary,
   },
   addIngredientContainer: {
     flexDirection: 'row',
@@ -735,14 +1154,11 @@ const styles = StyleSheet.create({
   },
   ingredientInput: {
     flex: 1,
-    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: COLORS.text,
   },
   addIngredientButton: {
     padding: 6,
@@ -750,9 +1166,7 @@ const styles = StyleSheet.create({
   portionControl: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
     borderRadius: 10,
     overflow: 'hidden',
   },
@@ -765,7 +1179,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.violet,
     paddingHorizontal: 8,
   },
   toggleContainer: {
@@ -781,21 +1194,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
-    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   toggleButtonActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
+    borderWidth: 1,
   },
   toggleButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
   },
   toggleButtonTextActive: {
-    color: COLORS.white,
+    fontWeight: '600',
   },
   macroGrid: {
     flexDirection: 'row',
@@ -805,28 +1214,23 @@ const styles = StyleSheet.create({
   },
   macroCard: {
     width: (width - 32 - 16) / 2.5,
-    backgroundColor: COLORS.white,
     borderRadius: 10,
     padding: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   macroLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: 6,
   },
   macroInput: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.violet,
     paddingHorizontal: 4,
   },
   macroUnit: {
     fontSize: 10,
-    color: COLORS.textSecondary,
     marginTop: 4,
   },
   mealTypesContainer: {
@@ -839,32 +1243,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderRadius: 10,
-    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.border,
     gap: 4,
   },
   mealTypeButtonActive: {
-    backgroundColor: `${COLORS.violet}15`,
-    borderColor: COLORS.violet,
+    borderWidth: 1,
   },
   mealTypeButtonLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
   },
   mealTypeButtonLabelActive: {
-    color: COLORS.violet,
+    fontSize: 11,
+    fontWeight: '600',
   },
   dataSourceCard: {
-    backgroundColor: `${COLORS.violet}10`,
     borderRadius: 10,
     padding: 12,
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
     borderWidth: 1,
-    borderColor: `${COLORS.violet}20`,
   },
   dataSourceContent: {
     flex: 1,
@@ -872,12 +1271,10 @@ const styles = StyleSheet.create({
   dataSourceTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: COLORS.text,
     marginBottom: 2,
   },
   dataSourceText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     lineHeight: 16,
   },
   buttonContainer: {
@@ -891,15 +1288,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: COLORS.white,
     borderWidth: 1.5,
-    borderColor: COLORS.violet,
     gap: 6,
   },
   discardButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.violet,
   },
   confirmButton: {
     flex: 1.2,
@@ -908,13 +1302,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: COLORS.violet,
     gap: 6,
   },
   confirmButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.white,
   },
   bottomSpacing: {
     height: 32,

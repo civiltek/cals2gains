@@ -17,7 +17,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { COLORS } from '../theme';
+import { useTranslation } from 'react-i18next';
+import { useColors } from '../store/themeStore';
 
 // Type definitions
 interface FoodItem {
@@ -53,8 +54,11 @@ interface FoodReport {
 }
 
 const FoodVerificationScreen = () => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const C = useColors();
+  const styles = useMemo(() => createStyles(C), [C]);
   const [activeTab, setActiveTab] = useState<'database' | 'myFoods'>('database');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
@@ -86,8 +90,8 @@ const FoodVerificationScreen = () => {
   const mockFoods: FoodItem[] = [
     {
       id: '1',
-      name: 'Pollo Pechuga',
-      brand: 'Fresco',
+      name: t('foodVerification.chickenBreast'),
+      brand: t('foodVerification.fresh'),
       source: 'OpenFoodFacts',
       verified: 'verified',
       nutrition: {
@@ -103,8 +107,8 @@ const FoodVerificationScreen = () => {
     },
     {
       id: '2',
-      name: 'Arroz Blanco Cocido',
-      brand: 'Genérico',
+      name: t('foodVerification.cookedWhiteRice'),
+      brand: t('foodVerification.generic'),
       source: 'USDA',
       verified: 'verified',
       nutrition: {
@@ -119,8 +123,8 @@ const FoodVerificationScreen = () => {
     },
     {
       id: '3',
-      name: 'Avena Integral',
-      brand: 'Marca A',
+      name: t('foodVerification.wholeOats'),
+      brand: t('foodVerification.brandA'),
       source: 'OpenFoodFacts',
       verified: 'unverified',
       nutrition: {
@@ -135,8 +139,8 @@ const FoodVerificationScreen = () => {
     },
     {
       id: '4',
-      name: 'Batata Dulce',
-      brand: 'Fresco',
+      name: t('foodVerification.sweetPotato'),
+      brand: t('foodVerification.fresh'),
       source: 'IA',
       verified: 'reported',
       nutrition: {
@@ -155,7 +159,7 @@ const FoodVerificationScreen = () => {
   const [myFoods, setMyFoods] = useState<FoodItem[]>([
     {
       id: 'custom-1',
-      name: 'Mi Smoothie Proteico',
+      name: t('foodVerification.myProteinSmoothie'),
       brand: 'Custom',
       source: 'Custom',
       verified: 'verified',
@@ -198,18 +202,18 @@ const FoodVerificationScreen = () => {
 
   const handleSubmitReport = async () => {
     if (!reportData.description.trim()) {
-      Alert.alert('Error', 'Por favor describe el problema');
+      Alert.alert('Error', t('foodVerification.describeProblem'));
       return;
     }
     setLoading(true);
     try {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Éxito', 'Tu reporte ha sido enviado. Gracias por ayudar a la comunidad.');
+      Alert.alert(t('common.success'), t('foodVerification.reportSent'));
       setShowReportModal(false);
       setShowDetailModal(false);
       setReportData({ foodId: '', issueType: 'calories', description: '' });
     } catch (error) {
-      Alert.alert('Error', 'No se pudo enviar el reporte');
+      Alert.alert('Error', t('foodVerification.reportFailed'));
     } finally {
       setLoading(false);
     }
@@ -217,7 +221,7 @@ const FoodVerificationScreen = () => {
 
   const handleAddCustomFood = async () => {
     if (!customFood.name.trim()) {
-      Alert.alert('Error', 'El nombre del alimento es requerido');
+      Alert.alert('Error', t('foodVerification.foodNameRequired'));
       return;
     }
     setLoading(true);
@@ -225,7 +229,7 @@ const FoodVerificationScreen = () => {
       const newFood: FoodItem = {
         id: `custom-${Date.now()}`,
         name: customFood.name,
-        brand: customFood.brand || 'Personalizado',
+        brand: customFood.brand || t('foodVerification.brandPlaceholder'),
         source: 'Custom',
         verified: 'verified',
         nutrition: {
@@ -241,7 +245,7 @@ const FoodVerificationScreen = () => {
       };
       setMyFoods([...myFoods, newFood]);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Éxito', 'Alimento personalizado creado');
+      Alert.alert(t('common.success'), t('foodVerification.customCreated'));
       setShowCustomFoodModal(false);
       setCustomFood({
         name: '',
@@ -254,7 +258,7 @@ const FoodVerificationScreen = () => {
         servingSize: '100',
       });
     } catch (error) {
-      Alert.alert('Error', 'No se pudo crear el alimento');
+      Alert.alert('Error', t('foodVerification.customFailed'));
     } finally {
       setLoading(false);
     }
@@ -262,12 +266,12 @@ const FoodVerificationScreen = () => {
 
   const handleDeleteCustomFood = (foodId: string) => {
     Alert.alert(
-      'Eliminar',
-      '¿Estás seguro de que deseas eliminar este alimento?',
+      t('common.delete'),
+      t('foodVerification.deleteConfirm'),
       [
-        { text: 'Cancelar', onPress: () => {}, style: 'cancel' },
+        { text: t('common.cancel'), onPress: () => {}, style: 'cancel' },
         {
-          text: 'Eliminar',
+          text: t('common.delete'),
           onPress: () => {
             setMyFoods(myFoods.filter((f) => f.id !== foodId));
           },
@@ -280,28 +284,28 @@ const FoodVerificationScreen = () => {
   const getVerificationBadge = (verified: string) => {
     switch (verified) {
       case 'verified':
-        return { icon: 'checkmark-circle', color: COLORS.success, label: 'Verificado' };
+        return { icon: 'checkmark-circle', color: C.success, label: t('foodVerification.verified') };
       case 'unverified':
-        return { icon: 'alert-circle', color: COLORS.warning, label: 'Sin verificar' };
+        return { icon: 'alert-circle', color: C.warning, label: t('foodVerification.unverified') };
       case 'reported':
-        return { icon: 'close-circle', color: COLORS.error, label: 'Reportado' };
+        return { icon: 'close-circle', color: C.error, label: t('foodVerification.reported') };
       default:
-        return { icon: 'help-circle', color: COLORS.text, label: 'Desconocido' };
+        return { icon: 'help-circle', color: C.text, label: t('foodVerification.unknown') };
     }
   };
 
   const getSourceColor = (source: string) => {
     switch (source) {
       case 'OpenFoodFacts':
-        return COLORS.primary;
+        return C.primary;
       case 'USDA':
-        return COLORS.secondary;
+        return C.info;
       case 'IA':
-        return COLORS.accent;
+        return C.accent;
       case 'Custom':
-        return COLORS.success;
+        return C.success;
       default:
-        return COLORS.textSecondary;
+        return C.textSecondary;
     }
   };
 
@@ -310,14 +314,14 @@ const FoodVerificationScreen = () => {
     return (
       <TouchableOpacity
         key={food.id}
-        style={[styles.foodCard, { backgroundColor: COLORS.background }]}
+        style={[styles.foodCard, { backgroundColor: C.background }]}
         onPress={() => handleFoodPress(food)}
         activeOpacity={0.7}
       >
         <View style={styles.foodCardHeader}>
           <View style={styles.foodInfo}>
-            <Text style={[styles.foodName, { color: COLORS.text }]}>{food.name}</Text>
-            <Text style={[styles.foodBrand, { color: COLORS.textSecondary }]}>
+            <Text style={[styles.foodName, { color: C.text }]}>{food.name}</Text>
+            <Text style={[styles.foodBrand, { color: C.textSecondary }]}>
               {food.brand}
             </Text>
           </View>
@@ -347,34 +351,34 @@ const FoodVerificationScreen = () => {
         </View>
         <View style={styles.nutritionRow}>
           <View style={styles.nutritionItem}>
-            <Text style={[styles.nutritionValue, { color: COLORS.text }]}>
+            <Text style={[styles.nutritionValue, { color: C.text }]}>
               {food.nutrition.calories}
             </Text>
-            <Text style={[styles.nutritionLabel, { color: COLORS.textSecondary }]}>cal</Text>
+            <Text style={[styles.nutritionLabel, { color: C.textSecondary }]}>{t('foodVerification.cal')}</Text>
           </View>
           <View style={styles.nutritionItem}>
-            <Text style={[styles.nutritionValue, { color: COLORS.text }]}>
+            <Text style={[styles.nutritionValue, { color: C.text }]}>
               {food.nutrition.protein}g
             </Text>
-            <Text style={[styles.nutritionLabel, { color: COLORS.textSecondary }]}>Protein</Text>
+            <Text style={[styles.nutritionLabel, { color: C.textSecondary }]}>{t('trainingDay.protein')}</Text>
           </View>
           <View style={styles.nutritionItem}>
-            <Text style={[styles.nutritionValue, { color: COLORS.text }]}>
+            <Text style={[styles.nutritionValue, { color: C.text }]}>
               {food.nutrition.carbs}g
             </Text>
-            <Text style={[styles.nutritionLabel, { color: COLORS.textSecondary }]}>Carbs</Text>
+            <Text style={[styles.nutritionLabel, { color: C.textSecondary }]}>{t('trainingDay.carbohydrates')}</Text>
           </View>
           <View style={styles.nutritionItem}>
-            <Text style={[styles.nutritionValue, { color: COLORS.text }]}>
+            <Text style={[styles.nutritionValue, { color: C.text }]}>
               {food.nutrition.fat}g
             </Text>
-            <Text style={[styles.nutritionLabel, { color: COLORS.textSecondary }]}>Fat</Text>
+            <Text style={[styles.nutritionLabel, { color: C.textSecondary }]}>{t('trainingDay.fats')}</Text>
           </View>
         </View>
         <Text
-          style={[styles.servingSize, { color: COLORS.textSecondary }]}
+          style={[styles.servingSize, { color: C.textSecondary }]}
         >
-          Por {food.nutrition.servingSize}{food.nutrition.unit}
+          {t('foodVerification.perServing', { size: food.nutrition.servingSize, unit: food.nutrition.unit })}
         </Text>
       </TouchableOpacity>
     );
@@ -383,7 +387,7 @@ const FoodVerificationScreen = () => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[styles.container, { backgroundColor: COLORS.surface }]}
+      style={[styles.container, { backgroundColor: C.surface }]}
     >
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top }]}
@@ -391,25 +395,25 @@ const FoodVerificationScreen = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: COLORS.text }]}>Base de Datos</Text>
-          <Text style={[styles.headerSubtitle, { color: COLORS.textSecondary }]}>
-            Busca y verifica alimentos
+          <Text style={[styles.headerTitle, { color: C.text }]}>{t('foodVerification.title')}</Text>
+          <Text style={[styles.headerSubtitle, { color: C.textSecondary }]}>
+            {t('foodVerification.subtitle')}
           </Text>
         </View>
 
         {/* Search Bar */}
-        <View style={[styles.searchContainer, { borderColor: COLORS.border }]}>
-          <Ionicons name="search" size={20} color={COLORS.textSecondary} />
+        <View style={[styles.searchContainer, { borderColor: C.border }]}>
+          <Ionicons name="search" size={20} color={C.textSecondary} />
           <TextInput
-            style={[styles.searchInput, { color: COLORS.text }]}
-            placeholder="Buscar alimento..."
-            placeholderTextColor={COLORS.textSecondary}
+            style={[styles.searchInput, { color: C.text }]}
+            placeholder={t('foodVerification.searchPlaceholder')}
+            placeholderTextColor={C.textSecondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color={COLORS.textSecondary} />
+              <Ionicons name="close-circle" size={20} color={C.textSecondary} />
             </TouchableOpacity>
           )}
         </View>
@@ -420,55 +424,55 @@ const FoodVerificationScreen = () => {
             style={[
               styles.tabButton,
               activeTab === 'database' && {
-                backgroundColor: COLORS.primary,
-                borderBottomColor: COLORS.primary,
+                backgroundColor: C.primary,
+                borderBottomColor: C.primary,
               },
-              { borderBottomColor: COLORS.border },
+              { borderBottomColor: C.border },
             ]}
             onPress={() => setActiveTab('database')}
           >
             <Ionicons
               name="cube"
               size={20}
-              color={activeTab === 'database' ? COLORS.surface : COLORS.textSecondary}
+              color={activeTab === 'database' ? C.surface : C.textSecondary}
             />
             <Text
               style={[
                 styles.tabText,
                 {
                   color:
-                    activeTab === 'database' ? COLORS.surface : COLORS.textSecondary,
+                    activeTab === 'database' ? C.surface : C.textSecondary,
                 },
               ]}
             >
-              Base de Datos
+              {t('foodVerification.title')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
               styles.tabButton,
               activeTab === 'myFoods' && {
-                backgroundColor: COLORS.primary,
-                borderBottomColor: COLORS.primary,
+                backgroundColor: C.primary,
+                borderBottomColor: C.primary,
               },
-              { borderBottomColor: COLORS.border },
+              { borderBottomColor: C.border },
             ]}
             onPress={() => setActiveTab('myFoods')}
           >
             <Ionicons
               name="star"
               size={20}
-              color={activeTab === 'myFoods' ? COLORS.surface : COLORS.textSecondary}
+              color={activeTab === 'myFoods' ? C.surface : C.textSecondary}
             />
             <Text
               style={[
                 styles.tabText,
                 {
-                  color: activeTab === 'myFoods' ? COLORS.surface : COLORS.textSecondary,
+                  color: activeTab === 'myFoods' ? C.surface : C.textSecondary,
                 },
               ]}
             >
-              Mis Alimentos
+              {t('foodVerification.myFoods')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -480,19 +484,19 @@ const FoodVerificationScreen = () => {
               filteredFoods.map((food) => renderFoodCard(food))
             ) : (
               <View style={styles.emptyState}>
-                <Ionicons name="search" size={48} color={COLORS.textSecondary} />
-                <Text style={[styles.emptyStateText, { color: COLORS.textSecondary }]}>
+                <Ionicons name="search" size={48} color={C.textSecondary} />
+                <Text style={[styles.emptyStateText, { color: C.textSecondary }]}>
                   {searchQuery.length > 0
-                    ? 'No se encontraron alimentos'
-                    : 'Comienza a buscar'}
+                    ? t('foodVerification.noResults')
+                    : t('foodVerification.startSearch')}
                 </Text>
               </View>
             )}
 
             {/* Recently Verified Section */}
             <View style={styles.sectionContainer}>
-              <Text style={[styles.sectionTitle, { color: COLORS.text }]}>
-                Verificados Recientemente
+              <Text style={[styles.sectionTitle, { color: C.text }]}>
+                {t('foodVerification.recentlyVerified')}
               </Text>
               {mockFoods
                 .filter((f) => f.verified === 'verified')
@@ -500,27 +504,27 @@ const FoodVerificationScreen = () => {
                 .map((food) => (
                   <TouchableOpacity
                     key={food.id}
-                    style={[styles.listItem, { borderBottomColor: COLORS.border }]}
+                    style={[styles.listItem, { borderBottomColor: C.border }]}
                     onPress={() => handleFoodPress(food)}
                   >
                     <View style={styles.listItemContent}>
-                      <Text style={[styles.listItemName, { color: COLORS.text }]}>
+                      <Text style={[styles.listItemName, { color: C.text }]}>
                         {food.name}
                       </Text>
-                      <Text style={[styles.listItemMeta, { color: COLORS.textSecondary }]}>
+                      <Text style={[styles.listItemMeta, { color: C.textSecondary }]}>
                         {food.nutrition.calories} cal • {food.brand}
                       </Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
+                    <Ionicons name="chevron-forward" size={20} color={C.textSecondary} />
                   </TouchableOpacity>
                 ))}
             </View>
 
             {/* Community Stats */}
-            <View style={[styles.statsContainer, { backgroundColor: COLORS.primary }]}>
-              <Ionicons name="people" size={24} color={COLORS.surface} />
-              <Text style={[styles.statsText, { color: COLORS.surface }]}>
-                152 alimentos verificados por la comunidad
+            <View style={[styles.statsContainer, { backgroundColor: C.primary }]}>
+              <Ionicons name="people" size={24} color={C.surface} />
+              <Text style={[styles.statsText, { color: C.surface }]}>
+                {t('foodVerification.communityVerified', { count: 152 })}
               </Text>
             </View>
           </>
@@ -530,12 +534,12 @@ const FoodVerificationScreen = () => {
         {activeTab === 'myFoods' && (
           <>
             <TouchableOpacity
-              style={[styles.createButton, { backgroundColor: COLORS.primary }]}
+              style={[styles.createButton, { backgroundColor: C.primary }]}
               onPress={() => setShowCustomFoodModal(true)}
             >
-              <Ionicons name="add-circle" size={24} color={COLORS.surface} />
-              <Text style={[styles.createButtonText, { color: COLORS.surface }]}>
-                Crear Alimento
+              <Ionicons name="add-circle" size={24} color={C.surface} />
+              <Text style={[styles.createButtonText, { color: C.surface }]}>
+                {t('foodVerification.createFood')}
               </Text>
             </TouchableOpacity>
 
@@ -545,7 +549,7 @@ const FoodVerificationScreen = () => {
                   key={food.id}
                   style={[
                     styles.myFoodCard,
-                    { backgroundColor: COLORS.background, borderColor: COLORS.border },
+                    { backgroundColor: C.background, borderColor: C.border },
                   ]}
                 >
                   <TouchableOpacity
@@ -553,32 +557,32 @@ const FoodVerificationScreen = () => {
                     onPress={() => handleFoodPress(food)}
                   >
                     <View>
-                      <Text style={[styles.foodName, { color: COLORS.text }]}>
+                      <Text style={[styles.foodName, { color: C.text }]}>
                         {food.name}
                       </Text>
-                      <Text style={[styles.foodBrand, { color: COLORS.textSecondary }]}>
+                      <Text style={[styles.foodBrand, { color: C.textSecondary }]}>
                         {food.nutrition.calories} cal • {food.nutrition.protein}g protein
                       </Text>
                     </View>
                   </TouchableOpacity>
                   <View style={styles.myFoodActions}>
                     <TouchableOpacity onPress={() => handleFoodPress(food)}>
-                      <Ionicons name="create" size={20} color={COLORS.primary} />
+                      <Ionicons name="create" size={20} color={C.primary} />
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => handleDeleteCustomFood(food.id)}
                       style={{ marginLeft: 12 }}
                     >
-                      <Ionicons name="trash" size={20} color={COLORS.error} />
+                      <Ionicons name="trash" size={20} color={C.error} />
                     </TouchableOpacity>
                   </View>
                 </View>
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Ionicons name="star" size={48} color={COLORS.textSecondary} />
-                <Text style={[styles.emptyStateText, { color: COLORS.textSecondary }]}>
-                  No tienes alimentos personalizados
+                <Ionicons name="star" size={48} color={C.textSecondary} />
+                <Text style={[styles.emptyStateText, { color: C.textSecondary }]}>
+                  {t('foodVerification.noCustomFoods')}
                 </Text>
               </View>
             )}
@@ -592,74 +596,74 @@ const FoodVerificationScreen = () => {
       <Modal visible={showDetailModal} transparent animationType="slide">
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={[styles.modalContainer, { backgroundColor: COLORS.surface }]}
+          style={[styles.modalContainer, { backgroundColor: C.surface }]}
         >
           <ScrollView contentContainerStyle={styles.modalContent} showsVerticalScrollIndicator={false}>
             <View style={styles.modalHeader}>
               <TouchableOpacity onPress={() => setShowDetailModal(false)}>
-                <Ionicons name="close" size={28} color={COLORS.text} />
+                <Ionicons name="close" size={28} color={C.text} />
               </TouchableOpacity>
-              <Text style={[styles.modalTitle, { color: COLORS.text }]}>Detalles</Text>
+              <Text style={[styles.modalTitle, { color: C.text }]}>{t('foodVerification.details')}</Text>
               <View style={{ width: 28 }} />
             </View>
 
             {selectedFood && (
               <>
                 <View style={styles.detailCard}>
-                  <Text style={[styles.detailName, { color: COLORS.text }]}>
+                  <Text style={[styles.detailName, { color: C.text }]}>
                     {selectedFood.name}
                   </Text>
-                  <Text style={[styles.detailBrand, { color: COLORS.textSecondary }]}>
+                  <Text style={[styles.detailBrand, { color: C.textSecondary }]}>
                     {selectedFood.brand}
                   </Text>
                 </View>
 
-                <View style={[styles.nutritionGrid, { backgroundColor: COLORS.background }]}>
+                <View style={[styles.nutritionGrid, { backgroundColor: C.background }]}>
                   <View style={styles.gridItem}>
-                    <Text style={[styles.gridLabel, { color: COLORS.textSecondary }]}>
-                      Calorías
+                    <Text style={[styles.gridLabel, { color: C.textSecondary }]}>
+                      {t('onboarding.calories')}
                     </Text>
-                    <Text style={[styles.gridValue, { color: COLORS.primary }]}>
+                    <Text style={[styles.gridValue, { color: C.primary }]}>
                       {selectedFood.nutrition.calories}
                     </Text>
                   </View>
                   <View style={styles.gridItem}>
-                    <Text style={[styles.gridLabel, { color: COLORS.textSecondary }]}>
-                      Proteína
+                    <Text style={[styles.gridLabel, { color: C.textSecondary }]}>
+                      {t('onboarding.protein')}
                     </Text>
-                    <Text style={[styles.gridValue, { color: COLORS.primary }]}>
+                    <Text style={[styles.gridValue, { color: C.primary }]}>
                       {selectedFood.nutrition.protein}g
                     </Text>
                   </View>
                   <View style={styles.gridItem}>
-                    <Text style={[styles.gridLabel, { color: COLORS.textSecondary }]}>
-                      Carbos
+                    <Text style={[styles.gridLabel, { color: C.textSecondary }]}>
+                      {t('onboarding.carbs')}
                     </Text>
-                    <Text style={[styles.gridValue, { color: COLORS.primary }]}>
+                    <Text style={[styles.gridValue, { color: C.primary }]}>
                       {selectedFood.nutrition.carbs}g
                     </Text>
                   </View>
                   <View style={styles.gridItem}>
-                    <Text style={[styles.gridLabel, { color: COLORS.textSecondary }]}>
-                      Grasas
+                    <Text style={[styles.gridLabel, { color: C.textSecondary }]}>
+                      {t('onboarding.fat')}
                     </Text>
-                    <Text style={[styles.gridValue, { color: COLORS.primary }]}>
+                    <Text style={[styles.gridValue, { color: C.primary }]}>
                       {selectedFood.nutrition.fat}g
                     </Text>
                   </View>
                   <View style={styles.gridItem}>
-                    <Text style={[styles.gridLabel, { color: COLORS.textSecondary }]}>
-                      Fibra
+                    <Text style={[styles.gridLabel, { color: C.textSecondary }]}>
+                      {t('onboarding.fiber')}
                     </Text>
-                    <Text style={[styles.gridValue, { color: COLORS.primary }]}>
+                    <Text style={[styles.gridValue, { color: C.primary }]}>
                       {selectedFood.nutrition.fiber}g
                     </Text>
                   </View>
                   <View style={styles.gridItem}>
-                    <Text style={[styles.gridLabel, { color: COLORS.textSecondary }]}>
-                      Porción
+                    <Text style={[styles.gridLabel, { color: C.textSecondary }]}>
+                      {t('foodVerification.portion')}
                     </Text>
-                    <Text style={[styles.gridValue, { color: COLORS.primary }]}>
+                    <Text style={[styles.gridValue, { color: C.primary }]}>
                       {selectedFood.nutrition.servingSize}
                       {selectedFood.nutrition.unit}
                     </Text>
@@ -667,12 +671,12 @@ const FoodVerificationScreen = () => {
                 </View>
 
                 <TouchableOpacity
-                  style={[styles.reportButton, { backgroundColor: COLORS.warning }]}
+                  style={[styles.reportButton, { backgroundColor: C.warning }]}
                   onPress={handleReportPress}
                 >
-                  <Ionicons name="alert-circle" size={20} color={COLORS.surface} />
-                  <Text style={[styles.reportButtonText, { color: COLORS.surface }]}>
-                    ¿Datos incorrectos?
+                  <Ionicons name="alert-circle" size={20} color={C.surface} />
+                  <Text style={[styles.reportButtonText, { color: C.surface }]}>
+                    {t('foodVerification.incorrectData')}
                   </Text>
                 </TouchableOpacity>
               </>
@@ -685,28 +689,28 @@ const FoodVerificationScreen = () => {
       <Modal visible={showReportModal} transparent animationType="slide">
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={[styles.modalContainer, { backgroundColor: COLORS.surface }]}
+          style={[styles.modalContainer, { backgroundColor: C.surface }]}
         >
           <ScrollView contentContainerStyle={styles.modalContent} showsVerticalScrollIndicator={false}>
             <View style={styles.modalHeader}>
               <TouchableOpacity onPress={() => setShowReportModal(false)}>
-                <Ionicons name="close" size={28} color={COLORS.text} />
+                <Ionicons name="close" size={28} color={C.text} />
               </TouchableOpacity>
-              <Text style={[styles.modalTitle, { color: COLORS.text }]}>Reportar Problema</Text>
+              <Text style={[styles.modalTitle, { color: C.text }]}>{t('foodVerification.reportProblem')}</Text>
               <View style={{ width: 28 }} />
             </View>
 
             <View style={styles.formSection}>
-              <Text style={[styles.formLabel, { color: COLORS.text }]}>Tipo de Problema</Text>
+              <Text style={[styles.formLabel, { color: C.text }]}>{t('foodVerification.problemType')}</Text>
               {(['calories', 'macros', 'serving', 'photo', 'other'] as const).map((type) => (
                 <TouchableOpacity
                   key={type}
                   style={[
                     styles.radioItem,
                     {
-                      backgroundColor: COLORS.background,
+                      backgroundColor: C.background,
                       borderColor:
-                        reportData.issueType === type ? COLORS.primary : COLORS.border,
+                        reportData.issueType === type ? C.primary : C.border,
                       borderWidth: reportData.issueType === type ? 2 : 1,
                     },
                   ]}
@@ -719,40 +723,40 @@ const FoodVerificationScreen = () => {
                       styles.radioButton,
                       {
                         backgroundColor:
-                          reportData.issueType === type ? COLORS.primary : 'transparent',
+                          reportData.issueType === type ? C.primary : 'transparent',
                         borderColor:
-                          reportData.issueType === type ? COLORS.primary : COLORS.border,
+                          reportData.issueType === type ? C.primary : C.border,
                       },
                     ]}
                   />
-                  <Text style={[styles.radioLabel, { color: COLORS.text }]}>
+                  <Text style={[styles.radioLabel, { color: C.text }]}>
                     {type === 'calories'
-                      ? 'Calorías incorrectas'
+                      ? t('foodVerification.incorrectCalories')
                       : type === 'macros'
-                        ? 'Macros incorrectos'
+                        ? t('foodVerification.incorrectMacros')
                         : type === 'serving'
-                          ? 'Tamaño de porción incorrecto'
+                          ? t('foodVerification.incorrectServing')
                           : type === 'photo'
-                            ? 'Foto incorrecta'
-                            : 'Otro'}
+                            ? t('foodVerification.incorrectPhoto')
+                            : t('foodVerification.other')}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
             <View style={styles.formSection}>
-              <Text style={[styles.formLabel, { color: COLORS.text }]}>Descripción</Text>
+              <Text style={[styles.formLabel, { color: C.text }]}>{t('foodVerification.description')}</Text>
               <TextInput
                 style={[
                   styles.textArea,
                   {
-                    color: COLORS.text,
-                    borderColor: COLORS.border,
-                    backgroundColor: COLORS.background,
+                    color: C.text,
+                    borderColor: C.border,
+                    backgroundColor: C.background,
                   },
                 ]}
-                placeholder="Cuéntanos qué está mal..."
-                placeholderTextColor={COLORS.textSecondary}
+                placeholder={t('foodVerification.descriptionPlaceholder')}
+                placeholderTextColor={C.textSecondary}
                 multiline
                 numberOfLines={4}
                 value={reportData.description}
@@ -765,18 +769,18 @@ const FoodVerificationScreen = () => {
             <TouchableOpacity
               style={[
                 styles.submitButton,
-                { backgroundColor: COLORS.primary, opacity: loading ? 0.6 : 1 },
+                { backgroundColor: C.primary, opacity: loading ? 0.6 : 1 },
               ]}
               onPress={handleSubmitReport}
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color={COLORS.surface} />
+                <ActivityIndicator color={C.surface} />
               ) : (
                 <>
-                  <Ionicons name="send" size={20} color={COLORS.surface} />
-                  <Text style={[styles.submitButtonText, { color: COLORS.surface }]}>
-                    Enviar Reporte
+                  <Ionicons name="send" size={20} color={C.surface} />
+                  <Text style={[styles.submitButtonText, { color: C.surface }]}>
+                    {t('foodVerification.sendReport')}
                   </Text>
                 </>
               )}
@@ -789,140 +793,140 @@ const FoodVerificationScreen = () => {
       <Modal visible={showCustomFoodModal} transparent animationType="slide">
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={[styles.modalContainer, { backgroundColor: COLORS.surface }]}
+          style={[styles.modalContainer, { backgroundColor: C.surface }]}
         >
           <ScrollView contentContainerStyle={styles.modalContent} showsVerticalScrollIndicator={false}>
             <View style={styles.modalHeader}>
               <TouchableOpacity onPress={() => setShowCustomFoodModal(false)}>
-                <Ionicons name="close" size={28} color={COLORS.text} />
+                <Ionicons name="close" size={28} color={C.text} />
               </TouchableOpacity>
-              <Text style={[styles.modalTitle, { color: COLORS.text }]}>Crear Alimento</Text>
+              <Text style={[styles.modalTitle, { color: C.text }]}>{t('foodVerification.createFood')}</Text>
               <View style={{ width: 28 }} />
             </View>
 
             <View style={styles.formSection}>
-              <Text style={[styles.formLabel, { color: COLORS.text }]}>Nombre *</Text>
+              <Text style={[styles.formLabel, { color: C.text }]}>{t('foodVerification.nameRequired')}</Text>
               <TextInput
                 style={[
                   styles.input,
-                  { color: COLORS.text, borderColor: COLORS.border },
+                  { color: C.text, borderColor: C.border },
                 ]}
-                placeholder="Ej: Mi Smoothie"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholder={t('foodVerification.namePlaceholder')}
+                placeholderTextColor={C.textSecondary}
                 value={customFood.name}
                 onChangeText={(text) => setCustomFood({ ...customFood, name: text })}
               />
             </View>
 
             <View style={styles.formSection}>
-              <Text style={[styles.formLabel, { color: COLORS.text }]}>Marca</Text>
+              <Text style={[styles.formLabel, { color: C.text }]}>{t('foodVerification.brand')}</Text>
               <TextInput
                 style={[
                   styles.input,
-                  { color: COLORS.text, borderColor: COLORS.border },
+                  { color: C.text, borderColor: C.border },
                 ]}
-                placeholder="Ej: Personalizado"
-                placeholderTextColor={COLORS.textSecondary}
+                placeholder={t('foodVerification.brandPlaceholder')}
+                placeholderTextColor={C.textSecondary}
                 value={customFood.brand}
                 onChangeText={(text) => setCustomFood({ ...customFood, brand: text })}
               />
             </View>
 
-            <Text style={[styles.formLabel, { color: COLORS.text, marginTop: 16 }]}>
-              Valores Nutricionales
+            <Text style={[styles.formLabel, { color: C.text, marginTop: 16 }]}>
+              {t('foodVerification.nutritionValues')}
             </Text>
             <View style={styles.gridInputs}>
               <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: COLORS.textSecondary }]}>
-                  Calorías
+                <Text style={[styles.inputLabel, { color: C.textSecondary }]}>
+                  {t('onboarding.calories')}
                 </Text>
                 <TextInput
                   style={[
                     styles.smallInput,
-                    { color: COLORS.text, borderColor: COLORS.border },
+                    { color: C.text, borderColor: C.border },
                   ]}
                   placeholder="0"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={C.textSecondary}
                   keyboardType="number-pad"
                   value={customFood.calories}
                   onChangeText={(text) => setCustomFood({ ...customFood, calories: text })}
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: COLORS.textSecondary }]}>
-                  Proteína (g)
+                <Text style={[styles.inputLabel, { color: C.textSecondary }]}>
+                  {t('onboarding.protein')} (g)
                 </Text>
                 <TextInput
                   style={[
                     styles.smallInput,
-                    { color: COLORS.text, borderColor: COLORS.border },
+                    { color: C.text, borderColor: C.border },
                   ]}
                   placeholder="0"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={C.textSecondary}
                   keyboardType="decimal-pad"
                   value={customFood.protein}
                   onChangeText={(text) => setCustomFood({ ...customFood, protein: text })}
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: COLORS.textSecondary }]}>
-                  Carbos (g)
+                <Text style={[styles.inputLabel, { color: C.textSecondary }]}>
+                  {t('onboarding.carbs')} (g)
                 </Text>
                 <TextInput
                   style={[
                     styles.smallInput,
-                    { color: COLORS.text, borderColor: COLORS.border },
+                    { color: C.text, borderColor: C.border },
                   ]}
                   placeholder="0"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={C.textSecondary}
                   keyboardType="decimal-pad"
                   value={customFood.carbs}
                   onChangeText={(text) => setCustomFood({ ...customFood, carbs: text })}
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: COLORS.textSecondary }]}>
-                  Grasas (g)
+                <Text style={[styles.inputLabel, { color: C.textSecondary }]}>
+                  {t('onboarding.fat')} (g)
                 </Text>
                 <TextInput
                   style={[
                     styles.smallInput,
-                    { color: COLORS.text, borderColor: COLORS.border },
+                    { color: C.text, borderColor: C.border },
                   ]}
                   placeholder="0"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={C.textSecondary}
                   keyboardType="decimal-pad"
                   value={customFood.fat}
                   onChangeText={(text) => setCustomFood({ ...customFood, fat: text })}
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: COLORS.textSecondary }]}>
+                <Text style={[styles.inputLabel, { color: C.textSecondary }]}>
                   Fibra (g)
                 </Text>
                 <TextInput
                   style={[
                     styles.smallInput,
-                    { color: COLORS.text, borderColor: COLORS.border },
+                    { color: C.text, borderColor: C.border },
                   ]}
                   placeholder="0"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={C.textSecondary}
                   keyboardType="decimal-pad"
                   value={customFood.fiber}
                   onChangeText={(text) => setCustomFood({ ...customFood, fiber: text })}
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: COLORS.textSecondary }]}>
+                <Text style={[styles.inputLabel, { color: C.textSecondary }]}>
                   Porción (g)
                 </Text>
                 <TextInput
                   style={[
                     styles.smallInput,
-                    { color: COLORS.text, borderColor: COLORS.border },
+                    { color: C.text, borderColor: C.border },
                   ]}
                   placeholder="100"
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={C.textSecondary}
                   keyboardType="number-pad"
                   value={customFood.servingSize}
                   onChangeText={(text) => setCustomFood({ ...customFood, servingSize: text })}
@@ -933,17 +937,17 @@ const FoodVerificationScreen = () => {
             <TouchableOpacity
               style={[
                 styles.submitButton,
-                { backgroundColor: COLORS.primary, marginTop: 24, opacity: loading ? 0.6 : 1 },
+                { backgroundColor: C.primary, marginTop: 24, opacity: loading ? 0.6 : 1 },
               ]}
               onPress={handleAddCustomFood}
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color={COLORS.surface} />
+                <ActivityIndicator color={C.surface} />
               ) : (
                 <>
-                  <Ionicons name="save" size={20} color={COLORS.surface} />
-                  <Text style={[styles.submitButtonText, { color: COLORS.surface }]}>
+                  <Ionicons name="save" size={20} color={C.surface} />
+                  <Text style={[styles.submitButtonText, { color: C.surface }]}>
                     Crear Alimento
                   </Text>
                 </>
@@ -956,10 +960,11 @@ const FoodVerificationScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+function createStyles(C: any) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+    },
   scrollContent: {
     paddingHorizontal: 16,
     paddingBottom: 24,
@@ -1015,7 +1020,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
+    borderColor: C.border,
   },
   foodCardHeader: {
     marginBottom: 12,
@@ -1177,7 +1182,7 @@ const styles = StyleSheet.create({
   detailCard: {
     paddingVertical: 20,
     borderBottomWidth: 1,
-    borderColor: '#E5E5EA',
+    borderColor: C.border,
     marginBottom: 20,
   },
   detailName: {
@@ -1286,10 +1291,11 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 24,
   },
-  submitButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+    submitButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
+}
 
 export default FoodVerificationScreen;

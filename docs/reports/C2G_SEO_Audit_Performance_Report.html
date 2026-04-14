@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cals2Gains — SEO Audit & Performance Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --violet: #9C8CFF;
+            --coral: #FF6A4D;
+            --plum: #17121D;
+            --bone: #F7F2EA;
+            --deep: #0D0B1A;
+            --card: #1E1829;
+            --border: #2A2236;
+            --green: #4ADE80;
+            --red: #F87171;
+            --yellow: #FBBF24;
+            --muted: #6B6278;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--deep); color: var(--bone); line-height: 1.7; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+        h1 { font-family: 'Outfit', sans-serif; font-size: 2rem; color: var(--violet); margin-bottom: 0.5rem; }
+        h1 span { color: var(--coral); }
+        h2 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; color: var(--violet); margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+        h3 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; color: var(--bone); margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; color: #c4bdd0; }
+        .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        .badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .badge-critical { background: rgba(248,113,113,0.2); color: var(--red); }
+        .badge-high { background: rgba(251,191,36,0.2); color: var(--yellow); }
+        .badge-medium { background: rgba(156,140,255,0.2); color: var(--violet); }
+        .badge-low { background: rgba(107,98,120,0.2); color: var(--muted); }
+        .badge-pass { background: rgba(74,222,128,0.2); color: var(--green); }
+        .badge-fail { background: rgba(248,113,113,0.2); color: var(--red); }
+        .badge-warn { background: rgba(251,191,36,0.2); color: var(--yellow); }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .score-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .score-card { text-align: center; padding: 1.5rem; }
+        .score-card .score { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 800; }
+        .score-card .label { font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem; }
+        .score-low { color: var(--red); }
+        .score-mid { color: var(--yellow); }
+        .score-high { color: var(--green); }
+
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th { text-align: left; padding: 0.75rem; background: rgba(156,140,255,0.1); color: var(--violet); font-weight: 600; border-bottom: 2px solid var(--border); }
+        td { padding: 0.75rem; border-bottom: 1px solid var(--border); color: #c4bdd0; }
+        tr:hover td { background: rgba(156,140,255,0.05); }
+
+        .exec-summary { background: linear-gradient(135deg, var(--plum), #241C30); border-left: 4px solid var(--coral); padding: 1.5rem 1.5rem 1.5rem 2rem; border-radius: 0 12px 12px 0; margin-bottom: 2rem; }
+        .exec-summary p { color: var(--bone); margin-bottom: 0.75rem; }
+        .exec-summary strong { color: var(--coral); }
+
+        .action-item { padding: 1rem 1.5rem; border-left: 3px solid var(--violet); background: rgba(156,140,255,0.05); border-radius: 0 8px 8px 0; margin-bottom: 0.75rem; }
+        .action-item.urgent { border-left-color: var(--coral); background: rgba(255,106,77,0.05); }
+        .action-item .title { font-weight: 600; color: var(--bone); margin-bottom: 0.25rem; }
+        .action-item .detail { font-size: 0.85rem; color: var(--muted); }
+
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .kpi { text-align: center; padding: 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 8px; }
+        .kpi .value { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--violet); }
+        .kpi .label { font-size: 0.75rem; color: var(--muted); }
+
+        .section-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; position: sticky; top: 0; background: var(--deep); padding: 1rem 0; z-index: 10; }
+        .section-nav a { padding: 0.4rem 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 20px; color: var(--bone); font-size: 0.8rem; text-decoration: none; transition: all 0.2s; }
+        .section-nav a:hover { background: var(--violet); color: var(--plum); }
+
+        @media print { body { background: white; color: #333; } .card { border: 1px solid #ddd; } h1, h2, h3 { color: #333; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Cals<span>2</span>Gains</h1>
+    <h1 style="font-size:1.3rem; color: var(--bone); margin-bottom: 0.25rem;">SEO Audit & Marketing Performance Report</h1>
+    <p class="subtitle">Fecha: 11 de abril de 2026 &bull; Dominio: cals2gains.com &bull; Fase: Pre-Lanzamiento</p>
+
+    <div class="section-nav">
+        <a href="#exec">Resumen Ejecutivo</a>
+        <a href="#scores">Puntuaciones</a>
+        <a href="#technical">SEO Tecnico</a>
+        <a href="#onpage">On-Page</a>
+        <a href="#keywords">Keywords</a>
+        <a href="#content">Content Gap</a>
+        <a href="#competitors">Competencia</a>
+        <a href="#marketing">Marketing</a>
+        <a href="#actions">Plan de Accion</a>
+    </div>
+
+    <!-- ============ EXECUTIVE SUMMARY ============ -->
+    <div id="exec" class="exec-summary">
+        <p><strong>Estado general: La landing page tiene una base tecnica solida pero el sitio NO esta indexado en Google.</strong> Esto es el hallazgo mas critico: una busqueda <code>site:cals2gains.com</code> devuelve cero resultados. La causa principal es la ausencia de <code>robots.txt</code> y <code>sitemap.xml</code>, combinada con el reciente cambio de DNS a Firebase Hosting (SSL en proceso de aprovisionamiento).</p>
+        <p>Los puntos fuertes son: schema markup de MobileApplication ya implementado, etiquetas Open Graph presentes, Google Analytics 4 configurado, y una landing page bilingue ES/EN con buen diseno.</p>
+        <p>Las 3 prioridades inmediatas son: <strong>1)</strong> Crear robots.txt + sitemap.xml y enviar a Google Search Console, <strong>2)</strong> Anadir etiquetas hreflang para las versiones ES/EN, <strong>3)</strong> Expandir el schema markup con FAQ, Organization y SoftwareApplication.</p>
+    </div>
+
+    <!-- ============ SCORES ============ -->
+    <div id="scores" class="score-cards">
+        <div class="card score-card">
+            <div class="score score-low">25</div>
+            <div class="label">SEO General<br>(de 100)</div>
+        </div>
+        <div class="card score-card">
+            <div class="score score-mid">55</div>
+            <div class="label">On-Page SEO<br>(de 100)</div>
+        </div>
+        <div class="card score-card">
+            <div class="score score-low">15</div>
+            <div class="label">SEO Tecnico<br>(de 100)</div>
+        </div>
+        <div class="card score-card">
+            <div class="score score-mid">60</div>
+            <div class="label">Contenido<br>(de 100)</div>
+        </div>
+    </div>
+
+    <!-- ============ TECHNICAL SEO ============ -->
+    <h2 id="technical">Auditoria SEO Tecnica</h2>
+
+    <div class="card">
+        <table>
+            <thead><tr><th>Verificacion</th><th>Estado</th><th>Detalles</th></tr></thead>
+            <tbody>
+                <tr><td>Indexacion en Google</td><td><span class="badge badge-fail">FALLA</span></td><td><code>site:cals2gains.com</code> devuelve 0 resultados. El sitio es completamente invisible para Google.</td></tr>
+                <tr><td>robots.txt</td><td><span class="badge badge-fail">FALLA</span></td><td>No existe. Sin este archivo, los bots no reciben directivas de rastreo.</td></tr>
+                <tr><td>sitemap.xml</td><td><span class="badge badge-fail">FALLA</span></td><td>No existe. Sin sitemap, Google no puede descubrir eficientemente las paginas.</td></tr>
+                <tr><td>Google Search Console</td><td><span class="badge badge-fail">FALLA</span></td><td>No hay evidencia de verificacion en Search Console. Imprescindible para solicitar indexacion.</td></tr>
+                <tr><td>Certificado SSL (HTTPS)</td><td><span class="badge badge-warn">EN PROCESO</span></td><td>DNS apunta a Firebase (199.36.158.100). SSL en aprovisionamiento tras cambio de DNS hoy.</td></tr>
+                <tr><td>Canonical tag</td><td><span class="badge badge-pass">OK</span></td><td><code>&lt;link rel="canonical" href="https://cals2gains.com"&gt;</code></td></tr>
+                <tr><td>Schema / Structured Data</td><td><span class="badge badge-pass">OK</span></td><td>MobileApplication schema presente con nombre, descripcion, categoria y precio.</td></tr>
+                <tr><td>Google Analytics</td><td><span class="badge badge-pass">OK</span></td><td>GA4 (G-97MNMCDEG2) configurado correctamente en el HTML.</td></tr>
+                <tr><td>Viewport meta</td><td><span class="badge badge-pass">OK</span></td><td><code>width=device-width, initial-scale=1.0</code></td></tr>
+                <tr><td>Etiquetas hreflang</td><td><span class="badge badge-fail">FALLA</span></td><td>La pagina es bilingue (ES/EN via JS) pero no tiene etiquetas hreflang para indicar idiomas a Google.</td></tr>
+                <tr><td>Open Graph</td><td><span class="badge badge-warn">PARCIAL</span></td><td>og:title, og:description, og:image, og:type presentes. Falta og:url y og:locale.</td></tr>
+                <tr><td>Compresion de imagenes</td><td><span class="badge badge-warn">REVISAR</span></td><td>Solo logo.png referenciado. Verificar tamano y si se usan formatos WebP/AVIF.</td></tr>
+                <tr><td>Enlaces rotos</td><td><span class="badge badge-warn">REVISAR</span></td><td>Verificar que los enlaces de App Store/Google Play llevan a paginas existentes o placeholder.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ============ ON-PAGE SEO ============ -->
+    <h2 id="onpage">Auditoria On-Page</h2>
+
+    <div class="card">
+        <h3>Title Tag</h3>
+        <p><code>Cals2Gains — La unica app de nutricion con IA real</code></p>
+        <p>Longitud: ~52 caracteres. <span class="badge badge-pass">OK</span> Incluye marca + keyword. Sugerencia: anadir "calorie counter" o "macro tracker" para el mercado EN.</p>
+
+        <h3>Meta Description</h3>
+        <p><code>Cals2Gains — La app de nutricion con IA real. Escanea tu plato, recibe coaching semanal personalizado y deja que la app ajuste tus macros por ti.</code></p>
+        <p>Longitud: ~148 caracteres. <span class="badge badge-pass">OK</span> Descriptiva y con CTA implicito. Sugerencia: anadir "Gratis" o "Sin publicidad" para mejorar CTR.</p>
+
+        <h3>H1 Tag</h3>
+        <p><code>Sacale una foto a tu plato.</code></p>
+        <p><span class="badge badge-warn">MEJORABLE</span> El H1 es creativo pero no contiene keywords SEO. Google prioriza keywords en H1. Sugerencia: <code>"Contador de calorias con IA — Sacale una foto a tu plato"</code></p>
+
+        <h3>Estructura de Headings</h3>
+        <table>
+            <thead><tr><th>Tag</th><th>Contenido (ES)</th><th>Estado</th></tr></thead>
+            <tbody>
+                <tr><td>H1</td><td>Sacale una foto a tu plato.</td><td><span class="badge badge-warn">Sin keywords</span></td></tr>
+                <tr><td>H2s</td><td>No se detectan H2 explicitos en el HTML analizado</td><td><span class="badge badge-fail">FALTA</span></td></tr>
+                <tr><td>H3s</td><td>No se detectan H3 explicitos</td><td><span class="badge badge-fail">FALTA</span></td></tr>
+            </tbody>
+        </table>
+        <p><span class="badge badge-critical">CRITICO</span> La landing page usa clases CSS para estilizar texto como headings, pero no usa tags H2/H3 semanticos. Google no puede leer la estructura del contenido correctamente.</p>
+
+        <h3>Alt Text de Imagenes</h3>
+        <p>Solo 2 imagenes con alt text, ambas con <code>alt="Cals2Gains"</code>. <span class="badge badge-high">MEJORABLE</span> Los alt texts deben ser descriptivos: "App de nutricion Cals2Gains mostrando analisis de comida con IA".</p>
+
+        <h3>Internal Linking</h3>
+        <p>La landing es una single-page con anchor links (#why, #how, #features, #comparison, #pricing). <span class="badge badge-warn">LIMITADO</span> No hay enlaces a paginas separadas (blog, about, FAQ) que podrian generar mas oportunidades de ranking.</p>
+    </div>
+
+    <!-- ============ KEYWORDS ============ -->
+    <h2 id="keywords">Oportunidades de Keywords</h2>
+
+    <div class="card">
+        <p>Basado en el analisis del mercado de apps de nutricion en 2026, estas son las keywords objetivo ordenadas por oportunidad:</p>
+        <table>
+            <thead><tr><th>Keyword</th><th>Dificultad</th><th>Oportunidad</th><th>Intent</th><th>Contenido Recomendado</th></tr></thead>
+            <tbody>
+                <tr><td>AI calorie counter app</td><td><span class="badge badge-high">Media</span></td><td><span class="badge badge-pass">Alta</span></td><td>Transactional</td><td>Landing page + ASO</td></tr>
+                <tr><td>contador de calorias con IA</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Transactional</td><td>Landing page ES</td></tr>
+                <tr><td>app para contar macros</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Transactional</td><td>Landing page ES</td></tr>
+                <tr><td>best macro tracking app 2026</td><td><span class="badge badge-high">Alta</span></td><td><span class="badge badge-high">Media</span></td><td>Commercial</td><td>Blog post comparativa</td></tr>
+                <tr><td>food photo calorie counter</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Transactional</td><td>Feature page + ASO</td></tr>
+                <tr><td>how to track macros</td><td><span class="badge badge-medium">Media</span></td><td><span class="badge badge-high">Media</span></td><td>Informational</td><td>Blog post / guia</td></tr>
+                <tr><td>MyFitnessPal alternative 2026</td><td><span class="badge badge-high">Media</span></td><td><span class="badge badge-pass">Alta</span></td><td>Commercial</td><td>Blog post comparativa</td></tr>
+                <tr><td>alternativa a MyFitnessPal</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Commercial</td><td>Blog post ES</td></tr>
+                <tr><td>nutrition app without ads</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Commercial</td><td>Landing + Blog</td></tr>
+                <tr><td>app nutricion sin publicidad</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Commercial</td><td>Landing + Blog</td></tr>
+                <tr><td>AI food scanner app</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Transactional</td><td>Feature page</td></tr>
+                <tr><td>app escanear comida calorias</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Transactional</td><td>Feature page ES</td></tr>
+                <tr><td>macro coaching app</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-high">Media</span></td><td>Commercial</td><td>Feature page</td></tr>
+                <tr><td>calorie counter dark mode</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-high">Media</span></td><td>Commercial</td><td>Blog post</td></tr>
+                <tr><td>como contar calorias facilmente</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-high">Media</span></td><td>Informational</td><td>Blog post ES</td></tr>
+                <tr><td>voice food logging app</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Transactional</td><td>Feature page</td></tr>
+                <tr><td>registrar comida por voz</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Transactional</td><td>Feature page ES</td></tr>
+                <tr><td>wearable nutrition tracking</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-high">Media</span></td><td>Informational</td><td>Blog post</td></tr>
+                <tr><td>calorie tracker comparison 2026</td><td><span class="badge badge-high">Alta</span></td><td><span class="badge badge-high">Media</span></td><td>Commercial</td><td>Blog post EN</td></tr>
+                <tr><td>GPT food analysis app</td><td><span class="badge badge-medium">Baja</span></td><td><span class="badge badge-pass">Alta</span></td><td>Transactional</td><td>Landing + Blog</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ============ CONTENT GAP ============ -->
+    <h2 id="content">Content Gap Analysis</h2>
+
+    <div class="card">
+        <p>El sitio actual tiene UNA sola pagina (landing). Los competidores tienen decenas o cientos de paginas indexadas. Estos son los gaps mas importantes:</p>
+        <table>
+            <thead><tr><th>Contenido que Falta</th><th>Por que Importa</th><th>Formato</th><th>Prioridad</th><th>Esfuerzo</th></tr></thead>
+            <tbody>
+                <tr><td>Blog de nutricion</td><td>Los competidores capturan trafico informacional masivo. MacroFactor tiene 50+ articulos indexados.</td><td>Blog (CMS o HTML)</td><td><span class="badge badge-fail">Alta</span></td><td>Medio (ongoing)</td></tr>
+                <tr><td>Pagina "Cals2Gains vs MyFitnessPal"</td><td>"MyFitnessPal alternative" tiene alto volumen de busqueda. Es trafico con alta intencion de cambio.</td><td>Landing comparativa</td><td><span class="badge badge-fail">Alta</span></td><td>Rapido (2-3h)</td></tr>
+                <tr><td>Pagina de FAQ</td><td>FAQ schema genera rich snippets en Google. Resuelve dudas de usuarios indecisos.</td><td>Pagina HTML + FAQ Schema</td><td><span class="badge badge-fail">Alta</span></td><td>Rapido (1-2h)</td></tr>
+                <tr><td>Paginas de features individuales</td><td>"AI food scanner", "voice food logging", "macro coaching" — cada feature merece su pagina para SEO.</td><td>Paginas HTML</td><td><span class="badge badge-warn">Media</span></td><td>Medio (1 dia)</td></tr>
+                <tr><td>Guia "Como contar macros"</td><td>Contenido educativo captura top-of-funnel. Alto volumen, baja competencia en ES.</td><td>Blog post largo</td><td><span class="badge badge-warn">Media</span></td><td>Medio (3-4h)</td></tr>
+                <tr><td>Pagina "Precios"</td><td>Los buscadores quieren transparencia de precios. Genera confianza.</td><td>Landing</td><td><span class="badge badge-warn">Media</span></td><td>Rapido (1h)</td></tr>
+                <tr><td>Pagina "Sobre Nosotros"</td><td>E-E-A-T (Experience, Expertise, Authority, Trust) de Google valora la transparencia.</td><td>Landing</td><td><span class="badge badge-medium">Baja</span></td><td>Rapido (1h)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ============ COMPETITORS ============ -->
+    <h2 id="competitors">Comparativa con Competidores</h2>
+
+    <div class="card">
+        <table>
+            <thead><tr><th>Dimension</th><th>Cals2Gains</th><th>Cal AI</th><th>MacroFactor</th><th>MyFitnessPal</th><th>Yazio</th></tr></thead>
+            <tbody>
+                <tr><td>Paginas indexadas</td><td style="color:var(--red)">0</td><td>~50+</td><td>~100+</td><td>~10.000+</td><td>~5.000+</td></tr>
+                <tr><td>Blog activo</td><td style="color:var(--red)">No</td><td>Si</td><td>Si (extenso)</td><td>Si</td><td>Si</td></tr>
+                <tr><td>Schema markup</td><td style="color:var(--green)">Si (App)</td><td>Si</td><td>Si</td><td>Si (multiples)</td><td>Si</td></tr>
+                <tr><td>IA foto comida</td><td style="color:var(--green)">GPT-4o Vision</td><td style="color:var(--green)">Si</td><td>No</td><td>Limitado</td><td>Limitado</td></tr>
+                <tr><td>Coaching IA</td><td style="color:var(--green)">Si (semanal)</td><td>No</td><td>Algoritmo adaptativo</td><td>No</td><td>No</td></tr>
+                <tr><td>Sin publicidad</td><td style="color:var(--green)">Si (todas)</td><td>Si (premium)</td><td>Si</td><td style="color:var(--red)">No (gratis con ads)</td><td style="color:var(--red)">No (gratis con ads)</td></tr>
+                <tr><td>Mercado ES</td><td style="color:var(--green)">Nativo bilingue</td><td>Solo EN</td><td>Solo EN</td><td>Multi-idioma</td><td style="color:var(--green)">Fuerte en EU</td></tr>
+                <tr><td>Redes sociales</td><td>14 seguidores</td><td>1M+ downloads</td><td>~50K+ social</td><td>Millones</td><td>Millones</td></tr>
+                <tr><td>Puntuacion app</td><td>N/A (pre-launch)</td><td>4.7 stars</td><td>4.8 stars</td><td>4.4 stars</td><td>4.5 stars</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:1rem">El nicho clave de Cals2Gains es: <strong>IA de vision real (GPT-4o) + coaching semanal + sin ads + bilingue ES/EN + tema oscuro premium</strong>. Ningun competidor combina todo esto. El mercado hispanohablante es especialmente desatendido por Cal AI y MacroFactor.</p>
+    </div>
+
+    <!-- ============ MARKETING PERFORMANCE ============ -->
+    <h2 id="marketing">Rendimiento Marketing Actual</h2>
+
+    <div class="kpi-row">
+        <div class="kpi"><div class="value">14</div><div class="label">North Star<br>(Seguidores totales)</div></div>
+        <div class="kpi"><div class="value">6</div><div class="label">@cals2gains<br>(EN)</div></div>
+        <div class="kpi"><div class="value">8</div><div class="label">@cals2gains_es<br>(ES)</div></div>
+        <div class="kpi"><div class="value">2</div><div class="label">Posts<br>publicados</div></div>
+        <div class="kpi"><div class="value">3</div><div class="label">Alcance<br>total</div></div>
+        <div class="kpi"><div class="value">0</div><div class="label">Visitas<br>landing (GA4)</div></div>
+    </div>
+
+    <div class="card">
+        <h3>Estado de Canales</h3>
+        <table>
+            <thead><tr><th>Canal</th><th>Estado</th><th>Metricas</th><th>Siguiente Paso</th></tr></thead>
+            <tbody>
+                <tr><td>Instagram @cals2gains (EN)</td><td><span class="badge badge-warn">Inicio</span></td><td>6 followers, 1 post, 3 reach</td><td>Publicar 4 Reels mas esta semana</td></tr>
+                <tr><td>Instagram @cals2gains_es (ES)</td><td><span class="badge badge-warn">Inicio</span></td><td>8 followers, 1 post, 0 reach</td><td>Publicar 4 Reels mas esta semana</td></tr>
+                <tr><td>Landing page (SEO)</td><td><span class="badge badge-fail">No indexada</span></td><td>0 visitas organicas</td><td>Robots.txt + Sitemap + Search Console</td></tr>
+                <tr><td>Google Analytics 4</td><td><span class="badge badge-pass">Configurado</span></td><td>Esperando SSL para empezar a medir</td><td>Verificar tracking post-SSL</td></tr>
+                <tr><td>Email marketing</td><td><span class="badge badge-fail">No iniciado</span></td><td>N/A</td><td>Crear formulario waitlist en landing</td></tr>
+                <tr><td>Estrategia comentarios</td><td><span class="badge badge-fail">No iniciado</span></td><td>0 comentarios/dia</td><td>Comenzar rutina de 30 comentarios/dia</td></tr>
+                <tr><td>App Store (ASO)</td><td><span class="badge badge-medium">Pre-launch</span></td><td>App en desarrollo</td><td>Preparar fichas con screenshots reales</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Contenido Publicado</h3>
+        <table>
+            <thead><tr><th>Fecha</th><th>Cuenta</th><th>Tipo</th><th>Tema</th><th>Reach</th><th>Likes</th><th>Comments</th><th>Saves</th></tr></thead>
+            <tbody>
+                <tr><td>09/04/2026</td><td>@cals2gains</td><td>Post (foto)</td><td>Still logging your food manually?</td><td>3</td><td>5</td><td>1</td><td>1</td></tr>
+                <tr><td>09/04/2026</td><td>@cals2gains_es</td><td>Post (foto)</td><td>Sigues buscando alimentos a mano?</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:1rem; color: var(--muted);">Con solo 2 posts publicados, el engagement rate no es representativo. El algoritmo de Instagram necesita minimo 3-5 publicaciones por semana durante las primeras 4 semanas para empezar a distribuir contenido.</p>
+    </div>
+
+    <!-- ============ ACTION PLAN ============ -->
+    <h2 id="actions">Plan de Accion Priorizado</h2>
+
+    <h3 style="color: var(--coral);">Acciones Urgentes (esta semana)</h3>
+
+    <div class="action-item urgent">
+        <div class="title">1. Crear robots.txt y sitemap.xml</div>
+        <div class="detail">Impacto: Critico &bull; Esfuerzo: 15 min &bull; Sin estos archivos, Google no puede indexar el sitio.</div>
+    </div>
+    <div class="action-item urgent">
+        <div class="title">2. Verificar en Google Search Console y enviar sitemap</div>
+        <div class="detail">Impacto: Critico &bull; Esfuerzo: 30 min &bull; Usar metodo de verificacion por DNS TXT o archivo HTML.</div>
+    </div>
+    <div class="action-item urgent">
+        <div class="title">3. Verificar SSL y GA4 en cals2gains.com</div>
+        <div class="detail">Impacto: Alto &bull; Esfuerzo: 10 min &bull; Esperar a que Firebase complete el aprovisionamiento SSL, luego confirmar.</div>
+    </div>
+    <div class="action-item urgent">
+        <div class="title">4. Anadir etiquetas hreflang (ES/EN)</div>
+        <div class="detail">Impacto: Alto &bull; Esfuerzo: 20 min &bull; Indicar a Google que la pagina tiene dos versiones de idioma.</div>
+    </div>
+    <div class="action-item urgent">
+        <div class="title">5. Publicar 4 Reels mas por cuenta (EN + ES)</div>
+        <div class="detail">Impacto: Alto &bull; Esfuerzo: 4-6h &bull; Alcanzar los 5 Reels iniciales del plan de contenido.</div>
+    </div>
+
+    <h3 style="color: var(--violet); margin-top: 2rem;">Acciones Estrategicas (este mes)</h3>
+
+    <div class="action-item">
+        <div class="title">6. Crear pagina FAQ con FAQ Schema</div>
+        <div class="detail">Impacto: Alto &bull; Esfuerzo: 2h &bull; Genera rich snippets en Google. Incluir 10-15 preguntas frecuentes sobre la app.</div>
+    </div>
+    <div class="action-item">
+        <div class="title">7. Crear landing "Cals2Gains vs MyFitnessPal"</div>
+        <div class="detail">Impacto: Alto &bull; Esfuerzo: 3h &bull; Captura trafico de usuarios insatisfechos. Keywords: "MyFitnessPal alternative", "alternativa a MyFitnessPal".</div>
+    </div>
+    <div class="action-item">
+        <div class="title">8. Anadir H2/H3 semanticos a la landing</div>
+        <div class="detail">Impacto: Medio &bull; Esfuerzo: 30 min &bull; Reemplazar divs estilizados por H2/H3 reales con keywords en las secciones.</div>
+    </div>
+    <div class="action-item">
+        <div class="title">9. Expandir schema markup (Organization + FAQ + SoftwareApplication)</div>
+        <div class="detail">Impacto: Medio &bull; Esfuerzo: 1h &bull; Las paginas con structured data obtienen ~30% mas clics.</div>
+    </div>
+    <div class="action-item">
+        <div class="title">10. Mejorar alt texts de imagenes</div>
+        <div class="detail">Impacto: Medio &bull; Esfuerzo: 15 min &bull; Cambiar "Cals2Gains" generico por descripciones con keywords.</div>
+    </div>
+    <div class="action-item">
+        <div class="title">11. Anadir og:url y og:locale a Open Graph</div>
+        <div class="detail">Impacto: Bajo &bull; Esfuerzo: 5 min &bull; Completa la metadata para compartir en redes sociales.</div>
+    </div>
+    <div class="action-item">
+        <div class="title">12. Iniciar blog (minimo 1 post/semana)</div>
+        <div class="detail">Impacto: Alto (largo plazo) &bull; Esfuerzo: Ongoing &bull; Primer post sugerido: "Como contar macros facilmente con IA".</div>
+    </div>
+    <div class="action-item">
+        <div class="title">13. Iniciar estrategia de comentarios en influencers</div>
+        <div class="detail">Impacto: Medio &bull; Esfuerzo: 30 min/dia &bull; 30 comentarios/dia/perfil en posts de fitness/nutricion.</div>
+    </div>
+    <div class="action-item">
+        <div class="title">14. Preparar formulario de waitlist/email capture</div>
+        <div class="detail">Impacto: Alto &bull; Esfuerzo: 2h &bull; Capturar emails de visitantes interesados antes del lanzamiento.</div>
+    </div>
+
+    <h3 style="color: var(--muted); margin-top: 2rem;">Acciones Post-Lanzamiento (Q3 2026)</h3>
+
+    <div class="action-item">
+        <div class="title">15. ASO: Optimizar fichas de App Store y Google Play</div>
+        <div class="detail">Keywords en titulo, subtitulo, descripcion. Screenshots con dark mode + light mode alternados.</div>
+    </div>
+    <div class="action-item">
+        <div class="title">16. Solicitar resenas de apps a bloggers de fitness</div>
+        <div class="detail">Generar backlinks de calidad desde sitios de fitness y nutricion.</div>
+    </div>
+    <div class="action-item">
+        <div class="title">17. Crear contenido comparativo por cada competidor</div>
+        <div class="detail">Paginas individuales: vs Cal AI, vs Yazio, vs Cronometer, vs Lose It!</div>
+    </div>
+
+    <div style="margin-top: 3rem; padding: 1rem; text-align: center; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border);">
+        Generado automaticamente por el sistema de control de crecimiento de Cals2Gains &bull; 11 abril 2026
+    </div>
+
+</div>
+</body>
+</html>

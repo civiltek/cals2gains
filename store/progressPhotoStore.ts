@@ -26,6 +26,7 @@ interface ProgressPhotoState {
 
   // Computed
   getByAngle: (angle: PhotoAngle) => ProgressPhoto[];
+  getPhotosByAngle: (angle: PhotoAngle) => ProgressPhoto[];
   getByDateRange: (start: Date, end: Date) => ProgressPhoto[];
   getComparison: (angle: PhotoAngle) => ProgressPhotoComparison;
 }
@@ -85,6 +86,11 @@ export const useProgressPhotoStore = create<ProgressPhotoState>((set, get) => ({
   },
 
   getByAngle: (angle: PhotoAngle) => {
+    const { photos } = get();
+    return photos.filter((p) => p.angle === angle);
+  },
+
+  getPhotosByAngle: (angle: PhotoAngle) => {
     const { photos } = get();
     return photos.filter((p) => p.angle === angle);
   },

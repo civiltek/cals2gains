@@ -10,8 +10,10 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import {
@@ -22,15 +24,21 @@ import {
   isToday,
 } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
-import Colors from '../../constants/colors';
+import { useColors, useThemeStore } from '../../store/themeStore';
 import MealCard from '../../components/ui/MealCard';
 import { useUserStore } from '../../store/userStore';
 import { useMealStore } from '../../store/mealStore';
 import { Meal } from '../../types';
 
+// Brand logo assets
+const LOGO_MARK = require('../../brand-assets/C2G-Mark-512.png');
+
 export default function HistoryScreen() {
   const { t, i18n } = useTranslation();
+  const C = useColors();
+  const isDark = useThemeStore(s => s.isDark);
   const { user } = useUserStore();
+  const nutritionMode = useUserStore((s) => s.user?.nutritionMode || 'simple');
   const { recentMeals, loadRecentMeals, removeMeal } = useMealStore();
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -60,7 +68,14 @@ export default function HistoryScreen() {
 
   const selectedDateKey = format(selectedDate, 'yyyy-MM-dd');
   const selectedMeals = groupedMeals[selectedDateKey] || [];
-  const totalCalories = selectedMeals.reduce((s, m) => s + m.nutrition.calories, 0);
+  const totalCalories = selectedMeals.reduce((s, m) => s + (m.nutrition?.calories ?? m.calories ?? 0), 0);
+
+  const handleEditMeal = (meal: any) => {
+    router.push({
+      pathname: '/edit-meal',
+      params: { mealJson: JSON.stringify(meal) },
+    });
+  };
 
   const handleDeleteMeal = async (mealId: string) => {
     try {
@@ -71,10 +86,27 @@ export default function HistoryScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.background }]} edges={['top']}>
+      {/* Brand Header */}
+      <View style={styles.brandHeader}>
+        <View style={styles.brandRow}>
+          <Image source={LOGO_MARK} style={styles.brandLogo} resizeMode="contain" />
+          <View style={styles.brandWordmark}>
+            <Text style={[styles.brandName, { color: C.text }]}>
+              <Text style={{ color: C.violet }}>Cals</Text>
+              <Text style={{ color: C.coral, fontSize: 15, fontFamily: 'Outfit-Bold' }}>2</Text>
+              <Text style={{ color: C.violet }}>Gains</Text>
+            </Text>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.notificationBtn} onPress={() => router.push('/paywall')}>
+          <Ionicons name="notifications-outline" size={22} color={C.textSecondary} />
+        </TouchableOpacity>
+      </View>
+
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>{t('history.title')}</Text>
+        <Text style={[styles.title, { color: C.text }]}>{t('history.title')}</Text>
       </View>
 
       {/* Date picker */}
@@ -87,17 +119,23 @@ export default function HistoryScreen() {
           return (
             <TouchableOpacity
               key={dateKey}
-              style={[styles.dateButton, isSelected && styles.dateButtonSelected]}
+              style={[
+                styles.dateButton,
+                {
+                  backgroundColor: isSelected ? C.primary : C.surface,
+                  borderColor: isSelected ? C.primary : C.border,
+                },
+              ]}
               onPress={() => setSelectedDate(date)}
             >
-              <Text style={[styles.dateDayLabel, isSelected && styles.dateLabelSelected]}>
+              <Text style={[styles.dateDayLabel, { color: isSelected ? C.white : C.textMuted }]}>
                 {format(date, 'EEE', { locale }).substring(0, 3)}
               </Text>
-              <Text style={[styles.dateDayNumber, isSelected && styles.dateLabelSelected]}>
+              <Text style={[styles.dateDayNumber, { color: isSelected ? C.white : C.text }]}>
                 {format(date, 'd')}
               </Text>
               {hasMeals && (
-                <View style={[styles.hasMealsDot, isSelected && styles.hasMealsDotSelected]} />
+                <View style={[styles.hasMealsDot, { backgroundColor: isSelected ? C.white : C.accent }]} />
               )}
             </TouchableOpacity>
           );
@@ -105,20 +143,20 @@ export default function HistoryScreen() {
       </View>
 
       {/* Selected day summary */}
-      <View style={styles.daySummary}>
+      <View style={[styles.daySummary, { backgroundColor: C.surface, borderColor: C.border }]}>
         <View>
-          <Text style={styles.daySummaryDate}>
+          <Text style={[styles.daySummaryDate, { color: C.text }]}>
             {formatDateLabel(selectedDate)} · {format(selectedDate, 'MMMM d', { locale })}
           </Text>
-          <Text style={styles.daySummaryMeals}>
+          <Text style={[styles.daySummaryMeals, { color: C.textSecondary }]}>
             {selectedMeals.length} {selectedMeals.length === 1 ? t('history.meal') : t('history.meals')}
           </Text>
         </View>
         <View style={styles.daySummaryCalories}>
-          <Text style={styles.daySummaryCaloriesValue}>
+          <Text style={[styles.daySummaryCaloriesValue, { color: C.primary }]}>
             {Math.round(totalCalories)}
           </Text>
-          <Text style={styles.daySummaryCaloriesUnit}>kcal</Text>
+          <Text style={[styles.daySummaryCaloriesUnit, { color: C.textSecondary }]}>kcal</Text>
         </View>
       </View>
 
@@ -131,13 +169,15 @@ export default function HistoryScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🍽️</Text>
-            <Text style={styles.emptyText}>{t('history.noMeals')}</Text>
+            <Text style={[styles.emptyText, { color: C.textSecondary }]}>{t('history.noMeals')}</Text>
           </View>
         }
         renderItem={({ item }) => (
           <MealCard
             meal={item}
             onDelete={handleDeleteMeal}
+            onEdit={handleEditMeal}
+            nutritionMode={nutritionMode}
           />
         )}
       />
@@ -148,17 +188,50 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+  },
+  brandHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 4,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  brandLogo: {
+    width: 32,
+    height: 32,
+  },
+  brandWordmark: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  brandName: {
+    fontSize: 20,
+    fontWeight: '800',
+    fontFamily: 'Outfit-Bold',
+    letterSpacing: -0.3,
+  },
+  notificationBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: C.text + '10',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 4,
     paddingBottom: 8,
   },
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: Colors.text,
   },
   datePicker: {
     flexDirection: 'row',
@@ -171,38 +244,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderRadius: 12,
-    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
     gap: 2,
-  },
-  dateButtonSelected: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
   },
   dateDayLabel: {
     fontSize: 10,
-    color: Colors.textMuted,
     textTransform: 'uppercase',
     fontWeight: '600',
   },
   dateDayNumber: {
     fontSize: 16,
     fontWeight: '700',
-    color: Colors.text,
-  },
-  dateLabelSelected: {
-    color: Colors.white,
   },
   hasMealsDot: {
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Colors.accent,
     marginTop: 2,
-  },
-  hasMealsDotSelected: {
-    backgroundColor: Colors.white,
   },
   daySummary: {
     flexDirection: 'row',
@@ -210,22 +268,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: Colors.surface,
     marginHorizontal: 16,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: Colors.border,
     marginBottom: 8,
   },
   daySummaryDate: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.text,
     textTransform: 'capitalize',
   },
   daySummaryMeals: {
     fontSize: 13,
-    color: Colors.textSecondary,
     marginTop: 2,
   },
   daySummaryCalories: {
@@ -234,11 +288,9 @@ const styles = StyleSheet.create({
   daySummaryCaloriesValue: {
     fontSize: 24,
     fontWeight: '800',
-    color: Colors.primary,
   },
   daySummaryCaloriesUnit: {
     fontSize: 12,
-    color: Colors.textSecondary,
   },
   listContent: {
     paddingHorizontal: 16,
@@ -254,6 +306,5 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: Colors.textSecondary,
   },
 });

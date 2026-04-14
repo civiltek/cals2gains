@@ -1,0 +1,11 @@
+Failed to read the app config from the project using "npx expo config" command: npx expo config --json exited with non-zero code: 7.
+Falling back to the version of "@expo/config" shipped with the EAS CLI.
+Resolved "preview" environment for the build. Learn more: https://docs.expo.dev/eas/environment-variables/#setting-the-environment-for-your-builds
+No environment variables with visibility "Plain text" and "Sensitive" found for the "preview" environment on EAS.
+
+
+
+android.versionCode field in app config is ignored when version source is set to remote, but this value will still be in the manifest available via expo-constants. It's recommended to remove this value from app config.
+Error loading Metro config at: C:\Users\Judit\Documents\Cals2Gains\metro.config.js
+Only URLs with a scheme in: file, data, and node are supported by the default ESM loader. On Windows, absolute paths must be valid file:// URLs. Received protocol 'c:'
+    Error: build command failed.

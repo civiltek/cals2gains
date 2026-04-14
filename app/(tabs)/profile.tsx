@@ -18,9 +18,11 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import Colors from '../../constants/colors';
 import { useUserStore } from '../../store/userStore';
-import { changeLanguage } from '../../i18n';
+import { useColors, useThemeStore } from '../../store/themeStore';
+
+// Brand logo assets
+const LOGO_MARK = require('../../brand-assets/C2G-Mark-512.png');
 import { calculateTDEE, calculateBMR } from '../../utils/nutrition';
 
 export default function ProfileScreen() {
@@ -31,8 +33,9 @@ export default function ProfileScreen() {
     isSubscriptionActive,
     isOnTrial,
     trialDaysRemaining,
-    updateLanguage,
   } = useUserStore();
+  const C = useColors(); // Reactive theme colors
+  const isDark = useThemeStore(s => s.isDark);
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
@@ -58,18 +61,13 @@ export default function ProfileScreen() {
     );
   };
 
-  const handleLanguageChange = async (lang: 'es' | 'en') => {
-    changeLanguage(lang);
-    await updateLanguage(lang);
-  };
-
   const tdee = user?.profile ? calculateTDEE(user.profile) : null;
   const bmr = user?.profile ? calculateBMR(user.profile) : null;
 
   const subscriptionStatus = () => {
     if (!user) return '';
     if (isOnTrial()) {
-      return `${t('profile.trial')} · ${trialDaysRemaining()} días`;
+      return `${t('profile.trial')} · ${trialDaysRemaining()} ${t('common.days')}`;
     }
     if (user.subscriptionType === 'monthly') return t('profile.monthly');
     if (user.subscriptionType === 'annual') return t('profile.annual');
@@ -77,199 +75,192 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>{t('profile.title')}</Text>
+        {/* Brand Header */}
+        <View style={styles.brandHeader}>
+          <View style={styles.brandRow}>
+            <Image source={LOGO_MARK} style={styles.brandLogo} resizeMode="contain" />
+            <View style={styles.brandWordmark}>
+              <Text style={[styles.brandName, { color: C.text }]}>
+                <Text style={{ color: C.violet }}>Cals</Text>
+                <Text style={{ color: C.coral, fontSize: 15, fontFamily: 'Outfit-Bold' }}>2</Text>
+                <Text style={{ color: C.violet }}>Gains</Text>
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.notificationBtn} onPress={() => router.push('/paywall')}>
+            <Ionicons name="notifications-outline" size={22} color={C.textSecondary} />
+          </TouchableOpacity>
         </View>
 
-        {/* User card */}
-        <View style={styles.userCard}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: C.text }]}>{t('profile.title')}</Text>
+        </View>
+
+        {/* User card — tap to edit */}
+        <TouchableOpacity
+          style={[styles.userCard, { backgroundColor: C.surface, borderColor: C.border }]}
+          onPress={() => router.push('/edit-profile')}
+          activeOpacity={0.7}
+        >
           {user?.photoURL ? (
             <Image source={{ uri: user.photoURL }} style={styles.avatar} />
           ) : (
-            <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarInitial}>
+            <View style={[styles.avatarPlaceholder, { backgroundColor: C.primary + '30' }]}>
+              <Text style={[styles.avatarInitial, { color: C.primary }]}>
                 {user?.displayName?.[0]?.toUpperCase() || '?'}
               </Text>
             </View>
           )}
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>{user?.displayName || 'User'}</Text>
-            <Text style={styles.userEmail}>{user?.email}</Text>
+            <Text style={[styles.userName, { color: C.text }]}>{user?.displayName || t('common.user')}</Text>
+            <Text style={[styles.userEmail, { color: C.textSecondary }]}>{user?.email}</Text>
           </View>
-          <View style={styles.subscriptionBadge}>
-            <Ionicons
-              name={isSubscriptionActive() ? 'checkmark-circle' : 'lock-closed'}
-              size={14}
-              color={isSubscriptionActive() ? Colors.accent : Colors.warning}
-            />
-            <Text style={[
-              styles.subscriptionBadgeText,
-              { color: isSubscriptionActive() ? Colors.accent : Colors.warning }
-            ]}>
-              {subscriptionStatus()}
-            </Text>
+          <View style={{ flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+            <Ionicons name="create-outline" size={18} color={C.textMuted} />
+            <View style={styles.subscriptionBadge}>
+              <Ionicons
+                name={isSubscriptionActive() ? 'checkmark-circle' : 'lock-closed'}
+                size={14}
+                color={isSubscriptionActive() ? C.accent : C.warning}
+              />
+              <Text style={[
+                styles.subscriptionBadgeText,
+                { color: isSubscriptionActive() ? C.accent : C.warning }
+              ]}>
+                {subscriptionStatus()}
+              </Text>
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Goals section */}
         {user?.goals && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('profile.dailyGoals')}</Text>
+          <View style={[styles.section, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <Text style={[styles.sectionTitle, { color: C.textSecondary }]}>{t('profile.dailyGoals')}</Text>
             <View style={styles.goalsGrid}>
               <GoalCell
                 emoji="🔥"
                 value={user.goals.calories}
                 unit={t('common.kcal')}
                 label={t('onboarding.calories')}
-                color={Colors.calories}
+                color={C.calories}
               />
               <GoalCell
                 emoji="🥩"
                 value={user.goals.protein}
                 unit={t('common.g')}
                 label={t('onboarding.protein')}
-                color={Colors.protein}
+                color={C.protein}
               />
               <GoalCell
                 emoji="🌾"
                 value={user.goals.carbs}
                 unit={t('common.g')}
                 label={t('onboarding.carbs')}
-                color={Colors.carbs}
+                color={C.carbs}
               />
               <GoalCell
                 emoji="🥑"
                 value={user.goals.fat}
                 unit={t('common.g')}
                 label={t('onboarding.fat')}
-                color={Colors.fat}
+                color={C.fat}
               />
             </View>
 
             {tdee && bmr && (
-              <View style={styles.metabolismRow}>
+              <View style={[styles.metabolismRow, { backgroundColor: C.background }]}>
                 <View style={styles.metabolismStat}>
-                  <Text style={styles.metabolismLabel}>BMR</Text>
-                  <Text style={styles.metabolismValue}>{Math.round(bmr)} kcal</Text>
+                  <Text style={[styles.metabolismLabel, { color: C.textMuted }]}>BMR</Text>
+                  <Text style={[styles.metabolismValue, { color: C.text }]}>{Math.round(bmr)} {t('common.kcal')}</Text>
                 </View>
-                <View style={styles.metabolismDivider} />
+                <View style={[styles.metabolismDivider, { backgroundColor: C.border }]} />
                 <View style={styles.metabolismStat}>
-                  <Text style={styles.metabolismLabel}>TDEE</Text>
-                  <Text style={styles.metabolismValue}>{Math.round(tdee)} kcal</Text>
+                  <Text style={[styles.metabolismLabel, { color: C.textMuted }]}>TDEE</Text>
+                  <Text style={[styles.metabolismValue, { color: C.text }]}>{Math.round(tdee)} {t('common.kcal')}</Text>
                 </View>
               </View>
             )}
 
             <TouchableOpacity
-              style={styles.editGoalsButton}
-              onPress={() => router.push('/(auth)/onboarding')}
+              style={[styles.editGoalsButton, { borderColor: C.primary + '50' }]}
+              onPress={() => router.push('/nutrition-settings')}
             >
-              <Ionicons name="settings-outline" size={16} color={Colors.primary} />
-              <Text style={styles.editGoalsText}>{t('profile.editProfile')}</Text>
+              <Ionicons name="settings-outline" size={16} color={C.primary} />
+              <Text style={[styles.editGoalsText, { color: C.primary }]}>{t('tools.nutritionSettings')}</Text>
             </TouchableOpacity>
           </View>
         )}
 
         {/* Subscription section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.subscription')}</Text>
+        <View style={[styles.section, { backgroundColor: C.surface, borderColor: C.border }]}>
+          <Text style={[styles.sectionTitle, { color: C.textSecondary }]}>{t('profile.subscription')}</Text>
 
           <TouchableOpacity
-            style={styles.subscriptionCard}
+            style={[styles.subscriptionCard, { backgroundColor: C.background }]}
             onPress={() => router.push('/paywall')}
           >
             <View style={styles.subscriptionInfo}>
-              <Text style={styles.subscriptionTitle}>
+              <Text style={[styles.subscriptionTitle, { color: C.text }]}>
                 {isSubscriptionActive()
-                  ? (isOnTrial() ? t('profile.trial') : 'Cals2Gains Premium')
-                  : 'Cals2Gains Premium'}
+                  ? (isOnTrial() ? t('profile.trial') : t('profile.currentPlan'))
+                  : t('profile.currentPlan')}
               </Text>
               {user?.subscriptionExpiresAt && isSubscriptionActive() && (
-                <Text style={styles.subscriptionExpiry}>
+                <Text style={[styles.subscriptionExpiry, { color: C.textSecondary }]}>
                   {t('profile.trialExpires')} {format(user.subscriptionExpiresAt, 'dd/MM/yyyy')}
                 </Text>
               )}
             </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.textMuted} />
+            <Ionicons name="chevron-forward" size={18} color={C.textMuted} />
           </TouchableOpacity>
         </View>
 
-        {/* Language section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.language')}</Text>
-          <View style={styles.languageRow}>
-            <TouchableOpacity
-              style={[
-                styles.languageButton,
-                i18n.language === 'es' && styles.languageButtonSelected,
-              ]}
-              onPress={() => handleLanguageChange('es')}
-            >
-              <Text style={styles.languageFlag}>🇪🇸</Text>
-              <Text style={[
-                styles.languageLabel,
-                i18n.language === 'es' && styles.languageLabelSelected,
-              ]}>
-                {t('profile.spanish')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.languageButton,
-                i18n.language === 'en' && styles.languageButtonSelected,
-              ]}
-              onPress={() => handleLanguageChange('en')}
-            >
-              <Text style={styles.languageFlag}>🇬🇧</Text>
-              <Text style={[
-                styles.languageLabel,
-                i18n.language === 'en' && styles.languageLabelSelected,
-              ]}>
-                {t('profile.english')}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
 
         {/* Settings */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: C.surface, borderColor: C.border }]}>
+          <Text style={[styles.sectionTitle, { color: C.textSecondary }]}>{t('profile.settings')}</Text>
           <SettingsRow
+            colors={C}
             icon="notifications-outline"
             label={t('profile.notifications')}
             right={
               <Switch
                 value={notificationsEnabled}
                 onValueChange={setNotificationsEnabled}
-                trackColor={{ false: Colors.border, true: Colors.primary + '60' }}
-                thumbColor={notificationsEnabled ? Colors.primary : Colors.textMuted}
+                trackColor={{ false: C.border, true: C.primary + '60' }}
+                thumbColor={notificationsEnabled ? C.primary : C.textMuted}
               />
             }
           />
+          <SettingsRow colors={C} icon="settings-outline" label={t('profile.advancedSettings')} onPress={() => router.push('/settings')} />
           <SettingsRow
+            colors={C}
             icon="help-circle-outline"
             label={t('profile.help')}
-            onPress={() => {}}
+            onPress={() => router.push('/help')}
           />
           <SettingsRow
+            colors={C}
             icon="information-circle-outline"
             label={t('profile.about')}
-            onPress={() => {}}
+            onPress={() => router.push('/about')}
           />
         </View>
 
         {/* Sign out */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: C.surface, borderColor: C.border }]}>
           <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-            <Ionicons name="log-out-outline" size={20} color={Colors.error} />
-            <Text style={styles.signOutText}>{t('auth.signOut')}</Text>
+            <Ionicons name="log-out-outline" size={20} color={C.error} />
+            <Text style={[styles.signOutText, { color: C.error }]}>{t('auth.signOut')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Version */}
-        <Text style={styles.versionText}>Cals2Gains v1.0.0</Text>
+        <Text style={[styles.versionText, { color: C.textMuted }]}>Cals2Gains {t('profile.version')} 1.0.0</Text>
 
         <View style={{ height: 32 }} />
       </ScrollView>
@@ -283,31 +274,35 @@ const GoalCell: React.FC<{
   unit: string;
   label: string;
   color: string;
-}> = ({ emoji, value, unit, label, color }) => (
-  <View style={[styles.goalCell, { borderTopColor: color }]}>
-    <Text style={styles.goalEmoji}>{emoji}</Text>
-    <Text style={[styles.goalValue, { color }]}>{value}</Text>
-    <Text style={styles.goalUnit}>{unit}</Text>
-    <Text style={styles.goalLabel}>{label}</Text>
-  </View>
-);
+}> = ({ emoji, value, unit, label, color }) => {
+  const C = useColors();
+  return (
+    <View style={[styles.goalCell, { borderTopColor: color, backgroundColor: C.background }]}>
+      <Text style={styles.goalEmoji}>{emoji}</Text>
+      <Text style={[styles.goalValue, { color }]}>{value}</Text>
+      <Text style={[styles.goalUnit, { color: C.textMuted }]}>{unit}</Text>
+      <Text style={[styles.goalLabel, { color: C.textSecondary }]}>{label}</Text>
+    </View>
+  );
+};
 
 const SettingsRow: React.FC<{
   icon: string;
   label: string;
   onPress?: () => void;
   right?: React.ReactNode;
-}> = ({ icon, label, onPress, right }) => (
+  colors: any;
+}> = ({ icon, label, onPress, right, colors }) => (
   <TouchableOpacity
-    style={styles.settingsRow}
+    style={[styles.settingsRow, { borderBottomColor: colors.border }]}
     onPress={onPress}
     disabled={!onPress && !right}
     activeOpacity={onPress ? 0.7 : 1}
   >
-    <Ionicons name={icon as any} size={20} color={Colors.textSecondary} />
-    <Text style={styles.settingsLabel}>{label}</Text>
+    <Ionicons name={icon as any} size={20} color={colors.textSecondary} />
+    <Text style={[styles.settingsLabel, { color: colors.text }]}>{label}</Text>
     {right || (onPress && (
-      <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+      <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
     ))}
   </TouchableOpacity>
 );
@@ -315,28 +310,59 @@ const SettingsRow: React.FC<{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+  },
+  brandHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 4,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  brandLogo: {
+    width: 32,
+    height: 32,
+  },
+  brandWordmark: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  brandName: {
+    fontSize: 20,
+    fontWeight: '800',
+    fontFamily: 'Outfit-Bold',
+    letterSpacing: -0.3,
+  },
+  notificationBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: C.text + '10',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 4,
     paddingBottom: 8,
   },
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: Colors.text,
   },
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 16,
     marginTop: 8,
-    backgroundColor: Colors.surface,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: Colors.border,
     gap: 14,
     flexWrap: 'wrap',
   },
@@ -349,14 +375,12 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.primary + '30',
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarInitial: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.primary,
   },
   userInfo: {
     flex: 1,
@@ -364,11 +388,9 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.text,
   },
   userEmail: {
     fontSize: 13,
-    color: Colors.textSecondary,
     marginTop: 2,
   },
   subscriptionBadge: {
@@ -383,16 +405,13 @@ const styles = StyleSheet.create({
   section: {
     marginHorizontal: 16,
     marginTop: 16,
-    backgroundColor: Colors.surface,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: Colors.border,
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.textSecondary,
     marginBottom: 14,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -404,7 +423,6 @@ const styles = StyleSheet.create({
   },
   goalCell: {
     flex: 1,
-    backgroundColor: Colors.background,
     borderRadius: 12,
     padding: 10,
     alignItems: 'center',
@@ -420,17 +438,14 @@ const styles = StyleSheet.create({
   },
   goalUnit: {
     fontSize: 10,
-    color: Colors.textMuted,
   },
   goalLabel: {
     fontSize: 10,
-    color: Colors.textSecondary,
     marginTop: 2,
     textAlign: 'center',
   },
   metabolismRow: {
     flexDirection: 'row',
-    backgroundColor: Colors.background,
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
@@ -441,17 +456,14 @@ const styles = StyleSheet.create({
   },
   metabolismLabel: {
     fontSize: 12,
-    color: Colors.textMuted,
     marginBottom: 4,
   },
   metabolismValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: Colors.text,
   },
   metabolismDivider: {
     width: 1,
-    backgroundColor: Colors.border,
   },
   editGoalsButton: {
     flexDirection: 'row',
@@ -460,18 +472,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1.5,
-    borderColor: Colors.primary + '50',
     gap: 8,
   },
   editGoalsText: {
     fontSize: 14,
-    color: Colors.primary,
     fontWeight: '600',
   },
   subscriptionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.background,
     borderRadius: 12,
     padding: 14,
   },
@@ -481,43 +490,10 @@ const styles = StyleSheet.create({
   subscriptionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.text,
   },
   subscriptionExpiry: {
     fontSize: 12,
-    color: Colors.textSecondary,
     marginTop: 2,
-  },
-  languageRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  languageButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    backgroundColor: Colors.background,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    gap: 8,
-  },
-  languageButtonSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary + '15',
-  },
-  languageFlag: {
-    fontSize: 20,
-  },
-  languageLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.textSecondary,
-  },
-  languageLabelSelected: {
-    color: Colors.primary,
   },
   settingsRow: {
     flexDirection: 'row',
@@ -525,12 +501,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 14,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
   },
   settingsLabel: {
     flex: 1,
     fontSize: 15,
-    color: Colors.text,
   },
   signOutButton: {
     flexDirection: 'row',
@@ -542,11 +516,9 @@ const styles = StyleSheet.create({
   signOutText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.error,
   },
   versionText: {
     fontSize: 12,
-    color: Colors.textMuted,
     textAlign: 'center',
     marginTop: 16,
   },

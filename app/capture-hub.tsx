@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,8 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { COLORS } from '../theme';
+import { useTranslation } from 'react-i18next';
+import { useColors } from '../store/themeStore';
 import { useRoute } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
@@ -22,8 +23,8 @@ const CARD_WIDTH = (width - 32 - 8) / GRID_COLS;
 
 interface CaptureMode {
   id: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   icon: string;
   route: string;
 }
@@ -46,95 +47,95 @@ interface FavoriteMeal {
 const CAPTURE_MODES: CaptureMode[] = [
   {
     id: 'photo',
-    label: 'Foto',
-    description: 'Captura visual',
+    labelKey: 'captureHub.photo',
+    descriptionKey: 'captureHub.photoDesc',
     icon: 'camera',
     route: '/(tabs)/camera',
   },
   {
     id: 'voice',
-    label: 'Voz',
-    description: 'Dictado rápido',
+    labelKey: 'captureHub.voice',
+    descriptionKey: 'captureHub.voiceDesc',
     icon: 'mic',
     route: 'voice',
   },
   {
     id: 'search',
-    label: 'Buscar',
-    description: 'Por nombre',
+    labelKey: 'captureHub.search',
+    descriptionKey: 'captureHub.searchDesc',
     icon: 'search',
     route: 'food-search',
   },
   {
     id: 'barcode',
-    label: 'Código de barras',
-    description: 'Escanea',
+    labelKey: 'captureHub.barcode',
+    descriptionKey: 'captureHub.barcodeDesc',
     icon: 'barcode',
     route: 'barcode-scanner',
   },
   {
     id: 'label',
-    label: 'Etiqueta',
-    description: 'Texto en imagen',
+    labelKey: 'captureHub.label',
+    descriptionKey: 'captureHub.labelDesc',
     icon: 'text',
     route: 'label-scanner',
   },
   {
     id: 'quick',
-    label: 'Rápido',
-    description: 'Entrada manual',
+    labelKey: 'captureHub.quick',
+    descriptionKey: 'captureHub.quickDesc',
     icon: 'flash',
     route: 'quick-add',
   },
 ];
 
-// Mock data - replace with actual store data
-const MOCK_RECENT_MEALS: RecentMeal[] = [
+// Mock data - replace with actual store data (will be populated with i18n in component)
+const createMockRecentMeals = (t: any): RecentMeal[] => [
   {
     id: '1',
-    name: 'Pollo con Arroz',
+    name: t('captureHub.mockMeal1'),
     calories: 520,
     timestamp: Date.now() - 86400000,
     type: 'lunch',
   },
   {
     id: '2',
-    name: 'Ensalada Verde',
+    name: t('captureHub.mockMeal2'),
     calories: 180,
     timestamp: Date.now() - 86400000,
     type: 'lunch',
   },
   {
     id: '3',
-    name: 'Sándwich Tostado',
+    name: t('captureHub.mockMeal3'),
     calories: 380,
     timestamp: Date.now() - 86400000,
     type: 'breakfast',
   },
 ];
 
-const MOCK_FAVORITES: FavoriteMeal[] = [
+const createMockFavorites = (t: any): FavoriteMeal[] => [
   {
     id: 'f1',
-    name: 'Avena',
+    name: t('captureHub.mockMeal4'),
     calories: 150,
     usageCount: 45,
   },
   {
     id: 'f2',
-    name: 'Pollo Grillado',
+    name: t('captureHub.mockMeal5'),
     calories: 280,
     usageCount: 32,
   },
   {
     id: 'f3',
-    name: 'Plátano',
+    name: t('captureHub.mockMeal6'),
     calories: 105,
     usageCount: 28,
   },
   {
     id: 'f4',
-    name: 'Café con Leche',
+    name: t('captureHub.mockMeal7'),
     calories: 75,
     usageCount: 87,
   },
@@ -148,17 +149,7 @@ const getMealType = (): 'breakfast' | 'lunch' | 'dinner' | 'snack' => {
   return 'snack';
 };
 
-const getMealTypeLabel = (
-  type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
-): string => {
-  const labels: Record<typeof type, string> = {
-    breakfast: 'Desayuno',
-    lunch: 'Almuerzo',
-    dinner: 'Cena',
-    snack: 'Merienda',
-  };
-  return labels[type];
-};
+// getMealTypeLabel is now handled via i18n t('home.breakfast') etc. inside component
 
 const getMealTypeIcon = (
   type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
@@ -173,20 +164,25 @@ const getMealTypeIcon = (
 };
 
 export default function CaptureHubScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const route = useRoute();
+  const C = useColors();
+  const styles = useMemo(() => createStyles(C), [C]);
+
+  const getMealTypeLabel = (type: string) => t(`home.${type}`);
   const [currentMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>(
     getMealType()
   );
   const [isLoading, setIsLoading] = useState(false);
   const [yesterdayMeals, setYesterdayMeals] = useState<RecentMeal[]>([]);
-  const [recentMeals] = useState<RecentMeal[]>(MOCK_RECENT_MEALS);
-  const [favorites] = useState<FavoriteMeal[]>(MOCK_FAVORITES);
+  const [recentMeals] = useState<RecentMeal[]>(createMockRecentMeals(t));
+  const [favorites] = useState<FavoriteMeal[]>(createMockFavorites(t));
 
   useEffect(() => {
     // Simulate loading yesterday's meals from store
-    setYesterdayMeals(MOCK_RECENT_MEALS.slice(0, 2));
-  }, []);
+    setYesterdayMeals(createMockRecentMeals(t).slice(0, 2));
+  }, [t]);
 
   const handleCaptureMode = async (mode: CaptureMode) => {
     await Haptics.selectionAsync();
@@ -234,11 +230,11 @@ export default function CaptureHubScreen() {
           <Ionicons
             name={item.icon as any}
             size={40}
-            color={COLORS.violet}
+            color="#9C8CFF"
           />
         </View>
-        <Text style={styles.cardLabel}>{item.label}</Text>
-        <Text style={styles.cardDescription}>{item.description}</Text>
+        <Text style={styles.cardLabel}>{t(item.labelKey)}</Text>
+        <Text style={styles.cardDescription}>{t(item.descriptionKey)}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -260,7 +256,7 @@ export default function CaptureHubScreen() {
           <Ionicons
             name="arrow-redo"
             size={16}
-            color={COLORS.violet}
+            color="#9C8CFF"
           />
         </View>
       </View>
@@ -277,7 +273,7 @@ export default function CaptureHubScreen() {
         <Ionicons
           name="heart"
           size={18}
-          color={COLORS.coral}
+          color="#FF6A4D"
         />
       </View>
       <Text style={styles.favoriteName}>{item.name}</Text>
@@ -297,7 +293,7 @@ export default function CaptureHubScreen() {
           <Ionicons
             name={getMealTypeIcon(item.type)}
             size={20}
-            color={COLORS.violet}
+            color="#9C8CFF"
           />
         </View>
         <View>
@@ -318,12 +314,12 @@ export default function CaptureHubScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Registrar Comida</Text>
+        <Text style={styles.title}>{t('captureHub.title')}</Text>
         <View style={styles.mealTypePill}>
           <Ionicons
             name={getMealTypeIcon(currentMealType)}
             size={14}
-            color={COLORS.white}
+            color="#FFFFFF"
           />
           <Text style={styles.mealTypeLabel}>
             {getMealTypeLabel(currentMealType)}
@@ -348,9 +344,9 @@ export default function CaptureHubScreen() {
         <View style={styles.voiceLoadingContainer}>
           <ActivityIndicator
             size="large"
-            color={COLORS.violet}
+            color="#9C8CFF"
           />
-          <Text style={styles.voiceLoadingText}>Escuchando...</Text>
+          <Text style={styles.voiceLoadingText}>{t('captureHub.listening')}</Text>
         </View>
       )}
 
@@ -358,8 +354,8 @@ export default function CaptureHubScreen() {
       {yesterdayMeals.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Mismo que ayer</Text>
-            <Text style={styles.sectionSubtitle}>Un toque para repetir</Text>
+            <Text style={styles.sectionTitle}>{t('captureHub.sameAsYesterday')}</Text>
+            <Text style={styles.sectionSubtitle}>{t('captureHub.sameAsYesterdayDesc')}</Text>
           </View>
           {yesterdayMeals.map((meal) => (
             <View key={meal.id}>
@@ -373,11 +369,11 @@ export default function CaptureHubScreen() {
       {favorites.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Favoritos</Text>
+            <Text style={styles.sectionTitle}>{t('captureHub.favorites')}</Text>
             <Ionicons
               name="heart"
               size={16}
-              color={COLORS.coral}
+              color="#FF6A4D"
             />
           </View>
           <FlatList
@@ -396,8 +392,8 @@ export default function CaptureHubScreen() {
       {recentMeals.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recientes</Text>
-            <Text style={styles.sectionSubtitle}>{recentMeals.length} comidas</Text>
+            <Text style={styles.sectionTitle}>{t('captureHub.recent')}</Text>
+            <Text style={styles.sectionSubtitle}>{recentMeals.length} {t('captureHub.meals')}</Text>
           </View>
           {recentMeals.slice(0, 5).map((meal) => (
             <View key={meal.id}>
@@ -413,234 +409,236 @@ export default function CaptureHubScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.text,
-    letterSpacing: -0.5,
-  },
-  mealTypePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.violet,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    gap: 4,
-  },
-  mealTypeLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-  section: {
-    paddingHorizontal: 16,
-    marginVertical: 12,
-  },
-  gridRow: {
-    gap: 8,
-  },
-  cardContainer: {
-    width: CARD_WIDTH,
-    marginBottom: 8,
-  },
-  captureCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 140,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    shadowColor: COLORS.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  iconBackground: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    backgroundColor: `${COLORS.violet}10`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  cardLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  cardDescription: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
-  voiceLoadingContainer: {
-    marginHorizontal: 16,
-    marginVertical: 16,
-    backgroundColor: `${COLORS.violet}10`,
-    borderRadius: 12,
-    padding: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  voiceLoadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.violet,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  sectionSubtitle: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  yesterdayMealCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  yesterdayMealContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  yesterdayMealName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 2,
-  },
-  yesterdayMealCals: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  relogBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: `${COLORS.violet}10`,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  favoritesList: {
-    gap: 12,
-    paddingRight: 16,
-  },
-  favoriteCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: 12,
-    width: 90,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: `${COLORS.coral}30`,
-    shadowColor: COLORS.coral,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  favoriteIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: `${COLORS.coral}15`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  favoriteName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  favoriteCals: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.violet,
-  },
-  favoriteCalLabel: {
-    fontSize: 10,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  recentMealItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  recentMealLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    gap: 12,
-  },
-  recentMealIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: `${COLORS.violet}10`,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  recentMealName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 2,
-  },
-  recentMealTime: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  recentMealCals: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.violet,
-  },
-  bottomSpacing: {
-    height: 32,
-  },
-});
+function createStyles(C: any) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: C.background,
+    },
+    header: {
+      paddingHorizontal: 16,
+      paddingTop: 16,
+      paddingBottom: 12,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: C.text,
+      letterSpacing: -0.5,
+    },
+    mealTypePill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#9C8CFF',
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 12,
+      gap: 4,
+    },
+    mealTypeLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: '#FFFFFF',
+    },
+    section: {
+      paddingHorizontal: 16,
+      marginVertical: 12,
+    },
+    gridRow: {
+      gap: 8,
+    },
+    cardContainer: {
+      width: CARD_WIDTH,
+      marginBottom: 8,
+    },
+    captureCard: {
+      backgroundColor: '#FFFFFF',
+      borderRadius: 16,
+      padding: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 140,
+      borderWidth: 1,
+      borderColor: C.border,
+      shadowColor: C.text,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    iconBackground: {
+      width: 60,
+      height: 60,
+      borderRadius: 12,
+      backgroundColor: '#9C8CFF10',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    cardLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+      marginBottom: 4,
+      textAlign: 'center',
+    },
+    cardDescription: {
+      fontSize: 12,
+      color: C.textSecondary,
+      textAlign: 'center',
+    },
+    voiceLoadingContainer: {
+      marginHorizontal: 16,
+      marginVertical: 16,
+      backgroundColor: '#9C8CFF10',
+      borderRadius: 12,
+      padding: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    voiceLoadingText: {
+      marginTop: 12,
+      fontSize: 14,
+      fontWeight: '500',
+      color: '#9C8CFF',
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: C.text,
+    },
+    sectionSubtitle: {
+      fontSize: 12,
+      color: C.textSecondary,
+    },
+    yesterdayMealCard: {
+      backgroundColor: '#FFFFFF',
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    yesterdayMealContent: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    yesterdayMealName: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+      marginBottom: 2,
+    },
+    yesterdayMealCals: {
+      fontSize: 12,
+      color: C.textSecondary,
+    },
+    relogBadge: {
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      backgroundColor: '#9C8CFF10',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    favoritesList: {
+      gap: 12,
+      paddingRight: 16,
+    },
+    favoriteCard: {
+      backgroundColor: '#FFFFFF',
+      borderRadius: 12,
+      padding: 12,
+      width: 90,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#FF6A4D30',
+      shadowColor: '#FF6A4D',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    favoriteIconContainer: {
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      backgroundColor: '#FF6A4D15',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    favoriteName: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: C.text,
+      textAlign: 'center',
+      marginBottom: 4,
+    },
+    favoriteCals: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: '#9C8CFF',
+    },
+    favoriteCalLabel: {
+      fontSize: 10,
+      color: C.textSecondary,
+      marginTop: 2,
+    },
+    recentMealItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: '#FFFFFF',
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    recentMealLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      gap: 12,
+    },
+    recentMealIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 8,
+      backgroundColor: '#9C8CFF10',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    recentMealName: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+      marginBottom: 2,
+    },
+    recentMealTime: {
+      fontSize: 12,
+      color: C.textSecondary,
+    },
+    recentMealCals: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: '#9C8CFF',
+    },
+    bottomSpacing: {
+      height: 32,
+    },
+  });
+}

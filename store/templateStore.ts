@@ -31,6 +31,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   isLoading: false,
 
   loadTemplates: async (userId: string) => {
+    if (!userId) return;
     set({ isLoading: true });
     try {
       const templates = await getMealTemplates(userId);
@@ -114,4 +115,4 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       .sort((a, b) => b.lastUsed.getTime() - a.lastUsed.getTime())
       .slice(0, limit);
   },
-}))
+}));

@@ -1,0 +1,7 @@
+      Credentialed Accounts
+ACTIVE  ACCOUNT
+*       judith.cordobes@gmail.com
+
+To set the active account, run:
+    $ gcloud config set account `ACCOUNT`
+

@@ -1,15 +1,31 @@
-﻿// ============================================
+// ============================================
 // Cals2Gains - RevenueCat Subscription Service
 // ============================================
 
-import Purchases, {
-  PurchasesPackage,
-  CustomerInfo,
-  PURCHASES_ERROR_CODE,
-  LOG_LEVEL,
-} from 'react-native-purchases';
 import { Platform } from 'react-native';
 import { updateSubscriptionStatus } from './firebase';
+
+// Dynamic import to avoid crash in Expo Go (native module not available)
+let Purchases: any = null;
+let PURCHASES_ERROR_CODE: any = {};
+let LOG_LEVEL: any = {};
+let _nativeAvailable = false;
+
+if (Platform.OS !== 'web') {
+  try {
+    const rnp = require('react-native-purchases');
+    Purchases = rnp.default;
+    PURCHASES_ERROR_CODE = rnp.PURCHASES_ERROR_CODE;
+    LOG_LEVEL = rnp.LOG_LEVEL;
+    _nativeAvailable = true;
+  } catch (e) {
+    console.warn('[RevenueCat] Native module not available (Expo Go mode)');
+  }
+}
+
+// Type stubs for when native module is unavailable
+type PurchasesPackageType = any;
+type CustomerInfoType = any;
 
 // Product identifiers (must match App Store Connect and Google Play)
 export const PRODUCT_IDS = {
@@ -25,6 +41,14 @@ let isConfigured = false;
  * Initialize RevenueCat SDK
  */
 export async function initializeRevenueCat(userId?: string): Promise<void> {
+  if (Platform.OS === 'web') {
+    console.warn('[RevenueCat] Skipping init — not supported on web');
+    return;
+  }
+  if (!_nativeAvailable) {
+    console.warn('[RevenueCat] Skipping init — native module not available');
+    return;
+  }
   if (isConfigured) return;
 
   const apiKey =
@@ -37,20 +61,25 @@ export async function initializeRevenueCat(userId?: string): Promise<void> {
     return;
   }
 
-  Purchases.setLogLevel(LOG_LEVEL.WARN);
-  await Purchases.configure({ apiKey });
+  try {
+    Purchases.setLogLevel(LOG_LEVEL.WARN);
+    await Purchases.configure({ apiKey });
 
-  if (userId) {
-    await Purchases.logIn(userId);
+    if (userId) {
+      await Purchases.logIn(userId);
+    }
+
+    isConfigured = true;
+  } catch (error) {
+    console.warn('[RevenueCat] Init failed:', error);
   }
-
-  isConfigured = true;
 }
 
 /**
  * Get available subscription packages
  */
-export async function getOfferings(): Promise<PurchasesPackage[]> {
+export async function getOfferings(): Promise<PurchasesPackageType[]> {
+  if (!_nativeAvailable || !isConfigured) return [];
   try {
     const offerings = await Purchases.getOfferings();
     if (offerings.current !== null) {
@@ -67,9 +96,12 @@ export async function getOfferings(): Promise<PurchasesPackage[]> {
  * Purchase a subscription package
  */
 export async function purchasePackage(
-  pkg: PurchasesPackage,
+  pkg: PurchasesPackageType,
   userId: string
-): Promise<{ success: boolean; customerInfo?: CustomerInfo; error?: string }> {
+): Promise<{ success: boolean; customerInfo?: CustomerInfoType; error?: string }> {
+  if (!_nativeAvailable || !isConfigured) {
+    return { success: false, error: 'RevenueCat not available in Expo Go' };
+  }
   try {
     const { customerInfo } = await Purchases.purchasePackage(pkg);
     const isActive = checkEntitlement(customerInfo);
@@ -94,7 +126,10 @@ export async function purchasePackage(
  */
 export async function restorePurchases(
   userId: string
-): Promise<{ success: boolean; customerInfo?: CustomerInfo }> {
+): Promise<{ success: boolean; customerInfo?: CustomerInfoType }> {
+  if (!_nativeAvailable || !isConfigured) {
+    return { success: false };
+  }
   try {
     const customerInfo = await Purchases.restorePurchases();
     const isActive = checkEntitlement(customerInfo);
@@ -115,7 +150,8 @@ export async function restorePurchases(
 /**
  * Get current customer info (subscription status)
  */
-export async function getCustomerInfo(): Promise<CustomerInfo | null> {
+export async function getCustomerInfo(): Promise<CustomerInfoType | null> {
+  if (!_nativeAvailable || !isConfigured) return null;
   try {
     return await Purchases.getCustomerInfo();
   } catch (error) {
@@ -127,15 +163,16 @@ export async function getCustomerInfo(): Promise<CustomerInfo | null> {
 /**
  * Check if user has active premium entitlement
  */
-export function checkEntitlement(customerInfo: CustomerInfo): boolean {
+export function checkEntitlement(customerInfo: CustomerInfoType): boolean {
+  if (!customerInfo?.entitlements?.active) return false;
   return typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== 'undefined';
 }
 
 /**
  * Get subscription expiration date
  */
-function getExpirationDate(customerInfo: CustomerInfo): Date | null {
-  const entitlement = customerInfo.entitlements.active[ENTITLEMENT_ID];
+function getExpirationDate(customerInfo: CustomerInfoType): Date | null {
+  const entitlement = customerInfo?.entitlements?.active?.[ENTITLEMENT_ID];
   if (!entitlement?.expirationDate) return null;
   return new Date(entitlement.expirationDate);
 }
@@ -143,8 +180,8 @@ function getExpirationDate(customerInfo: CustomerInfo): Date | null {
 /**
  * Determine subscription type from customer info
  */
-function determineSubType(customerInfo: CustomerInfo): 'monthly' | 'annual' {
-  const entitlement = customerInfo.entitlements.active[ENTITLEMENT_ID];
+function determineSubType(customerInfo: CustomerInfoType): 'monthly' | 'annual' {
+  const entitlement = customerInfo?.entitlements?.active?.[ENTITLEMENT_ID];
   if (!entitlement) return 'monthly';
 
   const productId = entitlement.productIdentifier || '';
@@ -155,6 +192,10 @@ function determineSubType(customerInfo: CustomerInfo): 'monthly' | 'annual' {
  * Log in user to RevenueCat (for cross-device sync)
  */
 export async function loginRevenueCat(userId: string): Promise<void> {
+  if (!_nativeAvailable || !isConfigured) {
+    console.warn('[RevenueCat] Skipping login — native module not available');
+    return;
+  }
   try {
     await Purchases.logIn(userId);
   } catch (error) {
@@ -166,6 +207,7 @@ export async function loginRevenueCat(userId: string): Promise<void> {
  * Log out from RevenueCat
  */
 export async function logoutRevenueCat(): Promise<void> {
+  if (!_nativeAvailable || !isConfigured) return;
   try {
     await Purchases.logOut();
   } catch (error) {

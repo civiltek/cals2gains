@@ -1,0 +1,12 @@
+04/11/2026 14:11:36 === STEP 1: Hide Claude, Focus Chrome ===
+Claude hidden: 66568
+Chrome focused: 131174
+04/11/2026 14:11:37 === STEP 2: Switch to Composer tab using Ctrl+Shift+A ===
+04/11/2026 14:11:41 === STEP 3: Click Añadir foto button ===
+04/11/2026 14:11:43 === STEP 4: Click 'Subir desde el ordenador' ===
+04/11/2026 14:11:43 === STEP 5: Wait for file dialog ===
+Found dialog: handle=67930 title=''
+Dialog found at handle 67930
+No edit box found, using Alt+N + clipboard paste
+Sent path via clipboard
+04/11/2026 14:11:47 === Script finished ===

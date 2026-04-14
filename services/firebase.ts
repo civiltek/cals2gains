@@ -10,6 +10,9 @@ import {
   GoogleAuthProvider,
   OAuthProvider,
   signInWithCredential,
+  signInWithEmailAndPassword as firebaseSignInWithEmail,
+  createUserWithEmailAndPassword as firebaseCreateWithEmail,
+  updateProfile,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   User as FirebaseUser,
@@ -30,8 +33,11 @@ import {
   Timestamp,
   limit,
 } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import * as FileSystem from 'expo-file-system/legacy';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Meal, DailyLog, UserGoals, UserProfile } from '../types';
+import { User, Meal, DailyLog, UserGoals, UserProfile, ProgressPhoto, PhotoAngle, Recipe, Nutrition } from '../types';
 import { emptyNutrition, addNutrition } from '../utils/nutrition';
 import { format } from 'date-fns';
 
@@ -48,17 +54,19 @@ const firebaseConfig = {
 // Initialize Firebase (avoid duplicate initialization)
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Auth with React Native persistence
+// Initialize Auth with AsyncStorage persistence
 let auth: ReturnType<typeof getAuth>;
 try {
   auth = initializeAuth(app, {
     persistence: getReactNativePersistence(AsyncStorage),
   });
 } catch (e) {
+  // Already initialized (hot reload) — use existing instance
   auth = getAuth(app);
 }
 
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 export { auth, db };
 
@@ -86,6 +94,31 @@ export async function signInWithApple(
   const provider = new OAuthProvider('apple.com');
   const credential = provider.credential({ idToken: identityToken, rawNonce: nonce });
   const result = await signInWithCredential(auth, credential);
+  await ensureUserDocument(result.user);
+  return result.user;
+}
+
+/**
+ * Sign in with email and password
+ */
+export async function signInWithEmail(email: string, password: string): Promise<FirebaseUser> {
+  const result = await firebaseSignInWithEmail(auth, email, password);
+  await ensureUserDocument(result.user);
+  return result.user;
+}
+
+/**
+ * Create account with email and password
+ */
+export async function createAccountWithEmail(
+  email: string,
+  password: string,
+  displayName?: string
+): Promise<FirebaseUser> {
+  const result = await firebaseCreateWithEmail(auth, email, password);
+  if (displayName) {
+    await updateProfile(result.user, { displayName });
+  }
   await ensureUserDocument(result.user);
   return result.user;
 }
@@ -129,6 +162,7 @@ async function ensureUserDocument(firebaseUser: FirebaseUser): Promise<void> {
       isSubscribed: true, // Trial counts as subscribed
       subscriptionType: 'trial',
       subscriptionExpiresAt: trialEnd,
+      onboardingCompleted: false,
       language: 'es', // Default to Spanish
       goals: {
         calories: 2000,
@@ -179,6 +213,7 @@ export async function getUserData(uid: string): Promise<User | null> {
       subscriptionExpiresAt: data.subscriptionExpiresAt?.toDate() || null,
       goals: data.goals || { calories: 2000, protein: 150, carbs: 200, fat: 65, fiber: 30 },
       profile: data.profile || {},
+      onboardingCompleted: data.onboardingCompleted || false,
       language: data.language || 'es',
     } as User;
   } catch (error) {
@@ -203,6 +238,93 @@ export async function updateUserProfile(
 }
 
 /**
+ * Update user goals, goal mode, and related fields
+ */
+export async function updateUserGoalsAndMode(
+  uid: string,
+  data: {
+    goals?: Partial<{ calories: number; protein: number; carbs: number; fat: number; fiber: number }>;
+    goalMode?: string;
+    nutritionMode?: string;
+    adaptiveMode?: boolean;
+    tdee?: number;
+    bmr?: number;
+    weight?: number;
+  }
+): Promise<void> {
+  const userRef = doc(db, 'users', uid);
+  const update: Record<string, any> = {};
+
+  if (data.goals) update.goals = data.goals;
+  if (data.goalMode !== undefined) update.goalMode = data.goalMode;
+  if (data.nutritionMode !== undefined) update.nutritionMode = data.nutritionMode;
+  if (data.adaptiveMode !== undefined) update.adaptiveMode = data.adaptiveMode;
+  if (data.tdee !== undefined) update.tdee = data.tdee;
+  if (data.bmr !== undefined) update.bmr = data.bmr;
+  if (data.weight !== undefined) update.weight = data.weight;
+
+  if (Object.keys(update).length > 0) {
+    await updateDoc(userRef, update);
+  }
+}
+
+/**
+ * Upload profile photo to Firebase Storage and update user document
+ */
+export async function uploadProfilePhoto(userId: string, uri: string): Promise<string> {
+  try {
+    // Convert local URI to blob using XMLHttpRequest (more reliable on RN than fetch)
+    const blob: Blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = () => resolve(xhr.response);
+      xhr.onerror = (e) => reject(new Error('Failed to convert image to blob'));
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+      xhr.send(null);
+    });
+
+    const storageRef = ref(storage, `users/${userId}/profile/avatar.jpg`);
+    await uploadBytes(storageRef, blob);
+    const downloadURL = await getDownloadURL(storageRef);
+
+    // Update Firestore user document
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, { photoURL: downloadURL });
+
+    // Also update Firebase Auth profile
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      await updateProfile(currentUser, { photoURL: downloadURL });
+    }
+
+    return downloadURL;
+  } catch (error: any) {
+    console.error('uploadProfilePhoto error:', error?.code, error?.message);
+    // If Storage fails (not configured, rules, etc.), save photo URI locally in Firestore only
+    if (error?.code?.includes('storage/') || error?.message?.includes('storage')) {
+      console.warn('Firebase Storage unavailable, saving photo URI to Firestore only');
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, { photoURL: uri });
+      return uri;
+    }
+    throw error;
+  }
+}
+
+/**
+ * Update user display name in both Firestore and Auth
+ */
+export async function updateUserDisplayName(userId: string, displayName: string): Promise<void> {
+  const userRef = doc(db, 'users', userId);
+  await updateDoc(userRef, { displayName });
+
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    await updateProfile(currentUser, { displayName });
+  }
+}
+
+/**
  * Update subscription status (called by RevenueCat webhook or client)
  */
 export async function updateSubscriptionStatus(
@@ -217,6 +339,14 @@ export async function updateSubscriptionStatus(
     subscriptionType,
     subscriptionExpiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
   });
+}
+
+/**
+ * Mark onboarding as completed
+ */
+export async function markOnboardingCompleted(uid: string): Promise<void> {
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, { onboardingCompleted: true });
 }
 
 /**
@@ -302,8 +432,51 @@ export async function getRecentMeals(userId: string, days: number = 7): Promise<
  * Delete a meal
  */
 export async function deleteMeal(mealId: string): Promise<void> {
+  if (!mealId || typeof mealId !== 'string') {
+    throw new Error('deleteMeal: mealId is required');
+  }
   const mealRef = doc(db, 'meals', mealId);
   await deleteDoc(mealRef);
+}
+
+/**
+ * Update an existing meal (for post-hoc editing)
+ */
+export async function updateMeal(mealId: string, updates: Partial<Omit<Meal, 'id'>>): Promise<void> {
+  if (!mealId || typeof mealId !== 'string') {
+    throw new Error('updateMeal: mealId is required');
+  }
+
+  // Build a Firestore-safe update object — strip undefined/NaN
+  const data: Record<string, any> = {};
+
+  if (updates.dishName != null) data.dishName = updates.dishName;
+  if (updates.dishNameEs != null) data.dishNameEs = updates.dishNameEs;
+  if (updates.dishNameEn != null) data.dishNameEn = updates.dishNameEn;
+  if (updates.estimatedWeight != null && !isNaN(updates.estimatedWeight)) {
+    data.estimatedWeight = updates.estimatedWeight;
+  }
+  if (updates.portionDescription != null) data.portionDescription = updates.portionDescription;
+  if (updates.mealType != null) data.mealType = updates.mealType;
+  if (updates.notes !== undefined) data.notes = updates.notes || '';
+  if (updates.ingredients != null) data.ingredients = updates.ingredients;
+
+  // Nutrition — merge sub-fields safely
+  if (updates.nutrition) {
+    const n = updates.nutrition;
+    data.nutrition = {
+      calories: Math.round(n.calories || 0),
+      protein: Math.round((n.protein || 0) * 10) / 10,
+      carbs: Math.round((n.carbs || 0) * 10) / 10,
+      fat: Math.round((n.fat || 0) * 10) / 10,
+      fiber: Math.round((n.fiber || 0) * 10) / 10,
+    };
+  }
+
+  data.editedAt = Timestamp.now();
+
+  const mealRef = doc(db, 'meals', mealId);
+  await updateDoc(mealRef, data);
 }
 
 // ============================================
@@ -488,4 +661,280 @@ export async function getDailyLog(userId: string, date: Date): Promise<DailyLog 
     totalNutrition: logSnap.data().totalNutrition || emptyNutrition(),
     goals: userData?.goals || { calories: 2000, protein: 150, carbs: 200, fat: 65, fiber: 30 },
   };
+}
+
+// ============================================
+// Meal Photo Upload
+// ============================================
+
+/**
+ * Save a meal photo as base64 data URI directly in the Firestore document.
+ * No Firebase Storage needed — works on Spark plan.
+ *
+ * @param mealId  Firestore document ID
+ * @param source  Either { base64: '...' } or { uri: 'file://...' }
+ * @returns       The data URI string saved, or '' on failure
+ */
+export async function saveMealPhotoBase64(
+  mealId: string,
+  source: { uri?: string; base64?: string },
+): Promise<string> {
+  let b64: string | null = null;
+
+  if (source.base64) {
+    b64 = source.base64;
+  } else if (source.uri && Platform.OS !== 'web') {
+    // Native: read local file → base64
+    const info = await FileSystem.getInfoAsync(source.uri);
+    if (!info.exists) {
+      throw new Error(`File missing: ${source.uri.substring(source.uri.lastIndexOf('/') + 1)}`);
+    }
+    b64 = await FileSystem.readAsStringAsync(source.uri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+  } else if (source.uri && source.uri.startsWith('data:')) {
+    b64 = source.uri.split(',')[1] || null;
+  }
+
+  if (!b64 || b64.length < 100) {
+    throw new Error(`Photo data too short (${b64?.length || 0})`);
+  }
+
+  const dataUri = `data:image/jpeg;base64,${b64}`;
+
+  // Save directly into the meal Firestore document
+  const mealRef = doc(db, 'meals', mealId);
+  await updateDoc(mealRef, { photoUrl: dataUri });
+
+  return dataUri;
+}
+
+/**
+ * Migrate existing meals: read local photos → base64 → save in Firestore.
+ * Run this from the iPhone (where the local files exist).
+ * No Firebase Storage required.
+ */
+export interface MigrationResult {
+  total: number;
+  alreadySynced: number;
+  noPhoto: number;
+  migrated: number;
+  failed: number;
+  errors: string[];
+}
+
+export async function migrateMealPhotosToFirestore(userId: string): Promise<MigrationResult> {
+  const result: MigrationResult = {
+    total: 0, alreadySynced: 0, noPhoto: 0,
+    migrated: 0, failed: 0, errors: [],
+  };
+
+  try {
+    const mealsRef = collection(db, 'meals');
+    const q = query(mealsRef, where('userId', '==', userId));
+    const snapshot = await getDocs(q);
+    result.total = snapshot.size;
+
+    for (const mealDoc of snapshot.docs) {
+      const data = mealDoc.data();
+
+      // Already synced
+      if (data.photoUrl) {
+        result.alreadySynced++;
+        continue;
+      }
+
+      // No photo
+      if (!data.photoUri || data.photoUri.length === 0) {
+        result.noPhoto++;
+        continue;
+      }
+
+      // Already a data URI or http — just copy to photoUrl
+      if (data.photoUri.startsWith('data:') || data.photoUri.startsWith('http')) {
+        try {
+          const mealRef = doc(db, 'meals', mealDoc.id);
+          await updateDoc(mealRef, { photoUrl: data.photoUri });
+          result.migrated++;
+        } catch {
+          result.failed++;
+        }
+        continue;
+      }
+
+      // Local file:// URI — read with FileSystem and save base64
+      try {
+        await saveMealPhotoBase64(mealDoc.id, { uri: data.photoUri });
+        result.migrated++;
+      } catch (err: any) {
+        result.failed++;
+        if (result.errors.length < 3) {
+          result.errors.push(`${mealDoc.id}: ${err?.message || 'unknown'}`);
+        }
+      }
+    }
+  } catch (error: any) {
+    result.errors.push(`Query: ${error?.message || 'unknown'}`);
+  }
+  return result;
+}
+
+// ============================================
+// Progress Photos
+// ============================================
+
+/**
+ * Save a progress photo to Firestore
+ * The photoUri is stored as a local file path (not uploaded to Storage in MVP)
+ */
+export async function saveProgressPhoto(photo: Omit<ProgressPhoto, 'id'>): Promise<string> {
+  const photosRef = collection(db, 'progressPhotos');
+  const data: any = {
+    userId: photo.userId,
+    date: photo.date instanceof Date ? Timestamp.fromDate(photo.date) : Timestamp.fromDate(new Date(photo.date)),
+    angle: photo.angle || 'front',
+    photoUri: photo.photoUri || '',
+  };
+  // Only add optional fields if they have values (Firestore rejects undefined)
+  if (photo.weight != null && !isNaN(photo.weight)) data.weight = photo.weight;
+  if (photo.bodyFat != null && !isNaN(photo.bodyFat)) data.bodyFat = photo.bodyFat;
+  if (photo.note && photo.note.trim()) data.note = photo.note.trim();
+
+  const docRef = await addDoc(photosRef, data);
+  return docRef.id;
+}
+
+/**
+ * Get progress photos for a user
+ */
+export async function getProgressPhotos(userId: string): Promise<ProgressPhoto[]> {
+  if (!userId) return [];
+  const photosRef = collection(db, 'progressPhotos');
+  const q = query(
+    photosRef,
+    where('userId', '==', userId),
+    orderBy('date', 'desc'),
+    limit(100)
+  );
+
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+    date: d.data().date?.toDate() || new Date(),
+  })) as ProgressPhoto[];
+}
+
+/**
+ * Delete a progress photo
+ */
+export async function deleteProgressPhoto(photoId: string): Promise<void> {
+  await deleteDoc(doc(db, 'progressPhotos', photoId));
+}
+
+// ============================================
+// Recipes
+// ============================================
+
+/**
+ * Save a recipe to Firestore
+ */
+export async function saveRecipe(recipe: Omit<Recipe, 'id'>): Promise<string> {
+  const docRef = await addDoc(collection(db, 'recipes'), {
+    ...recipe,
+    createdAt: Timestamp.fromDate(recipe.createdAt instanceof Date ? recipe.createdAt : new Date()),
+    updatedAt: Timestamp.fromDate(recipe.updatedAt instanceof Date ? recipe.updatedAt : new Date()),
+  });
+  return docRef.id;
+}
+
+/**
+ * Get all recipes for a user
+ */
+export async function getRecipes(userId: string): Promise<Recipe[]> {
+  const q = query(
+    collection(db, 'recipes'),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc')
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => {
+    const data = d.data();
+    return {
+      ...data,
+      id: d.id,
+      createdAt: data.createdAt?.toDate?.() || new Date(),
+      updatedAt: data.updatedAt?.toDate?.() || new Date(),
+    } as Recipe;
+  });
+}
+
+/**
+ * Update a recipe
+ */
+export async function updateRecipe(recipeId: string, updates: Partial<Recipe>): Promise<void> {
+  const safeUpdates: Record<string, any> = { ...updates, updatedAt: Timestamp.now() };
+  delete safeUpdates.id;
+  delete safeUpdates.userId;
+  if (safeUpdates.createdAt instanceof Date) {
+    safeUpdates.createdAt = Timestamp.fromDate(safeUpdates.createdAt);
+  }
+  await updateDoc(doc(db, 'recipes', recipeId), safeUpdates);
+}
+
+/**
+ * Delete a recipe
+ */
+export async function deleteRecipe(recipeId: string): Promise<void> {
+  await deleteDoc(doc(db, 'recipes', recipeId));
+}
+
+/**
+ * Update recipe favorite status
+ */
+export async function updateRecipeFavorite(recipeId: string, isFavorite: boolean): Promise<void> {
+  await updateDoc(doc(db, 'recipes', recipeId), { isFavorite, updatedAt: Timestamp.now() });
+}
+
+/**
+ * Log a recipe as a meal
+ */
+export async function logRecipeAsMealFb(
+  userId: string,
+  recipeId: string,
+  servings: number,
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack',
+  nutrition: Nutrition,
+  recipeName: string
+): Promise<string> {
+  const now = new Date();
+  const roundedNutrition = {
+    calories: Math.round(nutrition.calories),
+    protein: Math.round(nutrition.protein * 10) / 10,
+    carbs: Math.round(nutrition.carbs * 10) / 10,
+    fat: Math.round(nutrition.fat * 10) / 10,
+    fiber: Math.round((nutrition.fiber || 0) * 10) / 10,
+    sugar: nutrition.sugar ? Math.round(nutrition.sugar * 10) / 10 : 0,
+    saturatedFat: nutrition.saturatedFat ? Math.round(nutrition.saturatedFat * 10) / 10 : 0,
+    sodium: nutrition.sodium ? Math.round(nutrition.sodium * 10) / 10 : 0,
+  };
+  const mealDoc = await addDoc(collection(db, 'meals'), {
+    userId,
+    dishName: recipeName,
+    mealType,
+    // Nested nutrition object (primary — used by MealCard/store)
+    nutrition: roundedNutrition,
+    // Flat fields (legacy compat)
+    calories: roundedNutrition.calories,
+    protein: roundedNutrition.protein,
+    carbs: roundedNutrition.carbs,
+    fat: roundedNutrition.fat,
+    fiber: roundedNutrition.fiber,
+    notes: `Receta: ${recipeName} (${servings} porciones)`,
+    recipeId,
+    ingredients: [],
+    timestamp: Timestamp.fromDate(now),
+    createdAt: Timestamp.fromDate(now),
+  });
+  return mealDoc.id;
 }

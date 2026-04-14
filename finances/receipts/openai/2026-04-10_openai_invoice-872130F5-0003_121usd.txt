@@ -1,0 +1,9 @@
+PROVEEDOR: OpenAI (Platform API)
+FECHA: 10 de abril de 2026
+NUMERO_FACTURA: 872130F5-0003
+IMPORTE: $121.00 USD
+ESTADO: Paid
+FUENTE: https://platform.openai.com/settings/organization/billing/history
+URL_FACTURA: https://invoice.stripe.com/i/acct_1HOrSwC6h1nxGoI3/live_YWNjdF8xSE9yU3dDNmgxbnhHb0kzLF9VSkpEdXdKZjdGRzdqTEYzN3E2U2tIblVpc0dwbWU3LDE2NjY0MTkyOQ0200uE43LlQf?s=ap
+NOTA: PDF no descargable automaticamente (pagina JS de Stripe). Descargar manualmente desde el portal OpenAI o la URL de factura.
+OBTENIDO: 2026-04-13 (tarea automatica)

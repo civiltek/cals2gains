@@ -1,54 +1,30 @@
 // ============================================
-// Cals2Gains — Performance Intelligence Palette
+// Cals2Gains — Performance Intelligence Palette (THEME-AWARE)
 // Brand: Carbon Plum / Soft Violet / Signal Coral / Bone
 // ============================================
+// This file re-exports the mutable COLORS from theme.ts,
+// mapped to the Colors property names used by tab screens.
+// When the theme changes, these values update in-place.
 
-export const Colors = {
-  // Brand primaries
-  primary: "#9C8CFF",       // Soft Violet
-  primaryLight: "#B8ADFF",  // Violet light
-  primaryDark: "#7B6FE0",   // Violet dark
-  accent: "#FF6A4D",        // Signal Coral
-  accentLight: "#FF8A73",   // Coral light
+import { COLORS } from '../theme';
 
-  // Backgrounds
-  background: "#17121D",    // Carbon Plum
-  surface: "#1F1A28",       // Surface (slightly lighter)
-  surfaceLight: "#2A2335",  // Surface variant
-  card: "#1F1A28",
+// Re-export as a proxy that always reads from the mutable COLORS object
+const Colors: Record<string, any> = new Proxy(COLORS, {
+  get(target, prop: string) {
+    // Map Colors-specific names to COLORS equivalents
+    const aliases: Record<string, string> = {
+      primaryDark: 'primary',
+      accentLight: 'accent',
+      surfaceLight: 'surfaceLight',
+      borderLight: 'border',
+      carbon: 'background',
+      gradientStart: 'violet',
+      gradientEnd: 'coral',
+    };
+    const key = aliases[prop] || prop;
+    return (target as any)[key];
+  },
+});
 
-  // Text
-  text: "#F7F2EA",          // Bone (primary text on dark)
-  textSecondary: "#A09AAE", // Muted violet-grey
-  textMuted: "#6B6478",     // Subtle
-
-  // Macro colors (keep distinct for readability)
-  protein: "#F59E0B",       // Amber
-  carbs: "#9C8CFF",         // Violet (brand-aligned)
-  fat: "#FF6A4D",           // Coral (brand-aligned)
-  fiber: "#34D399",         // Emerald
-  calories: "#9C8CFF",      // Violet
-
-  // Status
-  success: "#34D399",
-  warning: "#F59E0B",
-  error: "#FF6A4D",         // Coral as error
-  info: "#9C8CFF",          // Violet as info
-
-  // Borders
-  border: "#2A2335",
-  borderLight: "#3D3549",
-
-  // Utility
-  overlay: "rgba(23,18,29,0.85)",
-  white: "#FFFFFF",
-  black: "#000000",
-  bone: "#F7F2EA",
-  coral: "#FF6A4D",
-  violet: "#9C8CFF",
-  carbon: "#17121D",
-  gradientStart: "#9C8CFF", // Violet
-  gradientEnd: "#FF6A4D",   // Coral
-  transparent: "transparent",
-};
+export { Colors };
 export default Colors;

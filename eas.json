@@ -9,7 +9,13 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EAS_SKIP_AUTO_FINGERPRINT": "1"
+      }
     },
     "production": {
       "autoIncrement": true
@@ -17,11 +23,6 @@
   },
   "submit": {
     "production": {
-      "ios": {
-        "appleId": "TU_APPLE_ID@email.com",
-        "ascAppId": "TU_APP_STORE_CONNECT_ID",
-        "appleTeamId": "TU_TEAM_ID"
-      },
       "android": {
         "serviceAccountKeyPath": "./google-play-service-account.json",
         "track": "internal"

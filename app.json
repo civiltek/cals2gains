@@ -24,8 +24,6 @@
         "NSHealthUpdateUsageDescription": "Cals2Gains sincroniza tu peso con Apple Health.",
         "CFBundleLocalizations": [
           "en",
-          "es",
-          "en",
           "es"
         ],
         "ITSAppUsesNonExemptEncryption": false
@@ -53,6 +51,12 @@
     "plugins": [
       "expo-router",
       "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.623010472348-a1mb9rqr8jlq3jkhi043bpacg6b4f9it"
+        }
+      ],
       [
         "expo-camera",
         {

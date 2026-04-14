@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cals2Gains — Estrategia de Comentarios en Influencers</title>
+<style>
+  :root {
+    --primary: #6366F1;
+    --primary-dark: #4F46E5;
+    --coral: #F97066;
+    --bg: #0F172A;
+    --bg2: #1E293B;
+    --bg3: #334155;
+    --text: #E2E8F0;
+    --text-muted: #94A3B8;
+    --green: #10B981;
+    --yellow: #FBBF24;
+    --red: #EF4444;
+    --blue: #3B82F6;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height:1.6; }
+  .container { max-width:1200px; margin:0 auto; padding:24px; }
+
+  header { text-align:center; padding:40px 0 30px; border-bottom:2px solid var(--bg3); margin-bottom:32px; }
+  header h1 { font-size:2.2em; background: linear-gradient(135deg, var(--primary), var(--coral)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:8px; }
+  header p { color: var(--text-muted); font-size:1.1em; }
+
+  .warning-box { background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(239,68,68,0.1)); border:1px solid var(--yellow); border-radius:12px; padding:20px 24px; margin-bottom:32px; }
+  .warning-box h3 { color: var(--yellow); margin-bottom:8px; }
+  .warning-box p { color: var(--text-muted); font-size:0.95em; }
+
+  .section { background: var(--bg2); border-radius:16px; padding:28px; margin-bottom:24px; border:1px solid var(--bg3); }
+  .section h2 { color: var(--primary); font-size:1.5em; margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--bg3); }
+  .section h3 { color: var(--coral); margin:18px 0 10px; font-size:1.15em; }
+
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:768px) { .grid-2 { grid-template-columns:1fr; } }
+
+  .influencer-card { background: var(--bg); border:1px solid var(--bg3); border-radius:12px; padding:16px; transition:border-color 0.2s; }
+  .influencer-card:hover { border-color: var(--primary); }
+  .influencer-card .name { font-weight:700; font-size:1.05em; color: var(--text); }
+  .influencer-card .handle { color: var(--primary); font-size:0.9em; }
+  .influencer-card .followers { color: var(--green); font-size:0.85em; margin-top:4px; }
+  .influencer-card .niche { color: var(--text-muted); font-size:0.85em; margin-top:2px; }
+
+  .tag { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.78em; font-weight:600; margin:2px; }
+  .tag-es { background:rgba(249,112,102,0.2); color:var(--coral); }
+  .tag-en { background:rgba(99,102,241,0.2); color:var(--primary); }
+  .tag-mx { background:rgba(16,185,129,0.2); color:var(--green); }
+
+  table { width:100%; border-collapse:collapse; margin:12px 0; }
+  th { background:var(--bg); color:var(--primary); text-align:left; padding:10px 12px; font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px; }
+  td { padding:10px 12px; border-top:1px solid var(--bg3); font-size:0.92em; }
+  tr:hover td { background:rgba(99,102,241,0.05); }
+
+  .time-slot { display:inline-block; background:var(--bg); padding:6px 14px; border-radius:8px; margin:4px; font-size:0.9em; border:1px solid var(--bg3); }
+  .time-slot.peak { border-color:var(--green); color:var(--green); font-weight:600; }
+  .time-slot.good { border-color:var(--blue); color:var(--blue); }
+
+  .comment-example { background:var(--bg); border-left:3px solid var(--primary); padding:14px 18px; margin:10px 0; border-radius:0 8px 8px 0; font-size:0.92em; }
+  .comment-example.es { border-left-color: var(--coral); }
+  .comment-example .label { font-size:0.75em; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px; margin-bottom:6px; }
+
+  .rule-list { list-style:none; }
+  .rule-list li { padding:8px 0; padding-left:24px; position:relative; }
+  .rule-list li::before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:700; }
+  .rule-list li.danger::before { content:"✗"; color:var(--red); }
+
+  .schedule-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  @media(max-width:768px) { .schedule-grid { grid-template-columns:1fr; } }
+  .schedule-block { background:var(--bg); border-radius:10px; padding:16px; text-align:center; border:1px solid var(--bg3); }
+  .schedule-block .time { font-size:1.4em; font-weight:700; color:var(--green); }
+  .schedule-block .desc { font-size:0.85em; color:var(--text-muted); margin-top:4px; }
+  .schedule-block .profile { font-size:0.8em; color:var(--primary); margin-top:6px; font-weight:600; }
+
+  .metric-row { display:flex; gap:16px; flex-wrap:wrap; margin:12px 0; }
+  .metric { background:var(--bg); border-radius:10px; padding:16px 20px; flex:1; min-width:140px; text-align:center; border:1px solid var(--bg3); }
+  .metric .num { font-size:1.6em; font-weight:800; color:var(--primary); }
+  .metric .label { font-size:0.8em; color:var(--text-muted); margin-top:2px; }
+
+  .rotation-table td:first-child { font-weight:600; color:var(--primary); white-space:nowrap; }
+
+  .step-num { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:var(--primary); color:white; font-weight:700; font-size:0.85em; margin-right:8px; flex-shrink:0; }
+  .workflow-step { display:flex; align-items:flex-start; padding:12px 0; }
+  .workflow-step p { flex:1; }
+
+  .category-title { background: linear-gradient(135deg, var(--primary), var(--coral)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:1.1em; font-weight:700; margin:16px 0 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Estrategia de Comentarios en Influencers</h1>
+  <p>Plan completo para @cals2gains (EN) · @cals2gains_es (ES) · Facebook Cals2Gains</p>
+  <p style="color:var(--text-muted);font-size:0.9em;margin-top:8px;">Abril 2026 — Documento interno</p>
+</header>
+
+<!-- ============ ADVERTENCIA IMPORTANTE ============ -->
+<div class="warning-box">
+  <h3>⚠ Nota Importante: Automatización y Política de Instagram</h3>
+  <p><strong>Comentar automáticamente en publicaciones de OTROS usuarios viola los Términos de Servicio de Instagram.</strong> La API oficial de Instagram (Graph API) NO permite publicar comentarios en posts ajenos. Usar bots de terceros para esto conlleva alto riesgo de <strong>shadowban, restricción temporal o cierre permanente</strong> de la cuenta. Instagram ha mejorado significativamente su detección de bots en 2025-2026 — lo que funcionaba antes ahora se detecta en días.</p>
+  <p style="margin-top:10px;">Esta estrategia está diseñada como un <strong>sistema semi-manual optimizado</strong>: te damos los influencers, los horarios, los comentarios pre-escritos y un flujo de trabajo con recordatorios automáticos para que el proceso sea lo más rápido y eficiente posible, sin arriesgar las cuentas.</p>
+</div>
+
+<!-- ============ MÉTRICAS OBJETIVO ============ -->
+<div class="section">
+  <h2>Objetivos Diarios</h2>
+  <div class="metric-row">
+    <div class="metric"><div class="num">~30</div><div class="label">Comentarios/día<br>@cals2gains_es</div></div>
+    <div class="metric"><div class="num">~30</div><div class="label">Comentarios/día<br>@cals2gains</div></div>
+    <div class="metric"><div class="num">~30</div><div class="label">Comentarios/día<br>FB Cals2Gains</div></div>
+    <div class="metric"><div class="num">~90</div><div class="label">Total<br>comentarios/día</div></div>
+  </div>
+  <p style="color:var(--text-muted);font-size:0.9em;margin-top:8px;">Distribuidos en 3 franjas horarias para maximizar visibilidad y parecer actividad humana natural.</p>
+</div>
+
+<!-- ============ INFLUENCERS ESPAÑOL ============ -->
+<div class="section">
+  <h2>Lista de Influencers Target</h2>
+
+  <h3>Español — España <span class="tag tag-es">ES</span></h3>
+  <div class="grid-2">
+    <div class="influencer-card">
+      <div class="name">Patry Jordán</div>
+      <div class="handle">@patryjordan</div>
+      <div class="followers">12M+ seguidores (YouTube + IG)</div>
+      <div class="niche">Fitness, rutinas en casa, vida saludable</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Sergio Peinado</div>
+      <div class="handle">@sergiopeinado</div>
+      <div class="followers">7M+ seguidores</div>
+      <div class="niche">Entrenamiento personal, nutrición, transformaciones</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Vikika Costa</div>
+      <div class="handle">@vikikacostaofficial</div>
+      <div class="followers">2.5M+ seguidores</div>
+      <div class="niche">Fitness, nutrición deportiva, competiciones</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">David Marchante</div>
+      <div class="handle">@powerexplosive</div>
+      <div class="followers">3M+ seguidores</div>
+      <div class="niche">Entrenamiento de fuerza, ciencia del ejercicio</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Mireia Figueras</div>
+      <div class="handle">@mireiafigueras</div>
+      <div class="followers">500K+ seguidores</div>
+      <div class="niche">Coaching fitness, movilidad, fuerza femenina</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Maru Lekhal</div>
+      <div class="handle">@marulekhal</div>
+      <div class="followers">300K+ seguidores</div>
+      <div class="niche">Entrenamiento online, nutrición personalizada</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Carlos Demattey</div>
+      <div class="handle">@carlos.demattey</div>
+      <div class="followers">1M+ seguidores</div>
+      <div class="niche">Recetas fitness, cocina saludable</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Realfooding (Carlos Ríos)</div>
+      <div class="handle">@carlosrios</div>
+      <div class="followers">4.5M+ seguidores</div>
+      <div class="niche">Comida real, nutrición, anti-ultraprocesados</div>
+    </div>
+  </div>
+
+  <h3>Español — México & LATAM <span class="tag tag-mx">MX/LATAM</span></h3>
+  <div class="grid-2">
+    <div class="influencer-card">
+      <div class="name">Bárbara de Regil</div>
+      <div class="handle">@barbaraderegil</div>
+      <div class="followers">9M+ seguidores</div>
+      <div class="niche">Fitness lifestyle, rutinas, motivación</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Yanet García</div>
+      <div class="handle">@iamyanetgarcia</div>
+      <div class="followers">14M+ seguidores</div>
+      <div class="niche">Fitness, lifestyle, planes de entrenamiento</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Brenda Zambrano</div>
+      <div class="handle">@brendazambranoc</div>
+      <div class="followers">5.8M+ seguidores</div>
+      <div class="niche">Fitness, vida saludable, motivación</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Alejandra Treviño</div>
+      <div class="handle">@alejandratrevino</div>
+      <div class="followers">5.1M+ seguidores</div>
+      <div class="niche">Ejercicio, alimentación, bienestar</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Sascha Fitness</div>
+      <div class="handle">@saikifit</div>
+      <div class="followers">4.5M+ seguidores</div>
+      <div class="niche">Nutrición basada en ciencia, fitness femenino</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Naty Arcila</div>
+      <div class="handle">@natyarcila</div>
+      <div class="followers">3M+ seguidores</div>
+      <div class="niche">Fitness, rutinas HIIT, wellness</div>
+    </div>
+  </div>
+
+  <h3>Inglés — Internacional <span class="tag tag-en">EN</span></h3>
+  <div class="grid-2">
+    <div class="influencer-card">
+      <div class="name">Kayla Itsines</div>
+      <div class="handle">@kaaborettoitsines</div>
+      <div class="followers">16M+ seguidores</div>
+      <div class="niche">BBG/SWEAT, fitness femenino, nutrition</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Chris Bumstead</div>
+      <div class="handle">@cbum</div>
+      <div class="followers">26M+ seguidores</div>
+      <div class="niche">Bodybuilding, training, nutrition</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Michelle Lewin</div>
+      <div class="handle">@michelle_lewin</div>
+      <div class="followers">15M+ seguidores</div>
+      <div class="niche">Fitness model, workout routines, meal prep</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Jeff Nippard</div>
+      <div class="handle">@jeffnippard</div>
+      <div class="followers">4M+ seguidores</div>
+      <div class="niche">Science-based training, nutrition research</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Natacha Océane</div>
+      <div class="handle">@natacha.oceane</div>
+      <div class="followers">3.5M+ seguidores</div>
+      <div class="niche">Science-based fitness, nutrition, performance</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Sommer Ray</div>
+      <div class="handle">@sommerray</div>
+      <div class="followers">26M+ seguidores</div>
+      <div class="niche">Fitness lifestyle, workouts, wellness</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Will Tennyson</div>
+      <div class="handle">@willtenny</div>
+      <div class="followers">3M+ seguidores</div>
+      <div class="niche">Nutrition challenges, meal prep, macros</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Greg Doucette</div>
+      <div class="handle">@gregdoucette</div>
+      <div class="followers">5M+ seguidores</div>
+      <div class="niche">Nutrition science, calorie tracking, fitness</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Senada</div>
+      <div class="handle">@senada.greca</div>
+      <div class="followers">6M+ seguidores</div>
+      <div class="niche">Holistic fitness, personal development</div>
+    </div>
+    <div class="influencer-card">
+      <div class="name">Amanda Bucci</div>
+      <div class="handle">@amandabucci</div>
+      <div class="followers">1M+ seguidores</div>
+      <div class="niche">Macro tracking, mindset, fitness coaching</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HORARIOS ÓPTIMOS ============ -->
+<div class="section">
+  <h2>Horarios Óptimos de Comentarios</h2>
+  <p style="color:var(--text-muted);margin-bottom:16px;">La clave es comentar en los primeros 30-60 minutos después de que el influencer publique. Como no siempre es predecible, estas ventanas cubren los momentos de mayor engagement general + los horarios típicos de publicación de influencers.</p>
+
+  <h3>Franja 1 — Mañana (Mayor alcance orgánico)</h3>
+  <div class="schedule-grid">
+    <div class="schedule-block">
+      <div class="time">7:00 - 9:00</div>
+      <div class="desc">Hora España (CET)</div>
+      <div class="profile">@cals2gains_es + influencers ES España</div>
+    </div>
+    <div class="schedule-block">
+      <div class="time">7:00 - 9:00</div>
+      <div class="desc">Hora EST / CST (USA)</div>
+      <div class="profile">@cals2gains + influencers EN</div>
+    </div>
+    <div class="schedule-block">
+      <div class="time">7:00 - 9:00</div>
+      <div class="desc">Hora CDMX (CST)</div>
+      <div class="profile">@cals2gains_es + influencers MX/LATAM</div>
+    </div>
+  </div>
+
+  <h3>Franja 2 — Mediodía (Pico de actividad)</h3>
+  <div class="schedule-grid">
+    <div class="schedule-block">
+      <div class="time">12:00 - 14:00</div>
+      <div class="desc">Hora España (CET)</div>
+      <div class="profile">@cals2gains_es + influencers ES España</div>
+    </div>
+    <div class="schedule-block">
+      <div class="time">11:00 - 13:00</div>
+      <div class="desc">Hora EST (USA)</div>
+      <div class="profile">@cals2gains + influencers EN</div>
+    </div>
+    <div class="schedule-block">
+      <div class="time">12:00 - 14:00</div>
+      <div class="desc">Hora CDMX (CST)</div>
+      <div class="profile">@cals2gains_es + influencers MX/LATAM</div>
+    </div>
+  </div>
+
+  <h3>Franja 3 — Tarde/Noche (Engagement máximo)</h3>
+  <div class="schedule-grid">
+    <div class="schedule-block">
+      <div class="time">19:00 - 21:00</div>
+      <div class="desc">Hora España (CET)</div>
+      <div class="profile">@cals2gains_es + influencers ES España</div>
+    </div>
+    <div class="schedule-block">
+      <div class="time">18:00 - 20:00</div>
+      <div class="desc">Hora EST (USA)</div>
+      <div class="profile">@cals2gains + influencers EN</div>
+    </div>
+    <div class="schedule-block">
+      <div class="time">19:00 - 21:00</div>
+      <div class="desc">Hora CDMX (CST)</div>
+      <div class="profile">@cals2gains_es + influencers MX/LATAM</div>
+    </div>
+  </div>
+
+  <h3>Distribución Diaria Recomendada</h3>
+  <table>
+    <tr><th>Franja</th><th>@cals2gains_es</th><th>@cals2gains</th><th>FB Cals2Gains</th></tr>
+    <tr><td>Mañana (7-9h)</td><td>10 comentarios</td><td>10 comentarios</td><td>10 comentarios</td></tr>
+    <tr><td>Mediodía (12-14h)</td><td>10 comentarios</td><td>10 comentarios</td><td>10 comentarios</td></tr>
+    <tr><td>Noche (19-21h)</td><td>10 comentarios</td><td>10 comentarios</td><td>10 comentarios</td></tr>
+    <tr style="font-weight:700;"><td>Total</td><td>30/día</td><td>30/día</td><td>30/día</td></tr>
+  </table>
+
+  <h3>Mejores Días de la Semana</h3>
+  <table>
+    <tr><th>Día</th><th>Prioridad</th><th>Nota</th></tr>
+    <tr><td>Martes</td><td style="color:var(--green);">ALTA</td><td>Segundo mejor día para engagement</td></tr>
+    <tr><td>Miércoles</td><td style="color:var(--green);">MÁXIMA</td><td>Pico de engagement semanal</td></tr>
+    <tr><td>Jueves</td><td style="color:var(--green);">MÁXIMA</td><td>Pico de engagement compartido con miércoles</td></tr>
+    <tr><td>Lunes</td><td style="color:var(--blue);">MEDIA-ALTA</td><td>Buen engagement, más competencia</td></tr>
+    <tr><td>Viernes</td><td style="color:var(--blue);">MEDIA</td><td>Engagement decrece hacia el fin de semana</td></tr>
+    <tr><td>Sábado</td><td style="color:var(--yellow);">BAJA</td><td>Reducir a 15-20 comentarios/perfil</td></tr>
+    <tr><td>Domingo</td><td style="color:var(--yellow);">BAJA</td><td>Reducir a 15-20 comentarios/perfil</td></tr>
+  </table>
+</div>
+
+<!-- ============ PLANTILLAS DE COMENTARIOS ============ -->
+<div class="section">
+  <h2>Librería de Comentarios — Español</h2>
+  <p style="color:var(--text-muted);margin-bottom:16px;">Cada comentario debe adaptarse al contenido específico del post. Estas plantillas son el esqueleto — personalízalas siempre con detalles del post.</p>
+
+  <div class="category-title">CATEGORÍA A — Dato nutricional / Valor añadido</div>
+  <p style="color:var(--text-muted);font-size:0.88em;margin-bottom:10px;">Aportan información real. Generan autoridad y curiosidad sobre quién está detrás del perfil.</p>
+
+  <div class="comment-example es">
+    <div class="label">A1 — Dato sorprendente</div>
+    Mucha gente no sabe que [alimento del post] tiene casi [X]g de proteína por cada 100g. Juegazo para los que buscan opciones sin tirar de pollo todo el día 💪
+  </div>
+  <div class="comment-example es">
+    <div class="label">A2 — Corrección amable</div>
+    Muy buen post! Solo un matiz: la [vitamina/nutriente] de [alimento] se absorbe mucho mejor si lo combinas con una fuente de grasa. Un chorrito de aceite de oliva y ya lo tienes 👌
+  </div>
+  <div class="comment-example es">
+    <div class="label">A3 — Tip complementario</div>
+    Esto es oro. Yo añadiría que si le echas un poco de canela al [plato/batido], además de sabor le estás bajando el índice glucémico. Pequeño hack que marca diferencia
+  </div>
+  <div class="comment-example es">
+    <div class="label">A4 — Pregunta inteligente</div>
+    Qué interesante! ¿Has probado a sustituir [ingrediente] por [alternativa]? El perfil de aminoácidos es parecido pero te ahorras bastantes calorías. Llevo un tiempo con eso y se nota
+  </div>
+  <div class="comment-example es">
+    <div class="label">A5 — Refuerzo con evidencia</div>
+    Totalmente de acuerdo. Hay un estudio reciente que muestra que [concepto del post] puede aumentar la síntesis proteica hasta un [X]%. La ciencia va confirmando lo que ya sabíamos en el gym 🧬
+  </div>
+
+  <div class="category-title">CATEGORÍA B — Experiencia personal</div>
+  <p style="color:var(--text-muted);font-size:0.88em;margin-bottom:10px;">Generan conexión humana y credibilidad. El perfil parece alguien real con conocimiento.</p>
+
+  <div class="comment-example es">
+    <div class="label">B1 — Historia breve</div>
+    Llevo 3 meses haciendo exactamente esto y el cambio ha sido brutal. Lo más difícil fue ajustar las cantidades al principio pero una vez que le pillas el truco va solo
+  </div>
+  <div class="comment-example es">
+    <div class="label">B2 — Error que cometí</div>
+    Me pasó justo eso cuando empecé. Creía que [error común] era lo correcto y resulta que estaba saboteando mis propios resultados sin saberlo. Posts como este ojalá los hubiera visto antes 🙌
+  </div>
+  <div class="comment-example es">
+    <div class="label">B3 — Resultado concreto</div>
+    Esto funciona de verdad. Empecé a trackear mis macros en serio hace poco y he bajado [X]% de grasa sin tocar mis cargas en el gym. Los números no mienten
+  </div>
+  <div class="comment-example es">
+    <div class="label">B4 — Evolución</div>
+    Antes pensaba que contar calorías era obsesivo. Hasta que lo probé bien, con una buena herramienta, y me di cuenta de que en realidad te libera porque dejas de adivinar
+  </div>
+
+  <div class="category-title">CATEGORÍA C — Opinión / Debate constructivo</div>
+  <p style="color:var(--text-muted);font-size:0.88em;margin-bottom:10px;">Generan engagement (respuestas, likes al comentario) y posicionan el perfil como conocedor.</p>
+
+  <div class="comment-example es">
+    <div class="label">C1 — Matiz respetuoso</div>
+    Buenísimo! Aunque yo diría que esto depende mucho del contexto de cada persona. Para alguien con un objetivo de [recomp/definición/volumen] la estrategia puede cambiar bastante
+  </div>
+  <div class="comment-example es">
+    <div class="label">C2 — Opinión popular</div>
+    Esto debería ser ley en todos los gyms del país. La cantidad de desinformación nutricional que hay es tremenda. Gracias por ponerlo tan claro 🔥
+  </div>
+  <div class="comment-example es">
+    <div class="label">C3 — Pregunta retórica</div>
+    Lo que más me flipó cuando aprendí esto es que la mayoría sigue pensando que [mito popular]. ¿Cuándo dejamos de escuchar a la industria y empezamos a mirar los datos reales?
+  </div>
+
+  <div class="category-title">CATEGORÍA D — Elogio con sustancia</div>
+  <p style="color:var(--text-muted);font-size:0.88em;margin-bottom:10px;">Simple pero efectivo. Muestra presencia sin forzar nada.</p>
+
+  <div class="comment-example es">
+    <div class="label">D1 — Elogio técnico</div>
+    La forma en que explicas [técnica/concepto] es brutal. Hay gente que lleva años entrenando y no tiene esto tan claro. Contenido de mucho nivel
+  </div>
+  <div class="comment-example es">
+    <div class="label">D2 — Elogio + beneficio</div>
+    Guardadísimo. Esto me va a ahorrar mucho tiempo en la cocina y encima cuadrando macros. Justo lo que necesitaba esta semana
+  </div>
+
+</div>
+
+<!-- ============ ENGLISH COMMENTS ============ -->
+<div class="section">
+  <h2>Comment Library — English</h2>
+
+  <div class="category-title">CATEGORY A — Nutritional Value / Expert Insight</div>
+
+  <div class="comment-example">
+    <div class="label">A1 — Surprising fact</div>
+    Most people don't realize [food in post] packs nearly [X]g of protein per serving. Solid option when you're tired of the same chicken-rice-broccoli rotation 💪
+  </div>
+  <div class="comment-example">
+    <div class="label">A2 — Friendly addition</div>
+    Great post! One thing worth noting — the [nutrient] in [food] absorbs way better when paired with a fat source. Even just a drizzle of olive oil makes a big difference
+  </div>
+  <div class="comment-example">
+    <div class="label">A3 — Complementary tip</div>
+    This is fire. I'd add that throwing in some cinnamon actually helps lower the glycemic impact too. Small hack but it adds up over time
+  </div>
+  <div class="comment-example">
+    <div class="label">A4 — Smart question</div>
+    Have you tried swapping [ingredient] for [alternative]? Similar amino acid profile but noticeably fewer calories. Been doing it for a few weeks and it's been a game changer
+  </div>
+  <div class="comment-example">
+    <div class="label">A5 — Evidence-backed</div>
+    Couldn't agree more. There's recent research showing [concept from post] can boost protein synthesis by up to [X]%. Science is finally catching up to what the gym community has known for years 🧬
+  </div>
+
+  <div class="category-title">CATEGORY B — Personal Experience</div>
+
+  <div class="comment-example">
+    <div class="label">B1 — Short story</div>
+    Been doing exactly this for 3 months and the results speak for themselves. Hardest part was dialing in the portions at first but once you get a system going it's effortless
+  </div>
+  <div class="comment-example">
+    <div class="label">B2 — Mistake I made</div>
+    I made this exact mistake when I started out. Thought [common misconception] was the way to go and ended up spinning my wheels for months. Wish I had seen content like this earlier
+  </div>
+  <div class="comment-example">
+    <div class="label">B3 — Concrete result</div>
+    This actually works. Started properly tracking my macros recently and dropped [X]% body fat without losing any strength. The numbers really don't lie
+  </div>
+  <div class="comment-example">
+    <div class="label">B4 — Mindset shift</div>
+    Used to think calorie tracking was obsessive. Then I tried doing it properly with the right tool and realized it's actually freeing — you stop guessing and start knowing
+  </div>
+
+  <div class="category-title">CATEGORY C — Opinion / Constructive Debate</div>
+
+  <div class="comment-example">
+    <div class="label">C1 — Respectful nuance</div>
+    Love this! Though I'd say it really depends on individual context. Someone in a cut vs. a lean bulk would probably approach this very differently
+  </div>
+  <div class="comment-example">
+    <div class="label">C2 — Strong agreement</div>
+    This should be mandatory reading in every gym. The amount of nutrition misinformation floating around is insane. Thank you for making it this clear 🔥
+  </div>
+  <div class="comment-example">
+    <div class="label">C3 — Rhetorical hook</div>
+    The thing that blew my mind when I learned this is that most people still believe [popular myth]. When did we stop looking at actual data and start trusting marketing?
+  </div>
+
+  <div class="category-title">CATEGORY D — Substantive Praise</div>
+
+  <div class="comment-example">
+    <div class="label">D1 — Technical praise</div>
+    The way you break down [technique/concept] is next level. Some people train for years without understanding this. Elite content right here
+  </div>
+  <div class="comment-example">
+    <div class="label">D2 — Praise + benefit</div>
+    Saved instantly. This is going to save me so much time in the kitchen while actually hitting my macros. Exactly what I needed this week
+  </div>
+</div>
+
+<!-- ============ SISTEMA DE ROTACIÓN ============ -->
+<div class="section">
+  <h2>Sistema de Rotación (Anti-Repetición)</h2>
+  <p style="color:var(--text-muted);margin-bottom:16px;">Nunca uses la misma categoría más de 2 veces seguidas. Sigue este patrón cíclico y ajústalo según el contenido del post.</p>
+
+  <table class="rotation-table">
+    <tr><th>Sesión</th><th>Comentarios 1-3</th><th>Comentarios 4-6</th><th>Comentarios 7-10</th></tr>
+    <tr><td>Mañana</td><td>A (datos) + B (experiencia)</td><td>C (opinión) + D (elogio)</td><td>A + C (mezclar)</td></tr>
+    <tr><td>Mediodía</td><td>B (experiencia) + C (opinión)</td><td>D (elogio) + A (datos)</td><td>B + D (mezclar)</td></tr>
+    <tr><td>Noche</td><td>C (opinión) + D (elogio)</td><td>A (datos) + B (experiencia)</td><td>C + A (mezclar)</td></tr>
+  </table>
+
+  <h3>Reglas de Oro</h3>
+  <ul class="rule-list">
+    <li>Nunca copiar una plantilla textual — siempre adaptar al post específico</li>
+    <li>Incluir detalles concretos del post (alimentos mencionados, ejercicios, datos)</li>
+    <li>Variar la longitud: algunos de 1 línea, otros de 3-4 líneas</li>
+    <li>Usar emojis con moderación (máximo 1-2 por comentario, y no siempre)</li>
+    <li>Responder a replies que recibas en tus comentarios (genera aún más visibilidad)</li>
+    <li>Algunos días priorizar "me gusta" a otros comentarios del post antes de comentar</li>
+    <li class="danger">NUNCA mencionar Cals2Gains, la app, ni "descarga" o "link en bio"</li>
+    <li class="danger">NUNCA usar el mismo comentario dos veces en la misma semana</li>
+    <li class="danger">NUNCA comentar más de 2 veces en posts del mismo influencer en un día</li>
+    <li class="danger">NUNCA comentar más de 10-12 posts seguidos sin pausas de 5-15 minutos</li>
+  </ul>
+</div>
+
+<!-- ============ FLUJO DE TRABAJO ============ -->
+<div class="section">
+  <h2>Flujo de Trabajo Diario</h2>
+  <p style="color:var(--text-muted);margin-bottom:16px;">Sistema optimizado para completar los ~90 comentarios diarios en ~45-60 minutos totales (3 sesiones de 15-20 minutos).</p>
+
+  <h3>Sesión 1 — Mañana (~15-20 min)</h3>
+  <div class="workflow-step"><span class="step-num">1</span><p>Abre Instagram con la cuenta @cals2gains_es. Revisa las publicaciones más recientes (últimas 2-4 horas) de los influencers ES de la lista.</p></div>
+  <div class="workflow-step"><span class="step-num">2</span><p>Comenta en las 10 publicaciones más recientes usando plantillas de las categorías asignadas para la mañana, adaptándolas al contenido.</p></div>
+  <div class="workflow-step"><span class="step-num">3</span><p>Cambia a @cals2gains. Repite con los influencers EN — 10 comentarios en inglés.</p></div>
+  <div class="workflow-step"><span class="step-num">4</span><p>Abre la página de Facebook Cals2Gains. Comenta en 10 posts de páginas fitness/nutrición en español.</p></div>
+  <div class="workflow-step"><span class="step-num">5</span><p>Deja pausa de 5-15 min entre cada bloque de 10. Dale "me gusta" a 5-10 comentarios de otros usuarios mientras tanto.</p></div>
+
+  <h3>Sesión 2 — Mediodía (~15-20 min)</h3>
+  <div class="workflow-step"><span class="step-num">6</span><p>Repite el proceso. Prioriza publicaciones nuevas que hayan salido desde la sesión de mañana.</p></div>
+  <div class="workflow-step"><span class="step-num">7</span><p>Revisa si algún comentario de la mañana recibió respuestas — contéstalas para generar conversación.</p></div>
+
+  <h3>Sesión 3 — Noche (~15-20 min)</h3>
+  <div class="workflow-step"><span class="step-num">8</span><p>Última ronda. Enfócate en posts publicados por la tarde y en Stories con opciones de respuesta.</p></div>
+  <div class="workflow-step"><span class="step-num">9</span><p>Revisa todas las respuestas del día y contesta las que falten.</p></div>
+  <div class="workflow-step"><span class="step-num">10</span><p>Registra en el spreadsheet de seguimiento los influencers comentados y las categorías usadas.</p></div>
+</div>
+
+<!-- ============ LÍMITES DE SEGURIDAD ============ -->
+<div class="section">
+  <h2>Límites de Seguridad Anti-Ban</h2>
+  <p style="color:var(--text-muted);margin-bottom:16px;">Instagram en 2026 detecta comportamiento de bot en días. Respeta estos límites estrictamente.</p>
+
+  <table>
+    <tr><th>Acción</th><th>Límite seguro/hora</th><th>Límite seguro/día</th><th>Nota</th></tr>
+    <tr><td>Comentarios</td><td>10-12</td><td>30-40 por cuenta</td><td>Con pausas aleatorias entre cada uno</td></tr>
+    <tr><td>Likes</td><td>20-30</td><td>100-150 por cuenta</td><td>Combinar con comentarios para parecer natural</td></tr>
+    <tr><td>Follows</td><td>5-8</td><td>20-30 por cuenta</td><td>No hacer follow masivo, solo selectivo</td></tr>
+    <tr><td>Pausa entre acciones</td><td colspan="2">30 seg – 3 min (aleatorio)</td><td>Nunca actuar a velocidad constante</td></tr>
+    <tr><td>Sesiones activas</td><td colspan="2">3-4 sesiones de 15-20 min</td><td>Distribuir a lo largo del día</td></tr>
+  </table>
+
+  <h3>Señales de Alerta — Reduce actividad inmediatamente si:</h3>
+  <ul class="rule-list">
+    <li class="danger">Recibes un mensaje de "Intenta de nuevo más tarde" al comentar</li>
+    <li class="danger">Notas que tus comentarios no aparecen (shadowban)</li>
+    <li class="danger">El alcance de tus propios posts baja repentinamente</li>
+    <li class="danger">Recibes un aviso de "actividad automatizada" de Instagram</li>
+  </ul>
+  <p style="color:var(--yellow);font-size:0.9em;margin-top:12px;">Si esto ocurre: para TODA actividad durante 24-48 horas. Luego retoma con la mitad del volumen durante una semana.</p>
+</div>
+
+<!-- ============ MÉTRICAS DE SEGUIMIENTO ============ -->
+<div class="section">
+  <h2>Métricas de Seguimiento Semanal</h2>
+  <p style="color:var(--text-muted);margin-bottom:16px;">Registra estos KPIs cada semana para evaluar la efectividad de la estrategia.</p>
+
+  <table>
+    <tr><th>Métrica</th><th>Cómo medir</th><th>Objetivo semanal</th></tr>
+    <tr><td>Visitas al perfil</td><td>Instagram Insights → Cuentas alcanzadas</td><td>Incremento +15-25% semana a semana</td></tr>
+    <tr><td>Nuevos seguidores</td><td>Instagram Insights → Seguidores</td><td>+50-100 orgánicos/semana por cuenta</td></tr>
+    <tr><td>Likes recibidos en comentarios</td><td>Revisar notificaciones</td><td>10-20% de comentarios con likes</td></tr>
+    <tr><td>Respuestas a comentarios</td><td>Revisar notificaciones</td><td>5-10% de comentarios con respuestas</td></tr>
+    <tr><td>Clics al perfil desde comentarios</td><td>Instagram Insights → Fuentes de tráfico</td><td>Crecimiento constante</td></tr>
+    <tr><td>Comentarios publicados</td><td>Registro en spreadsheet</td><td>~150-210 (lun-vie) + ~90-120 (sab-dom)</td></tr>
+  </table>
+</div>
+
+<!-- ============ ESTRATEGIA FACEBOOK ============ -->
+<div class="section">
+  <h2>Adaptación para Facebook</h2>
+  <p style="color:var(--text-muted);margin-bottom:16px;">Facebook tiene reglas menos estrictas que Instagram, pero la misma filosofía aplica.</p>
+
+  <h3>Páginas y Grupos Target (Español)</h3>
+  <table>
+    <tr><th>Tipo</th><th>Ejemplos</th><th>Comentarios/día</th></tr>
+    <tr><td>Páginas de influencers</td><td>Sergio Peinado, Patry Jordán, Realfooding, Sascha Fitness</td><td>10-15</td></tr>
+    <tr><td>Grupos de fitness/nutrición</td><td>Grupos abiertos de nutrición, dietas, vida fit en español</td><td>10-15</td></tr>
+    <tr><td>Páginas de marcas fitness</td><td>Myprotein ES, HSN, FoodSpring, etc.</td><td>5-10</td></tr>
+  </table>
+  <p style="color:var(--text-muted);font-size:0.9em;margin-top:12px;">En Facebook los comentarios más largos y detallados funcionan mejor. Usa versiones extendidas de las plantillas de Categoría A (datos) y C (opinión).</p>
+</div>
+
+<!-- ============ RECORDATORIO FINAL ============ -->
+<div class="section" style="border-color:var(--primary); background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(249,112,102,0.05));">
+  <h2>Recordatorio: El Perfil es la Clave</h2>
+  <p>Los comentarios generan curiosidad, pero <strong>es el perfil de @cals2gains / @cals2gains_es el que convierte visitantes en seguidores</strong>. Asegúrate de que:</p>
+  <ul class="rule-list" style="margin-top:12px;">
+    <li>La bio sea clara, atractiva y muestre el valor de la app sin ser demasiado "vendedora"</li>
+    <li>Los highlights estén organizados (tips, recetas, testimonios, FAQ)</li>
+    <li>Las últimas 9-12 publicaciones sean visualmente cohesivas y de alta calidad</li>
+    <li>El link en bio lleve a una landing atractiva (cals2gains.com)</li>
+    <li>La foto de perfil sea el logo profesional de Cals2Gains</li>
+    <li>Haya contenido reciente (publicar al menos 3-5 veces por semana)</li>
+  </ul>
+  <p style="margin-top:12px;color:var(--coral);font-weight:600;">La ecuación: Comentarios de valor → Curiosidad → Clic al perfil → Perfil atractivo → Follow → Descarga de la app</p>
+</div>
+
+</div>
+</body>
+</html>

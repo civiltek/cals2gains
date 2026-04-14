@@ -1,0 +1,37 @@
+npm warn using --force Recommended protections disabled.
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: react-dom@19.2.5
+npm warn Found: react@19.1.0
+npm warn node_modules/react
+npm warn   peerOptional react@"*" from @expo/devtools@0.1.8
+npm warn   node_modules/@expo/devtools
+npm warn     @expo/devtools@"0.1.8" from expo@54.0.33
+npm warn     node_modules/expo
+npm warn   67 more (@expo/vector-icons, @radix-ui/react-compose-refs, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^19.2.5" from react-dom@19.2.5
+npm warn node_modules/react-dom
+npm warn   peerOptional react-dom@"*" from expo-router@6.0.23
+npm warn   node_modules/expo-router
+npm warn   13 more (@expo/metro-runtime, @radix-ui/react-collection, ...)
+npm warn
+npm warn Conflicting peer dependency: react@19.2.5
+npm warn node_modules/react
+npm warn   peer react@"^19.2.5" from react-dom@19.2.5
+npm warn   node_modules/react-dom
+npm warn     peerOptional react-dom@"*" from expo-router@6.0.23
+npm warn     node_modules/expo-router
+npm warn     13 more (@expo/metro-runtime, @radix-ui/react-collection, ...)
+
+removed 3 packages, changed 1 package, and audited 915 packages in 14s
+
+67 packages are looking for funding
+  run `npm fund` for details
+
+10 vulnerabilities (9 moderate, 1 high)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.

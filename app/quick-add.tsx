@@ -20,17 +20,19 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useMealStore } from '../store/mealStore';
-import { COLORS } from '../theme';
+import { useUserStore } from '../store/userStore';
+import { useTranslation } from 'react-i18next';
+import { useColors } from '../store/themeStore';
 
 // ============================================
 // CONSTANTS
 // ============================================
 
 const MEAL_TYPES = [
-  { id: 'breakfast', label: 'Desayuno', icon: 'sunny-outline' },
-  { id: 'lunch', label: 'Almuerzo', icon: 'restaurant-outline' },
-  { id: 'dinner', label: 'Cena', icon: 'moon-outline' },
-  { id: 'snack', label: 'Snack', icon: 'cafe-outline' },
+  { id: 'breakfast', icon: 'sunny-outline' },
+  { id: 'lunch', icon: 'restaurant-outline' },
+  { id: 'dinner', icon: 'moon-outline' },
+  { id: 'snack', icon: 'cafe-outline' },
 ] as const;
 
 // ============================================
@@ -38,12 +40,16 @@ const MEAL_TYPES = [
 // ============================================
 
 export default function QuickAddScreen() {
+  const C = useColors();
+  const styles = createStyles(C);
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ mealType?: string }>();
+  const nutritionMode = useUserStore((s) => s.user?.nutritionMode || 'simple');
   const { addMeal } = useMealStore();
 
   // State - Main macros
-  const [foodName, setFoodName] = useState('Registro rápido');
+  const [foodName, setFoodName] = useState(t('errors.quickAddTitle'));
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
@@ -67,19 +73,19 @@ export default function QuickAddScreen() {
   };
 
   const handleLogMeal = async () => {
-    // Validation
+    // Both modes require calories + protein + carbs + fat
     if (!calories.trim() || !protein.trim() || !carbs.trim() || !fat.trim()) {
-      Alert.alert('Campos requeridos', 'Por favor completa Calorías, Proteína, Carbohidratos y Grasa');
+      Alert.alert(t('errors.requiredFields'), t('errors.missingMacros'));
       return;
     }
 
     const cal = parseInt(calories);
     const prot = parseInt(protein);
-    const carb = parseInt(carbs);
-    const fatt = parseInt(fat);
+    const carb = parseInt(carbs) || 0;
+    const fatt = parseInt(fat) || 0;
 
     if (cal < 0 || prot < 0 || carb < 0 || fatt < 0) {
-      Alert.alert('Valores inválidos', 'Los valores no pueden ser negativos');
+      Alert.alert(t('errors.invalidValues'), t('errors.negativeValues'));
       return;
     }
 
@@ -89,8 +95,8 @@ export default function QuickAddScreen() {
         userId: '', // Will be set by Firebase
         timestamp: new Date(),
         photoUri: '',
-        dishName: foodName.trim() || 'Registro rápido',
-        dishNameEs: foodName.trim() || 'Registro rápido',
+        dishName: foodName.trim() || t('errors.quickAddTitle'),
+        dishNameEs: foodName.trim() || t('errors.quickAddTitle'),
         dishNameEn: foodName.trim() || 'Quick Add',
         ingredients: [],
         portionDescription: 'Manual',
@@ -112,7 +118,7 @@ export default function QuickAddScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     } catch (error) {
-      Alert.alert('Error', 'No se pudo registrar la comida');
+      Alert.alert(t('errors.error'), t('quickAdd.logError'));
       console.error(error);
     } finally {
       setSaving(false);
@@ -150,7 +156,7 @@ export default function QuickAddScreen() {
           onPress={onMinus}
           activeOpacity={0.7}
         >
-          <Ionicons name="remove" size={18} color={COLORS.bone} />
+          <Ionicons name="remove" size={18} color={C.white} />
         </TouchableOpacity>
 
         <TextInput
@@ -159,7 +165,7 @@ export default function QuickAddScreen() {
           onChangeText={onChangeText}
           keyboardType="number-pad"
           placeholder="0"
-          placeholderTextColor={COLORS.textTertiary}
+          placeholderTextColor={C.textTertiary}
           maxLength={4}
         />
 
@@ -168,7 +174,7 @@ export default function QuickAddScreen() {
           onPress={onPlus}
           activeOpacity={0.7}
         >
-          <Ionicons name="add" size={18} color={COLORS.bone} />
+          <Ionicons name="add" size={18} color={C.white} />
         </TouchableOpacity>
       </View>
     </View>
@@ -197,9 +203,9 @@ export default function QuickAddScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name="close" size={24} color={COLORS.bone} />
+            <Ionicons name="close" size={24} color={C.white} />
           </TouchableOpacity>
-          <Text style={styles.title}>Registro Rápido</Text>
+          <Text style={styles.title}>{t('quickAdd.title')}</Text>
           <View style={styles.backBtn} />
         </View>
 
@@ -217,7 +223,7 @@ export default function QuickAddScreen() {
               <Ionicons
                 name={type.icon as any}
                 size={16}
-                color={mealType === type.id ? COLORS.bone : COLORS.textSecondary}
+                color={mealType === type.id ? C.white : C.textSecondary}
               />
               <Text
                 style={[
@@ -225,7 +231,7 @@ export default function QuickAddScreen() {
                   mealType === type.id && styles.mealTypeTextActive,
                 ]}
               >
-                {type.label}
+                {t(`home.${type.id}`)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -233,13 +239,13 @@ export default function QuickAddScreen() {
 
         {/* Food Name Input */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Descripción</Text>
+          <Text style={styles.sectionTitle}>{t('quickAdd.description')}</Text>
           <View style={styles.foodNameContainer}>
-            <Ionicons name="document-text-outline" size={18} color={COLORS.violet} />
+            <Ionicons name="document-text-outline" size={18} color={C.primary} />
             <TextInput
               style={styles.foodNameInput}
-              placeholder="Ej: Pollo con arroz"
-              placeholderTextColor={COLORS.textTertiary}
+              placeholder={t('quickAdd.exampleMeal')}
+              placeholderTextColor={C.textTertiary}
               value={foodName}
               onChangeText={setFoodName}
             />
@@ -248,12 +254,12 @@ export default function QuickAddScreen() {
 
         {/* Main Macros Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Macronutrientes</Text>
+          <Text style={styles.sectionTitle}>{t('quickAdd.macronutrients')}</Text>
 
           <View style={styles.macroGrid}>
             <View style={styles.macroColumn}>
               <MacroInput
-                label="Calorías"
+                label={t('quickAdd.calories')}
                 unit="kcal"
                 value={calories}
                 onChangeText={setCalories}
@@ -264,7 +270,7 @@ export default function QuickAddScreen() {
 
             <View style={styles.macroColumn}>
               <MacroInput
-                label="Proteína"
+                label={t('quickAdd.protein')}
                 unit="g"
                 value={protein}
                 onChangeText={setProtein}
@@ -275,7 +281,7 @@ export default function QuickAddScreen() {
 
             <View style={styles.macroColumn}>
               <MacroInput
-                label="Carbohidratos"
+                label={t('quickAdd.carbs')}
                 unit="g"
                 value={carbs}
                 onChangeText={setCarbs}
@@ -286,7 +292,7 @@ export default function QuickAddScreen() {
 
             <View style={styles.macroColumn}>
               <MacroInput
-                label="Grasa"
+                label={t('quickAdd.fat')}
                 unit="g"
                 value={fat}
                 onChangeText={setFat}
@@ -297,19 +303,21 @@ export default function QuickAddScreen() {
           </View>
         </View>
 
-        {/* Optional Macros Expander */}
-        <TouchableOpacity
-          style={styles.expanderBtn}
-          onPress={() => setShowOptional(!showOptional)}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name={showOptional ? 'chevron-up' : 'chevron-down'}
-            size={20}
-            color={COLORS.violet}
-          />
-          <Text style={styles.expanderText}>Macros opcionales</Text>
-        </TouchableOpacity>
+        {/* Optional Macros Expander — Advanced mode only */}
+        {nutritionMode === 'advanced' && (
+          <TouchableOpacity
+            style={styles.expanderBtn}
+            onPress={() => setShowOptional(!showOptional)}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name={showOptional ? 'chevron-up' : 'chevron-down'}
+              size={20}
+              color={C.primary}
+            />
+            <Text style={styles.expanderText}>{t('quickAdd.optionalMacros')}</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Optional Macros Section */}
         {showOptional && (
@@ -317,7 +325,7 @@ export default function QuickAddScreen() {
             <View style={styles.macroGrid}>
               <View style={styles.macroColumn}>
                 <MacroInput
-                  label="Fibra"
+                  label={t('quickAdd.fiber')}
                   unit="g"
                   value={fiber}
                   onChangeText={setFiber}
@@ -328,7 +336,7 @@ export default function QuickAddScreen() {
 
               <View style={styles.macroColumn}>
                 <MacroInput
-                  label="Azúcar"
+                  label={t('quickAdd.sugar')}
                   unit="g"
                   value={sugar}
                   onChangeText={setSugar}
@@ -339,7 +347,7 @@ export default function QuickAddScreen() {
 
               <View style={styles.macroColumn}>
                 <MacroInput
-                  label="Grasa Sat."
+                  label={t('quickAdd.saturatedFat')}
                   unit="g"
                   value={saturatedFat}
                   onChangeText={setSaturatedFat}
@@ -350,7 +358,7 @@ export default function QuickAddScreen() {
 
               <View style={styles.macroColumn}>
                 <MacroInput
-                  label="Sodio"
+                  label={t('quickAdd.sodium')}
                   unit="mg"
                   value={sodium}
                   onChangeText={setSodium}
@@ -365,17 +373,17 @@ export default function QuickAddScreen() {
         {/* Summary Card */}
         {(totalCalories > 0 || totalProtein > 0 || totalCarbs > 0 || totalFat > 0) && (
           <View style={styles.summaryCard}>
-            <Text style={styles.summaryTitle}>Resumen</Text>
+            <Text style={styles.summaryTitle}>{t('quickAdd.summary')}</Text>
             <View style={styles.summaryPills}>
               <View style={[styles.summaryPill, { backgroundColor: 'rgba(156,140,255,0.15)' }]}>
-                <Text style={[styles.summaryPillText, { color: COLORS.violet }]}>
+                <Text style={[styles.summaryPillText, { color: C.violet }]}>
                   {totalCalories}
                 </Text>
                 <Text style={styles.summaryPillLabel}>kcal</Text>
               </View>
 
               <View style={[styles.summaryPill, { backgroundColor: 'rgba(255,106,77,0.15)' }]}>
-                <Text style={[styles.summaryPillText, { color: COLORS.coral }]}>
+                <Text style={[styles.summaryPillText, { color: C.coral }]}>
                   {totalProtein}
                 </Text>
                 <Text style={styles.summaryPillLabel}>P</Text>
@@ -403,9 +411,9 @@ export default function QuickAddScreen() {
           disabled={saving}
           activeOpacity={0.8}
         >
-          <Ionicons name="checkmark-done" size={20} color={COLORS.bone} />
+          <Ionicons name="checkmark-done" size={20} color={C.white} />
           <Text style={styles.registerBtnText}>
-            {saving ? 'Registrando...' : 'Registrar'}
+            {saving ? t('quickAdd.registering') : t('quickAdd.register')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -417,222 +425,224 @@ export default function QuickAddScreen() {
 // STYLES
 // ============================================
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 60,
-    paddingBottom: 12,
-  },
-  backBtn: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.bone,
-  },
-  mealTypeRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    gap: 8,
-    marginBottom: 16,
-  },
-  mealTypeBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: COLORS.card,
-  },
-  mealTypeBtnActive: {
-    backgroundColor: COLORS.violet,
-  },
-  mealTypeText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
-  },
-  mealTypeTextActive: {
-    color: COLORS.bone,
-  },
-  section: {
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 12,
-  },
-  foodNameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  foodNameInput: {
-    flex: 1,
-    fontSize: 15,
-    color: COLORS.bone,
-  },
-  macroGrid: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  macroColumn: {
-    flex: 1,
-  },
-  macroInputContainer: {
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  macroLabel: {
-    marginBottom: 10,
-  },
-  macroLabelText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: COLORS.textSecondary,
-    textTransform: 'uppercase',
-  },
-  macroUnit: {
-    fontSize: 10,
-    color: COLORS.textTertiary,
-    marginTop: 2,
-  },
-  macroInputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  macroAdjustBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: 'rgba(156,140,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  macroTextInput: {
-    flex: 1,
-    backgroundColor: 'rgba(247,242,234,0.05)',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.bone,
-    textAlign: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(156,140,255,0.1)',
-  },
-  expanderBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginHorizontal: 16,
-    borderRadius: 10,
-    backgroundColor: 'rgba(156,140,255,0.08)',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  expanderText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.violet,
-  },
-  summaryCard: {
-    marginHorizontal: 16,
-    marginBottom: 20,
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  summaryTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: COLORS.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 10,
-  },
-  summaryPills: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  summaryPill: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    borderRadius: 10,
-  },
-  summaryPillText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.bone,
-  },
-  summaryPillLabel: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-    fontWeight: '600',
-  },
-  footer: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    paddingBottom: 34,
-    backgroundColor: COLORS.card,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  registerBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: COLORS.violet,
-    paddingVertical: 14,
-    borderRadius: 12,
-  },
-  registerBtnDisabled: {
-    opacity: 0.6,
-  },
-  registerBtnText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.bone,
-  },
-});
+function createStyles(C: any) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: C.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingBottom: 20,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      paddingTop: 60,
+      paddingBottom: 12,
+    },
+    backBtn: {
+      padding: 8,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: C.bone,
+    },
+    mealTypeRow: {
+      flexDirection: 'row',
+      paddingHorizontal: 16,
+      gap: 8,
+      marginBottom: 16,
+    },
+    mealTypeBtn: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 4,
+      paddingVertical: 8,
+      borderRadius: 8,
+      backgroundColor: C.card,
+    },
+    mealTypeBtnActive: {
+      backgroundColor: C.violet,
+    },
+    mealTypeText: {
+      fontSize: 12,
+      color: C.textSecondary,
+      fontWeight: '600',
+    },
+    mealTypeTextActive: {
+      color: C.bone,
+    },
+    section: {
+      paddingHorizontal: 16,
+      marginBottom: 20,
+    },
+    sectionTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: C.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+      marginBottom: 12,
+    },
+    foodNameContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: C.card,
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      gap: 8,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    foodNameInput: {
+      flex: 1,
+      fontSize: 15,
+      color: C.bone,
+    },
+    macroGrid: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    macroColumn: {
+      flex: 1,
+    },
+    macroInputContainer: {
+      backgroundColor: C.card,
+      borderRadius: 12,
+      padding: 12,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    macroLabel: {
+      marginBottom: 10,
+    },
+    macroLabelText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: C.textSecondary,
+      textTransform: 'uppercase',
+    },
+    macroUnit: {
+      fontSize: 10,
+      color: C.textTertiary,
+      marginTop: 2,
+    },
+    macroInputRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    macroAdjustBtn: {
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      backgroundColor: 'rgba(156,140,255,0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    macroTextInput: {
+      flex: 1,
+      backgroundColor: 'rgba(247,242,234,0.05)',
+      borderRadius: 8,
+      paddingHorizontal: 8,
+      paddingVertical: 6,
+      fontSize: 16,
+      fontWeight: '700',
+      color: C.bone,
+      textAlign: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(156,140,255,0.1)',
+    },
+    expanderBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      marginHorizontal: 16,
+      borderRadius: 10,
+      backgroundColor: 'rgba(156,140,255,0.08)',
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    expanderText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.violet,
+    },
+    summaryCard: {
+      marginHorizontal: 16,
+      marginBottom: 20,
+      backgroundColor: C.card,
+      borderRadius: 12,
+      padding: 14,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    summaryTitle: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: C.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+      marginBottom: 10,
+    },
+    summaryPills: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    summaryPill: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 10,
+      borderRadius: 10,
+    },
+    summaryPillText: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: C.bone,
+    },
+    summaryPillLabel: {
+      fontSize: 11,
+      color: C.textSecondary,
+      marginTop: 2,
+      fontWeight: '600',
+    },
+    footer: {
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      paddingBottom: 34,
+      backgroundColor: C.card,
+      borderTopWidth: 1,
+      borderTopColor: C.border,
+    },
+    registerBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 10,
+      backgroundColor: C.violet,
+      paddingVertical: 14,
+      borderRadius: 12,
+    },
+    registerBtnDisabled: {
+      opacity: 0.6,
+    },
+    registerBtnText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: C.bone,
+    },
+  });
+}

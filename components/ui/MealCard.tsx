@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // Cals2Gains - Meal Card Component
 // ============================================
 
@@ -10,10 +10,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Meal } from '../../types';
-import Colors from '../../constants/colors';
+import { useColors } from '../../store/themeStore';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
@@ -21,15 +22,27 @@ import { es, enUS } from 'date-fns/locale';
 interface MealCardProps {
   meal: Meal;
   onDelete?: (mealId: string) => void;
+  onEdit?: (meal: Meal) => void;
   onPress?: (meal: Meal) => void;
   compact?: boolean;
+  nutritionMode?: 'simple' | 'advanced';
 }
 
-const MealCard: React.FC<MealCardProps> = ({ meal, onDelete, onPress, compact = false }) => {
+const MealCard: React.FC<MealCardProps> = ({ meal, onDelete, onEdit, onPress, compact = false, nutritionMode = 'simple' }) => {
   const { t, i18n } = useTranslation();
+  const C = useColors();
+  const styles = createStyles(C);
   const locale = i18n.language === 'es' ? es : enUS;
 
   const dishName = i18n.language === 'es' ? meal.dishNameEs : meal.dishNameEn;
+
+  // Prefer cloud URL (works everywhere), fall back to local URI (mobile only)
+  const photoSource = meal.photoUrl || meal.photoUri;
+  const canShowPhoto = photoSource && (
+    Platform.OS !== 'web' ||
+    photoSource.startsWith('data:') ||
+    photoSource.startsWith('http')
+  );
 
   const handleDelete = () => {
     Alert.alert(
@@ -47,17 +60,20 @@ const MealCard: React.FC<MealCardProps> = ({ meal, onDelete, onPress, compact = 
   };
 
   if (compact) {
+    const calories = Math.round(meal.nutrition?.calories ?? 0);
+    const protein = Math.round(meal.nutrition?.protein ?? 0);
+
     return (
       <TouchableOpacity
         style={styles.compactCard}
         onPress={() => onPress?.(meal)}
         activeOpacity={0.7}
       >
-        {meal.photoUri ? (
-          <Image source={{ uri: meal.photoUri }} style={styles.compactImage} />
+        {canShowPhoto ? (
+          <Image source={{ uri: photoSource }} style={styles.compactImage} />
         ) : (
           <View style={[styles.compactImage, styles.imagePlaceholder]}>
-            <Ionicons name="fast-food" size={20} color={Colors.textMuted} />
+            <Ionicons name="fast-food" size={20} color={C.textMuted} />
           </View>
         )}
 
@@ -71,8 +87,12 @@ const MealCard: React.FC<MealCardProps> = ({ meal, onDelete, onPress, compact = 
         </View>
 
         <View style={styles.compactMacros}>
-          <Text style={styles.compactCalories}>{Math.round(meal.nutrition.calories)}</Text>
-          <Text style={styles.compactKcal}>kcal</Text>
+          <Text style={styles.compactMacroText}>
+            {calories} kcal <Text style={styles.compactMacroDot}>·</Text> {protein}g P <Text style={styles.compactMacroDot}>·</Text> {Math.round(meal.nutrition?.carbs ?? 0)}g C <Text style={styles.compactMacroDot}>·</Text> {Math.round(meal.nutrition?.fat ?? 0)}g G
+            {nutritionMode === 'advanced' && (meal.nutrition?.fiber ?? 0) > 0 && (
+              <Text style={styles.compactMacroDot}> · {Math.round(meal.nutrition?.fiber ?? 0)}g F</Text>
+            )}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -85,11 +105,11 @@ const MealCard: React.FC<MealCardProps> = ({ meal, onDelete, onPress, compact = 
       activeOpacity={0.7}
     >
       {/* Photo */}
-      {meal.photoUri ? (
-        <Image source={{ uri: meal.photoUri }} style={styles.photo} />
+      {canShowPhoto ? (
+        <Image source={{ uri: photoSource }} style={styles.photo} />
       ) : (
         <View style={[styles.photo, styles.imagePlaceholder]}>
-          <Ionicons name="fast-food-outline" size={32} color={Colors.textMuted} />
+          <Ionicons name="fast-food-outline" size={32} color={C.textMuted} />
         </View>
       )}
 
@@ -105,39 +125,62 @@ const MealCard: React.FC<MealCardProps> = ({ meal, onDelete, onPress, compact = 
             </Text>
           </View>
 
-          {onDelete && (
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={handleDelete}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="trash-outline" size={18} color={Colors.error} />
-            </TouchableOpacity>
-          )}
+          <View style={styles.actionButtons}>
+            {onEdit && (
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => onEdit(meal)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons name="pencil-outline" size={16} color={C.primary} />
+              </TouchableOpacity>
+            )}
+            {onDelete && (
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDelete}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons name="trash-outline" size={16} color={C.error} />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         {/* Macro pills */}
         <View style={styles.macroRow}>
           <MacroPill
-            value={Math.round(meal.nutrition.calories)}
+            value={Math.round(meal.nutrition?.calories ?? 0)}
             unit="kcal"
-            color={Colors.calories}
+            color={C.calories || C.accent}
+            C={C}
           />
           <MacroPill
-            value={Math.round(meal.nutrition.protein)}
+            value={Math.round(meal.nutrition?.protein ?? 0)}
             unit="P"
-            color={Colors.protein}
+            color={C.protein || '#4ADE80'}
+            C={C}
           />
           <MacroPill
-            value={Math.round(meal.nutrition.carbs)}
+            value={Math.round(meal.nutrition?.carbs ?? 0)}
             unit="C"
-            color={Colors.carbs}
+            color={C.carbs || '#FBBF24'}
+            C={C}
           />
           <MacroPill
-            value={Math.round(meal.nutrition.fat)}
+            value={Math.round(meal.nutrition?.fat ?? 0)}
             unit="G"
-            color={Colors.fat}
+            color={C.fat || '#FF6A4D'}
+            C={C}
           />
+          {nutritionMode === 'advanced' && (meal.nutrition?.fiber ?? 0) > 0 && (
+            <MacroPill
+              value={Math.round(meal.nutrition?.fiber ?? 0)}
+              unit="F"
+              color={C.fiber || '#4ADE80'}
+              C={C}
+            />
+          )}
         </View>
 
         {/* Notes */}
@@ -151,134 +194,147 @@ const MealCard: React.FC<MealCardProps> = ({ meal, onDelete, onPress, compact = 
   );
 };
 
-const MacroPill: React.FC<{ value: number; unit: string; color: string }> = ({
+const MacroPill: React.FC<{ value: number; unit: string; color: string; C: any }> = ({
   value,
   unit,
   color,
+  C,
 }) => (
-  <View style={[styles.macroPill, { borderColor: color + '40', backgroundColor: color + '15' }]}>
-    <Text style={[styles.macroPillText, { color }]}>
-      {value}
-      <Text style={styles.macroPillUnit}>{unit}</Text>
-    </Text>
-  </View>
-);
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.card,
-    borderRadius: 16,
-    marginVertical: 6,
-    flexDirection: 'row',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  photo: {
-    width: 90,
-    height: 90,
-  },
-  imagePlaceholder: {
-    backgroundColor: Colors.surfaceLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    padding: 12,
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  titleContainer: {
-    flex: 1,
-    marginRight: 8,
-  },
-  dishName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.text,
-    lineHeight: 20,
-  },
-  time: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginTop: 2,
-  },
-  deleteButton: {
-    padding: 4,
-  },
-  macroRow: {
-    flexDirection: 'row',
-    gap: 6,
-    marginTop: 10,
-    flexWrap: 'wrap',
-  },
-  macroPill: {
+  <View style={[{
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 20,
     borderWidth: 1,
-  },
-  macroPillText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  macroPillUnit: {
-    fontSize: 10,
-    fontWeight: '400',
-  },
-  notes: {
-    fontSize: 11,
-    color: Colors.textMuted,
-    marginTop: 6,
-    fontStyle: 'italic',
-  },
+    borderColor: color + '40',
+    backgroundColor: color + '15',
+  }]}>
+    <Text style={[{ fontSize: 12, fontWeight: '600', color }]}>
+      {value}
+      <Text style={{ fontSize: 10, fontWeight: '400' }}>{unit}</Text>
+    </Text>
+  </View>
+);
 
-  // Compact styles
-  compactCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.card,
-    borderRadius: 12,
-    marginVertical: 4,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  compactImage: {
-    width: 44,
-    height: 44,
-    borderRadius: 8,
-  },
-  compactContent: {
-    flex: 1,
-    marginHorizontal: 12,
-  },
-  compactTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  compactTime: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginTop: 2,
-  },
-  compactMacros: {
-    alignItems: 'flex-end',
-  },
-  compactCalories: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.text,
-  },
-  compactKcal: {
-    fontSize: 11,
-    color: Colors.textSecondary,
-  },
-});
+function createStyles(C: any) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: C.card || C.surface,
+      borderRadius: 16,
+      marginVertical: 6,
+      flexDirection: 'row',
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    photo: {
+      width: 90,
+      height: 90,
+    },
+    imagePlaceholder: {
+      backgroundColor: C.surfaceLight || C.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    content: {
+      flex: 1,
+      padding: 12,
+    },
+    topRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+    },
+    titleContainer: {
+      flex: 1,
+      marginRight: 8,
+    },
+    dishName: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: C.text,
+      lineHeight: 20,
+    },
+    time: {
+      fontSize: 12,
+      color: C.textSecondary,
+      marginTop: 2,
+    },
+    actionButtons: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    editButton: {
+      padding: 4,
+    },
+    deleteButton: {
+      padding: 4,
+    },
+    macroRow: {
+      flexDirection: 'row',
+      gap: 6,
+      marginTop: 10,
+      flexWrap: 'wrap',
+    },
+    notes: {
+      fontSize: 11,
+      color: C.textMuted,
+      marginTop: 6,
+      fontStyle: 'italic',
+    },
+
+    // Compact styles
+    compactCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: C.card || C.surface,
+      borderRadius: 12,
+      marginVertical: 4,
+      padding: 10,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    compactImage: {
+      width: 44,
+      height: 44,
+      borderRadius: 8,
+    },
+    compactContent: {
+      flex: 1,
+      marginHorizontal: 12,
+    },
+    compactTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.text,
+    },
+    compactTime: {
+      fontSize: 12,
+      color: C.textSecondary,
+      marginTop: 2,
+    },
+    compactMacros: {
+      alignItems: 'flex-end',
+    },
+    compactCalories: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: C.text,
+    },
+    compactKcal: {
+      fontSize: 11,
+      color: C.textSecondary,
+    },
+    compactMacroText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: C.text,
+    },
+    compactMacroDot: {
+      color: C.textSecondary,
+      fontWeight: '400',
+    },
+  });
+}
 
 export default MealCard;

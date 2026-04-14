@@ -21,20 +21,22 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useMealStore } from '../store/mealStore';
+import { useUserStore } from '../store/userStore';
 import { useTemplateStore } from '../store/templateStore';
+import { useColors } from '../store/themeStore';
 import { searchFoods, lookupBarcode, analyzeTextFood } from '../services/foodDatabase';
 import { FoodItem, MealTemplate } from '../types';
-import { COLORS } from '../theme';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // CONSTANTS
 // ============================================
 
 const MEAL_TYPES = [
-  { id: 'breakfast', label: 'Desayuno', icon: 'sunny-outline' },
-  { id: 'lunch', label: 'Almuerzo', icon: 'restaurant-outline' },
-  { id: 'dinner', label: 'Cena', icon: 'moon-outline' },
-  { id: 'snack', label: 'Snack', icon: 'cafe-outline' },
+  { id: 'breakfast', icon: 'sunny-outline' },
+  { id: 'lunch', icon: 'restaurant-outline' },
+  { id: 'dinner', icon: 'moon-outline' },
+  { id: 'snack', icon: 'cafe-outline' },
 ] as const;
 
 // ============================================
@@ -42,10 +44,14 @@ const MEAL_TYPES = [
 // ============================================
 
 export default function FoodSearchScreen() {
+  const C = useColors();
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ mealType?: string }>();
   const { addMeal } = useMealStore();
+  const user = useUserStore((s) => s.user);
   const { templates, loadTemplates } = useTemplateStore();
+  const styles = createStyles(C);
 
   // State
   const [query, setQuery] = useState('');
@@ -82,8 +88,8 @@ export default function FoodSearchScreen() {
           const product = await lookupBarcode(text.trim());
           setResults(product ? [product] : []);
         } else {
-          const foods = await searchFoods(text.trim());
-          setResults(foods);
+          const { items } = await searchFoods(text.trim());
+          setResults(items);
         }
       } catch (error) {
         console.error('Search error:', error);
@@ -106,7 +112,7 @@ export default function FoodSearchScreen() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     } catch (error) {
-      Alert.alert('Error', 'No se pudo analizar el alimento');
+      Alert.alert('Error', t('foodSearch.analyzeError'));
     } finally {
       setAnalyzing(false);
     }
@@ -114,49 +120,72 @@ export default function FoodSearchScreen() {
 
   // Log selected food
   const handleLogFood = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem || !user?.uid) return;
 
     const nutrition = selectedItem.nutritionPerServing || selectedItem.nutritionPer100g;
     if (!nutrition) return;
 
-    const multiplier = selectedItem.nutritionPerServing ? servings : servings;
-
     try {
       await addMeal({
-        name: selectedItem.name,
-        calories: Math.round(nutrition.calories * multiplier),
-        protein: Math.round(nutrition.protein * multiplier),
-        carbs: Math.round(nutrition.carbs * multiplier),
-        fat: Math.round(nutrition.fat * multiplier),
+        userId: user.uid,
+        timestamp: new Date(),
+        photoUri: '',
+        dishName: selectedItem.name || t('foodSearch.food'),
+        dishNameEs: selectedItem.nameEs || selectedItem.name || t('foodSearch.food'),
+        dishNameEn: selectedItem.nameEn || selectedItem.name || 'Food',
+        ingredients: [],
+        portionDescription: selectedItem.brand
+          ? `${selectedItem.brand} - ${servings} ${t('common.servings', { count: servings })}`
+          : `${servings} ${t('common.servings', { count: servings })}`,
+        estimatedWeight: Math.round((selectedItem.servingSize || 100) * servings),
+        nutrition: {
+          calories: Math.round((nutrition.calories || 0) * servings),
+          protein: Math.round((nutrition.protein || 0) * servings * 10) / 10,
+          carbs: Math.round((nutrition.carbs || 0) * servings * 10) / 10,
+          fat: Math.round((nutrition.fat || 0) * servings * 10) / 10,
+          fiber: Math.round((nutrition.fiber || 0) * servings * 10) / 10,
+        },
         mealType: mealType as any,
-        source: 'manual',
-        photoUri: undefined,
-      });
+        aiConfidence: 1.0,
+      } as any);
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     } catch (error) {
-      Alert.alert('Error', 'No se pudo registrar la comida');
+      console.error('Food search save error:', error);
+      Alert.alert('Error', t('foodSearch.logError'));
     }
   };
 
   // Log from template
   const handleTemplateLog = async (template: MealTemplate) => {
+    if (!user?.uid) return;
     try {
       await addMeal({
-        name: template.name,
-        calories: template.calories,
-        protein: template.protein,
-        carbs: template.carbs,
-        fat: template.fat,
+        userId: user.uid,
+        timestamp: new Date(),
+        photoUri: template.photoUri || '',
+        dishName: template.dishName || template.name || t('foodSearch.template'),
+        dishNameEs: template.dishNameEs || template.name || t('foodSearch.template'),
+        dishNameEn: template.dishNameEn || template.name || 'Template',
+        ingredients: template.ingredients || [],
+        portionDescription: template.portionDescription || t('foodSearch.oneServing'),
+        estimatedWeight: template.estimatedWeight || 100,
+        nutrition: {
+          calories: template.nutrition?.calories || 0,
+          protein: template.nutrition?.protein || 0,
+          carbs: template.nutrition?.carbs || 0,
+          fat: template.nutrition?.fat || 0,
+          fiber: template.nutrition?.fiber || 0,
+        },
         mealType: mealType as any,
-        source: 'manual',
-        photoUri: undefined,
-      });
+        aiConfidence: 1.0,
+      } as any);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     } catch (error) {
-      Alert.alert('Error', 'No se pudo registrar');
+      console.error('Template save error:', error);
+      Alert.alert('Error', t('foodSearch.logError'));
     }
   };
 
@@ -179,31 +208,31 @@ export default function FoodSearchScreen() {
         activeOpacity={0.7}
       >
         <View style={styles.resultInfo}>
-          <Text style={styles.resultName} numberOfLines={2}>{item.name}</Text>
+          <Text style={[styles.resultName, { color: C.text }]} numberOfLines={2}>{item.name}</Text>
           {item.brand && (
-            <Text style={styles.resultBrand}>{item.brand}</Text>
+            <Text style={[styles.resultBrand, { color: C.textSecondary }]}>{item.brand}</Text>
           )}
           <View style={styles.macroPills}>
             <View style={[styles.pill, { backgroundColor: 'rgba(156,140,255,0.15)' }]}>
-              <Text style={[styles.pillText, { color: COLORS.violet }]}>
+              <Text style={[styles.pillText, { color: C.primary }]}>
                 {nutrition?.calories || 0} kcal
               </Text>
             </View>
             <View style={[styles.pill, { backgroundColor: 'rgba(255,106,77,0.15)' }]}>
-              <Text style={[styles.pillText, { color: COLORS.coral }]}>
-                P {nutrition?.protein || 0}g
+              <Text style={[styles.pillText, { color: C.accent }]}>
+                {t('foodSearch.protAbbr')} {nutrition?.protein || 0}g
               </Text>
             </View>
             <View style={styles.pill}>
-              <Text style={styles.pillText}>C {nutrition?.carbs || 0}g</Text>
+              <Text style={styles.pillText}>{t('foodSearch.carbAbbr')} {nutrition?.carbs || 0}g</Text>
             </View>
             <View style={styles.pill}>
-              <Text style={styles.pillText}>G {nutrition?.fat || 0}g</Text>
+              <Text style={styles.pillText}>{t('foodSearch.fatAbbr')} {nutrition?.fat || 0}g</Text>
             </View>
           </View>
         </View>
         {item.verified && (
-          <Ionicons name="checkmark-circle" size={20} color={COLORS.violet} />
+          <Ionicons name="checkmark-circle" size={20} color={C.violet} />
         )}
       </TouchableOpacity>
     );
@@ -211,18 +240,18 @@ export default function FoodSearchScreen() {
 
   const renderTemplate = ({ item }: { item: MealTemplate }) => (
     <TouchableOpacity
-      style={styles.templateCard}
+      style={[styles.templateCard, { backgroundColor: C.surface }]}
       onPress={() => handleTemplateLog(item)}
       activeOpacity={0.7}
     >
-      <Ionicons name="bookmark" size={18} color={COLORS.violet} />
+      <Ionicons name="bookmark" size={18} color={C.primary} />
       <View style={styles.templateInfo}>
-        <Text style={styles.templateName}>{item.name}</Text>
-        <Text style={styles.templateMacros}>
-          {item.calories} kcal · P{item.protein}g · C{item.carbs}g · G{item.fat}g
+        <Text style={[styles.templateName, { color: C.text }]}>{item.name}</Text>
+        <Text style={[styles.templateMacros, { color: C.textSecondary }]}>
+          {item.calories} kcal · {t('foodSearch.protAbbr')} {item.protein}g · {t('foodSearch.carbAbbr')} {item.carbs}g · {t('foodSearch.fatAbbr')} {item.fat}g
         </Text>
       </View>
-      <Ionicons name="add-circle-outline" size={22} color={COLORS.coral} />
+      <Ionicons name="add-circle-outline" size={22} color={C.accent} />
     </TouchableOpacity>
   );
 
@@ -238,15 +267,23 @@ export default function FoodSearchScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="close" size={24} color={COLORS.bone} />
+          <Ionicons name="close" size={24} color={C.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Buscar Alimento</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/barcode-scanner')}
-          style={styles.scanBtn}
-        >
-          <Ionicons name="barcode-outline" size={24} color={COLORS.violet} />
-        </TouchableOpacity>
+        <Text style={[styles.title, { color: C.text }]}>{t('foodSearch.searchFood')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <TouchableOpacity
+            onPress={() => router.push('/barcode-scanner')}
+            style={styles.scanBtn}
+          >
+            <Ionicons name="barcode-outline" size={20} color={C.textSecondary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push('/capture-hub')}
+            style={[styles.scanBtn, { backgroundColor: `${C.primary}20` }]}
+          >
+            <Ionicons name="sparkles" size={22} color={C.primary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Meal Type Selector */}
@@ -256,34 +293,36 @@ export default function FoodSearchScreen() {
             key={type.id}
             style={[
               styles.mealTypeBtn,
-              mealType === type.id && styles.mealTypeBtnActive,
+              { backgroundColor: C.surface },
+              mealType === type.id && { backgroundColor: C.primary },
             ]}
             onPress={() => setMealType(type.id)}
           >
             <Ionicons
               name={type.icon as any}
               size={16}
-              color={mealType === type.id ? COLORS.bone : COLORS.textSecondary}
+              color={mealType === type.id ? C.text : C.textSecondary}
             />
             <Text
               style={[
                 styles.mealTypeText,
-                mealType === type.id && styles.mealTypeTextActive,
+                { color: C.textSecondary },
+                mealType === type.id && { color: C.text },
               ]}
             >
-              {type.label}
+              {t(`home.${type.id}`)}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
       {/* Search Input */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color={COLORS.textTertiary} />
+      <View style={[styles.searchContainer, { backgroundColor: C.surface, borderColor: C.border }]}>
+        <Ionicons name="search" size={20} color={C.textMuted} />
         <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar alimento o pegar codigo de barras..."
-          placeholderTextColor={COLORS.textTertiary}
+          style={[styles.searchInput, { color: C.text }]}
+          placeholder={t('foodSearch.searchBarPlaceholder')}
+          placeholderTextColor={C.textMuted}
           value={query}
           onChangeText={handleSearch}
           autoFocus
@@ -291,7 +330,7 @@ export default function FoodSearchScreen() {
         />
         {query.length > 0 && (
           <TouchableOpacity onPress={() => handleSearch('')}>
-            <Ionicons name="close-circle" size={20} color={COLORS.textTertiary} />
+            <Ionicons name="close-circle" size={20} color={C.textMuted} />
           </TouchableOpacity>
         )}
       </View>
@@ -299,16 +338,16 @@ export default function FoodSearchScreen() {
       {/* AI Analysis Button */}
       {query.length > 3 && results.length === 0 && !loading && (
         <TouchableOpacity
-          style={styles.aiButton}
+          style={[styles.aiButton, { backgroundColor: C.accent }]}
           onPress={handleAIAnalysis}
           disabled={analyzing}
         >
           {analyzing ? (
-            <ActivityIndicator color={COLORS.bone} size="small" />
+            <ActivityIndicator color={C.text} size="small" />
           ) : (
             <>
-              <Ionicons name="sparkles" size={18} color={COLORS.bone} />
-              <Text style={styles.aiButtonText}>Analizar con IA</Text>
+              <Ionicons name="sparkles" size={18} color={C.text} />
+              <Text style={[styles.aiButtonText, { color: C.text }]}>{t('foodSearch.analyzeWithAI')}</Text>
             </>
           )}
         </TouchableOpacity>
@@ -317,7 +356,7 @@ export default function FoodSearchScreen() {
       {/* Results / Templates */}
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator color={COLORS.violet} size="large" />
+          <ActivityIndicator color={C.primary} size="large" />
         </View>
       ) : query.length < 2 ? (
         // Show templates when no search
@@ -328,14 +367,14 @@ export default function FoodSearchScreen() {
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={
             templates.length > 0 ? (
-              <Text style={styles.sectionTitle}>Plantillas guardadas</Text>
+              <Text style={styles.sectionTitle}>{t('foodSearch.savedTemplates')}</Text>
             ) : null
           }
           ListEmptyComponent={
             <View style={styles.center}>
-              <Ionicons name="search-outline" size={48} color={COLORS.textTertiary} />
+              <Ionicons name="search-outline" size={48} color={C.textMuted} />
               <Text style={styles.emptyText}>
-                Busca un alimento o escanea un codigo de barras
+                {t('foodSearch.emptyHint')}
               </Text>
             </View>
           }
@@ -349,7 +388,7 @@ export default function FoodSearchScreen() {
           ListEmptyComponent={
             !loading ? (
               <View style={styles.center}>
-                <Text style={styles.emptyText}>No se encontraron resultados</Text>
+                <Text style={[styles.emptyText, { color: C.textMuted }]}>{t('foodSearch.noResults')}</Text>
               </View>
             ) : null
           }
@@ -358,26 +397,26 @@ export default function FoodSearchScreen() {
 
       {/* Selected Item Footer */}
       {selectedItem && (
-        <View style={styles.footer}>
+        <View style={[styles.footer, { backgroundColor: C.surface, borderTopColor: C.border }]}>
           <View style={styles.servingsRow}>
-            <Text style={styles.servingsLabel}>Porciones:</Text>
+            <Text style={[styles.servingsLabel, { color: C.textSecondary }]}>{t('foodSearch.servingsLabel')}</Text>
             <TouchableOpacity
               onPress={() => setServings(Math.max(0.5, servings - 0.5))}
               style={styles.servingsBtn}
             >
-              <Ionicons name="remove" size={20} color={COLORS.bone} />
+              <Ionicons name="remove" size={20} color={C.text} />
             </TouchableOpacity>
-            <Text style={styles.servingsValue}>{servings}</Text>
+            <Text style={[styles.servingsValue, { color: C.text }]}>{servings}</Text>
             <TouchableOpacity
               onPress={() => setServings(servings + 0.5)}
               style={styles.servingsBtn}
             >
-              <Ionicons name="add" size={20} color={COLORS.bone} />
+              <Ionicons name="add" size={20} color={C.text} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.logButton} onPress={handleLogFood}>
-            <Ionicons name="add-circle" size={20} color={COLORS.bone} />
-            <Text style={styles.logButtonText}>Registrar</Text>
+          <TouchableOpacity style={[styles.logButton, { backgroundColor: C.primary }]} onPress={handleLogFood}>
+            <Ionicons name="add-circle" size={20} color={C.text} />
+            <Text style={[styles.logButtonText, { color: C.text }]}>{t('foodSearch.logButton')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -389,10 +428,10 @@ export default function FoodSearchScreen() {
 // STYLES
 // ============================================
 
-const styles = StyleSheet.create({
+const createStyles = (C: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: C.background,
   },
   header: {
     flexDirection: 'row',
@@ -408,7 +447,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.bone,
   },
   scanBtn: {
     padding: 8,
@@ -427,35 +465,35 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: COLORS.card,
+    backgroundColor: C.surface,
   },
   mealTypeBtnActive: {
-    backgroundColor: COLORS.violet,
+    backgroundColor: C.primary,
   },
   mealTypeText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
     fontWeight: '600',
   },
   mealTypeTextActive: {
-    color: COLORS.bone,
+    color: C.text,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: C.surface,
     marginHorizontal: 16,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
     gap: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: C.border,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.bone,
+    color: C.text,
   },
   aiButton: {
     flexDirection: 'row',
@@ -466,12 +504,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: COLORS.coral,
+    backgroundColor: C.accent,
   },
   aiButtonText: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.bone,
+    color: C.text,
   },
   center: {
     flex: 1,
@@ -480,7 +518,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   emptyText: {
-    color: COLORS.textTertiary,
+    color: C.textMuted,
     fontSize: 15,
     textAlign: 'center',
     marginTop: 12,
@@ -488,7 +526,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 12,
@@ -499,7 +537,7 @@ const styles = StyleSheet.create({
   resultCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: C.surface,
     borderRadius: 12,
     padding: 14,
     marginBottom: 8,
@@ -507,8 +545,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   resultCardSelected: {
-    borderColor: COLORS.violet,
-    backgroundColor: COLORS.cardHover,
+    borderColor: C.primary,
+    backgroundColor: C.surfaceLight,
   },
   resultInfo: {
     flex: 1,
@@ -516,12 +554,12 @@ const styles = StyleSheet.create({
   resultName: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.bone,
+    color: C.text,
     marginBottom: 2,
   },
   resultBrand: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
     marginBottom: 6,
   },
   macroPills: {
@@ -537,12 +575,12 @@ const styles = StyleSheet.create({
   pillText: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
   },
   templateCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: C.surface,
     borderRadius: 12,
     padding: 14,
     marginBottom: 8,
@@ -554,11 +592,11 @@ const styles = StyleSheet.create({
   templateName: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.bone,
+    color: C.text,
   },
   templateMacros: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
     marginTop: 2,
   },
   footer: {
@@ -568,9 +606,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     paddingBottom: 34,
-    backgroundColor: COLORS.card,
+    backgroundColor: C.surface,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: C.border,
   },
   servingsRow: {
     flexDirection: 'row',
@@ -579,7 +617,7 @@ const styles = StyleSheet.create({
   },
   servingsLabel: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: C.textSecondary,
   },
   servingsBtn: {
     width: 32,
@@ -592,7 +630,7 @@ const styles = StyleSheet.create({
   servingsValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.bone,
+    color: C.text,
     minWidth: 30,
     textAlign: 'center',
   },
@@ -600,7 +638,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: COLORS.violet,
+    backgroundColor: C.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,
@@ -608,6 +646,6 @@ const styles = StyleSheet.create({
   logButtonText: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.bone,
+    color: C.text,
   },
 });

@@ -30,6 +30,7 @@ export const useWeightStore = create<WeightState>((set, get) => ({
   isLoading: false,
 
   loadHistory: async (userId: string, days: number = 90) => {
+    if (!userId) return; // Guard: avoid Firestore query with undefined userId
     set({ isLoading: true });
     try {
       const entries = await getWeightHistory(userId, days);
@@ -102,4 +103,10 @@ export const useWeightStore = create<WeightState>((set, get) => ({
     if (Math.abs(diff) < 0.3) return 'stable';
     return diff > 0 ? 'up' : 'down';
   },
-}))
+}));
+
+// Non-React accessor for screens that use weightStore directly
+export const weightStore = {
+  getWeights: () => useWeightStore.getState().entries,
+  getState: () => useWeightStore.getState(),
+};

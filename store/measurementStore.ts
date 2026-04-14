@@ -22,6 +22,7 @@ interface MeasurementState {
   // Computed
   getLatest: () => BodyMeasurement | null;
   getHistory: (limit?: number) => BodyMeasurement[];
+  getMeasurementHistory: (limit?: number) => BodyMeasurement[];
   getChanges: (field: keyof BodyMeasurement, days?: number) => number | null;
 }
 
@@ -85,6 +86,11 @@ export const useMeasurementStore = create<MeasurementState>((set, get) => ({
   },
 
   getHistory: (limit = 30) => {
+    const { measurements } = get();
+    return measurements.slice(0, limit);
+  },
+
+  getMeasurementHistory: (limit = 30) => {
     const { measurements } = get();
     return measurements.slice(0, limit);
   },

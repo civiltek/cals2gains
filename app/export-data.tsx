@@ -12,13 +12,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { mealStore } from '../store/mealStore';
 import { weightStore } from '../store/weightStore';
 import { waterStore } from '../store/waterStore';
-import { COLORS } from '../theme';
+import { useColors } from '../store/themeStore';
 
 type FormatType = 'csv' | 'pdf';
 type ScopeType = 'week' | 'month' | 'custom';
@@ -42,7 +43,6 @@ interface ExportPreview {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -52,23 +52,19 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.bone,
     marginBottom: 24,
   },
   sectionLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: 24,
     marginBottom: 12,
   },
   card: {
-    backgroundColor: COLORS.card,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
     padding: 16,
     marginBottom: 16,
   },
@@ -82,24 +78,20 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: COLORS.cardHover,
     borderWidth: 2,
-    borderColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   formatOptionActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
+    borderWidth: 2,
   },
   formatOptionText: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginTop: 4,
   },
   formatOptionTextActive: {
-    color: COLORS.background,
+    fontWeight: '600',
   },
   scopeGroup: {
     gap: 8,
@@ -109,41 +101,34 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: COLORS.cardHover,
     borderWidth: 1,
-    borderColor: COLORS.border,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
   scopeButtonActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
+    borderWidth: 1,
   },
   scopeButtonText: {
     flex: 1,
     fontSize: 13,
     fontWeight: '500',
-    color: COLORS.bone,
   },
   scopeButtonRadio: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: COLORS.violet,
     justifyContent: 'center',
     alignItems: 'center',
   },
   scopeButtonRadioActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
+    borderWidth: 2,
   },
   radioInner: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.background,
   },
   datePickerRow: {
     flexDirection: 'row',
@@ -156,10 +141,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.cardHover,
     fontSize: 13,
-    color: COLORS.bone,
   },
   checkboxGroup: {
     gap: 12,
@@ -170,36 +152,29 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: COLORS.cardHover,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   checkboxItemActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
+    borderWidth: 1,
   },
   checkbox: {
     width: 20,
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: COLORS.border,
     marginRight: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkboxActive: {
-    backgroundColor: COLORS.violet,
-    borderColor: COLORS.violet,
+    borderWidth: 2,
   },
   checkboxLabel: {
     flex: 1,
     fontSize: 13,
     fontWeight: '500',
-    color: COLORS.bone,
   },
   previewCard: {
-    backgroundColor: COLORS.cardHover,
     borderRadius: 8,
     padding: 12,
     marginTop: 12,
@@ -207,7 +182,6 @@ const styles = StyleSheet.create({
   previewTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.3,
@@ -219,18 +193,15 @@ const styles = StyleSheet.create({
   },
   previewLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
   previewValue: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.violet,
   },
   exportButton: {
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: COLORS.coral,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 16,
@@ -243,24 +214,14 @@ const styles = StyleSheet.create({
   exportButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginTop: 8,
-  },
-  successIcon: {
-    color: COLORS.coral,
+    color: '#fff',
   },
 });
 
+
 export default function ExportDataScreen() {
+  const C = useColors();
+  const { t } = useTranslation();
   const [format, setFormat] = useState<FormatType>('csv');
   const [scope, setScope] = useState<ScopeType>('week');
   const [customStartDate, setCustomStartDate] = useState<string>('');
@@ -355,7 +316,7 @@ export default function ExportDataScreen() {
 
     if (options.meals) {
       lines.push('=== COMIDAS ===');
-      lines.push('Fecha,Nombre,Calorías,Proteína (g),Carbos (g),Grasas (g)');
+      lines.push(`${t('export.csvDate')},${t('export.csvName')},${t('export.csvCalories')},${t('export.csvProtein')},${t('export.csvCarbs')},${t('export.csvFat')}`);
 
       const meals = mealStore
         .getMeals()
@@ -378,7 +339,7 @@ export default function ExportDataScreen() {
 
     if (options.weight) {
       lines.push('=== PESO ===');
-      lines.push('Fecha,Peso (kg)');
+      lines.push(`${t('export.csvDate')},${t('export.csvWeight')}`);
 
       const weights = weightStore
         .getWeights()
@@ -399,7 +360,7 @@ export default function ExportDataScreen() {
 
     if (options.water) {
       lines.push('=== AGUA ===');
-      lines.push('Fecha,Cantidad (ml)');
+      lines.push(`${t('export.csvDate')},${t('export.csvWater')}`);
 
       const water = waterStore
         .getWater()
@@ -420,13 +381,13 @@ export default function ExportDataScreen() {
 
     if (options.measurements) {
       lines.push('=== MEDIDAS CORPORALES ===');
-      lines.push('Fecha,Pecho (cm),Cintura (cm),Caderas (cm),Brazos (cm)');
+      lines.push(`${t('export.csvDate')},${t('export.csvChest')},${t('export.csvWaist')},${t('export.csvHips')},${t('export.csvArms')}`);
       lines.push('');
     }
 
     if (options.fasting) {
       lines.push('=== AYUNO ===');
-      lines.push('Fecha,Inicio,Fin,Duración (horas)');
+      lines.push(`${t('export.csvDate')},${t('export.csvStart')},${t('export.csvEnd')},${t('export.csvDuration')}`);
       lines.push('');
     }
 
@@ -438,9 +399,9 @@ export default function ExportDataScreen() {
 
     sections.push(`
       <div style="padding: 20px; font-family: Arial, sans-serif; color: #17121D;">
-        <h1 style="color: #9C8CFF; margin-bottom: 10px;">Exportación Cals2Gains</h1>
+        <h1 style="color: #9C8CFF; margin-bottom: 10px;">${t('export.title')}</h1>
         <p style="color: #9C8CFF; margin-bottom: 20px;">
-          Período: ${dateRange.start.toLocaleDateString('es-ES')} - ${dateRange.end.toLocaleDateString('es-ES')}
+          ${t('export.period')}: ${dateRange.start.toLocaleDateString('es-ES')} - ${dateRange.end.toLocaleDateString('es-ES')}
         </p>
     `);
 
@@ -455,12 +416,12 @@ export default function ExportDataScreen() {
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
       sections.push(`
-        <h2 style="color: #9C8CFF; margin-top: 20px; margin-bottom: 10px;">Comidas (${meals.length})</h2>
+        <h2 style="color: #9C8CFF; margin-top: 20px; margin-bottom: 10px;">${t('export.meals')} (${meals.length})</h2>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
           <thead>
             <tr style="background-color: #F7F2EA; color: #17121D;">
-              <th style="padding: 8px; text-align: left; border: 1px solid #9C8CFF;">Fecha</th>
-              <th style="padding: 8px; text-align: left; border: 1px solid #9C8CFF;">Nombre</th>
+              <th style="padding: 8px; text-align: left; border: 1px solid #9C8CFF;">${t('export.csvDate')}</th>
+              <th style="padding: 8px; text-align: left; border: 1px solid #9C8CFF;">${t('export.csvName')}</th>
               <th style="padding: 8px; text-align: right; border: 1px solid #9C8CFF;">Cal</th>
               <th style="padding: 8px; text-align: right; border: 1px solid #9C8CFF;">P (g)</th>
               <th style="padding: 8px; text-align: right; border: 1px solid #9C8CFF;">C (g)</th>
@@ -498,12 +459,12 @@ export default function ExportDataScreen() {
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
       sections.push(`
-        <h2 style="color: #9C8CFF; margin-top: 20px; margin-bottom: 10px;">Peso (${weights.length})</h2>
+        <h2 style="color: #9C8CFF; margin-top: 20px; margin-bottom: 10px;">${t('export.weight')} (${weights.length})</h2>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
           <thead>
             <tr style="background-color: #F7F2EA; color: #17121D;">
-              <th style="padding: 8px; text-align: left; border: 1px solid #9C8CFF;">Fecha</th>
-              <th style="padding: 8px; text-align: right; border: 1px solid #9C8CFF;">Peso (kg)</th>
+              <th style="padding: 8px; text-align: left; border: 1px solid #9C8CFF;">${t('export.csvDate')}</th>
+              <th style="padding: 8px; text-align: right; border: 1px solid #9C8CFF;">${t('export.csvWeight')}</th>
             </tr>
           </thead>
           <tbody>
@@ -533,12 +494,12 @@ export default function ExportDataScreen() {
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
       sections.push(`
-        <h2 style="color: #9C8CFF; margin-top: 20px; margin-bottom: 10px;">Agua (${water.length})</h2>
+        <h2 style="color: #9C8CFF; margin-top: 20px; margin-bottom: 10px;">${t('export.water')} (${water.length})</h2>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
           <thead>
             <tr style="background-color: #F7F2EA; color: #17121D;">
-              <th style="padding: 8px; text-align: left; border: 1px solid #9C8CFF;">Fecha</th>
-              <th style="padding: 8px; text-align: right; border: 1px solid #9C8CFF;">Cantidad (ml)</th>
+              <th style="padding: 8px; text-align: left; border: 1px solid #9C8CFF;">${t('export.csvDate')}</th>
+              <th style="padding: 8px; text-align: right; border: 1px solid #9C8CFF;">${t('export.csvWater')}</th>
             </tr>
           </thead>
           <tbody>
@@ -587,14 +548,14 @@ export default function ExportDataScreen() {
         if (Platform.OS === 'ios') {
           await Sharing.shareAsync(uri, {
             mimeType: 'application/pdf',
-            dialogTitle: 'Exportar Datos',
+            dialogTitle: t('exportData.title'),
           });
         } else {
           const permission = await FileSystem.getInfoAsync(uri);
           if (permission.exists) {
             await Sharing.shareAsync(uri, {
               mimeType: 'application/pdf',
-              dialogTitle: 'Exportar Datos',
+              dialogTitle: t('exportData.title'),
             });
           }
         }
@@ -602,7 +563,7 @@ export default function ExportDataScreen() {
         setLoading(false);
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-        Alert.alert('Éxito', 'Datos exportados correctamente', [
+        Alert.alert(t('common.success'), t('exportData.exported'), [
           {
             text: 'OK',
             onPress: () => {},
@@ -616,13 +577,13 @@ export default function ExportDataScreen() {
 
       await Sharing.shareAsync(fileUri, {
         mimeType,
-        dialogTitle: 'Exportar Datos',
+        dialogTitle: t('exportData.title'),
       });
 
       setLoading(false);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-      Alert.alert('Éxito', 'Datos exportados correctamente', [
+      Alert.alert(t('common.success'), t('exportData.exported'), [
         {
           text: 'OK',
           onPress: () => {},
@@ -632,7 +593,7 @@ export default function ExportDataScreen() {
       setLoading(false);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
-      Alert.alert('Error', 'No se pudieron exportar los datos', [
+      Alert.alert('Error', t('exportData.exportFailed'), [
         {
           text: 'OK',
           onPress: () => {},
@@ -644,9 +605,9 @@ export default function ExportDataScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.violet} />
+        <ActivityIndicator size="large" color={C.violet} />
         <Text style={styles.loadingText}>
-          {format === 'csv' ? 'Generando CSV...' : 'Generando PDF...'}
+          {format === 'csv' ? t('exportData.generatingCSV') : t('exportData.generatingPDF')}
         </Text>
       </View>
     );
@@ -660,15 +621,15 @@ export default function ExportDataScreen() {
     preview.fastingEntries > 0;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: C.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.header}>Exportar Datos</Text>
+        <Text style={[styles.header, { color: C.bone }]}>{t('exportData.title')}</Text>
 
         {/* Format Selector */}
-        <Text style={styles.sectionLabel}>Formato</Text>
+        <Text style={[styles.sectionLabel, { color: C.textSecondary }]}>{t('exportData.format')}</Text>
         <View style={styles.formatGroup}>
           <TouchableOpacity
             style={[styles.formatOption, format === 'csv' && styles.formatOptionActive]}
@@ -677,7 +638,7 @@ export default function ExportDataScreen() {
             <Ionicons
               name="document-text"
               size={24}
-              color={format === 'csv' ? COLORS.background : COLORS.violet}
+              color={format === 'csv' ? C.background : C.violet}
             />
             <Text
               style={[
@@ -695,7 +656,7 @@ export default function ExportDataScreen() {
             <Ionicons
               name="document"
               size={24}
-              color={format === 'pdf' ? COLORS.background : COLORS.violet}
+              color={format === 'pdf' ? C.background : C.violet}
             />
             <Text
               style={[
@@ -709,76 +670,76 @@ export default function ExportDataScreen() {
         </View>
 
         {/* Scope Selector */}
-        <Text style={styles.sectionLabel}>Rango de Fechas</Text>
+        <Text style={[styles.sectionLabel, { color: C.textSecondary }]}>{t('exportData.dateRange')}</Text>
         <View style={styles.scopeGroup}>
           <TouchableOpacity
             style={[styles.scopeButton, scope === 'week' && styles.scopeButtonActive]}
             onPress={() => setScope('week')}
           >
-            <View style={styles.scopeButtonRadio}>
-              {scope === 'week' && <View style={styles.radioInner} />}
+            <View style={[styles.scopeButtonRadio, { borderColor: C.violet }]}>
+              {scope === 'week' && <View style={[styles.radioInner, { backgroundColor: C.background }]} />}
             </View>
-            <Text style={styles.scopeButtonText}>Última Semana</Text>
+            <Text style={[styles.scopeButtonText, { color: C.bone }]}>{t('exportData.lastWeek')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.scopeButton, scope === 'month' && styles.scopeButtonActive]}
             onPress={() => setScope('month')}
           >
-            <View style={styles.scopeButtonRadio}>
-              {scope === 'month' && <View style={styles.radioInner} />}
+            <View style={[styles.scopeButtonRadio, { borderColor: C.violet }]}>
+              {scope === 'month' && <View style={[styles.radioInner, { backgroundColor: C.background }]} />}
             </View>
-            <Text style={styles.scopeButtonText}>Último Mes</Text>
+            <Text style={[styles.scopeButtonText, { color: C.bone }]}>{t('exportData.lastMonth')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.scopeButton, scope === 'custom' && styles.scopeButtonActive]}
             onPress={() => setScope('custom')}
           >
-            <View style={styles.scopeButtonRadio}>
-              {scope === 'custom' && <View style={styles.radioInner} />}
+            <View style={[styles.scopeButtonRadio, { borderColor: C.violet }]}>
+              {scope === 'custom' && <View style={[styles.radioInner, { backgroundColor: C.background }]} />}
             </View>
-            <Text style={styles.scopeButtonText}>Personalizado</Text>
+            <Text style={[styles.scopeButtonText, { color: C.bone }]}>{t('exportData.custom')}</Text>
           </TouchableOpacity>
         </View>
 
         {scope === 'custom' && (
-          <View style={styles.card}>
-            <Text style={styles.sectionLabel}>Seleccionar Fechas</Text>
+          <View style={[styles.card, { backgroundColor: C.card, borderColor: C.border }]}>
+            <Text style={[styles.sectionLabel, { color: C.textSecondary }]}>{t('exportData.selectDates')}</Text>
             <View style={styles.datePickerRow}>
               <Text
                 style={[
                   styles.dateInput,
                   {
-                    color: COLORS.textSecondary,
+                    color: C.textSecondary,
                     paddingVertical: 10,
-                    backgroundColor: COLORS.cardHover,
+                    backgroundColor: C.cardHover,
                   },
                 ]}
               >
-                {customStartDate || 'Inicio (YYYY-MM-DD)'}
+                {customStartDate || t('exportData.startPlaceholder')}
               </Text>
               <Text
                 style={[
                   styles.dateInput,
                   {
-                    color: COLORS.textSecondary,
+                    color: C.textSecondary,
                     paddingVertical: 10,
-                    backgroundColor: COLORS.cardHover,
+                    backgroundColor: C.cardHover,
                   },
                 ]}
               >
-                {customEndDate || 'Fin (YYYY-MM-DD)'}
+                {customEndDate || t('exportData.endPlaceholder')}
               </Text>
             </View>
-            <Text style={{ fontSize: 11, color: COLORS.textTertiary, marginTop: 8 }}>
-              Ingresa las fechas en formato YYYY-MM-DD
+            <Text style={{ fontSize: 11, color: C.textTertiary, marginTop: 8 }}>
+              {t('exportData.dateFormat')}
             </Text>
           </View>
         )}
 
         {/* Data Checkboxes */}
-        <Text style={styles.sectionLabel}>Datos a Exportar</Text>
+        <Text style={[styles.sectionLabel, { color: C.textSecondary }]}>{t('exportData.dataToExport')}</Text>
         <View style={styles.checkboxGroup}>
           <TouchableOpacity
             style={[styles.checkboxItem, options.meals && styles.checkboxItemActive]}
@@ -786,10 +747,10 @@ export default function ExportDataScreen() {
           >
             <View style={[styles.checkbox, options.meals && styles.checkboxActive]}>
               {options.meals && (
-                <Ionicons name="checkmark" size={14} color={COLORS.background} />
+                <Ionicons name="checkmark" size={14} color={C.background} />
               )}
             </View>
-            <Text style={styles.checkboxLabel}>Comidas</Text>
+            <Text style={[styles.checkboxLabel, { color: C.bone }]}>{t('exportData.meals')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -798,10 +759,10 @@ export default function ExportDataScreen() {
           >
             <View style={[styles.checkbox, options.weight && styles.checkboxActive]}>
               {options.weight && (
-                <Ionicons name="checkmark" size={14} color={COLORS.background} />
+                <Ionicons name="checkmark" size={14} color={C.background} />
               )}
             </View>
-            <Text style={styles.checkboxLabel}>Peso</Text>
+            <Text style={[styles.checkboxLabel, { color: C.bone }]}>{t('exportData.weight')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -815,10 +776,10 @@ export default function ExportDataScreen() {
           >
             <View style={[styles.checkbox, options.measurements && styles.checkboxActive]}>
               {options.measurements && (
-                <Ionicons name="checkmark" size={14} color={COLORS.background} />
+                <Ionicons name="checkmark" size={14} color={C.background} />
               )}
             </View>
-            <Text style={styles.checkboxLabel}>Medidas Corporales</Text>
+            <Text style={[styles.checkboxLabel, { color: C.bone }]}>{t('exportData.bodyMeasurements')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -827,10 +788,10 @@ export default function ExportDataScreen() {
           >
             <View style={[styles.checkbox, options.water && styles.checkboxActive]}>
               {options.water && (
-                <Ionicons name="checkmark" size={14} color={COLORS.background} />
+                <Ionicons name="checkmark" size={14} color={C.background} />
               )}
             </View>
-            <Text style={styles.checkboxLabel}>Agua</Text>
+            <Text style={[styles.checkboxLabel, { color: C.bone }]}>{t('exportData.water')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -839,58 +800,58 @@ export default function ExportDataScreen() {
           >
             <View style={[styles.checkbox, options.fasting && styles.checkboxActive]}>
               {options.fasting && (
-                <Ionicons name="checkmark" size={14} color={COLORS.background} />
+                <Ionicons name="checkmark" size={14} color={C.background} />
               )}
             </View>
-            <Text style={styles.checkboxLabel}>Ayuno</Text>
+            <Text style={[styles.checkboxLabel, { color: C.bone }]}>{t('exportData.fasting')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Preview */}
-        <View style={styles.card}>
-          <Text style={styles.previewTitle}>Previsualización</Text>
+        <View style={[styles.card, { backgroundColor: C.card, borderColor: C.border }]}>
+          <Text style={[styles.previewTitle, { color: C.textSecondary }]}>{t('exportData.preview')}</Text>
           {hasData ? (
             <>
               {options.meals && preview.mealCount > 0 && (
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>Comidas registradas</Text>
-                  <Text style={styles.previewValue}>{preview.mealCount}</Text>
+                  <Text style={[styles.previewLabel, { color: C.textSecondary }]}>{t('exportData.mealsLogged')}</Text>
+                  <Text style={[styles.previewValue, { color: C.violet }]}>{preview.mealCount}</Text>
                 </View>
               )}
               {options.weight && preview.weightEntries > 0 && (
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>Registros de peso</Text>
-                  <Text style={styles.previewValue}>{preview.weightEntries}</Text>
+                  <Text style={[styles.previewLabel, { color: C.textSecondary }]}>{t('exportData.weightEntries')}</Text>
+                  <Text style={[styles.previewValue, { color: C.violet }]}>{preview.weightEntries}</Text>
                 </View>
               )}
               {options.water && preview.waterEntries > 0 && (
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>Registros de agua</Text>
-                  <Text style={styles.previewValue}>{preview.waterEntries}</Text>
+                  <Text style={[styles.previewLabel, { color: C.textSecondary }]}>{t('exportData.waterEntries')}</Text>
+                  <Text style={[styles.previewValue, { color: C.violet }]}>{preview.waterEntries}</Text>
                 </View>
               )}
               {options.measurements && preview.measurementEntries > 0 && (
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>Medidas registradas</Text>
-                  <Text style={styles.previewValue}>{preview.measurementEntries}</Text>
+                  <Text style={[styles.previewLabel, { color: C.textSecondary }]}>{t('exportData.measurementEntries')}</Text>
+                  <Text style={[styles.previewValue, { color: C.violet }]}>{preview.measurementEntries}</Text>
                 </View>
               )}
               {options.fasting && preview.fastingEntries > 0 && (
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>Registros de ayuno</Text>
-                  <Text style={styles.previewValue}>{preview.fastingEntries}</Text>
+                  <Text style={[styles.previewLabel, { color: C.textSecondary }]}>{t('exportData.fastingEntries')}</Text>
+                  <Text style={[styles.previewValue, { color: C.violet }]}>{preview.fastingEntries}</Text>
                 </View>
               )}
               <View style={styles.previewRow}>
-                <Text style={styles.previewLabel}>Período</Text>
-                <Text style={styles.previewValue}>
+                <Text style={[styles.previewLabel, { color: C.textSecondary }]}>{t('exportData.period')}</Text>
+                <Text style={[styles.previewValue, { color: C.violet }]}>
                   {dateRange.start.toLocaleDateString('es-ES')} - {dateRange.end.toLocaleDateString('es-ES')}
                 </Text>
               </View>
             </>
           ) : (
-            <Text style={styles.previewLabel}>
-              No hay datos disponibles para el período seleccionado
+            <Text style={[styles.previewLabel, { color: C.textSecondary }]}>
+              {t('exportData.noData')}
             </Text>
           )}
         </View>
@@ -904,10 +865,10 @@ export default function ExportDataScreen() {
           <Ionicons
             name="download"
             size={18}
-            color={COLORS.background}
+            color={C.background}
           />
           <Text style={styles.exportButtonText}>
-            Exportar {format.toUpperCase()}
+            {t('exportData.exportBtn', { format: format.toUpperCase() })}
           </Text>
         </TouchableOpacity>
       </ScrollView>
