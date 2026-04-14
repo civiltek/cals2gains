@@ -1,5 +1,51 @@
 # Changelog - Cals2Gains
 
+## 2026-04-14 — Puesta en marcha del sistema de agentes financiero y legal
+
+### Nuevo agente: `legal`
+- Creado `Claude code/agents/legal.md` — agente de cumplimiento normativo (RGPD, LOPD-GDD, LSSI, AI Act, requisitos App Store / Play Store).
+- Alcance: auditoría de privacy.html y terms.html, EIPD/DPIA, derechos ARCO+, Data Safety Section, aviso legal, banner de cookies.
+
+### Nuevos skills
+- `reconciliation` — reconciliación mensual (cruza Excel con recibos y suscripciones, detecta discrepancias).
+- `financial-report` — reporte financiero completo con desglose, anomalías, proyecciones y recomendaciones.
+- `legal-audit` — auditoría legal completa (privacidad, términos, RGPD, stores, LSSI, consistencia de textos legales).
+
+### Nuevos comandos
+- `/finance-report` — genera reporte financiero con reconciliación previa.
+- `/legal-check` — ejecuta auditoría legal (completa o parcial: privacy, terms, stores, pre-launch).
+
+### Nuevos workflows
+- W10: Auditoría legal (disparada por `/legal-check`, pre-lanzamiento o feature nueva con datos personales).
+- W11: Reporte financiero mensual (disparado por `/finance-report` o final de mes).
+- W12: EIPD/DPIA para nueva feature (evalúa impacto en protección de datos).
+
+### Nuevos handoffs
+- `legal → web-dev` (deploy de textos legales tras aprobación).
+- `legal → app-dev` (features legales in-app: eliminación cuenta, consentimiento, centro privacidad).
+- `legal → finance` (costes legales: DPAs, asesor externo).
+- `finance → legal` (contratos/DPAs que requieren revisión legal).
+- `legal → research` (investigación de cambios normativos).
+
+### Nuevos archivos de estado y contexto
+- `_project-hub/LEGAL.md` — estado legal del proyecto con evaluación por área (RGPD, stores, LSSI, web).
+- `Claude code/context/LEGAL-OVERVIEW.md` — arquitectura del sistema legal, marco normativo, datos tratados, flujo de datos.
+- `docs/legal/` — directorio para DPIAs, checklists y documentos legales internos.
+
+### Actualizaciones
+- `CLAUDE.md`: añadido agente `legal` a tabla de agentes, `LEGAL.md` al hub, comandos `/finance-report` y `/legal-check`, paso legal en checklist de cierre.
+- `guardrails/RULES.md`: añadidas R16 (textos legales requieren aprobación), R17 (no afirmar cumplimiento sin verificar), R18 (datos de salud = categoría especial RGPD).
+- `guardrails/ESCALATION.md`: añadidos puntos de escalado obligatorio (textos legales, datos de salud) y recomendado (cambios normativos), operaciones rutinarias (auditorías de lectura).
+- `orchestration/WORKFLOWS.md`: añadidos W10, W11, W12.
+- `orchestration/HANDOFFS.md`: añadidos 5 nuevos handoffs.
+
+### Hallazgos iniciales (bloqueantes para lanzamiento)
+- 🔴 Falta eliminación de cuenta in-app (requisito stores desde 2024).
+- 🔴 Falta aviso legal / Impressum en web (obligatorio LSSI España).
+- 🔴 Falta banner de cookies (obligatorio con GA4).
+- 🔴 Falta Data Safety Section en Play Console.
+- 🔴 privacy.html incompleta (no cubre fasting, voice, training, measurements).
+
 ## 2026-04-14 (noche-4) — Motor audiovisual v4.0 (Studio)
 
 ### Visual Engine — Upgrade a calidad de estudio profesional

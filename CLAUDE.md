@@ -30,6 +30,7 @@ Cals2Gains/
 │   ├── CHANGELOG.md       ← log de cambios (mantener últimas 50 entradas)
 │   ├── FEATURES.md        ← features con estado
 │   ├── FINANCES.md        ← resumen financiero narrativo
+│   ├── LEGAL.md           ← estado legal y cumplimiento (RGPD, stores, LSSI)
 │   ├── METRICS.md         ← métricas RRSS/web/stores
 │   ├── ACCOUNTS.md        ← cuentas (sin credenciales)
 │   ├── BRAND.md           ← voz, colores, tipografía
@@ -67,7 +68,8 @@ Cuando una tarea cae claramente dentro del alcance de un agente, invócalo (lée
 |--------|---------------|
 | `app-dev` | React Native / Expo, builds EAS, Android/iOS, i18n, tema oscuro, testing |
 | `web-dev` | Firebase hosting, SEO, landing cals2gains.com |
-| `finance` | Excel + dashboard + recibos + reconciliación |
+| `finance` | Excel + dashboard + recibos + reconciliación + reportes financieros |
+| `legal` | RGPD, privacidad, términos, compliance stores, cookies, LSSI |
 | `marketing` | Brand voice, posts IG/FB, emails, copy |
 | `growth` | Métricas GA4, IG/FB, análisis, recomendaciones |
 | `ops` | Coordinación, limpieza, tareas programadas, salud del sistema |
@@ -121,12 +123,14 @@ Lista completa y detallada en `guardrails/RULES.md`.
 ## 6. Comandos frecuentes
 
 ### Slash commands (en `commands/`)
-- `/status` — estado general (app, web, finanzas, RRSS)
+- `/status` — estado general (app, web, finanzas, legal, RRSS)
 - `/morning-brief` — briefing del día
 - `/receipts` — escaneo manual de recibos
 - `/metrics` — snapshot de métricas
 - `/build-app` — build EAS con verificación previa
 - `/deploy-web` — deploy Firebase con checks
+- `/finance-report` — reporte financiero con reconciliación
+- `/legal-check` — auditoría legal completa
 
 ### Bash útiles
 ```bash
@@ -148,8 +152,9 @@ firebase deploy --only hosting
 2. Si afecta a estado del proyecto → actualizar `_project-hub/PROJECT_STATUS.md`.
 3. Si afecta a finanzas → actualizar `_project-hub/FINANCES.md` **y** regenerar `dashboard.html` en ambas ubicaciones (`finances/` y `_project-hub/`).
 4. Si afecta a features → actualizar `_project-hub/FEATURES.md`.
-5. Si afecta a screenshots → actualizar `marketing/screenshots/` + `_project-hub/SCREENSHOTS.md`.
-6. Reportar a Judith en una línea: qué hiciste, qué quedó pendiente, si hay algo que confirmar.
+5. Si afecta a privacidad/legal → actualizar `_project-hub/LEGAL.md`.
+6. Si afecta a screenshots → actualizar `marketing/screenshots/` + `_project-hub/SCREENSHOTS.md`.
+7. Reportar a Judith en una línea: qué hiciste, qué quedó pendiente, si hay algo que confirmar.
 
 ---
 

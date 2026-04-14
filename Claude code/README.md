@@ -29,7 +29,8 @@ Claude code/
 ├── agents/                       ← subagentes especializados
 │   ├── app-dev.md                ← React Native / Expo / EAS
 │   ├── web-dev.md                ← Firebase hosting / SEO
-│   ├── finance.md                ← Excel, dashboard, recibos
+│   ├── finance.md                ← Excel, dashboard, recibos, reportes financieros
+│   ├── legal.md                  ← RGPD, privacidad, términos, compliance stores, LSSI
 │   ├── marketing.md              ← Brand voice, posts, copy
 │   ├── growth.md                 ← Analítica GA4 / IG / FB / stores
 │   ├── ops.md                    ← Coordinación, CHANGELOG, salud
@@ -38,6 +39,9 @@ Claude code/
 ├── skills/                       ← skills reutilizables
 │   ├── update-dashboard/         ← regenera dashboard desde Excel
 │   ├── download-receipt/         ← archiva recibos con naming canónico
+│   ├── reconciliation/           ← reconciliación mensual Excel vs recibos
+│   ├── financial-report/         ← reporte financiero con desglose y proyecciones
+│   ├── legal-audit/              ← auditoría legal completa (RGPD, stores, LSSI)
 │   ├── publish-post/             ← flujo de publicación IG/FB
 │   ├── crash-diagnosis/          ← diagnóstico ADB Android
 │   ├── eas-build/                ← build EAS con validación
@@ -49,7 +53,9 @@ Claude code/
 │   ├── deploy-web.md
 │   ├── build-app.md
 │   ├── metrics.md
-│   └── morning-brief.md
+│   ├── morning-brief.md
+│   ├── finance-report.md         ← reporte financiero con reconciliación
+│   └── legal-check.md            ← auditoría legal
 │
 ├── orchestration/                ← coordinación entre agentes y tareas
 │   ├── WORKFLOWS.md              ← flujos típicos paso a paso
@@ -57,7 +63,7 @@ Claude code/
 │   └── scheduled-tasks-map.md    ← mapa de tareas programadas
 │
 ├── guardrails/                   ← reglas y criterios de parada
-│   ├── RULES.md                  ← 15 reglas inquebrantables
+│   ├── RULES.md                  ← 18 reglas inquebrantables
 │   ├── ANTI-PATTERNS.md          ← errores comunes y cómo evitarlos
 │   └── ESCALATION.md             ← cuándo preguntar vs actuar
 │

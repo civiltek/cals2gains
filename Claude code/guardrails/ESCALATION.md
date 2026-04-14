@@ -16,6 +16,8 @@
 8. **Dar de alta servicios** externos (SaaS, plugins, MCPs nuevos).
 9. **Modificar la estructura de `_project-hub/`** o de `Claude code/`.
 10. **Operaciones destructivas git** (`reset --hard`, `push --force`, rebase sobre ramas compartidas).
+11. **Publicar textos legales** modificados (privacy.html, terms.html, aviso legal, cookies). (R16)
+12. **Añadir recopilación de datos de salud** sin EIPD/DPIA. (R18)
 
 ## Escalado recomendado (preguntar si no tienes contexto claro)
 
@@ -24,6 +26,8 @@
 - Una feature del producto que no está en `FEATURES.md` aparece en código o en copy.
 - Una cuenta (IG/FB/email) que no está en `ACCOUNTS.md` aparece en contexto.
 - Una tarea programada falla repetidamente.
+- Cambio normativo que puede afectar al proyecto (nueva ley, actualización de guidelines de stores).
+- Resultado de auditoría legal con items 🔴 críticos.
 
 ## Actuar sin preguntar (operaciones rutinarias)
 
@@ -34,6 +38,9 @@
 - Capturar métricas y anexarlas a METRICS.md.
 - Ejecutar typecheck, lint, tests locales.
 - Leer logs ADB del dispositivo de pruebas.
+- Ejecutar auditoría legal de lectura (`/legal-check`) — solo lectura + informe.
+- Ejecutar reporte financiero (`/finance-report`) — solo lectura + informe.
+- Actualizar `_project-hub/LEGAL.md` con hallazgos de auditoría.
 
 ---
 
