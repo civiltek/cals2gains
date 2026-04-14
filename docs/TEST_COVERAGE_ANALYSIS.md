@@ -2,7 +2,7 @@
 
 **Fecha:** 2026-04-14
 **Estado inicial:** 0% cobertura (sin framework de tests, sin tests, sin scripts)
-**Estado tras este análisis:** 5.21% statements, 81 tests pasando en 3 suites
+**Estado final:** 35% statements, 307 tests pasando en 18 suites
 
 ---
 
@@ -158,10 +158,26 @@ Dependencias añadidas:
   @types/jest    - Tipos TypeScript para Jest
 
 Archivos creados:
-  jest.config.js                              - Configuración de Jest
-  __tests__/utils/nutrition.test.ts           - 31 tests (100% cobertura)
-  __tests__/services/adaptiveMacroEngine.test.ts - 21 tests (94% cobertura)
-  __tests__/constants/macroPresets.test.ts     - 29 tests (100% cobertura)
+  jest.config.js                                    - Configuración de Jest
+  jest.setup.js                                     - Mocks globales (Firebase, AsyncStorage, expo-*)
+  __tests__/utils/nutrition.test.ts                 - 31 tests
+  __tests__/utils/imageUtils.test.ts                - 14 tests
+  __tests__/utils/language.test.ts                  - 5 tests
+  __tests__/constants/macroPresets.test.ts           - 29 tests
+  __tests__/services/adaptiveMacroEngine.test.ts    - 21 tests
+  __tests__/services/memoryEngine.test.ts           - 27 tests
+  __tests__/services/personalEngine.test.ts         - 24 tests
+  __tests__/services/macroCoach.test.ts             - 13 tests
+  __tests__/services/recipeService.test.ts          - 28 tests
+  __tests__/services/foodDatabase.test.ts           - 14 tests
+  __tests__/services/exportService.test.ts          - 17 tests
+  __tests__/data/spanishFoods.test.ts               - 22 tests
+  __tests__/store/mealStore.test.ts                 - 17 tests
+  __tests__/store/weightStore.test.ts               - 17 tests
+  __tests__/store/fastingStore.test.ts              - 18 tests
+  __tests__/store/waterStore.test.ts                - 14 tests
+  __tests__/store/mealPlanStore.test.ts             - 11 tests
+  __tests__/store/adaptiveStore.test.ts             - 15 tests
 
 Scripts añadidos a package.json:
   npm test              - Ejecutar todos los tests
@@ -171,38 +187,58 @@ Scripts añadidos a package.json:
 
 ---
 
-## 4. Cobertura actual (baseline)
+## 4. Cobertura actual
 
 ```
 -------------------------|---------|----------|---------|---------|
 File                     | % Stmts | % Branch | % Funcs | % Lines |
 -------------------------|---------|----------|---------|---------|
-All files                |    5.21 |     3.89 |    6.07 |    5.07 |
- utils/nutrition.ts      |     100 |      100 |     100 |     100 |  ✅
+All files                |   34.79 |    25.54 |   40.88 |   35.37 |
+ utils/ (3 archivos)     |     100 |      100 |     100 |     100 |  ✅
+ data/spanishFoods.ts    |   96.36 |    85.18 |     100 |     100 |  ✅
  constants/macroPresets   |     100 |      100 |     100 |     100 |  ✅
+ services/personalEngine |     100 |      100 |     100 |     100 |  ✅
+ services/memoryEngine   |   98.29 |    89.18 |     100 |     100 |  ✅
  services/adaptiveMacro  |   93.87 |    83.01 |     100 |   94.62 |  ✅
- Todo lo demás           |       0 |        0 |       0 |       0 |  ❌
+ store/weightStore       |   94.73 |      100 |   92.85 |   93.47 |  ✅
+ store/fastingStore      |   86.66 |    73.91 |     100 |   88.57 |  ✅
+ store/adaptiveStore     |   82.45 |       40 |   92.85 |      84 |  ✅
+ store/waterStore        |   81.63 |       50 |   88.88 |   81.81 |  ✅
+ services/exportService  |    72.6 |    82.53 |   82.75 |   72.53 |  ⚠️
+ services/foodDatabase   |   71.95 |    53.91 |   71.42 |   73.61 |  ⚠️
+ store/mealPlanStore     |   56.33 |       50 |   78.57 |   60.93 |  ⚠️
+ store/mealStore         |   55.08 |    42.85 |   54.83 |   54.46 |  ⚠️
+ services/recipeService  |   40.35 |    34.28 |   61.53 |   37.73 |  ⚠️
+ (demás archivos)        |       0 |        0 |       0 |       0 |  ❌
 -------------------------|---------|----------|---------|---------|
 ```
 
 ---
 
-## 5. Objetivos sugeridos
+## 5. Archivos sin cobertura (0%)
 
-| Fase | Objetivo | Archivos a cubrir | Cobertura estimada |
-|------|----------|-------------------|--------------------|
-| **Actual** | Baseline | nutrition, adaptiveMacroEngine, macroPresets | ~5% |
-| **Fase 1** | Lógica pura | + memoryEngine, personalEngine, recipeService (puras), spanishFoods, imageUtils, language | ~25% |
-| **Fase 2** | Stores | + mealStore, weightStore, fastingStore, mealPlanStore | ~45% |
-| **Fase 3** | Servicios con API | + foodDatabase, exportService, macroCoach | ~60% |
-| **Fase 4** | Hooks + integración | + useAdaptiveEngines, userStore, adaptiveStore | ~70% |
+Estos archivos no tienen tests. Los más impactantes para cubrir a continuación:
+
+| Archivo | Motivo | Esfuerzo estimado |
+|---------|--------|-------------------|
+| `store/userStore.ts` | Gestiona auth, perfil, suscripciones | Alto (mock auth + RevenueCat) |
+| `store/shoppingListStore.ts` | CRUD con Firestore directo | Alto (mock Firestore batch) |
+| `services/reminderService.ts` | Notificaciones push | Medio (mock expo-notifications) |
+| `hooks/useAdaptiveEngines.ts` | Orquesta engines al abrir app | Medio (React Testing Library) |
+| `services/firebase.ts` | Capa de acceso a datos | Alto (mock completo Firestore) |
+| `store/recipeStore.ts` | CRUD recetas | Medio |
+| `store/templateStore.ts` | CRUD templates | Medio |
+| `services/openai.ts` | Llamadas a GPT | Alto (mock fetch) |
 
 ---
 
 ## 6. Recomendaciones técnicas
 
-1. **Añadir `jest.useFakeTimers()`** en tests que dependen de `new Date()` — especialmente para `adaptiveMacroEngine.calculateAdherenceScore` y `fastingStore`
-2. **Crear mock global de Firebase** en `__mocks__/services/firebase.ts` para reutilizar en todos los tests de stores
-3. **Crear mock de AsyncStorage** en `jest.setup.js` — ya existe un mock oficial en `@react-native-async-storage/async-storage/jest/async-storage-mock`
-4. **Considerar extraer funciones puras** de los stores a archivos `utils/` para facilitar el testing sin mocks
-5. **CI:** Añadir `npm test` al pipeline de EAS Build (via `eas-build-pre-install` script) para que los tests se ejecuten antes de cada build
+1. **CI:** Añadir `npm test` al pipeline de EAS Build (via `eas-build-pre-install` script) para que los tests se ejecuten antes de cada build
+2. **Usar `jest.useFakeTimers()`** en tests que dependen de `new Date()` para eliminar flakiness
+3. **Considerar extraer funciones puras** de los stores a archivos `utils/` para facilitar el testing sin mocks
+4. **Añadir React Testing Library** (`@testing-library/react-native`) para testear hooks y componentes
+5. **Añadir umbral de cobertura** en `jest.config.js` para evitar regresiones:
+   ```js
+   coverageThreshold: { global: { statements: 30, branches: 20, functions: 35, lines: 30 } }
+   ```
