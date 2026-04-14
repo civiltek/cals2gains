@@ -622,20 +622,27 @@
             obs.observe(el);
         });
 
-        // LEAD FORM — TODO: conectar con Brevo API via Cloud Function
+        // LEAD FORM — Brevo subscription via sibforms
         function handleLeadSubmit(e) {
             e.preventDefault();
-            const email = e.target.querySelector('input').value;
+            const form = e.target;
+            const email = form.querySelector('input').value;
+            const btn = form.querySelector('button');
+            const origText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = lang === 'es' ? 'Enviando...' : 'Sending...';
             if (window.gtag) gtag('event', 'lead_capture', { email_domain: email.split('@')[1] });
-            // Temporal: guardar en Firestore hasta conectar Brevo
-            if (typeof firebase !== 'undefined' && firebase.firestore) {
-                firebase.firestore().collection('leads').add({
-                    email: email,
-                    source: 'macro-calculator',
-                    createdAt: new Date().toISOString()
-                }).catch(function(){});
-            }
-            e.target.innerHTML = '<p style="color:var(--success);font-size:1.1rem;font-weight:700;padding:1rem">&#9989; ' + (lang === 'es' ? '¡Gracias! Te avisaremos cuando este disponible.' : 'Thanks! We\'ll let you know when it\'s ready.') + '</p>';
+            // Send to Brevo via sibforms endpoint
+            fetch('https://e16073f5.sibforms.com/serve/MUIFANJ7cd06Veo9bk942kJaC6WCiR3GdgciKExwgfSQDvL4iiBcp6BuMqcae5eZ1R0QWDYdi287h7arB48ys5WCUK0fw_4UO6oLAigE3MSjn35XTnn9SN_eq5SSorSeENj_iWLIyUHeOXFhk11t5wQDqaUSrBKw_HnWOZWpICGrjdVaHM6iOrkXsRQiCu0XaDml9P57J6f1Q-lncg==', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'EMAIL=' + encodeURIComponent(email),
+                mode: 'no-cors'
+            }).then(function() {
+                form.innerHTML = '<p style="color:var(--success);font-size:1.1rem;font-weight:700;padding:1rem">&#9989; ' + (lang === 'es' ? '¡Gracias! Revisa tu email para confirmar la suscripcion.' : 'Thanks! Check your email to confirm your subscription.') + '</p>';
+            }).catch(function() {
+                form.innerHTML = '<p style="color:var(--success);font-size:1.1rem;font-weight:700;padding:1rem">&#9989; ' + (lang === 'es' ? '¡Gracias! Revisa tu email para confirmar la suscripcion.' : 'Thanks! Check your email to confirm your subscription.') + '</p>';
+            });
         }
 
         // NAV SCROLL
