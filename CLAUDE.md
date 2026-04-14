@@ -1,79 +1,176 @@
-﻿# Cals2Gains - Instrucciones del Proyecto
+# CLAUDE.md — Reglas globales del sistema Cals2Gains
 
-## Regla #1: Lee el contexto antes de empezar
-Antes de hacer CUALQUIER trabajo, lee estos archivos del hub central:
-- `_project-hub/PROJECT_STATUS.md` — estado actual del proyecto, builds, bugs
-- `_project-hub/CHANGELOG.md` — cambios recientes (últimas 10 entradas)
-- `_project-hub/FEATURES.md` — features de la app con estado
-- `_project-hub/ACCOUNTS.md` — cuentas de RRSS y plataformas
-- `_project-hub/BRAND.md` — colores, tipografía, tono de voz
-- `_project-hub/CONTENT_PLAN.md` — plan de contenido actual
-- `_project-hub/SCREENSHOTS.md` — screenshots disponibles
-- `_project-hub/METRICS.md` — métricas de RRSS, web y stores (si existe)
+> Este archivo es el punto de entrada. Si un Claude nuevo llega al proyecto, debe leerlo entero antes de tocar nada. Léelo también tú, Claude, al inicio de cada sesión seria.
 
-## Regla #2: Actualiza el hub al terminar
-Al finalizar tu tarea, SIEMPRE actualiza:
-1. **CHANGELOG.md** — añade una entrada con fecha, descripción breve de lo que hiciste
-2. **PROJECT_STATUS.md** — actualiza cualquier sección que haya cambiado (nuevo build, bug resuelto, feature añadida, etc.)
-3. **FEATURES.md** — si añadiste, modificaste o eliminaste una feature
-4. **METRICS.md** — si recopilaste métricas nuevas
+**Propietaria:** Judith (info@civiltek.es) — CivilTek
+**Proyecto:** Cals2Gains — app móvil de nutrición con IA (React Native / Expo)
+**Idioma de trabajo:** Español. Siempre responde a Judith en español salvo que ella cambie al inglés.
 
-## Regla #3: Screenshots
-Si haces cambios visuales en la app (UI, nuevas pantallas, correcciones de diseño):
-- Genera screenshots actualizados
-- Guárdalos en `marketing/screenshots/`
-- Actualiza `_project-hub/SCREENSHOTS.md` con las rutas
+---
 
-## Sobre el proyecto
-- **Qué es**: App de nutrición con IA (React Native/Expo)
-- **Propietaria**: Judith (info@civiltek.es)
-- **Empresa**: CivilTek
-- **Precio**: $9.99/mes (modelo freemium)
-- **Idiomas**: Español y English
-- **Plataformas**: iOS y Android
+## 1. Las 3 reglas de oro (no negociables)
 
-## Cuentas de RRSS
-- IG @cals2gains — cuenta principal EN (800+ seguidores, verificación pendiente)
-- IG @cals2gains_es — cuenta ES
-- IG @calstogains — antigua EN renombrada
-- FB "Cals2Gains - AI Nutrition" (EN)
-- FB página ES
-- Web: cals2gains.com
+1. **Leer antes de actuar.** Abre `_project-hub/PROJECT_STATUS.md`, `_project-hub/CHANGELOG.md` y los archivos del hub relevantes a la tarea antes de proponer cambios.
+2. **No inventar datos.** Si no tienes el dato (un importe, un KPI, una métrica, un estado de build) lo dices — no rellenas. Ver `guardrails/RULES.md`.
+3. **Dejar rastro.** Toda acción no trivial se registra: entrada en `_project-hub/CHANGELOG.md` con fecha y resumen, y, si aplica, actualización del archivo de hub correspondiente.
 
-## Brand
-- Colores: coral #FF6A4D, violet #9C8CFF, orange #FF9800, gold #FFD700, dark #17121D, bone #F7F2EA
-- Fuente: Outfit
-- Tono: cercano, motivador, basado en ciencia, no condescendiente
+Cualquier otra cosa de este documento es un derivado de estas tres.
 
-## Estructura del proyecto
+---
+
+## 2. Rutas clave del proyecto
+
+Raíz del proyecto: `C:\Users\Judit\Documents\Cals2Gains\`
+
 ```
 Cals2Gains/
-├── _project-hub/       ← HUB CENTRAL (lee siempre primero)
-├── app/                ← Código fuente React Native
-├── components/         ← Componentes React
-├── services/           ← Servicios (Firebase, API, etc.)
-├── store/              ← State management (Zustand)
-├── i18n/               ← Traducciones ES/EN
-├── marketing/          ← Todo marketing
-│   ├── Campaign_F1/    ← Campaña Fase 1 (EN + ES)
-│   ├── instagram/      ← Posts y reels
-│   ├── content-calendar/
-│   ├── strategies/
-│   └── screenshots/    ← Screenshots actualizados de la app
-├── docs/               ← Documentación, guías, reportes
-├── website/            ← Landing page (cals2gains.com)
-├── brand-assets/       ← Logos, iconos, fuentes
-└── store-screenshots/  ← Screenshots para App Store / Play Store
+├── Claude code/           ← ESTE SISTEMA (agentes, skills, reglas, context)
+├── _project-hub/          ← Hub central de estado del proyecto
+│   ├── PROJECT_STATUS.md  ← estado vivo (builds, bugs, métricas)
+│   ├── CHANGELOG.md       ← log de cambios (mantener últimas 50 entradas)
+│   ├── FEATURES.md        ← features con estado
+│   ├── FINANCES.md        ← resumen financiero narrativo
+│   ├── METRICS.md         ← métricas RRSS/web/stores
+│   ├── ACCOUNTS.md        ← cuentas (sin credenciales)
+│   ├── BRAND.md           ← voz, colores, tipografía
+│   ├── CONTENT_PLAN.md    ← plan de contenido
+│   ├── SCREENSHOTS.md     ← índice de screenshots
+│   └── dashboard.html     ← copia del dashboard financiero
+├── app/, components/, services/, store/, i18n/, hooks/, utils/, constants/, theme.ts
+├── public/, website/      ← landing cals2gains.com (Firebase hosting)
+├── finances/
+│   ├── Cals2Gains_Finances.xlsx  ← FUENTE DE VERDAD financiera
+│   ├── dashboard.html              ← dashboard generado desde el Excel
+│   ├── receipts/{anthropic,openai,google,apple,meta,expo,hosting,otros}/
+│   └── reports/
+├── marketing/             ← campañas, posts, screenshots, estrategias
+├── brand-assets/          ← logos, iconos, fuentes
+├── store-screenshots/     ← screenshots para App Store / Play Store
+├── tools/
+│   ├── outlook-mcp-server          ← MCP Outlook (Tenant civiltek)
+│   ├── imap-mcp-server             ← IMAP cals2gains
+│   ├── imap-mcp-server-civiltek
+│   ├── imap-mcp-server-gmail-cals2gains
+│   └── imap-mcp-server-gmail-judith
+└── skills/instagram-commenter/     ← skill legado (respuestas a comentarios IG)
 ```
 
-## Bugs conocidos (actualizar conforme se resuelvan)
-- Firebase Storage: error al subir fotos (ArrayBuffer issue → usar XMLHttpRequest)
-- expo-notifications: removido por crash sin FCM en Android
-- Firebase water permissions: "Missing or insufficient permissions"
+Memoria persistente de Cowork: `/sessions/*/mnt/.auto-memory/` (ver `memory/MEMORY-STRUCTURE.md`).
 
-## Comunicación entre áreas
-- **Developer → Marketing**: al añadir features, actualizar FEATURES.md y generar screenshots
-- **Marketing → Developer**: si necesita screenshots nuevos, pedirlos vía SCREENSHOTS.md
-- **Contenido → Brand**: siempre consultar BRAND.md para colores, tono, estilo
-- **Métricas**: se recopilan automáticamente cada lunes (metrics-collector)
-- **Comentarios RRSS**: se responden automáticamente 3x/día (instagram-comment-replies)
+---
+
+## 3. Sistema de agentes
+
+Cuando una tarea cae claramente dentro del alcance de un agente, invócalo (léete su `.md` y opera bajo su rol). Los agentes están en `Claude code/agents/`:
+
+| Agente | Alcance corto |
+|--------|---------------|
+| `app-dev` | React Native / Expo, builds EAS, Android/iOS, i18n, tema oscuro, testing |
+| `web-dev` | Firebase hosting, SEO, landing cals2gains.com |
+| `finance` | Excel + dashboard + recibos + reconciliación |
+| `marketing` | Brand voice, posts IG/FB, emails, copy |
+| `growth` | Métricas GA4, IG/FB, análisis, recomendaciones |
+| `ops` | Coordinación, limpieza, tareas programadas, salud del sistema |
+| `research` | Competidores, trends, user research |
+
+Los handoffs entre agentes se definen en `Claude code/orchestration/HANDOFFS.md`.
+
+---
+
+## 4. Convenciones
+
+### Idioma y tono
+- Respuestas a Judith: español, directo, sin adorno innecesario.
+- Nombres de archivos, variables, código: inglés (consistente con el resto del repo).
+- Commits / CHANGELOG: español, imperativo corto ("Añadir X", "Corregir Y").
+
+### Nombres de archivos de recibos
+`YYYY-MM-DD_proveedor_descripcion-corta_importe.ext`
+Ejemplo: `2026-04-13_anthropic_receipt-2466-5491-6579_595eur.pdf`
+Ubicación: `finances/receipts/{proveedor}/`
+
+### Brand (resumen — detalle en `context/BRAND.md`)
+- Coral `#FF6A4D` · Violet `#9C8CFF` · Orange `#FF9800` · Gold `#FFD700`
+- Dark `#17121D` · Bone `#F7F2EA`
+- Tipografía: Outfit (Instrument Sans para UI)
+- Voz: cercana, motivadora, basada en ciencia, no condescendiente
+
+### Tech stack (resumen — detalle en `context/TECH-STACK.md`)
+- React Native + Expo Router (typed routes), SDK 54, RN 0.81.5
+- Firebase (Auth, Firestore, Storage), Zustand, i18next, RevenueCat
+- EAS Build (owner `civiltek`, project `381120d5-3866-4b97-af00-4c6840768327`)
+- GA4 (`G-WMHZQ52NS2`, property `macrolens-ai-4c482`)
+
+---
+
+## 5. Qué NUNCA hacer
+
+1. **Nunca ejecutar `rm -rf`, `git reset --hard`, `--force`, o borrados masivos sin confirmación explícita de Judith.**
+2. **Nunca inventar importes, métricas, recibos o estados de build.** Si no los ves, lo dices.
+3. **Nunca tocar credenciales, tokens o API keys.** No los pegues en archivos, no los pongas en CHANGELOG, no los envíes por email.
+4. **Nunca publicar contenido en RRSS sin que Judith lo haya revisado** (salvo flujos automáticos ya autorizados: respuestas a comentarios IG).
+5. **Nunca instalar la APK rota** (build `358414d2` — reanimated v3 incompatible). Siempre validar que el build es uno posterior al fix del 13/04/2026.
+6. **Nunca modificar `finances/Cals2Gains_Finances.xlsx` sin hacer antes copia de seguridad** en `finances/Cals2Gains_Finances_pre_update.xlsx`.
+7. **Nunca borrar recibos originales (PDFs) de `finances/receipts/`.**
+8. **Nunca commitear `google-services.json`, `GoogleService-Info.plist`, `.env` ni similares.**
+
+Lista completa y detallada en `guardrails/RULES.md`.
+
+---
+
+## 6. Comandos frecuentes
+
+### Slash commands (en `commands/`)
+- `/status` — estado general (app, web, finanzas, RRSS)
+- `/morning-brief` — briefing del día
+- `/receipts` — escaneo manual de recibos
+- `/metrics` — snapshot de métricas
+- `/build-app` — build EAS con verificación previa
+- `/deploy-web` — deploy Firebase con checks
+
+### Bash útiles
+```bash
+# ADB logcat del dispositivo de pruebas (Samsung R3CR10E9LSE)
+adb -s R3CR10E9LSE logcat -s ReactNativeJS:V System.err:W AndroidRuntime:E
+
+# Build Android preview
+eas build --profile preview --platform android
+
+# Deploy web (desde raíz del proyecto)
+firebase deploy --only hosting
+```
+
+---
+
+## 7. Al terminar cualquier tarea
+
+1. Añadir entrada a `_project-hub/CHANGELOG.md` (fecha ISO + descripción breve).
+2. Si afecta a estado del proyecto → actualizar `_project-hub/PROJECT_STATUS.md`.
+3. Si afecta a finanzas → actualizar `_project-hub/FINANCES.md` **y** regenerar `dashboard.html` en ambas ubicaciones (`finances/` y `_project-hub/`).
+4. Si afecta a features → actualizar `_project-hub/FEATURES.md`.
+5. Si afecta a screenshots → actualizar `marketing/screenshots/` + `_project-hub/SCREENSHOTS.md`.
+6. Reportar a Judith en una línea: qué hiciste, qué quedó pendiente, si hay algo que confirmar.
+
+---
+
+## 8. Escalado a Judith
+
+Consulta siempre antes de:
+- Hacer cualquier pago, suscripción o compra.
+- Publicar en RRSS (fuera de respuestas automáticas ya autorizadas).
+- Enviar emails a terceros desde info@civiltek.es o cualquier otra cuenta.
+- Modificar `firebase.json`, `eas.json`, `app.json`, `package.json` si el cambio puede romper builds.
+- Borrar archivos del proyecto.
+- Cambiar la estructura de `_project-hub/` o de `Claude code/`.
+
+Detalle en `guardrails/ESCALATION.md`.
+
+---
+
+## 9. Estado inicial del sistema (al crear esta estructura)
+
+- **Fecha creación:** 14 de abril de 2026
+- **Último build Android estable:** `c00a412e` (pendiente validar tras fix reanimated v4)
+- **Gasto acumulado:** 1.120,08 € (ver `_project-hub/FINANCES.md`)
+- **Seguidores IG totales:** ~887 (@cals2gains 868, @cals2gains_es 11, @calstogains 8)
+- **App no lanzada aún** → ingresos = 0 €
