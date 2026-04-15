@@ -28,7 +28,6 @@ load_dotenv(PROJECT_DIR / ".env")
 OPENAI_API_KEY = os.getenv("EXPO_PUBLIC_OPENAI_API_KEY", "")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-HIGGSFIELD_API_KEY = os.getenv("HIGGSFIELD_API_KEY", "")
 
 # -- Color Palette (from theme.ts) -----------------------------------------
 class Colors:

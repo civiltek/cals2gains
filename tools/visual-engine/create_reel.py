@@ -5,8 +5,8 @@ End-to-end pipeline: script -> AI video/images -> branding -> voice -> music -> 
 Applies VIRAL-FORMAT-BIBLE 2026 rules and TEMPLATE-SPECS.json specs.
 
 Pipeline:
-  1. Generate script with GPT-5.4 applying viral rules
-  2. Generate clips with Higgsfield Cloud API (video) or gpt-image-1.5 (images)
+  1. Generate script with GPT-4o applying viral rules
+  2. Generate clips with Open Higgsfield/muapi.ai (free, no paid account) or images
   3. Generate voice PER SCENE (individual API calls, fixes desync)
   4. Apply brand overlay (logo, text, word-by-word subtitles)
   5. Compose with transitions, audio mix, loudness normalization
@@ -285,7 +285,7 @@ def create_reel_from_script(
     print(f"  Title:        {title}")
     print(f"  Scenes:       {len(scene_defs)}")
     print(f"  Est. duration: {total_duration + 3:.0f}s (+ intro/outro)")
-    print(f"  Video AI:     {'Higgsfield API' if use_higgsfield else 'Images + Ken Burns'}")
+    print(f"  Video AI:     {'Open Higgsfield/muapi.ai' if use_higgsfield else 'Images + Ken Burns'}")
     print(f"  Voice:        {voice_pref} (per-scene)")
     print(f"  Output:       {output_path}")
     print(f"{'='*70}\n")
