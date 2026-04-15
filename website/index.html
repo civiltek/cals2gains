@@ -14,8 +14,8 @@
     <meta property="og:locale" content="es_ES">
     <meta property="og:locale:alternate" content="en_US">
     <link rel="canonical" href="https://cals2gains.com">
-    <link rel="icon" type="image/png" href="/c2g-icon.png">
-    <link rel="apple-touch-icon" href="/c2g-icon.png">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico"><link rel="icon" type="image/png" sizes="192x192" href="/c2g-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="alternate" hreflang="es" href="https://cals2gains.com/">
     <link rel="alternate" hreflang="en" href="https://cals2gains.com/">
     <link rel="alternate" hreflang="x-default" href="https://cals2gains.com/">
@@ -26,16 +26,6 @@
     <meta name="twitter:image" content="https://cals2gains.com/logo.png">
     <meta name="robots" content="index, follow">
     <meta name="keywords" content="contador calorias, app nutricion, IA nutricion, macro tracking, escanear comida, coaching nutricional, cals2gains">
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-97MNMCDEG2"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-97MNMCDEG2');
-        gtag('config', 'G-WMHZQ52NS2');
-    </script>
 
     <title data-es="Cals2Gains — Tu nutricion con IA real" data-en="Cals2Gains — Real AI Nutrition">Cals2Gains — Tu nutricion con IA real</title>
 
@@ -87,6 +77,62 @@
             "email": "info@cals2gains.com",
             "contactType": "customer support"
         }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "¿Es precisa la IA para analizar mis comidas?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Si. Utilizamos IA de vision avanzada que identifica alimentos, estima cantidades y calcula macros con una precision del 85-95%. Puedes ajustar manualmente si lo deseas, y la IA aprende de tus correcciones."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "¿Mis datos estan seguros?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Absolutamente. Tus datos se almacenan con cifrado de extremo a extremo. Cumplimos con RGPD. Las fotos se procesan en tiempo real y no se almacenan en servidores de IA. Nunca vendemos tus datos a terceros."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "¿Cuanto cuesta Cals2Gains Premium?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "8,90 euros al mes o 49,90 euros al anno (ahorra un 53%). Incluye 7 dias de prueba gratuita. Puedes cancelar en cualquier momento. Sin compromisos, sin letra pequenna."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "¿En que se diferencia Cals2Gains de otras apps de nutricion?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "La mayoria de apps usan bases de datos estaticas y busqueda manual. Cals2Gains tiene IA real integrada: escaneo de platos por foto, coaching semanal personalizado, sugerencias en tiempo real, TDEE adaptativo y 0 anuncios incluso en la version gratuita."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "¿Funciona sin conexion?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Parcialmente. Registro manual, busqueda de alimentos y escaner de codigo de barras funcionan offline. Las funciones de IA (foto, coaching, sugerencias) necesitan conexion para procesar datos en la nube."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "¿Puedo usarla con restricciones alimentarias?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Si. Configura tu objetivo (perdida de grasa, ganancia muscular, mantenimiento, recomposicion) y la IA se adapta. El coaching semanal tiene en cuenta tus preferencias, alergias y estilo de vida."
+                }
+            }
+        ]
     }
     </script>
 
@@ -578,6 +624,7 @@
                 <ul>
                     <li><a href="/privacy.html" data-es="Privacidad" data-en="Privacy">Privacidad</a></li>
                     <li><a href="/terms.html" data-es="Terminos" data-en="Terms">Terminos</a></li>
+                    <li><a href="javascript:void(0)" onclick="c2gOpenCookiePrefs()" class="c2g-cookie-settings-link" data-es="Configuracion de cookies" data-en="Cookie settings">Configuracion de cookies</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -687,5 +734,7 @@
             });
         });
     </script>
+    <script src="/cookie-consent.js"></script>
 </body>
 </html>
+

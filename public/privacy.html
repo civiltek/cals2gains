@@ -3,76 +3,454 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cals2Gains - Politica de Privacidad</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-97MNMCDEG2"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-97MNMCDEG2');
+</script>
+<meta name="theme-color" content="#17121D">
+<meta name="description" content="Cals2Gains - Privacy Policy / Politica de Privacidad. GDPR, LOPD-GDD, CCPA compliant.">
+<link rel="canonical" href="https://cals2gains.com/privacy.html">
+<link rel="icon" type="image/png" href="/c2g-icon.png">
+<link rel="apple-touch-icon" href="/c2g-icon.png">
+<title data-es="Cals2Gains — Politica de Privacidad" data-en="Cals2Gains — Privacy Policy">Cals2Gains — Politica de Privacidad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0F172A;color:#F8FAFC;line-height:1.7;padding:40px 20px}
-.container{max-width:720px;margin:0 auto}
-h1{font-size:28px;margin-bottom:8px;color:#818CF8}
-h2{font-size:20px;margin:32px 0 12px;color:#818CF8}
-.date{color:#94A3B8;font-size:14px;margin-bottom:32px}
-p{margin-bottom:16px;color:#CBD5E1}
-ul{margin:12px 0 16px 24px;color:#CBD5E1}
-li{margin-bottom:8px}
-a{color:#818CF8}
-.footer{margin-top:48px;padding-top:24px;border-top:1px solid #334155;color:#64748B;font-size:13px;text-align:center}
+:root{--violet:#9C8CFF;--violet-bright:#B4A3FF;--coral:#FF6A4D;--plum:#17121D;--plum-light:#1E1829;--bone:#F7F2EA;--bone-80:rgba(247,242,234,0.8);--bone-60:rgba(247,242,234,0.6);--bone-40:rgba(247,242,234,0.4);--bone-10:rgba(247,242,234,0.1);--violet-15:rgba(156,140,255,0.15);--violet-25:rgba(156,140,255,0.25);--coral-15:rgba(255,106,77,0.15);--gradient:linear-gradient(135deg,#9C8CFF,#FF6A4D)}
+html{scroll-behavior:smooth}
+body{font-family:'Instrument Sans',-apple-system,sans-serif;background:var(--plum);color:var(--bone);line-height:1.7;padding:0}
+a{color:var(--violet);text-decoration:none}
+a:hover{text-decoration:underline}
+button{border:none;cursor:pointer;font-family:inherit}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0.75rem 2rem;backdrop-filter:blur(20px);background:rgba(23,18,29,0.92);border-bottom:1px solid var(--violet-15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:0.6rem;text-decoration:none;color:inherit}
+.nav-logo img{width:36px;height:36px;border-radius:10px}
+.nav-wordmark{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:800;letter-spacing:-0.5px}
+.nav-wordmark .c{color:var(--violet)}.nav-wordmark .t{color:var(--coral)}.nav-wordmark .g{color:var(--violet)}
+.nav-right{display:flex;gap:0.75rem;align-items:center}
+.lang-toggle{background:transparent;border:1px solid var(--violet-15);padding:0.3rem 0.7rem;border-radius:999px;font-size:0.8rem;color:var(--bone-60);transition:all .3s}
+.lang-toggle:hover{color:var(--violet);border-color:var(--violet-25)}
+.nav-cta{background:var(--violet);color:var(--plum);padding:0.5rem 1.1rem;border-radius:10px;font-weight:700;font-family:'Outfit',sans-serif;font-size:0.82rem;transition:all .3s;text-decoration:none}
+.nav-cta:hover{background:var(--violet-bright);transform:translateY(-1px);box-shadow:0 8px 24px rgba(156,140,255,.3);text-decoration:none}
+
+/* CONTENT */
+.page{max-width:780px;margin:0 auto;padding:6rem 1.5rem 3rem}
+.back{display:inline-flex;align-items:center;gap:0.4rem;color:var(--violet);font-size:0.9rem;margin-bottom:2rem;text-decoration:none;transition:opacity .3s}
+.back:hover{opacity:0.7}
+h1{font-family:'Outfit',sans-serif;font-size:2.2rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem}
+.date{color:var(--bone-60);font-size:0.85rem;margin-bottom:0.5rem}
+.legal-intro{color:var(--bone-60);font-size:0.95rem;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--violet-15)}
+h2{font-family:'Outfit',sans-serif;color:var(--violet);font-size:1.2rem;font-weight:700;margin:2.25rem 0 0.75rem}
+h3{font-family:'Outfit',sans-serif;color:var(--bone);font-size:1.05rem;font-weight:600;margin:1.5rem 0 0.5rem}
+p{margin-bottom:1rem;color:var(--bone-60)}
+ul,ol{margin:0.75rem 0 1rem 1.5rem;color:var(--bone-60)}
+li{margin-bottom:0.5rem}
+strong{color:var(--bone)}
+.highlight-box{background:var(--plum-light);border:1px solid var(--violet-15);border-radius:12px;padding:1.25rem 1.5rem;margin:1rem 0 1.5rem}
+.highlight-box p{margin-bottom:0.5rem}
+.highlight-box p:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:0.9rem}
+th{text-align:left;padding:0.6rem 0.75rem;background:var(--plum-light);color:var(--violet);font-weight:600;border-bottom:2px solid var(--violet-15)}
+td{padding:0.6rem 0.75rem;border-bottom:1px solid var(--violet-15);color:var(--bone-60)}
+.footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--violet-15);color:var(--bone-40);font-size:0.8rem;text-align:center}
+.footer a{color:var(--violet)}
+
+@media(max-width:600px){
+    nav{padding:0.6rem 1rem}
+    .page{padding:5rem 1rem 2rem}
+    h1{font-size:1.7rem}
+    table{font-size:0.8rem}
+    th,td{padding:0.4rem}
+}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>Politica de Privacidad</h1>
-<p class="date">Ultima actualizacion: 9 de abril de 2026</p>
 
-<p>Cals2Gains ("nosotros", "la app") es una aplicacion de seguimiento nutricional desarrollada por CivilTek. Esta politica explica como recopilamos, usamos y protegemos tu informacion.</p>
+<!-- NAV -->
+<nav>
+<div class="nav-inner">
+    <a href="/" class="nav-logo">
+        <img src="/c2g-icon.png" alt="Cals2Gains" width="36" height="36">
+        <span class="nav-wordmark"><span class="c">Cals</span><span class="t">2</span><span class="g">Gains</span></span>
+    </a>
+    <div class="nav-right">
+        <button class="lang-toggle" onclick="toggleLang()" id="langBtn">EN</button>
+        <a href="/" class="nav-cta" data-es="Ir a la web" data-en="Go to website">Ir a la web</a>
+    </div>
+</div>
+</nav>
 
-<h2>1. Informacion que recopilamos</h2>
+<div class="page">
+<a href="/" class="back" data-es="&#8592; Volver a cals2gains.com" data-en="&#8592; Back to cals2gains.com">&#8592; Volver a cals2gains.com</a>
+
+<h1 data-es="Politica de Privacidad" data-en="Privacy Policy">Politica de Privacidad</h1>
+<p class="date" data-es="Ultima actualizacion: 15 de abril de 2026" data-en="Last updated: April 15, 2026">Ultima actualizacion: 15 de abril de 2026</p>
+
+<p class="legal-intro" data-es="Esta Politica de Privacidad explica como CivilTek Ingenieria SLU (en adelante, &laquo;Cals2Gains&raquo;, &laquo;nosotros&raquo; o &laquo;nuestro&raquo;), con domicilio en Espana y CIF correspondiente, recopila, usa, almacena y protege tus datos personales cuando utilizas nuestra aplicacion movil Cals2Gains y nuestro sitio web cals2gains.com. Esta politica cumple con el Reglamento General de Proteccion de Datos (RGPD/GDPR — Reglamento UE 2016/679), la Ley Organica 3/2018 de Proteccion de Datos Personales y Garantia de Derechos Digitales (LOPD-GDD) de Espana, la Ley de Privacidad del Consumidor de California (CCPA/CPRA), y la Ley 34/2002 de Servicios de la Sociedad de la Informacion (LSSI-CE)." data-en="This Privacy Policy explains how CivilTek Ingenieria SLU (hereinafter &laquo;Cals2Gains&raquo;, &laquo;we&raquo;, or &laquo;our&raquo;), domiciled in Spain, collects, uses, stores, and protects your personal data when you use our Cals2Gains mobile application and our website cals2gains.com. This policy complies with the General Data Protection Regulation (GDPR — EU Regulation 2016/679), Spain's Organic Law 3/2018 on Personal Data Protection and Guarantee of Digital Rights (LOPD-GDD), the California Consumer Privacy Act (CCPA/CPRA), and Law 34/2002 on Information Society Services (LSSI-CE).">Esta Politica de Privacidad explica como CivilTek Ingenieria SLU (en adelante, &laquo;Cals2Gains&raquo;, &laquo;nosotros&raquo; o &laquo;nuestro&raquo;), con domicilio en Espana y CIF correspondiente, recopila, usa, almacena y protege tus datos personales cuando utilizas nuestra aplicacion movil Cals2Gains y nuestro sitio web cals2gains.com. Esta politica cumple con el Reglamento General de Proteccion de Datos (RGPD/GDPR — Reglamento UE 2016/679), la Ley Organica 3/2018 de Proteccion de Datos Personales y Garantia de Derechos Digitales (LOPD-GDD) de Espana, la Ley de Privacidad del Consumidor de California (CCPA/CPRA), y la Ley 34/2002 de Servicios de la Sociedad de la Informacion (LSSI-CE).</p>
+
+<!-- 1. RESPONSABLE -->
+<h2 data-es="1. Responsable del tratamiento" data-en="1. Data Controller">1. Responsable del tratamiento</h2>
+<div class="highlight-box">
+<p><strong data-es="Responsable:" data-en="Controller:">Responsable:</strong> <span data-es="CivilTek Ingenieria SLU" data-en="CivilTek Ingenieria SLU">CivilTek Ingenieria SLU</span></p>
+<p><strong data-es="Nombre comercial:" data-en="Trade name:">Nombre comercial:</strong> Cals2Gains</p>
+<p><strong data-es="Pais:" data-en="Country:">Pais:</strong> <span data-es="Espana" data-en="Spain">Espana</span></p>
+<p><strong data-es="Email de contacto (DPO):" data-en="Contact email (DPO):">Email de contacto (DPO):</strong> <a href="mailto:info@cals2gains.com">info@cals2gains.com</a></p>
+<p><strong data-es="Email corporativo:" data-en="Corporate email:">Email corporativo:</strong> <a href="mailto:info@civiltek.es">info@civiltek.es</a></p>
+<p><strong data-es="Sitio web:" data-en="Website:">Sitio web:</strong> <a href="https://cals2gains.com">https://cals2gains.com</a></p>
+</div>
+
+<!-- 2. DATOS QUE RECOPILAMOS -->
+<h2 data-es="2. Datos que recopilamos" data-en="2. Data We Collect">2. Datos que recopilamos</h2>
+
+<h3 data-es="2.1 Datos de cuenta" data-en="2.1 Account Data">2.1 Datos de cuenta</h3>
+<p data-es="Cuando te registras mediante Google Sign-In o Apple Sign-In, recopilamos: nombre, direccion de correo electronico y foto de perfil proporcionados por el proveedor de autenticacion." data-en="When you sign up via Google Sign-In or Apple Sign-In, we collect: name, email address, and profile photo provided by the authentication provider.">Cuando te registras mediante Google Sign-In o Apple Sign-In, recopilamos: nombre, direccion de correo electronico y foto de perfil proporcionados por el proveedor de autenticacion.</p>
+
+<h3 data-es="2.2 Datos de perfil y salud" data-en="2.2 Profile &amp; Health Data">2.2 Datos de perfil y salud</h3>
+<p data-es="Recopilamos datos que proporcionas voluntariamente durante el onboarding y el uso de la app: edad, peso, altura, genero, nivel de actividad fisica, objetivos nutricionales y datos de composicion corporal. <strong>Estos datos se consideran datos relativos a la salud segun el articulo 9 del RGPD</strong> y son tratados con medidas de proteccion reforzadas. La base legal para su tratamiento es tu consentimiento explicito (art. 9.2.a RGPD)." data-en="We collect data you voluntarily provide during onboarding and app usage: age, weight, height, gender, physical activity level, nutritional goals, and body composition data. <strong>These are considered health-related data under GDPR Article 9</strong> and are processed with enhanced protection measures. The legal basis for processing is your explicit consent (Art. 9.2.a GDPR).">Recopilamos datos que proporcionas voluntariamente durante el onboarding y el uso de la app: edad, peso, altura, genero, nivel de actividad fisica, objetivos nutricionales y datos de composicion corporal. <strong>Estos datos se consideran datos relativos a la salud segun el articulo 9 del RGPD</strong> y son tratados con medidas de proteccion reforzadas. La base legal para su tratamiento es tu consentimiento explicito (art. 9.2.a RGPD).</p>
+
+<h3 data-es="2.3 Fotos de comida (procesamiento por IA)" data-en="2.3 Food Photos (AI Processing)">2.3 Fotos de comida (procesamiento por IA)</h3>
+<p data-es="Cuando utilizas la funcion de escaneo de platos, tus fotos se envian de forma segura a la API de OpenAI (GPT-5.4 con capacidad de vision) para el analisis nutricional. <strong>Las fotos NO se almacenan de forma permanente en nuestros servidores ni en los de OpenAI.</strong> OpenAI procesa la imagen en tiempo real y devuelve unicamente las estimaciones de macronutrientes. Segun la politica de datos de OpenAI para API, las imagenes enviadas a traves de la API no se utilizan para entrenar sus modelos." data-en="When you use the plate scanning feature, your photos are securely sent to the OpenAI API (GPT-5.4 with vision capability) for nutritional analysis. <strong>Photos are NOT permanently stored on our servers or on OpenAI's servers.</strong> OpenAI processes the image in real time and returns only macronutrient estimates. Per OpenAI's API data policy, images submitted through the API are not used to train their models.">Cuando utilizas la funcion de escaneo de platos, tus fotos se envian de forma segura a la API de OpenAI (GPT-5.4 con capacidad de vision) para el analisis nutricional. <strong>Las fotos NO se almacenan de forma permanente en nuestros servidores ni en los de OpenAI.</strong> OpenAI procesa la imagen en tiempo real y devuelve unicamente las estimaciones de macronutrientes. Segun la politica de datos de OpenAI para API, las imagenes enviadas a traves de la API no se utilizan para entrenar sus modelos.</p>
+
+<h3 data-es="2.4 Datos nutricionales" data-en="2.4 Nutritional Data">2.4 Datos nutricionales</h3>
+<p data-es="Los resultados del analisis de IA (estimaciones de calorias, proteinas, carbohidratos y grasas), tu historial de comidas y estadisticas de progreso se almacenan en Firebase (Google Cloud) asociados a tu cuenta." data-en="AI analysis results (calorie, protein, carbohydrate, and fat estimates), your meal history, and progress statistics are stored in Firebase (Google Cloud) linked to your account.">Los resultados del analisis de IA (estimaciones de calorias, proteinas, carbohidratos y grasas), tu historial de comidas y estadisticas de progreso se almacenan en Firebase (Google Cloud) asociados a tu cuenta.</p>
+
+<h3 data-es="2.5 Datos de email marketing" data-en="2.5 Email Marketing Data">2.5 Datos de email marketing</h3>
+<p data-es="Si proporcionas tu email a traves de nuestros lead magnets (Calculadora de Macros, plan de 7 dias, mini-curso de nutricion), utilizamos tu email para enviarte contenido nutricional relevante a traves de Brevo (anteriormente Sendinblue). Puedes darte de baja en cualquier momento." data-en="If you provide your email through our lead magnets (Macro Calculator, 7-day plan, nutrition mini-course), we use your email to send you relevant nutritional content via Brevo (formerly Sendinblue). You can unsubscribe at any time.">Si proporcionas tu email a traves de nuestros lead magnets (Calculadora de Macros, plan de 7 dias, mini-curso de nutricion), utilizamos tu email para enviarte contenido nutricional relevante a traves de Brevo (anteriormente Sendinblue). Puedes darte de baja en cualquier momento.</p>
+
+<h3 data-es="2.6 Datos de uso y analitica" data-en="2.6 Usage &amp; Analytics Data">2.6 Datos de uso y analitica</h3>
+<p data-es="Recopilamos datos anonimos de uso a traves de Google Analytics 4 (ID: G-97MNMCDEG2) en nuestro sitio web, incluyendo: paginas visitadas, duracion de la sesion, tipo de dispositivo, pais y fuente de trafico. Estos datos son anonimos y no permiten identificarte personalmente." data-en="We collect anonymous usage data through Google Analytics 4 (ID: G-97MNMCDEG2) on our website, including: pages visited, session duration, device type, country, and traffic source. This data is anonymous and does not personally identify you.">Recopilamos datos anonimos de uso a traves de Google Analytics 4 (ID: G-97MNMCDEG2) en nuestro sitio web, incluyendo: paginas visitadas, duracion de la sesion, tipo de dispositivo, pais y fuente de trafico. Estos datos son anonimos y no permiten identificarte personalmente.</p>
+
+<!-- 3. BASE LEGAL -->
+<h2 data-es="3. Base legal del tratamiento (RGPD Art. 6 y 9)" data-en="3. Legal Basis for Processing (GDPR Art. 6 &amp; 9)">3. Base legal del tratamiento (RGPD Art. 6 y 9)</h2>
+<table>
+<thead>
+<tr>
+    <th data-es="Finalidad" data-en="Purpose">Finalidad</th>
+    <th data-es="Base legal" data-en="Legal basis">Base legal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td data-es="Proporcionar el servicio (analisis IA, tracking)" data-en="Provide the service (AI analysis, tracking)">Proporcionar el servicio (analisis IA, tracking)</td>
+    <td data-es="Ejecucion del contrato (Art. 6.1.b)" data-en="Performance of contract (Art. 6.1.b)">Ejecucion del contrato (Art. 6.1.b)</td>
+</tr>
+<tr>
+    <td data-es="Procesar datos de salud (peso, objetivos, historial)" data-en="Process health data (weight, goals, history)">Procesar datos de salud (peso, objetivos, historial)</td>
+    <td data-es="Consentimiento explicito (Art. 9.2.a)" data-en="Explicit consent (Art. 9.2.a)">Consentimiento explicito (Art. 9.2.a)</td>
+</tr>
+<tr>
+    <td data-es="Gestionar suscripciones y pagos" data-en="Manage subscriptions and payments">Gestionar suscripciones y pagos</td>
+    <td data-es="Ejecucion del contrato (Art. 6.1.b)" data-en="Performance of contract (Art. 6.1.b)">Ejecucion del contrato (Art. 6.1.b)</td>
+</tr>
+<tr>
+    <td data-es="Email marketing (lead magnets)" data-en="Email marketing (lead magnets)">Email marketing (lead magnets)</td>
+    <td data-es="Consentimiento (Art. 6.1.a)" data-en="Consent (Art. 6.1.a)">Consentimiento (Art. 6.1.a)</td>
+</tr>
+<tr>
+    <td data-es="Analitica web (Google Analytics)" data-en="Web analytics (Google Analytics)">Analitica web (Google Analytics)</td>
+    <td data-es="Interes legitimo (Art. 6.1.f) / Consentimiento cookies" data-en="Legitimate interest (Art. 6.1.f) / Cookie consent">Interes legitimo (Art. 6.1.f) / Consentimiento cookies</td>
+</tr>
+<tr>
+    <td data-es="Obligaciones legales (fiscales, regulatorias)" data-en="Legal obligations (tax, regulatory)">Obligaciones legales (fiscales, regulatorias)</td>
+    <td data-es="Cumplimiento legal (Art. 6.1.c)" data-en="Legal compliance (Art. 6.1.c)">Cumplimiento legal (Art. 6.1.c)</td>
+</tr>
+</tbody>
+</table>
+
+<!-- 4. COMO USAMOS -->
+<h2 data-es="4. Como usamos tu informacion" data-en="4. How We Use Your Information">4. Como usamos tu informacion</h2>
 <ul>
-<li><strong>Datos de cuenta:</strong> Nombre, email y foto de perfil proporcionados por Google o Apple al iniciar sesion.</li>
-<li><strong>Datos de perfil:</strong> Edad, peso, altura, genero y nivel de actividad que proporcionas voluntariamente durante el onboarding.</li>
-<li><strong>Fotos de comida:</strong> Las fotos que tomas para analizar se envian temporalmente a OpenAI para el analisis nutricional. No almacenamos las fotos en nuestros servidores de forma permanente.</li>
-<li><strong>Datos nutricionales:</strong> Los resultados del analisis y tu historial de comidas se almacenan en Firebase (Google Cloud) asociados a tu cuenta.</li>
+<li data-es="Proporcionar el servicio de analisis nutricional con IA (escaneo de platos, estimacion de macros)." data-en="Provide the AI nutritional analysis service (plate scanning, macro estimation).">Proporcionar el servicio de analisis nutricional con IA (escaneo de platos, estimacion de macros).</li>
+<li data-es="Calcular y rastrear tus objetivos nutricionales personalizados con TDEE adaptativo." data-en="Calculate and track your personalized nutritional goals with adaptive TDEE.">Calcular y rastrear tus objetivos nutricionales personalizados con TDEE adaptativo.</li>
+<li data-es="Generar coaching semanal personalizado mediante inteligencia artificial." data-en="Generate personalized weekly coaching using artificial intelligence.">Generar coaching semanal personalizado mediante inteligencia artificial.</li>
+<li data-es="Gestionar tu suscripcion y acceso a funciones premium a traves de RevenueCat." data-en="Manage your subscription and access to premium features via RevenueCat.">Gestionar tu suscripcion y acceso a funciones premium a traves de RevenueCat.</li>
+<li data-es="Enviarte contenido nutricional relevante si te has suscrito a nuestros lead magnets." data-en="Send you relevant nutritional content if you subscribed to our lead magnets.">Enviarte contenido nutricional relevante si te has suscrito a nuestros lead magnets.</li>
+<li data-es="Mejorar la precision y funcionalidad del servicio." data-en="Improve the accuracy and functionality of the service.">Mejorar la precision y funcionalidad del servicio.</li>
+<li data-es="Cumplir con obligaciones legales y regulatorias." data-en="Comply with legal and regulatory obligations.">Cumplir con obligaciones legales y regulatorias.</li>
 </ul>
 
-<h2>2. Como usamos tu informacion</h2>
+<!-- 5. TRANSPARENCIA DE LA IA -->
+<h2 data-es="5. Transparencia de la inteligencia artificial" data-en="5. Artificial Intelligence Transparency">5. Transparencia de la inteligencia artificial</h2>
+<p data-es="Cals2Gains utiliza inteligencia artificial en varias funcionalidades centrales:" data-en="Cals2Gains uses artificial intelligence in several core features:">Cals2Gains utiliza inteligencia artificial en varias funcionalidades centrales:</p>
 <ul>
-<li>Para proporcionar el servicio de analisis nutricional con IA.</li>
-<li>Para calcular y rastrear tus objetivos nutricionales personalizados.</li>
-<li>Para gestionar tu suscripcion y acceso a funciones premium.</li>
-<li>Para mejorar la precision del servicio.</li>
+<li data-es="<strong>Escaneo de platos:</strong> Se utiliza GPT-5.4 (OpenAI) con capacidad de vision para analizar fotografias de comida y estimar macronutrientes. La precision puede variar segun la calidad de la imagen, el tipo de alimento y las porciones." data-en="<strong>Plate scanning:</strong> GPT-5.4 (OpenAI) with vision capability is used to analyze food photographs and estimate macronutrients. Accuracy may vary depending on image quality, food type, and portions.">
+<strong>Escaneo de platos:</strong> Se utiliza GPT-5.4 (OpenAI) con capacidad de vision para analizar fotografias de comida y estimar macronutrientes. La precision puede variar segun la calidad de la imagen, el tipo de alimento y las porciones.</li>
+<li data-es="<strong>Coaching semanal:</strong> Se utiliza IA generativa para proporcionar recomendaciones nutricionales personalizadas basadas en tu historial y objetivos." data-en="<strong>Weekly coaching:</strong> Generative AI is used to provide personalized nutritional recommendations based on your history and goals.">
+<strong>Coaching semanal:</strong> Se utiliza IA generativa para proporcionar recomendaciones nutricionales personalizadas basadas en tu historial y objetivos.</li>
+<li data-es="<strong>Sugerencias de comida:</strong> La IA sugiere opciones de comida basadas en tus macros restantes del dia." data-en="<strong>Meal suggestions:</strong> AI suggests meal options based on your remaining daily macros.">
+<strong>Sugerencias de comida:</strong> La IA sugiere opciones de comida basadas en tus macros restantes del dia.</li>
+</ul>
+<div class="highlight-box">
+<p data-es="<strong>Importante:</strong> Las estimaciones proporcionadas por la IA son aproximaciones y no deben considerarse medicamente precisas. No almacenamos tus fotos de comida de forma permanente. Las imagenes se procesan en tiempo real y se descartan inmediatamente despues del analisis. Tus datos no se utilizan para entrenar modelos de IA de terceros." data-en="<strong>Important:</strong> AI-provided estimates are approximations and should not be considered medically precise. We do not permanently store your food photos. Images are processed in real time and discarded immediately after analysis. Your data is not used to train third-party AI models.">
+<strong>Importante:</strong> Las estimaciones proporcionadas por la IA son aproximaciones y no deben considerarse medicamente precisas. No almacenamos tus fotos de comida de forma permanente. Las imagenes se procesan en tiempo real y se descartan inmediatamente despues del analisis. Tus datos no se utilizan para entrenar modelos de IA de terceros.</p>
+</div>
+
+<!-- 6. PROCESADORES Y SUBENCARGADOS -->
+<h2 data-es="6. Encargados del tratamiento y subencargados" data-en="6. Data Processors &amp; Sub-processors">6. Encargados del tratamiento y subencargados</h2>
+<p data-es="Compartimos tus datos con los siguientes encargados del tratamiento, todos ellos con acuerdos de procesamiento de datos (DPA) vigentes:" data-en="We share your data with the following data processors, all with active Data Processing Agreements (DPAs):">Compartimos tus datos con los siguientes encargados del tratamiento, todos ellos con acuerdos de procesamiento de datos (DPA) vigentes:</p>
+
+<table>
+<thead>
+<tr>
+    <th data-es="Proveedor" data-en="Provider">Proveedor</th>
+    <th data-es="Finalidad" data-en="Purpose">Finalidad</th>
+    <th data-es="Datos procesados" data-en="Data processed">Datos procesados</th>
+    <th data-es="Ubicacion" data-en="Location">Ubicacion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td><strong>OpenAI</strong></td>
+    <td data-es="Analisis IA de fotos de comida, coaching" data-en="AI analysis of food photos, coaching">Analisis IA de fotos de comida, coaching</td>
+    <td data-es="Fotos de comida (temporal), datos nutricionales" data-en="Food photos (temporary), nutritional data">Fotos de comida (temporal), datos nutricionales</td>
+    <td data-es="EE.UU." data-en="USA">EE.UU.</td>
+</tr>
+<tr>
+    <td><strong>Firebase / Google Cloud</strong></td>
+    <td data-es="Autenticacion, base de datos, almacenamiento" data-en="Authentication, database, storage">Autenticacion, base de datos, almacenamiento</td>
+    <td data-es="Datos de cuenta, perfil, historial nutricional" data-en="Account data, profile, nutritional history">Datos de cuenta, perfil, historial nutricional</td>
+    <td data-es="UE (europe-west1)" data-en="EU (europe-west1)">UE (europe-west1)</td>
+</tr>
+<tr>
+    <td><strong>RevenueCat</strong></td>
+    <td data-es="Gestion de suscripciones" data-en="Subscription management">Gestion de suscripciones</td>
+    <td data-es="ID usuario, estado suscripcion, historial de compras" data-en="User ID, subscription status, purchase history">ID usuario, estado suscripcion, historial de compras</td>
+    <td data-es="EE.UU." data-en="USA">EE.UU.</td>
+</tr>
+<tr>
+    <td><strong>Brevo</strong></td>
+    <td data-es="Email marketing y transaccional" data-en="Marketing and transactional email">Email marketing y transaccional</td>
+    <td data-es="Email, nombre, preferencias de comunicacion" data-en="Email, name, communication preferences">Email, nombre, preferencias de comunicacion</td>
+    <td data-es="UE (Francia)" data-en="EU (France)">UE (Francia)</td>
+</tr>
+<tr>
+    <td><strong>ElevenLabs</strong></td>
+    <td data-es="Generacion de audio IA (coaching por voz)" data-en="AI audio generation (voice coaching)">Generacion de audio IA (coaching por voz)</td>
+    <td data-es="Texto de coaching (sin datos personales directos)" data-en="Coaching text (no direct personal data)">Texto de coaching (sin datos personales directos)</td>
+    <td data-es="EE.UU." data-en="USA">EE.UU.</td>
+</tr>
+<tr>
+    <td><strong>Higgsfield AI</strong></td>
+    <td data-es="Generacion de video IA (contenido marketing)" data-en="AI video generation (marketing content)">Generacion de video IA (contenido marketing)</td>
+    <td data-es="Datos de contenido (sin datos personales de usuarios)" data-en="Content data (no user personal data)">Datos de contenido (sin datos personales de usuarios)</td>
+    <td data-es="EE.UU." data-en="USA">EE.UU.</td>
+</tr>
+<tr>
+    <td><strong>Google Analytics (GA4)</strong></td>
+    <td data-es="Analitica web" data-en="Web analytics">Analitica web</td>
+    <td data-es="Datos de navegacion anonimos, cookies" data-en="Anonymous browsing data, cookies">Datos de navegacion anonimos, cookies</td>
+    <td data-es="EE.UU. / UE" data-en="USA / EU">EE.UU. / UE</td>
+</tr>
+<tr>
+    <td><strong>Apple / Google</strong></td>
+    <td data-es="Procesamiento de pagos, distribucion de la app" data-en="Payment processing, app distribution">Procesamiento de pagos, distribucion de la app</td>
+    <td data-es="Datos de transacciones" data-en="Transaction data">Datos de transacciones</td>
+    <td data-es="EE.UU. / Global" data-en="USA / Global">EE.UU. / Global</td>
+</tr>
+</tbody>
+</table>
+
+<!-- 7. TRANSFERENCIAS INTERNACIONALES -->
+<h2 data-es="7. Transferencias internacionales de datos" data-en="7. International Data Transfers">7. Transferencias internacionales de datos</h2>
+<p data-es="Algunos de nuestros encargados del tratamiento se encuentran fuera del Espacio Economico Europeo (EEE), principalmente en Estados Unidos. Estas transferencias estan protegidas por:" data-en="Some of our data processors are located outside the European Economic Area (EEA), primarily in the United States. These transfers are protected by:">Algunos de nuestros encargados del tratamiento se encuentran fuera del Espacio Economico Europeo (EEE), principalmente en Estados Unidos. Estas transferencias estan protegidas por:</p>
+<ul>
+<li data-es="<strong>Marco de Privacidad de Datos UE-EE.UU. (EU-US DPF):</strong> Para proveedores certificados bajo el Data Privacy Framework." data-en="<strong>EU-US Data Privacy Framework (DPF):</strong> For providers certified under the Data Privacy Framework."><strong>Marco de Privacidad de Datos UE-EE.UU. (EU-US DPF):</strong> Para proveedores certificados bajo el Data Privacy Framework.</li>
+<li data-es="<strong>Clausulas Contractuales Tipo (SCC):</strong> Clausulas aprobadas por la Comision Europea (Decisiones 2021/914 y 2021/915) incluidas en los DPA con cada proveedor." data-en="<strong>Standard Contractual Clauses (SCCs):</strong> EU Commission-approved clauses (Decisions 2021/914 and 2021/915) included in DPAs with each provider."><strong>Clausulas Contractuales Tipo (SCC):</strong> Clausulas aprobadas por la Comision Europea (Decisiones 2021/914 y 2021/915) incluidas en los DPA con cada proveedor.</li>
+<li data-es="<strong>Medidas complementarias:</strong> Cifrado de datos en transito (TLS 1.2+) y en reposo, minimizacion de datos y evaluaciones de impacto de transferencias (TIA)." data-en="<strong>Supplementary measures:</strong> Data encryption in transit (TLS 1.2+) and at rest, data minimization, and Transfer Impact Assessments (TIAs)."><strong>Medidas complementarias:</strong> Cifrado de datos en transito (TLS 1.2+) y en reposo, minimizacion de datos y evaluaciones de impacto de transferencias (TIA).</li>
 </ul>
 
-<h2>3. Servicios de terceros</h2>
-<p>Utilizamos los siguientes servicios:</p>
+<!-- 8. COOKIES -->
+<h2 data-es="8. Cookies y tecnologias similares" data-en="8. Cookies &amp; Similar Technologies">8. Cookies y tecnologias similares</h2>
+<p data-es="Nuestro sitio web utiliza cookies. De conformidad con la LSSI-CE y la normativa europea de cookies, solicitamos tu consentimiento antes de instalar cookies no esenciales." data-en="Our website uses cookies. In accordance with the LSSI-CE and European cookie regulations, we request your consent before installing non-essential cookies.">Nuestro sitio web utiliza cookies. De conformidad con la LSSI-CE y la normativa europea de cookies, solicitamos tu consentimiento antes de instalar cookies no esenciales.</p>
+<table>
+<thead>
+<tr>
+    <th data-es="Cookie" data-en="Cookie">Cookie</th>
+    <th data-es="Tipo" data-en="Type">Tipo</th>
+    <th data-es="Finalidad" data-en="Purpose">Finalidad</th>
+    <th data-es="Duracion" data-en="Duration">Duracion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>_ga</td>
+    <td data-es="Analitica" data-en="Analytics">Analitica</td>
+    <td data-es="Google Analytics 4 — distinguir usuarios" data-en="Google Analytics 4 — distinguish users">Google Analytics 4 — distinguir usuarios</td>
+    <td data-es="2 anos" data-en="2 years">2 anos</td>
+</tr>
+<tr>
+    <td>_ga_97MNMCDEG2</td>
+    <td data-es="Analitica" data-en="Analytics">Analitica</td>
+    <td data-es="GA4 — mantener estado de sesion" data-en="GA4 — maintain session state">GA4 — mantener estado de sesion</td>
+    <td data-es="2 anos" data-en="2 years">2 anos</td>
+</tr>
+<tr>
+    <td>c2g-lang</td>
+    <td data-es="Funcional" data-en="Functional">Funcional</td>
+    <td data-es="Recordar preferencia de idioma" data-en="Remember language preference">Recordar preferencia de idioma</td>
+    <td data-es="Permanente (localStorage)" data-en="Persistent (localStorage)">Permanente (localStorage)</td>
+</tr>
+<tr>
+    <td>c2g-cookie-consent</td>
+    <td data-es="Estrictamente necesaria" data-en="Strictly necessary">Estrictamente necesaria</td>
+    <td data-es="Recordar tu eleccion de cookies" data-en="Remember your cookie choice">Recordar tu eleccion de cookies</td>
+    <td data-es="1 ano" data-en="1 year">1 ano</td>
+</tr>
+</tbody>
+</table>
+<p data-es="Puedes gestionar tus preferencias de cookies en cualquier momento a traves de la configuracion de tu navegador o del banner de cookies de nuestro sitio web." data-en="You can manage your cookie preferences at any time through your browser settings or our website's cookie banner.">Puedes gestionar tus preferencias de cookies en cualquier momento a traves de la configuracion de tu navegador o del banner de cookies de nuestro sitio web.</p>
+
+<!-- 9. RETENCION -->
+<h2 data-es="9. Plazos de conservacion de datos" data-en="9. Data Retention Periods">9. Plazos de conservacion de datos</h2>
+<table>
+<thead>
+<tr>
+    <th data-es="Tipo de dato" data-en="Data type">Tipo de dato</th>
+    <th data-es="Periodo de conservacion" data-en="Retention period">Periodo de conservacion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td data-es="Datos de cuenta y perfil" data-en="Account and profile data">Datos de cuenta y perfil</td>
+    <td data-es="Mientras la cuenta este activa + 30 dias tras eliminacion" data-en="While the account is active + 30 days after deletion">Mientras la cuenta este activa + 30 dias tras eliminacion</td>
+</tr>
+<tr>
+    <td data-es="Historial nutricional" data-en="Nutritional history">Historial nutricional</td>
+    <td data-es="Mientras la cuenta este activa + 30 dias tras eliminacion" data-en="While the account is active + 30 days after deletion">Mientras la cuenta este activa + 30 dias tras eliminacion</td>
+</tr>
+<tr>
+    <td data-es="Fotos de comida" data-en="Food photos">Fotos de comida</td>
+    <td data-es="No almacenadas — procesadas en tiempo real y descartadas" data-en="Not stored — processed in real time and discarded">No almacenadas — procesadas en tiempo real y descartadas</td>
+</tr>
+<tr>
+    <td data-es="Datos de suscripcion" data-en="Subscription data">Datos de suscripcion</td>
+    <td data-es="Mientras la suscripcion este activa + retencion legal fiscal (5 anos)" data-en="While subscription is active + tax legal retention (5 years)">Mientras la suscripcion este activa + retencion legal fiscal (5 anos)</td>
+</tr>
+<tr>
+    <td data-es="Email marketing" data-en="Email marketing">Email marketing</td>
+    <td data-es="Hasta que te des de baja" data-en="Until you unsubscribe">Hasta que te des de baja</td>
+</tr>
+<tr>
+    <td data-es="Datos analiticos (cookies)" data-en="Analytics data (cookies)">Datos analiticos (cookies)</td>
+    <td data-es="26 meses (configuracion GA4)" data-en="26 months (GA4 configuration)">26 meses (configuracion GA4)</td>
+</tr>
+<tr>
+    <td data-es="Datos legales/fiscales" data-en="Legal/tax data">Datos legales/fiscales</td>
+    <td data-es="5 anos (obligacion fiscal espanola)" data-en="5 years (Spanish tax obligation)">5 anos (obligacion fiscal espanola)</td>
+</tr>
+</tbody>
+</table>
+
+<!-- 10. TUS DERECHOS -->
+<h2 data-es="10. Tus derechos" data-en="10. Your Rights">10. Tus derechos</h2>
+
+<h3 data-es="10.1 Derechos bajo el RGPD y la LOPD-GDD (usuarios UE/Espana)" data-en="10.1 Rights under GDPR &amp; LOPD-GDD (EU/Spain users)">10.1 Derechos bajo el RGPD y la LOPD-GDD (usuarios UE/Espana)</h3>
+<p data-es="De conformidad con los articulos 15-22 del RGPD y la LOPD-GDD, tienes los siguientes derechos:" data-en="In accordance with GDPR Articles 15-22 and the LOPD-GDD, you have the following rights:">De conformidad con los articulos 15-22 del RGPD y la LOPD-GDD, tienes los siguientes derechos:</p>
 <ul>
-<li><strong>Firebase (Google):</strong> Autenticacion y almacenamiento de datos.</li>
-<li><strong>OpenAI:</strong> Analisis de imagenes de comida con GPT-4o Vision.</li>
-<li><strong>RevenueCat:</strong> Gestion de suscripciones.</li>
-<li><strong>Apple / Google:</strong> Procesamiento de pagos.</li>
+<li data-es="<strong>Acceso (Art. 15):</strong> Obtener confirmacion de si estamos tratando tus datos y acceder a ellos." data-en="<strong>Access (Art. 15):</strong> Obtain confirmation of whether we process your data and access it."><strong>Acceso (Art. 15):</strong> Obtener confirmacion de si estamos tratando tus datos y acceder a ellos.</li>
+<li data-es="<strong>Rectificacion (Art. 16):</strong> Solicitar la correccion de datos inexactos." data-en="<strong>Rectification (Art. 16):</strong> Request correction of inaccurate data."><strong>Rectificacion (Art. 16):</strong> Solicitar la correccion de datos inexactos.</li>
+<li data-es="<strong>Supresion (Art. 17):</strong> Solicitar la eliminacion de tus datos personales (&laquo;derecho al olvido&raquo;)." data-en="<strong>Erasure (Art. 17):</strong> Request deletion of your personal data (&laquo;right to be forgotten&raquo;)."><strong>Supresion (Art. 17):</strong> Solicitar la eliminacion de tus datos personales (&laquo;derecho al olvido&raquo;).</li>
+<li data-es="<strong>Limitacion (Art. 18):</strong> Solicitar la restriccion del tratamiento de tus datos." data-en="<strong>Restriction (Art. 18):</strong> Request restriction of your data processing."><strong>Limitacion (Art. 18):</strong> Solicitar la restriccion del tratamiento de tus datos.</li>
+<li data-es="<strong>Portabilidad (Art. 20):</strong> Recibir tus datos en un formato estructurado y de uso comun." data-en="<strong>Portability (Art. 20):</strong> Receive your data in a structured, commonly used format."><strong>Portabilidad (Art. 20):</strong> Recibir tus datos en un formato estructurado y de uso comun.</li>
+<li data-es="<strong>Oposicion (Art. 21):</strong> Oponerte al tratamiento de tus datos en determinadas circunstancias." data-en="<strong>Objection (Art. 21):</strong> Object to the processing of your data in certain circumstances."><strong>Oposicion (Art. 21):</strong> Oponerte al tratamiento de tus datos en determinadas circunstancias.</li>
+<li data-es="<strong>Decisiones automatizadas (Art. 22):</strong> No ser objeto de decisiones basadas unicamente en tratamiento automatizado que produzcan efectos juridicos sobre ti." data-en="<strong>Automated decisions (Art. 22):</strong> Not to be subject to decisions based solely on automated processing that produce legal effects on you."><strong>Decisiones automatizadas (Art. 22):</strong> No ser objeto de decisiones basadas unicamente en tratamiento automatizado que produzcan efectos juridicos sobre ti.</li>
+<li data-es="<strong>Retirar el consentimiento:</strong> Puedes retirar tu consentimiento en cualquier momento sin que ello afecte a la licitud del tratamiento previo." data-en="<strong>Withdraw consent:</strong> You may withdraw your consent at any time without affecting the lawfulness of prior processing."><strong>Retirar el consentimiento:</strong> Puedes retirar tu consentimiento en cualquier momento sin que ello afecte a la licitud del tratamiento previo.</li>
 </ul>
 
-<h2>4. Seguridad</h2>
-<p>Tus datos se almacenan de forma segura en Firebase con reglas de acceso estrictas. Cada usuario solo puede acceder a sus propios datos. Las comunicaciones estan cifradas mediante HTTPS/TLS.</p>
+<h3 data-es="10.2 Derechos adicionales bajo la LOPD-GDD" data-en="10.2 Additional Rights under LOPD-GDD">10.2 Derechos adicionales bajo la LOPD-GDD</h3>
+<p data-es="Conforme a la Disposicion Final Undecima de la LOPD-GDD, tambien tienes derecho al testamento digital y a la designacion de un representante para gestionar tus datos tras tu fallecimiento." data-en="Under the Eleventh Final Provision of the LOPD-GDD, you also have the right to a digital will and to designate a representative to manage your data after your death.">Conforme a la Disposicion Final Undecima de la LOPD-GDD, tambien tienes derecho al testamento digital y a la designacion de un representante para gestionar tus datos tras tu fallecimiento.</p>
 
-<h2>5. Retencion de datos</h2>
-<p>Conservamos tus datos mientras mantengas tu cuenta activa. Puedes solicitar la eliminacion de tu cuenta y todos los datos asociados en cualquier momento contactandonos.</p>
+<h3 data-es="10.3 Derechos bajo la CCPA/CPRA (residentes de California)" data-en="10.3 Rights under CCPA/CPRA (California residents)">10.3 Derechos bajo la CCPA/CPRA (residentes de California)</h3>
+<p data-es="Si eres residente de California, tienes derechos adicionales bajo la CCPA/CPRA:" data-en="If you are a California resident, you have additional rights under the CCPA/CPRA:">Si eres residente de California, tienes derechos adicionales bajo la CCPA/CPRA:</p>
+<ul>
+<li data-es="<strong>Derecho a saber:</strong> Que datos personales recopilamos, usamos, compartimos o vendemos." data-en="<strong>Right to know:</strong> What personal information we collect, use, share, or sell."><strong>Derecho a saber:</strong> Que datos personales recopilamos, usamos, compartimos o vendemos.</li>
+<li data-es="<strong>Derecho a eliminar:</strong> Solicitar la eliminacion de tus datos personales." data-en="<strong>Right to delete:</strong> Request deletion of your personal information."><strong>Derecho a eliminar:</strong> Solicitar la eliminacion de tus datos personales.</li>
+<li data-es="<strong>Derecho a la no discriminacion:</strong> No ser discriminado por ejercer tus derechos de privacidad." data-en="<strong>Right to non-discrimination:</strong> Not be discriminated against for exercising your privacy rights."><strong>Derecho a la no discriminacion:</strong> No ser discriminado por ejercer tus derechos de privacidad.</li>
+<li data-es="<strong>Derecho a optar por no participar en la venta:</strong> <em>Cals2Gains no vende tus datos personales.</em>" data-en="<strong>Right to opt-out of sale:</strong> <em>Cals2Gains does not sell your personal data.</em>"><strong>Derecho a optar por no participar en la venta:</strong> <em>Cals2Gains no vende tus datos personales.</em></li>
+<li data-es="<strong>Derecho a corregir:</strong> Solicitar la correccion de datos personales inexactos." data-en="<strong>Right to correct:</strong> Request correction of inaccurate personal data."><strong>Derecho a corregir:</strong> Solicitar la correccion de datos personales inexactos.</li>
+<li data-es="<strong>Derecho a limitar el uso de datos sensibles:</strong> Incluyendo datos de salud procesados por la app." data-en="<strong>Right to limit use of sensitive data:</strong> Including health data processed by the app."><strong>Derecho a limitar el uso de datos sensibles:</strong> Incluyendo datos de salud procesados por la app.</li>
+</ul>
+<div class="highlight-box">
+<p data-es="<strong>Aviso CCPA:</strong> Cals2Gains no vende ni comparte datos personales con terceros para fines publicitarios cruzados. No utilizamos datos personales para la elaboracion de perfiles con fines de publicidad comportamental." data-en="<strong>CCPA Notice:</strong> Cals2Gains does not sell or share personal data with third parties for cross-context behavioral advertising purposes. We do not use personal data for profiling for behavioral advertising purposes."><strong>Aviso CCPA:</strong> Cals2Gains no vende ni comparte datos personales con terceros para fines publicitarios cruzados. No utilizamos datos personales para la elaboracion de perfiles con fines de publicidad comportamental.</p>
+</div>
 
-<h2>6. Tus derechos</h2>
-<p>Tienes derecho a acceder, corregir o eliminar tus datos personales. Para ejercer estos derechos, contactanos en <a href="mailto:info@civiltek.es">info@civiltek.es</a>.</p>
+<h3 data-es="10.4 Como ejercer tus derechos" data-en="10.4 How to Exercise Your Rights">10.4 Como ejercer tus derechos</h3>
+<p data-es="Para ejercer cualquiera de estos derechos, enviaenos un email a <a href='mailto:info@cals2gains.com'>info@cals2gains.com</a> con el asunto &laquo;Ejercicio de derechos de privacidad&raquo;. Responderemos en un plazo maximo de 30 dias (RGPD) o 45 dias (CCPA). Podemos solicitar verificacion de identidad antes de procesar tu solicitud." data-en="To exercise any of these rights, email us at <a href='mailto:info@cals2gains.com'>info@cals2gains.com</a> with the subject line &laquo;Privacy rights request&raquo;. We will respond within 30 days (GDPR) or 45 days (CCPA). We may request identity verification before processing your request.">Para ejercer cualquiera de estos derechos, enviaenos un email a <a href="mailto:info@cals2gains.com">info@cals2gains.com</a> con el asunto &laquo;Ejercicio de derechos de privacidad&raquo;. Responderemos en un plazo maximo de 30 dias (RGPD) o 45 dias (CCPA). Podemos solicitar verificacion de identidad antes de procesar tu solicitud.</p>
 
-<h2>7. Menores</h2>
-<p>Cals2Gains no esta destinada a menores de 13 anos. No recopilamos conscientemente datos de menores.</p>
+<!-- 11. AUTORIDADES -->
+<h2 data-es="11. Derecho a reclamar ante una autoridad de control" data-en="11. Right to Lodge a Complaint with a Supervisory Authority">11. Derecho a reclamar ante una autoridad de control</h2>
+<p data-es="Si consideras que el tratamiento de tus datos personales vulnera la normativa vigente, puedes presentar una reclamacion ante:" data-en="If you believe the processing of your personal data violates applicable regulations, you may file a complaint with:">Si consideras que el tratamiento de tus datos personales vulnera la normativa vigente, puedes presentar una reclamacion ante:</p>
+<ul>
+<li data-es="<strong>Espana:</strong> Agencia Espanola de Proteccion de Datos (AEPD) — <a href='https://www.aepd.es' target='_blank' rel='noopener'>www.aepd.es</a>" data-en="<strong>Spain:</strong> Spanish Data Protection Agency (AEPD) — <a href='https://www.aepd.es' target='_blank' rel='noopener'>www.aepd.es</a>"><strong>Espana:</strong> Agencia Espanola de Proteccion de Datos (AEPD) — <a href="https://www.aepd.es" target="_blank" rel="noopener">www.aepd.es</a></li>
+<li data-es="<strong>UE:</strong> La autoridad de proteccion de datos de tu pais de residencia." data-en="<strong>EU:</strong> The data protection authority in your country of residence."><strong>UE:</strong> La autoridad de proteccion de datos de tu pais de residencia.</li>
+</ul>
 
-<h2>8. Cambios</h2>
-<p>Podemos actualizar esta politica ocasionalmente. Te notificaremos de cambios significativos a traves de la app.</p>
+<!-- 12. SEGURIDAD -->
+<h2 data-es="12. Seguridad de los datos" data-en="12. Data Security">12. Seguridad de los datos</h2>
+<p data-es="Implementamos medidas tecnicas y organizativas apropiadas para proteger tus datos personales:" data-en="We implement appropriate technical and organizational measures to protect your personal data:">Implementamos medidas tecnicas y organizativas apropiadas para proteger tus datos personales:</p>
+<ul>
+<li data-es="Cifrado en transito (HTTPS/TLS 1.2+) y en reposo." data-en="Encryption in transit (HTTPS/TLS 1.2+) and at rest.">Cifrado en transito (HTTPS/TLS 1.2+) y en reposo.</li>
+<li data-es="Reglas de acceso estrictas en Firebase: cada usuario solo puede acceder a sus propios datos." data-en="Strict Firebase access rules: each user can only access their own data.">Reglas de acceso estrictas en Firebase: cada usuario solo puede acceder a sus propios datos.</li>
+<li data-es="Autenticacion segura mediante proveedores OAuth 2.0 (Google, Apple)." data-en="Secure authentication via OAuth 2.0 providers (Google, Apple).">Autenticacion segura mediante proveedores OAuth 2.0 (Google, Apple).</li>
+<li data-es="Revision periodica de seguridad y evaluaciones de vulnerabilidades." data-en="Periodic security reviews and vulnerability assessments.">Revision periodica de seguridad y evaluaciones de vulnerabilidades.</li>
+<li data-es="Principio de minimizacion de datos: solo recopilamos los datos necesarios para proporcionar el servicio." data-en="Data minimization principle: we only collect data necessary to provide the service.">Principio de minimizacion de datos: solo recopilamos los datos necesarios para proporcionar el servicio.</li>
+</ul>
 
-<h2>9. Contacto</h2>
-<p>Para cualquier consulta sobre privacidad:<br>
-CivilTek<br>
-Email: <a href="mailto:info@civiltek.es">info@civiltek.es</a></p>
+<!-- 13. DISCLAIMER SALUD -->
+<h2 data-es="13. Aviso sobre datos de salud" data-en="13. Health Data Disclaimer">13. Aviso sobre datos de salud</h2>
+<div class="highlight-box">
+<p data-es="<strong>Cals2Gains NO es un dispositivo medico ni un sustituto del consejo medico profesional.</strong> Los datos nutricionales proporcionados por la aplicacion, incluyendo las estimaciones de calorias y macronutrientes generadas por IA, son aproximaciones con fines informativos y de bienestar general. No deben utilizarse para diagnosticar, tratar, curar o prevenir ninguna enfermedad o condicion medica. Consulta siempre con un profesional de la salud antes de realizar cambios significativos en tu dieta, especialmente si tienes alergias alimentarias, condiciones medicas preexistentes o estas embarazada o en periodo de lactancia." data-en="<strong>Cals2Gains is NOT a medical device or a substitute for professional medical advice.</strong> Nutritional data provided by the app, including AI-generated calorie and macronutrient estimates, are approximations for informational and general wellness purposes. They should not be used to diagnose, treat, cure, or prevent any disease or medical condition. Always consult a healthcare professional before making significant changes to your diet, especially if you have food allergies, pre-existing medical conditions, or are pregnant or breastfeeding."><strong>Cals2Gains NO es un dispositivo medico ni un sustituto del consejo medico profesional.</strong> Los datos nutricionales proporcionados por la aplicacion, incluyendo las estimaciones de calorias y macronutrientes generadas por IA, son aproximaciones con fines informativos y de bienestar general. No deben utilizarse para diagnosticar, tratar, curar o prevenir ninguna enfermedad o condicion medica. Consulta siempre con un profesional de la salud antes de realizar cambios significativos en tu dieta, especialmente si tienes alergias alimentarias, condiciones medicas preexistentes o estas embarazada o en periodo de lactancia.</p>
+</div>
+
+<!-- 14. MENORES -->
+<h2 data-es="14. Privacidad de menores" data-en="14. Children's Privacy">14. Privacidad de menores</h2>
+<p data-es="Cals2Gains no esta destinada a menores de 13 anos. En Espana, conforme al articulo 8 de la LOPD-GDD, la edad minima de consentimiento digital es de 14 anos. No recopilamos conscientemente datos personales de menores de 13 anos (o 14 anos en Espana, o 16 anos donde lo exija la legislacion nacional del RGPD). Si descubrimos que hemos recopilado datos de un menor sin el consentimiento parental adecuado, los eliminaremos de inmediato. Si crees que tu hijo/a ha proporcionado datos a Cals2Gains, contactanos en <a href='mailto:info@cals2gains.com'>info@cals2gains.com</a>." data-en="Cals2Gains is not intended for children under 13. In Spain, under Article 8 of the LOPD-GDD, the minimum age of digital consent is 14. We do not knowingly collect personal data from children under 13 (or 14 in Spain, or 16 where required by GDPR national legislation). If we discover we have collected data from a minor without appropriate parental consent, we will delete it immediately. If you believe your child has provided data to Cals2Gains, contact us at <a href='mailto:info@cals2gains.com'>info@cals2gains.com</a>.">Cals2Gains no esta destinada a menores de 13 anos. En Espana, conforme al articulo 8 de la LOPD-GDD, la edad minima de consentimiento digital es de 14 anos. No recopilamos conscientemente datos personales de menores de 13 anos (o 14 anos en Espana, o 16 anos donde lo exija la legislacion nacional del RGPD). Si descubrimos que hemos recopilado datos de un menor sin el consentimiento parental adecuado, los eliminaremos de inmediato. Si crees que tu hijo/a ha proporcionado datos a Cals2Gains, contactanos en <a href="mailto:info@cals2gains.com">info@cals2gains.com</a>.</p>
+
+<!-- 15. CAMBIOS -->
+<h2 data-es="15. Cambios en esta politica" data-en="15. Changes to This Policy">15. Cambios en esta politica</h2>
+<p data-es="Podemos actualizar esta Politica de Privacidad periodicamente para reflejar cambios en nuestras practicas o en la legislacion aplicable. Te notificaremos de cambios significativos a traves de la aplicacion, por email o mediante un aviso destacado en nuestro sitio web. La fecha de &laquo;Ultima actualizacion&raquo; en la parte superior de esta pagina indica cuando se realizo la ultima revision. Te recomendamos revisarla periodicamente." data-en="We may update this Privacy Policy periodically to reflect changes in our practices or applicable legislation. We will notify you of significant changes through the app, via email, or by a prominent notice on our website. The &laquo;Last updated&raquo; date at the top of this page indicates when the last revision was made. We recommend reviewing it periodically.">Podemos actualizar esta Politica de Privacidad periodicamente para reflejar cambios en nuestras practicas o en la legislacion aplicable. Te notificaremos de cambios significativos a traves de la aplicacion, por email o mediante un aviso destacado en nuestro sitio web. La fecha de &laquo;Ultima actualizacion&raquo; en la parte superior de esta pagina indica cuando se realizo la ultima revision. Te recomendamos revisarla periodicamente.</p>
+
+<!-- 16. CONTACTO -->
+<h2 data-es="16. Contacto y Delegado de Proteccion de Datos" data-en="16. Contact &amp; Data Protection Officer">16. Contacto y Delegado de Proteccion de Datos</h2>
+<p data-es="Para cualquier consulta relacionada con esta Politica de Privacidad, el tratamiento de tus datos personales o para ejercer tus derechos, puedes contactarnos en:" data-en="For any questions about this Privacy Policy, the processing of your personal data, or to exercise your rights, you can contact us at:">Para cualquier consulta relacionada con esta Politica de Privacidad, el tratamiento de tus datos personales o para ejercer tus derechos, puedes contactarnos en:</p>
+<div class="highlight-box">
+<p><strong data-es="Responsable / DPO:" data-en="Controller / DPO:">Responsable / DPO:</strong> CivilTek Ingenieria SLU</p>
+<p><strong data-es="Email de privacidad:" data-en="Privacy email:">Email de privacidad:</strong> <a href="mailto:info@cals2gains.com">info@cals2gains.com</a></p>
+<p><strong data-es="Email corporativo:" data-en="Corporate email:">Email corporativo:</strong> <a href="mailto:info@civiltek.es">info@civiltek.es</a></p>
+<p><strong data-es="Sitio web:" data-en="Website:">Sitio web:</strong> <a href="https://cals2gains.com">https://cals2gains.com</a></p>
+</div>
 
 <div class="footer">
-<p>&copy; 2026 CivilTek - Cals2Gains. Todos los derechos reservados.</p>
+<p>&copy; 2026 CivilTek Ingenieria SLU — Cals2Gains.</p>
+<p data-es="Todos los derechos reservados. | <a href='/terms.html'>Terminos de Servicio</a>" data-en="All rights reserved. | <a href='/terms.html'>Terms of Service</a>">Todos los derechos reservados. | <a href="/terms.html">Terminos de Servicio</a></p>
 </div>
 </div>
+
+<script>
+var lang = localStorage.getItem('c2g-lang') || (navigator.language.startsWith('es') ? 'es' : 'en');
+var btn = document.getElementById('langBtn');
+function setLang(l) {
+    lang = l;
+    localStorage.setItem('c2g-lang', l);
+    document.documentElement.lang = l;
+    btn.textContent = l === 'es' ? 'EN' : 'ES';
+    document.querySelectorAll('[data-es][data-en]').forEach(function(el) {
+        var val = el.getAttribute('data-' + l);
+        if (el.tagName === 'INPUT') el.placeholder = val;
+        else if (val.includes('<')) el.innerHTML = val;
+        else el.textContent = val;
+    });
+}
+function toggleLang() { setLang(lang === 'es' ? 'en' : 'es'); }
+setLang(lang);
+</script>
 </body>
 </html>
