@@ -1,5 +1,23 @@
 # Changelog - Cals2Gains
 
+## 2026-04-15 — Auditoría de seguridad completa + correcciones pendientes
+
+### Tokens migrados a SecureStore
+- `services/terraService.ts`: token Terra movido de AsyncStorage a `expo-secure-store` con migración automática.
+- `services/inBodyService.ts`: token + userId InBody movidos a SecureStore con migración y limpieza de AsyncStorage en disconnect.
+
+### Console.log eliminados de producción
+- Instalado `babel-plugin-transform-remove-console` como devDependency.
+- `babel.config.js`: plugin activo cuando `NODE_ENV=production` — elimina 161 console.log/warn/error de los builds.
+
+### Content-Security-Policy configurada
+- `firebase.json`: CSP con whitelist para Google Analytics, Google Fonts, imágenes propias.
+
+### Hallazgos de alta severidad documentados (requieren Cloud Function)
+- **SEC-009**: OpenAI API key (`EXPO_PUBLIC_OPENAI_API_KEY`) embebida en 6 archivos del bundle cliente. Fix: proxy vía Firebase Cloud Function.
+- **SEC-010**: InBody `client_secret` en código cliente. Fix: mover token exchange a Cloud Function.
+- Plan de corrección detallado en `_project-hub/SECURITY_STATUS.md`.
+
 ## 2026-04-14 — Corrección de hallazgos de seguridad (8/8 resueltos)
 
 ### Firestore Rules — reescritura completa

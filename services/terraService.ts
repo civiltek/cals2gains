@@ -7,6 +7,7 @@
 
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 // ============================================
 // TYPES
@@ -146,7 +147,16 @@ class TerraService {
         });
       }
 
-      this.apiToken = await AsyncStorage.getItem(STORAGE_KEYS.TERRA_TOKEN);
+      // Read token from SecureStore (migrate from AsyncStorage if needed)
+      this.apiToken = await SecureStore.getItemAsync(STORAGE_KEYS.TERRA_TOKEN);
+      if (!this.apiToken) {
+        const legacy = await AsyncStorage.getItem(STORAGE_KEYS.TERRA_TOKEN);
+        if (legacy) {
+          await SecureStore.setItemAsync(STORAGE_KEYS.TERRA_TOKEN, legacy);
+          await AsyncStorage.removeItem(STORAGE_KEYS.TERRA_TOKEN);
+          this.apiToken = legacy;
+        }
+      }
     } catch (error) {
       console.error('Terra initialization error:', error);
     }
