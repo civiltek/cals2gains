@@ -1,5 +1,18 @@
 # Changelog - Cals2Gains
 
+## 2026-04-15 — Fix bloqueantes pre-lanzamiento (rama claude/awesome-herschel)
+
+- **gpt-5.4 → gpt-4o**: sustituido el modelo inexistente en 6 archivos de código (openai.ts, label-scanner.tsx, foodDatabase.ts, macroCoach.ts, recipeService.ts, create_reel.py)
+- **firestore.indexes.json**: añadido índice compuesto `fastingSessions` (userId ASC + startTime DESC)
+- **waterStore.setGoal**: ahora persiste el goal en Firestore (antes solo local)
+- **Streak proteínas**: implementado cálculo real desde `recentMeals` en protein-dashboard.tsx
+- **TS errors export-data.tsx**: corregidos accesos incorrectos a `Meal.date`, `Meal.calories`, `Meal.name` → `timestamp`, `nutrition.calories`, `dishName`; añadidos estilos `loadingContainer`/`loadingText` faltantes
+- **TS errors coach-share.tsx**: corregido `m.date → m.timestamp`, `user.profile.name → user.displayName`; añadidos estilos de coach faltantes en StyleSheet
+- **TS errors edit-profile.tsx**: corregidas referencias a `user.profile.name → user.displayName`
+- **types/index.ts**: añadidos `bio?`, `avatarType?`, `name?` opcionales a `UserProfile`
+- **Nota**: `services/firebase.ts` — sin bytes nulos (limpio). `services/openai.ts` — no estaba truncado, sólo faltaba el fix del modelo.
+- **Pendiente**: errores TS pre-existentes en otros archivos (history.tsx, measurements.tsx, fastingStore.ts, etc.) — no formaban parte de esta tarea
+
 ## 2026-04-14 (noche-4) — Motor audiovisual v4.0 (Studio)
 
 ### Visual Engine — Upgrade a calidad de estudio profesional
