@@ -101,15 +101,10 @@ function computeWeeklyReport(
   // Group meals by day — skip meals with invalid dates
   const dayMap = new Map<string, Meal[]>();
   for (const m of meals) {
-    let key: string;
-    if (typeof m.date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(m.date)) {
-      key = m.date.slice(0, 10);
-    } else {
-      const parsed = safeDate(m.date ?? m.timestamp);
-      if (!parsed) continue; // skip meals with invalid dates
-      key = safeFormat(parsed, 'yyyy-MM-dd');
-      if (key === '--') continue;
-    }
+    const parsed = safeDate(m.timestamp);
+    if (!parsed) continue; // skip meals with invalid timestamps
+    const key = safeFormat(parsed, 'yyyy-MM-dd');
+    if (key === '--') continue;
     const dayStart = startOfDay(weekStart).getTime();
     const mealDay = startOfDay(new Date(key)).getTime();
     if (isNaN(mealDay)) continue;
@@ -204,7 +199,7 @@ export default function CoachShareScreen() {
     [allMeals, weightChange, goals],
   );
 
-  const userName = user?.profile?.name || user?.profile?.displayName || t('coach.user');
+  const userName = user?.displayName || t('coach.user');
 
   const togglePermission = (key: SharedPermission['key']) => {
     setPermissions(perms =>
@@ -774,6 +769,67 @@ const styles = StyleSheet.create({
   },
   coachsList: {
     gap: 12,
+  },
+  coachCount: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  emptyCoachState: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    gap: 8,
+  },
+  emptyState: {
+    fontSize: 13,
+    textAlign: 'center',
+    opacity: 0.6,
+  },
+  coachCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  coachInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  coachAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  coachInitial: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  coachDetails: {
+    flex: 1,
+  },
+  coachName: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  coachEmail: {
+    fontSize: 12,
+    opacity: 0.6,
+    marginTop: 2,
+  },
+  connectedDate: {
+    fontSize: 11,
+    opacity: 0.5,
+    marginTop: 2,
+  },
+  removeButton: {
+    padding: 4,
   },
 });
 

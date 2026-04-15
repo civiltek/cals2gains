@@ -34,6 +34,10 @@ export interface UserProfile {
   gender: 'male' | 'female' | 'other';
   activityLevel: ActivityLevel;
   goal: FitnessGoal;
+  // Optional extended profile fields
+  name?: string;
+  bio?: string;
+  avatarType?: string;
 }
 
 export type ActivityLevel =
