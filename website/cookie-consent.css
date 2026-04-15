@@ -1,0 +1,45 @@
+/* ===== COOKIE CONSENT BANNER — GDPR/LOPD Compliant ===== */
+#c2g-cookie-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99998;opacity:0;transition:opacity .3s ease;pointer-events:none}
+#c2g-cookie-overlay.active{opacity:1;pointer-events:auto}
+#c2g-cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1E1829;border-top:1px solid rgba(156,140,255,0.2);padding:1.25rem 1.5rem;font-family:'Instrument Sans',-apple-system,BlinkMacSystemFont,sans-serif;color:#F7F2EA;transform:translateY(100%);transition:transform .4s cubic-bezier(.4,0,.2,1);box-shadow:0 -8px 32px rgba(0,0,0,0.4)}
+#c2g-cookie-banner.active{transform:translateY(0)}
+.c2g-cookie-inner{max-width:1100px;margin:0 auto;display:flex;align-items:flex-start;gap:1.25rem;flex-wrap:wrap}
+.c2g-cookie-text{flex:1;min-width:280px}
+.c2g-cookie-text h4{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;margin-bottom:0.35rem;color:#F7F2EA}
+.c2g-cookie-text p{font-size:0.85rem;line-height:1.5;color:rgba(247,242,234,0.65);margin:0}
+.c2g-cookie-text a{color:#9C8CFF;text-decoration:underline}
+.c2g-cookie-btns{display:flex;gap:0.6rem;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.c2g-cookie-btn{border:none;border-radius:10px;padding:0.6rem 1.25rem;font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all .2s ease;white-space:nowrap}
+.c2g-cookie-btn.accept{background:linear-gradient(135deg,#9C8CFF,#FF6A4D);color:#17121D}
+.c2g-cookie-btn.accept:hover{opacity:0.9;transform:translateY(-1px)}
+.c2g-cookie-btn.reject{background:rgba(247,242,234,0.08);color:#F7F2EA;border:1px solid rgba(247,242,234,0.15)}
+.c2g-cookie-btn.reject:hover{background:rgba(247,242,234,0.12)}
+.c2g-cookie-btn.customize{background:transparent;color:#9C8CFF;border:1px solid rgba(156,140,255,0.3);padding:0.6rem 1rem}
+.c2g-cookie-btn.customize:hover{background:rgba(156,140,255,0.08)}
+/* Preferences modal */
+#c2g-cookie-prefs{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);z-index:100000;background:#1E1829;border:1px solid rgba(156,140,255,0.2);border-radius:16px;padding:2rem;width:min(480px,92vw);max-height:85vh;overflow-y:auto;opacity:0;pointer-events:none;transition:all .3s ease;box-shadow:0 24px 64px rgba(0,0,0,0.5)}
+#c2g-cookie-prefs.active{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+#c2g-cookie-prefs h3{font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:700;color:#F7F2EA;margin-bottom:1rem}
+.c2g-pref-cat{background:rgba(247,242,234,0.04);border:1px solid rgba(247,242,234,0.06);border-radius:12px;padding:1rem;margin-bottom:0.75rem}
+.c2g-pref-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem}
+.c2g-pref-header label{font-family:'Outfit',sans-serif;font-weight:600;font-size:0.95rem;color:#F7F2EA}
+.c2g-pref-header .c2g-badge{font-size:0.7rem;background:rgba(156,140,255,0.15);color:#9C8CFF;padding:0.15rem 0.5rem;border-radius:99px;font-weight:600}
+.c2g-pref-desc{font-size:0.8rem;color:rgba(247,242,234,0.55);line-height:1.5;margin:0}
+/* Toggle switch */
+.c2g-toggle{position:relative;width:42px;height:24px;flex-shrink:0}
+.c2g-toggle input{opacity:0;width:0;height:0}
+.c2g-toggle .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:rgba(247,242,234,0.12);border-radius:24px;transition:.3s}
+.c2g-toggle .slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#F7F2EA;border-radius:50%;transition:.3s}
+.c2g-toggle input:checked+.slider{background:#9C8CFF}
+.c2g-toggle input:checked+.slider:before{transform:translateX(18px)}
+.c2g-toggle input:disabled+.slider{opacity:0.6;cursor:default}
+.c2g-prefs-btns{display:flex;gap:0.6rem;margin-top:1.25rem;justify-content:flex-end}
+/* Cookie settings link */
+.c2g-cookie-settings-link{cursor:pointer;color:#9C8CFF;text-decoration:none;font-size:inherit;transition:opacity .2s}
+.c2g-cookie-settings-link:hover{opacity:0.7;text-decoration:underline}
+@media(max-width:640px){
+  .c2g-cookie-inner{flex-direction:column;gap:1rem}
+  .c2g-cookie-btns{width:100%;justify-content:stretch}
+  .c2g-cookie-btn{flex:1;text-align:center;padding:0.7rem 0.75rem}
+  #c2g-cookie-prefs{padding:1.5rem}
+}
