@@ -1,5 +1,99 @@
 # Changelog - Cals2Gains
 
+## 2026-04-15 — Cloud Functions proxy: API keys fuera del cliente (SEC-009/SEC-010)
+
+### Firebase Cloud Functions (nuevas)
+- `functions/src/index.ts`: 3 funciones — `openaiChat`, `openaiTranscribe`, `inbodyTokenExchange`.
+- Rate limiting: 100 llamadas/día por usuario (via Firestore `apiUsage/`).
+- Whitelist de modelos permitidos. Cap de max_tokens a 4000.
+- `functions/.env.example` con variables requeridas.
+
+### Proxy cliente
+- `services/apiProxy.ts`: wrapper `callOpenAIChat()`, `callOpenAITranscribe()`, `exchangeInBodyToken()` via `httpsCallable`.
+
+### Archivos refactorizados (7)
+- `services/openai.ts` — 3 funciones migradas (analyzeFoodPhoto, refineAnalysis, generateAIMealSuggestions).
+- `services/voiceLog.ts` — transcribeAudio migrado a proxy Whisper.
+- `services/macroCoach.ts` — generateWeeklyRecommendation migrado.
+- `services/recipeService.ts` — importRecipeFromUrl migrado.
+- `services/foodDatabase.ts` — analyzeTextFood migrado.
+- `app/label-scanner.tsx` — extractLabelOCR migrado.
+- `services/inBodyService.ts` — handleAuthCallback migrado (client_secret eliminado del cliente).
+
+### Configuración
+- `firebase.json` — sección `functions` añadida.
+- `.gitignore` — `functions/lib/`, `functions/node_modules/`, `functions/.env` añadidos.
+
+### Estado de seguridad
+- SEC-009 y SEC-010 → RESUELTOS. 13/13 hallazgos cerrados, 0 abiertos.
+
+## 2026-04-15 — Auditoría de seguridad completa + correcciones pendientes
+
+### Tokens migrados a SecureStore
+- `services/terraService.ts`: token Terra movido de AsyncStorage a `expo-secure-store` con migración automática.
+- `services/inBodyService.ts`: token + userId InBody movidos a SecureStore con migración y limpieza de AsyncStorage en disconnect.
+
+### Console.log eliminados de producción
+- Instalado `babel-plugin-transform-remove-console` como devDependency.
+- `babel.config.js`: plugin activo cuando `NODE_ENV=production` — elimina 161 console.log/warn/error de los builds.
+
+### Content-Security-Policy configurada
+- `firebase.json`: CSP con whitelist para Google Analytics, Google Fonts, imágenes propias.
+
+### Hallazgos de alta severidad documentados (requieren Cloud Function)
+- **SEC-009**: OpenAI API key (`EXPO_PUBLIC_OPENAI_API_KEY`) embebida en 6 archivos del bundle cliente. Fix: proxy vía Firebase Cloud Function.
+- **SEC-010**: InBody `client_secret` en código cliente. Fix: mover token exchange a Cloud Function.
+- Plan de corrección detallado en `_project-hub/SECURITY_STATUS.md`.
+
+## 2026-04-14 — Corrección de hallazgos de seguridad (8/8 resueltos)
+
+### Firestore Rules — reescritura completa
+- Validación de schema en `create` para todas las colecciones: campos requeridos, tipos, enums, límites.
+- Funciones helper: `isAuth()`, `isOwner()`, `ownsResource()`, `validNutrition()`, `ownsLogById()`.
+- `dailyLogs`: regex mejorado de `_.*` a `_[0-9]{4}-[0-9]{2}-[0-9]{2}` + validación doble de userId.
+- `waterLogs`: **reglas añadidas** — fix del bug "Missing or insufficient permissions".
+
+### Storage Rules — límites añadidos
+- Máximo 10 MB por archivo.
+- Solo tipo MIME `image/*` permitido.
+
+### Firebase Hosting — headers de seguridad
+- HSTS, X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy, Permissions-Policy, X-XSS-Protection.
+
+### Dependencias
+- Override `undici@^7.10.0` en package.json para resolver 10 CVEs (1 high, 9 moderate). `npm audit`: 0 vulnerabilidades.
+
+### .gitignore
+- `google-services.json` y `GoogleService-Info.plist` añadidos a `.gitignore`.
+
+### Escaneo de secretos
+- Grep de patterns de API keys en código fuente (.ts/.tsx/.js/.jsx/.json) — limpio.
+
+## 2026-04-14 — Sistema de agentes de ciberseguridad
+
+### Nuevos agentes de seguridad
+- `agents/security.md` — Coordinador de ciberseguridad: auditorías periódicas, escaneo de dependencias y secretos, gestión de vulnerabilidades.
+- `agents/appsec.md` — Seguridad de la app móvil: código RN, dependencias npm, almacenamiento seguro, auth, protección del APK.
+- `agents/infrasec.md` — Seguridad de infraestructura: Firestore rules, Storage rules, hosting headers, API keys, configuración cloud.
+
+### Nuevos archivos de soporte
+- `_project-hub/SECURITY_STATUS.md` — Estado vivo de seguridad con vulnerabilidades clasificadas (7 hallazgos iniciales).
+- `guardrails/SECURITY-BASELINE.md` — 12 estándares de seguridad mínimos (SB1-SB12).
+- `orchestration/SECURITY-WORKFLOWS.md` — 6 flujos de seguridad (SW1-SW6): escaneo deps, secretos, auditoría mensual, respuesta a incidentes, pre-build, pre-deploy.
+
+### Archivos actualizados
+- `CLAUDE.md` — Tabla de agentes ampliada con security, appsec, infrasec.
+- `orchestration/HANDOFFS.md` — Handoffs de seguridad añadidos (security↔appsec, security↔infrasec, appsec→app-dev, infrasec→web-dev, cualquiera→security).
+- `orchestration/WORKFLOWS.md` — Referencia a flujos de seguridad (W10-W16 → SECURITY-WORKFLOWS.md).
+
+### Hallazgos iniciales de seguridad
+- SEC-001/002: `google-services.json` y `GoogleService-Info.plist` commiteados (severidad media).
+- SEC-003: Sin validación de schema en Firestore rules (severidad media).
+- SEC-004: Sin límites de tamaño ni filtro MIME en Storage rules (severidad media).
+- SEC-005: Regex frágil en dailyLogs (severidad media).
+- SEC-006: Headers de seguridad HTTP no configurados (severidad baja).
+- SEC-007: GitHub Push Protection bloqueó tokens de GCloud (mitigada).
+
 ## 2026-04-14 (noche-4) — Motor audiovisual v4.0 (Studio)
 
 ### Visual Engine — Upgrade a calidad de estudio profesional

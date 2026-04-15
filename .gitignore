@@ -27,6 +27,10 @@ yarn-error.*
 .env.staging
 tools/**/.env
 
+# Firebase config (contains API keys / project IDs)
+google-services.json
+GoogleService-Info.plist
+
 # Credentials & signing
 google-play-service-account.json
 *.jks
@@ -54,6 +58,11 @@ Thumbs.db
 
 # Firebase cache
 .firebase/
+
+# Firebase Functions build output & secrets
+functions/lib/
+functions/node_modules/
+functions/.env
 
 # IDE
 .idea/

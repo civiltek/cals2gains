@@ -5,9 +5,7 @@
 
 import { Recipe, RecipeIngredient, Nutrition, GroceryItem, GroceryCategory } from '../types';
 import { getAppLanguage } from '../utils/language';
-
-const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+import { callOpenAIChat } from './apiProxy';
 
 /**
  * System prompt for recipe extraction from URL — language-aware
@@ -174,10 +172,6 @@ export async function importRecipeFromUrl(
   url: string,
   language: 'es' | 'en' = getAppLanguage()
 ): Promise<Recipe> {
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
-  }
-
   // Fetch the webpage content
   let pageContent: string;
   try {
@@ -193,56 +187,40 @@ export async function importRecipeFromUrl(
     }
 
     const html = await response.text();
-    // Extract text content (remove HTML tags)
     pageContent = html
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
       .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
       .replace(/<[^>]*>/g, ' ')
       .replace(/\s+/g, ' ')
       .trim()
-      .slice(0, 4000); // Limit to avoid token overflow
+      .slice(0, 4000);
   } catch (error) {
     console.error('Failed to fetch recipe URL:', error);
     throw new Error('Failed to fetch recipe from URL');
   }
 
-  // Call OpenAI to extract recipe
   try {
-    const response = await fetch(OPENAI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-5.4',
-        max_tokens: 2000,
-        messages: [
-          {
-            role: 'system',
-            content: getRecipeExtractionSystem(language),
-          },
-          {
-            role: 'user',
-            content: buildRecipeExtractionPrompt(pageContent, language),
-          },
-        ],
-      }),
+    const aiResponse = await callOpenAIChat({
+      model: 'gpt-5.4',
+      max_tokens: 2000,
+      messages: [
+        {
+          role: 'system',
+          content: getRecipeExtractionSystem(language),
+        },
+        {
+          role: 'user',
+          content: buildRecipeExtractionPrompt(pageContent, language),
+        },
+      ],
     });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(`OpenAI API error: ${response.status} - ${JSON.stringify(error)}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+    const content = aiResponse.content;
 
     if (!content) {
       throw new Error('No response from OpenAI');
     }
 
-    // Parse and validate response
     const cleanedContent = content
       .replace(/```json\n?/g, '')
       .replace(/```\n?/g, '')

@@ -7,6 +7,7 @@
 import { FoodItem, Nutrition } from '../types';
 import { getAppLanguage } from '../utils/language';
 import { searchSpanishFoods, translateFoodName, looksEnglish } from '../data/spanishFoods';
+import { callOpenAIChat } from './apiProxy';
 
 const OFF_API = 'https://world.openfoodfacts.org';
 const OFF_SEARCH = `${OFF_API}/cgi/search.pl`;
@@ -202,23 +203,14 @@ export async function analyzeTextFood(
   description: string,
   language: 'es' | 'en' = getAppLanguage()
 ): Promise<FoodItem | null> {
-  const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
-  if (!OPENAI_API_KEY) return null;
-
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-5.4',
-        max_tokens: 500,
-        messages: [
-          {
-            role: 'system',
-            content: `You are a nutrition expert. Given a food description, estimate its nutritional content per 100g and total. Respond ONLY in valid JSON with this structure:
+    const response = await callOpenAIChat({
+      model: 'gpt-5.4',
+      max_tokens: 500,
+      messages: [
+        {
+          role: 'system',
+          content: `You are a nutrition expert. Given a food description, estimate its nutritional content per 100g and total. Respond ONLY in valid JSON with this structure:
 {
   "name": "English name",
   "nameEs": "Spanish name",
@@ -227,19 +219,15 @@ export async function analyzeTextFood(
   "nutritionPer100g": { "calories": 150, "protein": 8, "carbs": 12, "fat": 7, "fiber": 1 },
   "totalNutrition": { "calories": 300, "protein": 16, "carbs": 24, "fat": 14, "fiber": 2 }
 }`,
-          },
-          {
-            role: 'user',
-            content: `Estimate nutrition for: "${description}" (user language: ${language})`,
-          },
-        ],
-      }),
+        },
+        {
+          role: 'user',
+          content: `Estimate nutrition for: "${description}" (user language: ${language})`,
+        },
+      ],
     });
 
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+    const content = response.content;
     if (!content) return null;
 
     const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();

@@ -6,6 +6,8 @@
 // Uses InBody API v2 for data retrieval
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import { exchangeInBodyToken } from './apiProxy';
 
 // ============================================
 // TYPES
@@ -79,8 +81,25 @@ class InBodyService {
    */
   async initialize(): Promise<void> {
     try {
-      this.token = await AsyncStorage.getItem(STORAGE_KEYS.INBODY_TOKEN);
-      this.userId = await AsyncStorage.getItem(STORAGE_KEYS.INBODY_USER_ID);
+      // Read tokens from SecureStore (migrate from AsyncStorage if needed)
+      this.token = await SecureStore.getItemAsync(STORAGE_KEYS.INBODY_TOKEN);
+      if (!this.token) {
+        const legacy = await AsyncStorage.getItem(STORAGE_KEYS.INBODY_TOKEN);
+        if (legacy) {
+          await SecureStore.setItemAsync(STORAGE_KEYS.INBODY_TOKEN, legacy);
+          await AsyncStorage.removeItem(STORAGE_KEYS.INBODY_TOKEN);
+          this.token = legacy;
+        }
+      }
+      this.userId = await SecureStore.getItemAsync(STORAGE_KEYS.INBODY_USER_ID);
+      if (!this.userId) {
+        const legacy = await AsyncStorage.getItem(STORAGE_KEYS.INBODY_USER_ID);
+        if (legacy) {
+          await SecureStore.setItemAsync(STORAGE_KEYS.INBODY_USER_ID, legacy);
+          await AsyncStorage.removeItem(STORAGE_KEYS.INBODY_USER_ID);
+          this.userId = legacy;
+        }
+      }
 
       const savedMeasurements = await AsyncStorage.getItem(STORAGE_KEYS.INBODY_MEASUREMENTS);
       if (savedMeasurements) {
@@ -138,26 +157,13 @@ class InBodyService {
    */
   async handleAuthCallback(authCode: string): Promise<boolean> {
     try {
-      const response = await fetch(`${INBODY_API_BASE}/oauth/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          grant_type: 'authorization_code',
-          code: authCode,
-          client_id: process.env.EXPO_PUBLIC_INBODY_CLIENT_ID || '',
-          client_secret: process.env.EXPO_PUBLIC_INBODY_CLIENT_SECRET || '',
-          redirect_uri: 'cals2gains://inbody-callback',
-        }),
-      });
+      // Token exchange via Cloud Function — client_secret stays server-side
+      const data = await exchangeInBodyToken(authCode);
+      this.token = data.accessToken;
+      this.userId = data.userId;
 
-      if (!response.ok) return false;
-
-      const data = await response.json();
-      this.token = data.access_token;
-      this.userId = data.user_id;
-
-      await AsyncStorage.setItem(STORAGE_KEYS.INBODY_TOKEN, this.token!);
-      await AsyncStorage.setItem(STORAGE_KEYS.INBODY_USER_ID, this.userId!);
+      await SecureStore.setItemAsync(STORAGE_KEYS.INBODY_TOKEN, this.token!);
+      await SecureStore.setItemAsync(STORAGE_KEYS.INBODY_USER_ID, this.userId!);
 
       // Fetch profile and initial measurements
       await this.fetchProfile();
@@ -178,9 +184,11 @@ class InBodyService {
     this.userId = null;
     this.cachedMeasurements = [];
 
+    // Remove tokens from SecureStore
+    await SecureStore.deleteItemAsync(STORAGE_KEYS.INBODY_TOKEN);
+    await SecureStore.deleteItemAsync(STORAGE_KEYS.INBODY_USER_ID);
+    // Remove cached data from AsyncStorage
     await AsyncStorage.multiRemove([
-      STORAGE_KEYS.INBODY_TOKEN,
-      STORAGE_KEYS.INBODY_USER_ID,
       STORAGE_KEYS.INBODY_MEASUREMENTS,
       STORAGE_KEYS.INBODY_PROFILE,
     ]);
