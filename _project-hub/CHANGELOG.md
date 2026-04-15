@@ -1,5 +1,36 @@
 # Changelog - Cals2Gains
 
+## 2026-04-15 — Pipeline visual-engine end-to-end validado + corrección de 8 bugs moviepy v2
+
+- **API key Muapi**: `MUAPI_KEY` y `MUAPI_API_KEY` añadidas al `.env` raíz
+- **Pipeline probado**: `create_reel.py --topic "3 mitos sobre las proteínas"` → GPT script ✅ → Sora 2 (5 clips) ✅ → ElevenLabs (5 voces ES) ✅ → composición ✅
+- **Fallback activo**: Muapi devuelve 402 (key sin prefijo `sk-`) → Sora 2 hace de fallback automático
+- **Bugs corregidos en `reel_composer.py` y `create_reel.py`**:
+  - `→` U+2192 → `->` (charmap Windows cp1252 crash en print)
+  - `scene_voices` kwarg ausente en `compose_reel()` → añadido con `CompositeAudioClip` por escena
+  - `generate_voice()` devuelve dict → `create_reel.py` desempaqueta `result["audio_path"]`
+  - `AudioClip.resized()` no existe → eliminado de `mix_audio_tracks`
+  - `clip.resized(newsize=)` → `clip.resized(new_size=)` (moviepy v2)
+  - `clip.fl()` → `clip.transform()` (moviepy v2)
+  - `add_watermark(position=)` kwarg inválido → eliminado
+  - `with_volume_multiplied` → `with_volume_scaled` (moviepy v2)
+  - `write_videofile(verbose=False)` → eliminado (moviepy v2)
+- **Archivo final**: `tools/visual-engine/output/3_mitos_sobre_las_proteínas_1776266756/compose_test.mp4` (7.7 MB, ~24s, 1080×1920)
+
+## 2026-04-15 — Generar carrusel PIEZA-01 "Huevos y colesterol" con imágenes Gamma
+
+- **render_gamma_slides.py**: ejecutado completo — genera 14 slides (7 ES + 7 EN) con imágenes Gamma como fondo + overlays de marca Outfit Bold/Regular
+- **Calidad**: 453 KB – 1.07 MB por slide (vs 37-74 KB del script anterior sin Gamma)
+- **Output ES**: `content/piezas/pieza-01-assets/slide_01-07.png` + copia en `pieza-01-final/`
+- **Output EN**: `content/piezas/pieza-01-assets-en/slide_01-07.png`
+- **Enviado a Telegram**: 7 slides ES enviadas como media group al canal de aprobación (`draft_id: pieza-01-es-v1`), pendiente aprobación de Judith
+
+## 2026-04-15 — Deploy Firebase: reglas Firestore, índices y hosting
+
+- **Firestore rules**: `firestore.rules` compilado y publicado en Cloud Firestore (water tracker, fasting y seguridad activos en producción)
+- **Firestore indexes**: `firestore.indexes.json` desplegado en base de datos `(default)`
+- **Hosting**: 16 archivos en `public/`, release completo — cals2gains.com actualizado
+
 ## 2026-04-15 — Migrar visual-engine a API open source de Higgsfield (Muapi.ai)
 
 - **higgsfield_client.py**: reescritura completa — cambia de `cloud.higgsfield.ai` (de pago) a `api.muapi.ai` (open source, tier gratuito)

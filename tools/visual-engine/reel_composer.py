@@ -313,7 +313,7 @@ def create_brand_overlay_frame(
     frame = _add_corner_accents(frame)
 
     # 6. Watermark
-    frame = add_watermark(frame, text="@cals2gains", position="bottom-left", opacity=0.6)
+    frame = add_watermark(frame, text="@cals2gains", opacity=0.6)
 
     return frame
 
@@ -476,7 +476,7 @@ def load_scene_clip(scene: Scene, force_duration: Optional[float] = None) -> Vid
         # Ensure correct resolution
         if clip.size != Reel.SIZE:
             logger.debug(f"Resizing clip from {clip.size} to {Reel.SIZE}")
-            clip = clip.resized(newsize=Reel.SIZE)
+            clip = clip.resized(new_size=Reel.SIZE)
 
         return clip.with_fps(Reel.FPS)
 
@@ -547,7 +547,7 @@ def apply_brand_overlays_to_clip(
         return np.array(frame_with_overlays.convert("RGB"))
 
     # Create new clip with frame processing
-    overlaid_clip = clip.without_audio().fl(process_frame)
+    overlaid_clip = clip.without_audio().transform(process_frame)
 
     # Preserve original audio if it exists
     if clip.audio is not None:
@@ -608,7 +608,7 @@ def apply_transition_to_clips(
         return blended.astype(np.uint8)
 
     # Create transition clip
-    transition_clip = clip_out_tail.fl(blend_frames)
+    transition_clip = clip_out_tail.transform(blend_frames)
 
     # Composite: main clip out (without tail) + transition + main clip in (without head)
     main_out_part = clip_out.subclipped(0, clip_out.duration - duration)
@@ -654,21 +654,17 @@ def mix_audio_tracks(
 
     # Add voiceover (primary track, no ducking)
     if voiceover_audio:
-        vo_track = voiceover_audio.resized(1.0)
-        if vo_track.duration < total_duration:
-            # Pad with silence
-            silence_duration = total_duration - vo_track.duration
-            silence = AudioFileClip("assets/silence.mp3") if False else None
-            if silence:
-                silence = silence.with_duration(silence_duration)
-                vo_track = concatenate_audioclips([vo_track, silence])
-        vo_track = vo_track.subclipped(0, total_duration)
+        vo_track = voiceover_audio  # AudioClip has no resized(); use as-is
+        try:
+            vo_track = vo_track.subclipped(0, total_duration)
+        except Exception:
+            pass  # CompositeAudioClip may not support subclipped; pass
         tracks.append(vo_track)
-        logger.debug(f"Voiceover added: {vo_track.duration}s")
+        logger.debug(f"Voiceover added")
 
     # Add music (with ducking if voiceover present)
     if music_audio:
-        music_track = music_audio.resized(1.0)
+        music_track = music_audio  # resized not applicable to audio
 
         # Loop music if needed
         if music_track.duration < total_duration:
@@ -682,7 +678,7 @@ def mix_audio_tracks(
         if voiceover_audio:
             duck_db = Reel.MUSIC_DUCK_DB
             duck_factor = 10 ** (duck_db / 20.0)
-            music_track = music_track.with_volume_multiplied(duck_factor)
+            music_track = music_track.with_volume_scaled(duck_factor)
             logger.debug(f"Music ducking applied: {duck_db} dB")
 
         tracks.append(music_track)
@@ -708,6 +704,7 @@ def mix_audio_tracks(
 def compose_reel(
     scenes: List[Scene],
     voice_audio: Optional[Path] = None,
+    scene_voices: Optional[List[Optional[Path]]] = None,
     music_audio: Optional[Path] = None,
     output_path: Optional[Path] = None,
     add_intro: bool = True,
@@ -822,6 +819,24 @@ def compose_reel(
     vo_audio = None
     if voice_audio:
         vo_audio = AudioFileClip(str(voice_audio))
+    elif scene_voices:
+        # Build composite voice track from per-scene audio files
+        # Each voice starts at the cumulative offset: intro (0.8s if present) + sum of prior scenes
+        intro_offset = 0.8 if add_intro else 0.0
+        voice_segments = []
+        cursor = intro_offset
+        for i, (scene, vpath) in enumerate(zip(scenes, scene_voices)):
+            if vpath and Path(vpath).exists():
+                try:
+                    seg = AudioFileClip(str(vpath)).with_start(cursor)
+                    voice_segments.append(seg)
+                    logger.info(f"Voice scene {i+1}: {Path(vpath).name} at t={cursor:.2f}s")
+                except Exception as e:
+                    logger.warning(f"Voice scene {i+1} load failed: {e}")
+            cursor += scene.duration
+        if voice_segments:
+            vo_audio = CompositeAudioClip(voice_segments).with_duration(total_duration)
+            logger.info(f"Per-scene voice track built: {len(voice_segments)} segments")
 
     music = None
     if music_audio:
@@ -846,7 +861,6 @@ def compose_reel(
             audio_codec=Reel.AUDIO_CODEC,
             fps=Reel.FPS,
             audio_bitrate=Reel.AUDIO_BITRATE,
-            verbose=False,
             logger=None,
         )
     except Exception as e:

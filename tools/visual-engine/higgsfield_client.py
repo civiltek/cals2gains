@@ -11,9 +11,9 @@ Cómo obtener la API key gratuita:
   3. Añade al .env:  MUAPI_API_KEY=sk-...
 
 API Reference (api.muapi.ai):
-  POST /api/v1/{model-endpoint}           - Enviar job → devuelve request_id
+  POST /api/v1/{model-endpoint}           - Enviar job -> devuelve request_id
   GET  /api/v1/predictions/{id}/result    - Polling cada 2s hasta completar
-  POST /api/v1/upload_file                - Subir imagen/vídeo → URL alojada
+  POST /api/v1/upload_file                - Subir imagen/vídeo -> URL alojada
 
 Autenticación: header  x-api-key: sk-...
 
@@ -47,7 +47,7 @@ MUAPI_BASE_URL = "https://api.muapi.ai/api/v1"
 # Modelo T2V por defecto — buen equilibrio calidad/coste en tier gratuito
 DEFAULT_VIDEO_MODEL = "kling-v2.6-pro-t2v"
 
-# Mapeo de nombres heredados (Higgsfield Cloud) → IDs de Muapi
+# Mapeo de nombres heredados (Higgsfield Cloud) -> IDs de Muapi
 MODEL_ALIASES = {
     "sora-2": "openai-sora-2-text-to-video",
     "sora": "openai-sora",
@@ -121,7 +121,7 @@ class HiggsFieldClient:
 
     Capacidades:
       - Generación de vídeo desde texto (40+ modelos: Kling, Seedance, Veo, Sora…)
-      - Conversión imagen → vídeo
+      - Conversión imagen -> vídeo
       - Polling asíncrono con backoff exponencial
     """
 
@@ -188,7 +188,7 @@ class HiggsFieldClient:
     def _extract_video_url(self, result_data: dict) -> Optional[str]:
         """
         Extrae la URL del vídeo del resultado del polling.
-        Orden de prioridad: outputs[0] → url → output.url → output (str)
+        Orden de prioridad: outputs[0] -> url -> output.url -> output (str)
         """
         outputs = result_data.get("outputs")
         if outputs and isinstance(outputs, list) and outputs[0]:
@@ -326,7 +326,7 @@ class HiggsFieldClient:
                     )
                     if not url:
                         raise RuntimeError(f"Sin URL en respuesta de upload: {data}")
-                    self._log(f"Subido {file_path.name} → {url}")
+                    self._log(f"Subido {file_path.name} -> {url}")
                     return str(url)
 
         except Exception as e:
@@ -450,7 +450,7 @@ class HiggsFieldClient:
         if prompt:
             payload["prompt"] = f"{prompt}. {BRAND_VIDEO_SUFFIX}"
 
-        self._log(f"Imagen → vídeo: {image_path.name} ({model})")
+        self._log(f"Imagen -> vídeo: {image_path.name} ({model})")
 
         def create_job():
             with httpx.Client(timeout=TIMEOUT) as client:
@@ -664,7 +664,7 @@ def generate_scene_clip(
                     model=DEFAULT_VIDEO_MODEL,
                     output_path=output_path,
                 )
-                print(f"[Scene] Muapi OK → {clip}")
+                print(f"[Scene] Muapi OK -> {clip}")
                 return clip
 
             elif method == "sora":
@@ -680,7 +680,7 @@ def generate_scene_clip(
                     size="720x1280",
                     output_path=output_path,
                 )
-                print(f"[Scene] Sora 2 OK → {clip}")
+                print(f"[Scene] Sora 2 OK -> {clip}")
                 return clip
 
             elif method == "image":
@@ -701,7 +701,7 @@ def generate_scene_clip(
                         duration_s=duration,
                         output_path=output_path,
                     )
-                    print(f"[Scene] Ken Burns OK → {clip}")
+                    print(f"[Scene] Ken Burns OK -> {clip}")
                     return clip
                 else:
                     import tempfile

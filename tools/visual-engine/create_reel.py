@@ -401,34 +401,48 @@ def create_reel_from_script(
 
         print(f"\n  Scene {i+1:2d}/{len(scene_defs)}: Generating voice...")
         try:
-            vo_path = generate_voice(
+            result = generate_voice(
                 text=vo_text,
                 prefer=voice_pref,
                 lang=lang,
                 output_path=work_dir / f"voice_{i+1:02d}.mp3",
             )
+
+            # generate_voice returns a dict {audio_path, duration_s, word_timestamps}
+            # or a str/Path for backward compat (return_timestamps=False)
+            if isinstance(result, dict):
+                vo_path = Path(result["audio_path"])
+                voice_dur = result.get("duration_s")
+            else:
+                vo_path = Path(result) if result else None
+                voice_dur = None
+
             voice_paths.append(vo_path)
 
-            # Get actual voice duration for subtitle sync
-            try:
-                from moviepy import AudioFileClip
-                with AudioFileClip(str(vo_path)) as afc:
-                    voice_dur = afc.duration
-                voice_durations.append(voice_dur)
-                print(f"           [OK] {vo_path.name} ({voice_dur:.2f}s)")
-            except Exception:
-                voice_durations.append(None)
-                print(f"           [OK] {vo_path.name} (duration unknown)")
+            if voice_dur is None and vo_path and vo_path.exists():
+                try:
+                    from moviepy import AudioFileClip
+                    with AudioFileClip(str(vo_path)) as afc:
+                        voice_dur = afc.duration
+                except Exception:
+                    pass
+
+            voice_durations.append(voice_dur)
+            dur_str = f"{voice_dur:.2f}s" if voice_dur else "unknown"
+            name_str = vo_path.name if vo_path else "?"
+            print(f"           [OK] {name_str} ({dur_str})")
 
         except Exception as e:
             print(f"           [FAIL] {type(e).__name__}: {str(e)[:50]}")
             voice_paths.append(None)
             voice_durations.append(None)
 
-    # Update Scene objects with voice durations and data overlays
+    # Update Scene objects with voice durations, paths, timestamps, and data overlays
     for i, scene in enumerate(scenes):
         if i < len(voice_durations) and voice_durations[i]:
             scene.voice_duration = voice_durations[i]
+        if i < len(voice_paths) and voice_paths[i]:
+            scene.voiceover_path = voice_paths[i]
         if i < len(scene_defs):
             scene.data_overlays = scene_defs[i].get("data_overlays", [])
 
