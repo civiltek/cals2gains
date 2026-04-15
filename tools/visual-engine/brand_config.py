@@ -28,7 +28,11 @@ load_dotenv(PROJECT_DIR / ".env")
 OPENAI_API_KEY = os.getenv("EXPO_PUBLIC_OPENAI_API_KEY", "")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-HIGGSFIELD_API_KEY = os.getenv("HIGGSFIELD_API_KEY", "")
+# Muapi API key (gratis en muapi.ai) — backend open-source de Higgsfield
+MUAPI_API_KEY = os.getenv("MUAPI_API_KEY", "")
+# Alias heredado para compatibilidad con código existente
+HIGGSFIELD_API_KEY = MUAPI_API_KEY
+HIGGSFIELD_DEFAULT_MODEL = "kling-v2.6-pro-t2v"
 
 # -- Color Palette (from theme.ts) -----------------------------------------
 class Colors:

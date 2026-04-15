@@ -1,5 +1,26 @@
 # Changelog - Cals2Gains
 
+## 2026-04-15 — Migrar visual-engine a API open source de Higgsfield (Muapi.ai)
+
+- **higgsfield_client.py**: reescritura completa — cambia de `cloud.higgsfield.ai` (de pago) a `api.muapi.ai` (open source, tier gratuito)
+- **Auth**: de `Authorization: Bearer` a header `x-api-key`; env var renombrada de `HIGGSFIELD_API_KEY` a `MUAPI_API_KEY`
+- **Endpoints actualizados**: submit `POST /api/v1/{model-id}` · polling `GET /api/v1/predictions/{id}/result` · upload `POST /api/v1/upload_file`
+- **40+ modelos disponibles**: Kling v2.6 Pro (por defecto), Seedance 2.0, Veo 3.1, Sora 2, Runway, Wan 2.6, etc.
+- **Mapeo automático** de nombres heredados (sora-2, kling-3.0, veo-3.1…) a IDs de Muapi
+- **brand_config.py**: añadido `MUAPI_API_KEY` + `HIGGSFIELD_DEFAULT_MODEL`; `HIGGSFIELD_API_KEY` queda como alias de compatibilidad
+- **.env**: añadido placeholder `MUAPI_API_KEY=` (pendiente de rellenar con key gratuita de muapi.ai)
+- **Sin breaking changes**: misma interfaz pública (`HiggsFieldClient`, `CameraPresets`, `StylePresets`, `generate_scene_clip`); `create_reel.py` funciona sin modificar
+
+## 2026-04-15 — Notion workspace completo + auto-sync diario
+
+- **Notion API**: workspace completo conectado al repo vía integración "Cals2Gains hub"
+- **Páginas estáticas**: Dashboard & KPIs, SEO & Web, Brand Guidelines, Tech Stack, Cuentas & Servicios, Agentes IA, Legal
+- **Bases de datos**: Roadmap (19 tareas), Finanzas (9 gastos), Features App (42 pantallas), Plan de Contenido (10 piezas)
+- **Auto-sync diario 9:00**: tarea programada `notion-sync-cals2gains` creada via Claude Code scheduled tasks
+- **Scripts**: `tools/setup-notion.mjs` (setup), `tools/update-notion.mjs` (auto-sync), `tools/sync-notion.mjs` (manual/CLI)
+- **IDs Notion**: `tools/notion-ids.json` · Parent page: `3435c636bbd680b181b0d03f747b2cd0`
+- **Qué actualiza el auto-sync**: Dashboard (KPIs + alertas desde hub), Finanzas DB (nuevos gastos sin duplicar), timestamp HQ
+
 ## 2026-04-15 — Fix bloqueantes pre-lanzamiento (rama claude/awesome-herschel)
 
 - **gpt-5.4 → gpt-4o**: sustituido el modelo inexistente en 6 archivos de código (openai.ts, label-scanner.tsx, foodDatabase.ts, macroCoach.ts, recipeService.ts, create_reel.py)
