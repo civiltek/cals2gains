@@ -1,5 +1,41 @@
 # Changelog - Cals2Gains
 
+## 2026-04-15 — Integración completa del hub con Notion API
+
+### Notion Integration — Sistema de sincronización hub → Notion
+Ruta: `services/notion/`
+
+**Nuevos archivos:**
+- `notionClient.ts` — Cliente SDK singleton, tipos base, helpers para propiedades de Notion
+- `databases.ts` — Esquemas y creación automática de 7 bases de datos (Features, Changelog, Finanzas, Suscripciones, Métricas, Calendario de Contenido, Bugs)
+- `notionSync.ts` — Orquestador de sincronización completa con resumen por base de datos
+- `syncFeatures.ts` — Parseo de FEATURES.md y sync con Notion (categorías, estados, bugs)
+- `syncChangelog.ts` — Parseo de CHANGELOG.md con detección automática de tipo y agente
+- `syncFinances.ts` — Parseo de gastos y suscripciones de FINANCES.md
+- `syncMetrics.ts` — Parseo de snapshots de métricas de METRICS.md
+- `syncContentPlan.ts` — Parseo de calendario de contenido de CONTENT_PLAN.md
+- `syncBugs.ts` — Extracción de bugs de PROJECT_STATUS.md y FEATURES.md
+- `index.ts` — Punto de entrada con exports completos
+
+**CLI (tools/notion-cli.ts):**
+- `npm run notion:setup` — Crea todas las bases de datos en Notion bajo una página padre
+- `npm run notion:sync` — Sincroniza todo el hub completo
+- `npm run notion:sync -- <db>` — Sincroniza una base de datos específica
+- `npm run notion:verify` — Verifica conexión y accesibilidad de bases de datos
+- `npm run notion:status` — Muestra estado de la configuración
+
+**Configuración:**
+- Variables `.env`: `NOTION_API_KEY` y `NOTION_PARENT_PAGE`
+- `.env.example` actualizado
+- `.gitignore`: excluye `.notion-config.json`
+- `tsx` añadido como devDependency para ejecutar CLI TypeScript
+- `@notionhq/client` v5.18+ ya instalado
+
+**Documentación:**
+- CLAUDE.md actualizado: rutas, tech stack, comandos bash, paso post-tarea
+
+---
+
 ## 2026-04-14 (noche-4) — Motor audiovisual v4.0 (Studio)
 
 ### Visual Engine — Upgrade a calidad de estudio profesional

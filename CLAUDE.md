@@ -52,6 +52,17 @@ Cals2Gains/
 │   ├── imap-mcp-server-civiltek
 │   ├── imap-mcp-server-gmail-cals2gains
 │   └── imap-mcp-server-gmail-judith
+├── services/notion/               ← Integración completa con Notion (hub → Notion)
+│   ├── notionClient.ts            ← Cliente SDK, tipos, helpers
+│   ├── databases.ts               ← Esquemas y creación de bases de datos
+│   ├── notionSync.ts              ← Orquestador de sincronización
+│   ├── syncFeatures.ts            ← Sync FEATURES.md
+│   ├── syncChangelog.ts           ← Sync CHANGELOG.md
+│   ├── syncFinances.ts            ← Sync gastos y suscripciones
+│   ├── syncMetrics.ts             ← Sync METRICS.md
+│   ├── syncContentPlan.ts         ← Sync CONTENT_PLAN.md
+│   ├── syncBugs.ts                ← Sync bugs de PROJECT_STATUS + FEATURES
+│   └── index.ts                   ← Punto de entrada
 └── skills/instagram-commenter/     ← skill legado (respuestas a comentarios IG)
 ```
 
@@ -98,6 +109,7 @@ Ubicación: `finances/receipts/{proveedor}/`
 ### Tech stack (resumen — detalle en `context/TECH-STACK.md`)
 - React Native + Expo Router (typed routes), SDK 54, RN 0.81.5
 - Firebase (Auth, Firestore, Storage), Zustand, i18next, RevenueCat
+- Notion API (`@notionhq/client`) — sincronización del hub completo
 - EAS Build (owner `civiltek`, project `381120d5-3866-4b97-af00-4c6840768327`)
 - GA4 (`G-WMHZQ52NS2`, property `macrolens-ai-4c482`)
 
@@ -138,6 +150,19 @@ eas build --profile preview --platform android
 
 # Deploy web (desde raíz del proyecto)
 firebase deploy --only hosting
+
+# Notion — Setup (crear bases de datos)
+npm run notion:setup
+
+# Notion — Sincronizar todo el hub
+npm run notion:sync
+
+# Notion — Sincronizar solo una base de datos
+npm run notion:sync -- features
+npm run notion:sync -- changelog
+
+# Notion — Verificar conexión
+npm run notion:verify
 ```
 
 ---
@@ -149,7 +174,8 @@ firebase deploy --only hosting
 3. Si afecta a finanzas → actualizar `_project-hub/FINANCES.md` **y** regenerar `dashboard.html` en ambas ubicaciones (`finances/` y `_project-hub/`).
 4. Si afecta a features → actualizar `_project-hub/FEATURES.md`.
 5. Si afecta a screenshots → actualizar `marketing/screenshots/` + `_project-hub/SCREENSHOTS.md`.
-6. Reportar a Judith en una línea: qué hiciste, qué quedó pendiente, si hay algo que confirmar.
+6. Si hay integración Notion activa → sincronizar los archivos afectados: `npm run notion:sync -- <db>`.
+7. Reportar a Judith en una línea: qué hiciste, qué quedó pendiente, si hay algo que confirmar.
 
 ---
 
