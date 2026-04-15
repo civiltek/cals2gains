@@ -1,0 +1,67 @@
+{
+  "title": "Cut vs Bulk: Which One Are You?",
+  "lang": "en",
+  "format": "carousel",
+  "slides": 7,
+  "aspect_ratio": "4:5",
+  "color_scheme": "dark",
+  "slides_data": [
+    {
+      "type": "cover",
+      "prompt": "Split screen dark aesthetic: left side lean physique with cool blue tones, right side muscular physique with warm coral tones, VS graphic in center with violet glow, dramatic lighting, 4:5",
+      "headline": "CUT vs BULK",
+      "subheadline": "Which one are you?",
+      "text_style": "hero",
+      "cta_text": "Swipe to decide →"
+    },
+    {
+      "type": "content",
+      "prompt": "Clean dark infographic showing downward arrow with deficit numbers, lean athletic body silhouette, cool blue and violet color scheme, minimal data visualization, 4:5",
+      "headline": "CUTTING",
+      "body": "Goal: Lose body fat, keep muscle.\nCalorie deficit: 300-500 cal below maintenance.\nProtein: Stay HIGH (2g/kg minimum).\nCardio: Moderate, don't overdo it.\nTimeline: 8-16 weeks.",
+      "text_style": "educational",
+      "icon": "scissors"
+    },
+    {
+      "type": "content",
+      "prompt": "Clean dark infographic showing upward arrow with surplus numbers, muscular body silhouette, warm coral and violet color scheme, minimal data visualization, 4:5",
+      "headline": "BULKING",
+      "body": "Goal: Build muscle, controlled weight gain.\nCalorie surplus: 200-400 cal above maintenance.\nProtein: 1.8-2.2g/kg.\nTraining: Progressive overload is king.\nTimeline: 12-24 weeks.",
+      "text_style": "educational",
+      "icon": "dumbbell"
+    },
+    {
+      "type": "content",
+      "prompt": "Dark premium decision tree flowchart with glowing nodes, body fat percentage indicators, violet and coral connected pathways, clean infographic, 4:5",
+      "headline": "HOW TO CHOOSE",
+      "body": "Body fat above 20% (men) / 30% (women)? → CUT FIRST\nBody fat under 15% (men) / 23% (women)? → BULK\nIn between? → Either works. Pick your priority.\nBeen cutting 16+ weeks? → Maintenance break.",
+      "text_style": "educational",
+      "icon": "compass"
+    },
+    {
+      "type": "content",
+      "prompt": "Side by side comparison: messy dirty bulk plate vs clean lean bulk plate, dark background, one with red X one with green check, dramatic food photography, 4:5",
+      "headline": "BIGGEST MISTAKES",
+      "body": "Cut too hard → muscle loss, binge cycles\nBulk too fast → unnecessary fat gain\nNo tracking → guessing = no results\nNo protein priority → wasted effort",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Phone showing Cals2Gains app switching between Cut and Bulk mode with smooth animation, dark premium UI, violet and coral mode indicators, 4:5",
+      "headline": "SWITCH MODES INSTANTLY",
+      "body": "Cals2Gains has dedicated Cut and Bulk modes.\nAI adjusts your calories and macros automatically.\nSwitch when you're ready — the app adapts with you.",
+      "text_style": "feature",
+      "icon": "switch"
+    },
+    {
+      "type": "cta",
+      "prompt": "Bold split design: CUT and BULK text with arrow pointing to Cals2Gains logo in center, dark premium with violet and coral gradient, powerful, 4:5",
+      "headline": "PICK YOUR MODE",
+      "body": "Start your cut or bulk with AI guidance. Free 7 days.",
+      "text_style": "cta",
+      "cta_text": "Link in bio 🔗",
+      "hashtags": ["#cutvsbulk", "#cuttingseason", "#bulkingseason", "#cals2gains", "#bodyrecomposition"]
+    }
+  ]
+}

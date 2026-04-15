@@ -1,0 +1,75 @@
+{
+  "title": "6 Errores de Principiante Que Matan Tu Progreso",
+  "lang": "es",
+  "format": "carousel",
+  "slides": 8,
+  "aspect_ratio": "4:5",
+  "color_scheme": "dark",
+  "slides_data": [
+    {
+      "type": "cover",
+      "prompt": "Dramatic dark background with shattered glass effect revealing red warning symbols, bold typography space, violet and coral accent particles, cinematic tension, 4:5",
+      "headline": "6 ERRORES DE PRINCIPIANTE",
+      "subheadline": "Que estan matando tu progreso",
+      "text_style": "hero",
+      "cta_text": "Desliza para corregirlos →"
+    },
+    {
+      "type": "content",
+      "prompt": "Person staring at empty plate with extreme deficit, sad expression, dark moody blue lighting, dramatic portrait, calorie counter showing dangerously low number, 4:5",
+      "headline": "1. BAJAR CALORIAS DEMASIADO",
+      "body": "Menos de 1200? Tu metabolismo se frena.\nPierdes musculo, no solo grasa.\nSolucion: Deficit moderado (300-500 cal).\nDespacio y constante siempre gana.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Protein powder and supplements scattered chaotically while real food sits ignored in background, dark contrast lighting, red X overlay, 4:5",
+      "headline": "2. IGNORAR LA PROTEINA",
+      "body": "La mayoria come la mitad de lo que necesita.\nProteina protege musculo en definicion.\nProteina construye musculo en volumen.\nSolucion: Trackeala. Objetivo: 1.6-2.2g por kg.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Person on treadmill for hours looking exhausted, gym clock showing long duration, dark dramatic lighting, sweat and fatigue, 4:5",
+      "headline": "3. DEMASIADO CARDIO",
+      "body": "El cardio no construye el cuerpo que quieres.\nCardio excesivo = perder musculo + hambre.\nSolucion: Prioriza las pesas. Cardio estrategico.\n3-4 sesiones por semana. No 7.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Calendar showing inconsistent tracking with random gaps, dark background, missed days highlighted in red, scattered pattern, 4:5",
+      "headline": "4. TRACKEAR SOLO LOS DIAS BUENOS",
+      "body": "De lunes a jueves? Perfecto.\nFin de semana? Misterio total.\nEl finde es donde fallan la mayoria de dietas.\nSolucion: Trackea todo. Incluso los dias malos.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Person weighing themselves daily with anxious expression, scale showing different numbers each day, dark background with red fluctuation graph, 4:5",
+      "headline": "5. OBSESIONARTE CON EL PESO DIARIO",
+      "body": "El peso fluctua 1-2 kg al dia. Agua, sodio, estres.\nPesarte cada dia = ansiedad diaria.\nSolucion: Mira medias semanales.\nLas tendencias importan. Un dia suelto no.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Person copying someone else's meal plan from social media, generic one-size-fits-all diet sheet, dark background, mismatched body types, 4:5",
+      "headline": "6. COPIAR LA DIETA DE OTRO",
+      "body": "Su cuerpo no es el tuyo.\nSu metabolismo no es el tuyo.\nSu vida no es la tuya.\nSolucion: Un plan hecho para TI. Personalizado con IA.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "cta",
+      "prompt": "Phone showing Cals2Gains with personalized dashboard, all 6 mistakes crossed out with green checkmarks, dark premium UI, violet and coral celebratory glow, 4:5",
+      "headline": "CORRIGE LOS 6 HOY",
+      "body": "Cals2Gains personaliza todo con IA. Gratis 7 dias.",
+      "text_style": "cta",
+      "cta_text": "Link en bio 🔗",
+      "hashtags": ["#erroresfitness", "#consejosnutricion", "#principiantesgym", "#cals2gains", "#progresofitness"]
+    }
+  ]
+}

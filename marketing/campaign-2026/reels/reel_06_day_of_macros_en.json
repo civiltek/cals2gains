@@ -1,0 +1,86 @@
+{
+  "title": "Full Day of Eating for Your Macros",
+  "lang": "en",
+  "voice": "elevenlabs",
+  "music_mood": "upbeat",
+  "setting": "Dark premium kitchen and dining area with consistent warm side lighting, black matte surfaces, coral accent lights, same overhead food photography angle throughout, lifestyle aesthetic",
+  "scenes": [
+    {
+      "prompt": "Sunrise through kitchen window, dark premium countertop with meal prep containers, warm golden hour light with coral accents, cinematic food photography, 9:16 vertical",
+      "text": "Full day of eating for your macros",
+      "text_style": "hero",
+      "voiceover": "Full day of eating, perfectly tracked. Let me show you how easy it is.",
+      "duration": 3,
+      "transition": "cut",
+      "effect": "zoom_punch",
+      "data_overlays": []
+    },
+    {
+      "prompt": "Beautiful overhead shot of overnight oats with berries and nuts on dark slate, phone scanning food with AI interface glowing, morning light, 9:16 vertical",
+      "text": "Breakfast: 480 cal | 35g protein",
+      "text_style": "stat",
+      "voiceover": "Breakfast. Overnight oats with Greek yogurt, berries, and almonds. One photo scan. 480 calories, 35 grams of protein. Done in 3 seconds.",
+      "duration": 5,
+      "transition": "zoom_cut",
+      "effect": "pan_left",
+      "data_overlays": [
+        {"text": "480 kcal", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 3.0},
+        {"text": "35g protein", "style": "stat_small", "position": "bottom-right", "appear_at": 1.0, "duration": 2.5},
+        {"text": "Scanned in 3s", "style": "label", "position": "bottom-left", "appear_at": 1.5, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Stylish lunch bowl with grilled chicken, rice, avocado on dark background, macro overlay graphics floating, warm lighting with violet accents, 9:16 vertical",
+      "text": "Lunch: 620 cal | 45g protein",
+      "text_style": "stat",
+      "voiceover": "Lunch. Chicken bowl with rice and avocado. The AI nails the portions every time. 620 calories, 45 grams of protein.",
+      "duration": 5,
+      "transition": "whip_pan",
+      "effect": "zoom_in",
+      "data_overlays": [
+        {"text": "620 kcal", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 3.0},
+        {"text": "45g protein", "style": "stat_small", "position": "bottom-right", "appear_at": 1.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Dramatic shot of protein shake and banana on dark marble, gym bag in background, moody violet and coral lighting, fitness lifestyle, 9:16 vertical",
+      "text": "Snack: 280 cal | 30g protein",
+      "text_style": "stat",
+      "voiceover": "Post-workout snack. Protein shake and a banana. 280 calories, 30 grams of protein. Your daily total updating in real time.",
+      "duration": 4,
+      "transition": "zoom_cut",
+      "effect": "diagonal",
+      "data_overlays": [
+        {"text": "280 kcal", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 2.5},
+        {"text": "30g protein", "style": "stat_small", "position": "bottom-right", "appear_at": 1.0, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Elegant dinner plate with salmon, sweet potato, greens on dark background, app showing completed daily macros with green checkmarks, warm coral glow, 9:16 vertical",
+      "text": "Dinner: 580 cal | 40g protein",
+      "text_style": "stat",
+      "voiceover": "Dinner. Salmon with sweet potato and greens. 580 calories, 40 grams of protein. Day complete. All macros hit.",
+      "duration": 5,
+      "transition": "whip_pan",
+      "effect": "pan_right",
+      "data_overlays": [
+        {"text": "580 kcal", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 3.0},
+        {"text": "40g protein", "style": "stat_small", "position": "bottom-right", "appear_at": 1.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Phone screen showing daily macro summary all green, confetti animation, dark premium UI with violet and coral, celebration mood, 9:16 vertical",
+      "text": "1960 cal | 150g protein. Nailed it.",
+      "text_style": "cta",
+      "voiceover": "1960 calories, 150 grams of protein. Four scans. Zero guesswork. Try Cals2Gains free for 7 days.",
+      "duration": 4,
+      "transition": "crossfade",
+      "effect": "zoom_out",
+      "data_overlays": [
+        {"text": "1960 kcal total", "style": "stat_big", "position": "center", "appear_at": 0.3, "duration": 2.5},
+        {"text": "150g protein", "style": "stat_small", "position": "bottom-left", "appear_at": 0.8, "duration": 2.0},
+        {"text": "4 scans only", "style": "label", "position": "bottom-right", "appear_at": 1.2, "duration": 2.0}
+      ]
+    }
+  ]
+}

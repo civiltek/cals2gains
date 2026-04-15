@@ -1,0 +1,86 @@
+{
+  "title": "Un Dia Completo de Macros Perfecto",
+  "lang": "es",
+  "voice": "elevenlabs",
+  "music_mood": "upbeat",
+  "setting": "Dark premium kitchen and dining area with consistent warm side lighting, black matte surfaces, coral accent lights, same overhead food photography angle throughout, lifestyle aesthetic",
+  "scenes": [
+    {
+      "prompt": "Sunrise through kitchen window, dark premium countertop with meal prep containers, warm golden hour light with coral accents, cinematic food photography, 9:16 vertical",
+      "text": "Un dia completo de macros perfecto",
+      "text_style": "hero",
+      "voiceover": "Un dia completo de comidas, perfectamente trackeado. Mira lo facil que es.",
+      "duration": 3,
+      "transition": "cut",
+      "effect": "zoom_punch",
+      "data_overlays": []
+    },
+    {
+      "prompt": "Beautiful overhead shot of overnight oats with berries and nuts on dark slate, phone scanning food with AI interface glowing, morning light, 9:16 vertical",
+      "text": "Desayuno: 480 cal | 35g proteina",
+      "text_style": "stat",
+      "voiceover": "Desayuno. Overnight oats con yogur griego, frutos rojos y almendras. Una foto. 480 calorias, 35 gramos de proteina. Listo en 3 segundos.",
+      "duration": 5,
+      "transition": "zoom_cut",
+      "effect": "pan_left",
+      "data_overlays": [
+        {"text": "480 kcal", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 3.0},
+        {"text": "35g proteína", "style": "stat_small", "position": "bottom-right", "appear_at": 1.0, "duration": 2.5},
+        {"text": "Escaneado en 3s", "style": "label", "position": "bottom-left", "appear_at": 1.5, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Stylish lunch bowl with grilled chicken, rice, avocado on dark background, macro overlay graphics floating, warm lighting with violet accents, 9:16 vertical",
+      "text": "Comida: 620 cal | 45g proteina",
+      "text_style": "stat",
+      "voiceover": "Comida. Bowl de pollo con arroz y aguacate. La IA clava las porciones. 620 calorias, 45 gramos de proteina.",
+      "duration": 5,
+      "transition": "whip_pan",
+      "effect": "zoom_in",
+      "data_overlays": [
+        {"text": "620 kcal", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 3.0},
+        {"text": "45g proteína", "style": "stat_small", "position": "bottom-right", "appear_at": 1.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Dramatic shot of protein shake and banana on dark marble, gym bag in background, moody violet and coral lighting, fitness lifestyle, 9:16 vertical",
+      "text": "Snack: 280 cal | 30g proteina",
+      "text_style": "stat",
+      "voiceover": "Snack post-entreno. Batido de proteina y un platano. 280 calorias, 30 gramos de proteina. Tu total diario actualizandose en tiempo real.",
+      "duration": 4,
+      "transition": "zoom_cut",
+      "effect": "diagonal",
+      "data_overlays": [
+        {"text": "280 kcal", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 2.5},
+        {"text": "30g proteína", "style": "stat_small", "position": "bottom-right", "appear_at": 1.0, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Elegant dinner plate with salmon, sweet potato, greens on dark background, app showing completed daily macros with green checkmarks, warm coral glow, 9:16 vertical",
+      "text": "Cena: 580 cal | 40g proteina",
+      "text_style": "stat",
+      "voiceover": "Cena. Salmon con boniato y verduras. 580 calorias, 40 gramos de proteina. Dia completado. Todos los macros cumplidos.",
+      "duration": 5,
+      "transition": "whip_pan",
+      "effect": "pan_right",
+      "data_overlays": [
+        {"text": "580 kcal", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 3.0},
+        {"text": "40g proteína", "style": "stat_small", "position": "bottom-right", "appear_at": 1.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Phone screen showing daily macro summary all green, confetti animation, dark premium UI with violet and coral, celebration mood, 9:16 vertical",
+      "text": "1960 cal | 150g proteina. Clavado.",
+      "text_style": "cta",
+      "voiceover": "1960 calorias, 150 gramos de proteina. Cuatro fotos. Cero adivinanzas. Prueba Cals2Gains gratis 7 dias.",
+      "duration": 4,
+      "transition": "crossfade",
+      "effect": "zoom_out",
+      "data_overlays": [
+        {"text": "1960 kcal total", "style": "stat_big", "position": "center", "appear_at": 0.3, "duration": 2.5},
+        {"text": "150g proteína", "style": "stat_small", "position": "bottom-left", "appear_at": 0.8, "duration": 2.0},
+        {"text": "Solo 4 fotos", "style": "label", "position": "bottom-right", "appear_at": 1.2, "duration": 2.0}
+      ]
+    }
+  ]
+}

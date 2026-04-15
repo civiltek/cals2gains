@@ -1,0 +1,75 @@
+{
+  "title": "6 Beginner Mistakes Killing Your Progress",
+  "lang": "en",
+  "format": "carousel",
+  "slides": 8,
+  "aspect_ratio": "4:5",
+  "color_scheme": "dark",
+  "slides_data": [
+    {
+      "type": "cover",
+      "prompt": "Dramatic dark background with shattered glass effect revealing red warning symbols, bold typography space, violet and coral accent particles, cinematic tension, 4:5",
+      "headline": "6 BEGINNER MISTAKES",
+      "subheadline": "Killing your progress right now",
+      "text_style": "hero",
+      "cta_text": "Swipe to fix them →"
+    },
+    {
+      "type": "content",
+      "prompt": "Person staring at empty plate with extreme deficit, sad expression, dark moody blue lighting, dramatic portrait, calorie counter showing dangerously low number, 4:5",
+      "headline": "1. CUTTING CALORIES TOO LOW",
+      "body": "Under 1200? Your metabolism slows down.\nYou lose muscle, not just fat.\nFix: Moderate deficit (300-500 cal).\nSlow and steady wins every time.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Protein powder and supplements scattered chaotically while real food sits ignored in background, dark contrast lighting, red X overlay, 4:5",
+      "headline": "2. IGNORING PROTEIN",
+      "body": "Most beginners eat half what they need.\nProtein preserves muscle during cuts.\nProtein builds muscle during bulks.\nFix: Track it. Aim for 1.6-2.2g per kg.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Person on treadmill for hours looking exhausted, gym clock showing long duration, dark dramatic lighting, sweat and fatigue, 4:5",
+      "headline": "3. TOO MUCH CARDIO",
+      "body": "Cardio doesn't build the body you want.\nExcessive cardio = muscle loss + hunger.\nFix: Prioritize lifting. Add cardio strategically.\n3-4 sessions per week. Not 7.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Calendar showing inconsistent tracking with random gaps, dark background, missed days highlighted in red, scattered pattern, 4:5",
+      "headline": "4. TRACKING ONLY ON GOOD DAYS",
+      "body": "Monday to Thursday? Perfect.\nWeekend? Total mystery.\nThe weekend is where most diets fail.\nFix: Track everything. Even the bad days.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Person weighing themselves daily with anxious expression, scale showing different numbers each day, dark background with red fluctuation graph, 4:5",
+      "headline": "5. OBSESSING OVER DAILY WEIGHT",
+      "body": "Weight fluctuates 1-2 kg daily. Water, sodium, stress.\nDaily weigh-ins = daily anxiety.\nFix: Track weekly averages.\nTrends matter. Single days don't.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "content",
+      "prompt": "Person copying someone else's meal plan from social media, generic one-size-fits-all diet sheet, dark background, mismatched body types, 4:5",
+      "headline": "6. COPYING SOMEONE ELSE'S PLAN",
+      "body": "Their body isn't yours.\nTheir metabolism isn't yours.\nTheir lifestyle isn't yours.\nFix: Get a plan built for YOU. AI-personalized.",
+      "text_style": "educational",
+      "icon": "warning"
+    },
+    {
+      "type": "cta",
+      "prompt": "Phone showing Cals2Gains with personalized dashboard, all 6 mistakes crossed out with green checkmarks, dark premium UI, violet and coral celebratory glow, 4:5",
+      "headline": "FIX ALL 6 TODAY",
+      "body": "Cals2Gains personalizes everything with AI. Free 7 days.",
+      "text_style": "cta",
+      "cta_text": "Link in bio 🔗",
+      "hashtags": ["#beginnermistakes", "#fitnesstips", "#nutritionmistakes", "#cals2gains", "#fitnessjourney"]
+    }
+  ]
+}

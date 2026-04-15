@@ -1,0 +1,67 @@
+{
+  "title": "Meal Prep Like a Pro in 5 Steps",
+  "lang": "en",
+  "format": "carousel",
+  "slides": 7,
+  "aspect_ratio": "4:5",
+  "color_scheme": "dark",
+  "slides_data": [
+    {
+      "type": "cover",
+      "prompt": "Overhead shot of organized meal prep containers in grid formation on dark marble countertop, steam rising, warm coral and violet accent lighting, professional food photography, 4:5",
+      "headline": "MEAL PREP LIKE A PRO",
+      "subheadline": "5 steps. 2 hours. Done for the week.",
+      "text_style": "hero",
+      "cta_text": "Swipe for the system →"
+    },
+    {
+      "type": "content",
+      "prompt": "Phone screen showing weekly macro targets with shopping list auto-generated, dark premium app UI, violet accent glow, organized list aesthetic, 4:5",
+      "headline": "1. SET YOUR TARGETS",
+      "body": "Know your weekly macros first.\nCalories, protein, carbs, fats — all planned.\nCals2Gains sets these automatically based on your goal.\nNo guesswork. Just follow the numbers.",
+      "text_style": "educational",
+      "icon": "target"
+    },
+    {
+      "type": "content",
+      "prompt": "Grocery store aisle with hand selecting lean protein packages, dark moody color grading, organized shopping cart, warm lighting, lifestyle shot, 4:5",
+      "headline": "2. SHOP SMART",
+      "body": "Pick 2-3 protein sources (chicken, fish, eggs).\n2-3 carb sources (rice, potato, oats).\nVegetables in bulk.\nKeep it simple — variety kills consistency.",
+      "text_style": "educational",
+      "icon": "cart"
+    },
+    {
+      "type": "content",
+      "prompt": "Kitchen scene with batch cooking: multiple pans, oven timer, organized mise en place on dark countertop, warm dramatic lighting, efficient cooking process, 4:5",
+      "headline": "3. BATCH COOK",
+      "body": "Cook proteins in bulk (oven + stovetop).\nPrepare carbs in large batches.\nRoast vegetables on sheet pans.\nTotal time: 90-120 minutes for 5 days.",
+      "text_style": "educational",
+      "icon": "flame"
+    },
+    {
+      "type": "content",
+      "prompt": "Close-up of portioning food into labeled containers with kitchen scale, dark background, organized assembly line, violet and coral accent lighting, precise and satisfying, 4:5",
+      "headline": "4. PORTION & STORE",
+      "body": "Weigh portions with a scale (or scan with AI).\nLabel containers: M/T/W/T/F.\n3-4 days in fridge, rest in freezer.\nScan each container once — saved forever in the app.",
+      "text_style": "educational",
+      "icon": "scale"
+    },
+    {
+      "type": "content",
+      "prompt": "Person grabbing ready container from organized fridge, morning rush scene, dark premium aesthetic, quick and effortless, warm coral lighting, 4:5",
+      "headline": "5. GRAB & GO",
+      "body": "Monday morning? Grab your container.\nMacros already logged from Sunday.\nReheat. Eat. Done.\nZero decisions. Zero stress. All gains.",
+      "text_style": "educational",
+      "icon": "rocket"
+    },
+    {
+      "type": "cta",
+      "prompt": "Full week of meal prep containers in perfect grid with Cals2Gains app overlay showing all macros tracked, dark premium background, violet and coral glow, satisfying organization, 4:5",
+      "headline": "TRACK YOUR PREP",
+      "body": "Scan once. Log all week. Free for 7 days.",
+      "text_style": "cta",
+      "cta_text": "Link in bio 🔗",
+      "hashtags": ["#mealprep", "#mealprepsunday", "#macrofriendly", "#cals2gains", "#foodprep"]
+    }
+  ]
+}

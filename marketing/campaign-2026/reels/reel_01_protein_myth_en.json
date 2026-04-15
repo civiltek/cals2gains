@@ -1,0 +1,67 @@
+{
+  "title": "The Protein Myth",
+  "lang": "en",
+  "voice": "elevenlabs",
+  "music_mood": "dark",
+  "setting": "Dark premium kitchen with black marble counter, single dramatic spotlight from top-left, purple LED strip ambient light in background, shallow depth of field, consistent camera height, moody cinematic color grading",
+  "scenes": [
+    {
+      "prompt": "Dramatic close-up of protein shake being poured in slow motion, dark moody kitchen with purple neon backlighting, liquid splashing with frozen droplets, cinematic shallow depth of field, professional food videography, 9:16 vertical",
+      "text": "The protein myth nobody talks about",
+      "text_style": "hero",
+      "voiceover": "There's a protein myth that nobody talks about.",
+      "duration": 3,
+      "transition": "cut",
+      "effect": "zoom_punch",
+      "data_overlays": []
+    },
+    {
+      "prompt": "Overhead flat lay of high-protein foods: chicken breast, eggs, greek yogurt, lentils, fish, arranged on dark slate surface, dramatic side lighting with violet color grading, premium food photography, 9:16 vertical",
+      "text": "You DON'T need 200g per day",
+      "text_style": "hero",
+      "voiceover": "Most people think they need 200 grams of protein per day. But science says otherwise.",
+      "duration": 5,
+      "transition": "zoom_cut",
+      "effect": "pan_left",
+      "data_overlays": [
+        {"text": "200g?", "style": "stat_big", "position": "center", "appear_at": 0.5, "duration": 2.0},
+        {"text": "Common myth", "style": "label", "position": "bottom-left", "appear_at": 1.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Athletic person in a dark premium gym lifting weights with perfect form, purple ambient lighting, sweat glistening, dramatic rim light, professional sports videography, shallow depth of field, 9:16 vertical",
+      "text": "0.7-1g per lb is ENOUGH",
+      "text_style": "stat",
+      "voiceover": "Research shows 0.7 to 1 gram per pound of bodyweight is enough for maximum muscle growth.",
+      "duration": 5,
+      "transition": "whip_pan",
+      "effect": "zoom_in",
+      "data_overlays": [
+        {"text": "0.7-1.0g/lb", "style": "stat_big", "position": "center", "appear_at": 0.3, "duration": 3.0},
+        {"text": "Meta-analysis 2024", "style": "label", "position": "bottom-right", "appear_at": 1.5, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Abstract visualization of protein molecules breaking into amino acids, colorful particles in dark space, neon violet and coral palette, scientific yet artistic, clean modern aesthetic, 9:16 vertical",
+      "text": "More protein != more muscle",
+      "text_style": "title",
+      "voiceover": "Eating more protein beyond this point does NOT build more muscle. Your body simply can't use it all.",
+      "duration": 5,
+      "transition": "zoom_cut",
+      "effect": "diagonal",
+      "data_overlays": [
+        {"text": "Diminishing returns", "style": "comparison", "position": "bottom-left", "appear_at": 1.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Person smiling while using a sleek dark-themed nutrition tracking app on their phone, cozy kitchen background with warm coral accent lighting, close-up of hands and screen, premium lifestyle photography, 9:16 vertical",
+      "text": "Send this to your gym buddy",
+      "text_style": "cta",
+      "voiceover": "Save this and send it to your gym buddy who's chugging 5 shakes a day.",
+      "duration": 4,
+      "transition": "crossfade",
+      "effect": "zoom_out",
+      "data_overlays": []
+    }
+  ]
+}

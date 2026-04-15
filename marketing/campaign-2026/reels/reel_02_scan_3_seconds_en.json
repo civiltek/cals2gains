@@ -1,0 +1,67 @@
+{
+  "title": "Track Macros in 3 Seconds",
+  "lang": "en",
+  "voice": "elevenlabs",
+  "music_mood": "upbeat",
+  "setting": "Dark premium kitchen environment with matte black surfaces, consistent violet ambient glow from background LEDs, warm overhead spotlight, shallow depth of field, same camera height and framing throughout",
+  "scenes": [
+    {
+      "prompt": "Frustrated person scrolling through endless food database on phone in dimly lit kitchen, overwhelmed expression, moody lighting with violet shadows, cinematic close-up of phone screen showing long list, 9:16 vertical",
+      "text": "Still searching every food?",
+      "text_style": "hero",
+      "voiceover": "Still searching every single food in your calorie app?",
+      "duration": 3,
+      "transition": "cut",
+      "effect": "zoom_punch",
+      "data_overlays": []
+    },
+    {
+      "prompt": "Hand holding phone taking photo of a colorful healthy meal on dark plate, camera flash illuminating food, premium dark kitchen background, violet ambient glow, overhead angle, 9:16 vertical",
+      "text": "Just take a photo",
+      "text_style": "title",
+      "voiceover": "With Cals2Gains, just take a photo of your plate.",
+      "duration": 4,
+      "transition": "whip_pan",
+      "effect": "zoom_in",
+      "data_overlays": [
+        {"text": "1 photo", "style": "stat_big", "position": "center", "appear_at": 1.0, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Sleek dark-themed app interface showing AI analyzing food with glowing scan lines, macro breakdown appearing with animated numbers, violet and coral UI accents, futuristic holographic effect, 9:16 vertical",
+      "text": "AI identifies everything",
+      "text_style": "title",
+      "voiceover": "Our AI identifies every ingredient, estimates portions, and calculates exact macros.",
+      "duration": 5,
+      "transition": "zoom_cut",
+      "effect": "pan_left",
+      "data_overlays": [
+        {"text": "AI-powered", "style": "label", "position": "top-right", "appear_at": 0.5, "duration": 2.5},
+        {"text": "98% accuracy", "style": "stat_small", "position": "bottom-left", "appear_at": 1.5, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Split screen comparison: left side shows timer counting 15 minutes with frustrated person, right side shows 3-second counter with happy person, dark premium aesthetic, violet neon divider, 9:16 vertical",
+      "text": "15 min vs 3 seconds",
+      "text_style": "stat",
+      "voiceover": "Fifteen minutes of manual searching... or three seconds with AI. You choose.",
+      "duration": 5,
+      "transition": "whip_pan",
+      "effect": "drift",
+      "data_overlays": [
+        {"text": "15:00", "style": "stat_big", "position": "center-left", "appear_at": 0.5, "duration": 2.0},
+        {"text": "0:03", "style": "stat_big", "position": "center-right", "appear_at": 1.5, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Confident person enjoying their meal while phone shows tracked macros on dark premium app, warm coral lighting, relaxed lifestyle vibe, shallow depth of field, 9:16 vertical",
+      "text": "Try free - link in bio",
+      "text_style": "cta",
+      "voiceover": "Download Cals2Gains free. Link in bio. Your macros in three seconds.",
+      "duration": 4,
+      "transition": "crossfade",
+      "effect": "zoom_out",
+      "data_overlays": []
+    }
+  ]
+}

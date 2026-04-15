@@ -1,0 +1,68 @@
+{
+  "title": "3 Mitos de Calorias Que Te Frenan",
+  "lang": "es",
+  "voice": "elevenlabs",
+  "music_mood": "dark",
+  "setting": "Dark dramatic studio with moody directional lighting, deep plum background, tension-building cinematic color grading, consistent camera distance and height, red and violet accent lights",
+  "scenes": [
+    {
+      "prompt": "Dramatic shot of scale with question marks floating, dark moody background with red warning glow, cinematic tension, 9:16 vertical",
+      "text": "3 mitos de calorias que te frenan",
+      "text_style": "hero",
+      "voiceover": "Tres mitos sobre calorias que estan frenando tu progreso ahora mismo.",
+      "duration": 3,
+      "transition": "cut",
+      "effect": "zoom_punch",
+      "data_overlays": []
+    },
+    {
+      "prompt": "Person eating tiny salad looking miserable, dark background with cold blue lighting, dramatic portrait, 9:16 vertical",
+      "text": "MITO: Comer menos = perder mas",
+      "text_style": "title",
+      "voiceover": "Mito uno: comer menos siempre significa perder mas. Falso. Si bajas demasiado tu metabolismo se frena. Necesitas un deficit inteligente, no pasar hambre.",
+      "duration": 6,
+      "transition": "zoom_cut",
+      "effect": "pan_left",
+      "data_overlays": [
+        {"text": "MITO #1", "style": "label", "position": "top-left", "appear_at": 0.3, "duration": 3.0},
+        {"text": "Metabolismo se frena", "style": "stat_small", "position": "bottom-right", "appear_at": 2.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Clock showing midnight with food plate crossed out, dark dramatic background, violet and coral lighting, 9:16 vertical",
+      "text": "MITO: Sin carbos despues de las 6",
+      "text_style": "title",
+      "voiceover": "Mito dos: nada de carbohidratos despues de las seis. Broscience total. Tu cuerpo no tiene un toque de queda para carbos. Lo que importa es el total diario.",
+      "duration": 6,
+      "transition": "whip_pan",
+      "effect": "zoom_in",
+      "data_overlays": [
+        {"text": "MITO #2", "style": "label", "position": "top-left", "appear_at": 0.3, "duration": 3.0},
+        {"text": "Total diario importa", "style": "stat_small", "position": "bottom-right", "appear_at": 2.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Person staring at calorie app showing 1800 with confused expression, dark moody lighting, violet haze, 9:16 vertical",
+      "text": "MITO: Todas las calorias son iguales",
+      "text_style": "title",
+      "voiceover": "Mito tres: una caloria es una caloria. No exactamente. 200 calorias de pollo construyen musculo. 200 de chuches no. Los macros importan.",
+      "duration": 6,
+      "transition": "zoom_cut",
+      "effect": "diagonal",
+      "data_overlays": [
+        {"text": "MITO #3", "style": "label", "position": "top-left", "appear_at": 0.3, "duration": 3.0},
+        {"text": "Macros > calorías", "style": "comparison", "position": "bottom-right", "appear_at": 2.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Person preparing balanced meal with dark premium app in background, warm coral lighting, empowered lifestyle, 9:16 vertical",
+      "text": "Trackea bien. Manda esto.",
+      "text_style": "cta",
+      "voiceover": "Deja de creer mitos. Empieza a trackear bien con Cals2Gains. Manda esto a quien lo necesite.",
+      "duration": 4,
+      "transition": "crossfade",
+      "effect": "zoom_out",
+      "data_overlays": []
+    }
+  ]
+}
