@@ -7,6 +7,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
+import { exchangeInBodyToken } from './apiProxy';
 
 // ============================================
 // TYPES
@@ -156,23 +157,10 @@ class InBodyService {
    */
   async handleAuthCallback(authCode: string): Promise<boolean> {
     try {
-      const response = await fetch(`${INBODY_API_BASE}/oauth/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          grant_type: 'authorization_code',
-          code: authCode,
-          client_id: process.env.EXPO_PUBLIC_INBODY_CLIENT_ID || '',
-          client_secret: process.env.EXPO_PUBLIC_INBODY_CLIENT_SECRET || '',
-          redirect_uri: 'cals2gains://inbody-callback',
-        }),
-      });
-
-      if (!response.ok) return false;
-
-      const data = await response.json();
-      this.token = data.access_token;
-      this.userId = data.user_id;
+      // Token exchange via Cloud Function — client_secret stays server-side
+      const data = await exchangeInBodyToken(authCode);
+      this.token = data.accessToken;
+      this.userId = data.userId;
 
       await SecureStore.setItemAsync(STORAGE_KEYS.INBODY_TOKEN, this.token!);
       await SecureStore.setItemAsync(STORAGE_KEYS.INBODY_USER_ID, this.userId!);

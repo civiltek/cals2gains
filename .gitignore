@@ -59,6 +59,11 @@ Thumbs.db
 # Firebase cache
 .firebase/
 
+# Firebase Functions build output & secrets
+functions/lib/
+functions/node_modules/
+functions/.env
+
 # IDE
 .idea/
 .vscode/

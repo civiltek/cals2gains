@@ -12,7 +12,7 @@
 | Firestore Rules | 🟢 Schema validation + waterLogs | 2026-04-14 |
 | Storage Rules | 🟢 Límite 10 MB + solo imágenes | 2026-04-14 |
 | Hosting Headers | 🟢 HSTS, CSP, X-Frame-Options, etc. | 2026-04-14 |
-| API Keys en cliente | 🔴 OpenAI key + InBody secret en bundle JS | 2026-04-14 |
+| API Keys en cliente | 🟢 Proxy via Cloud Functions (key server-side) | 2026-04-15 |
 | Auth Configuration | 🟡 Firebase Auth por defecto, sin hardening adicional | 2026-04-14 |
 | Almacenamiento local | 🟢 Tokens migrados a SecureStore | 2026-04-14 |
 | Logs en producción | 🟢 Babel plugin strip en prod | 2026-04-14 |
@@ -24,11 +24,7 @@
 ## Vulnerabilidades activas
 
 ### Altas
-
-| ID | Área | Descripción | Archivos afectados | Plan de corrección |
-|----|------|-------------|-------------------|-------------------|
-| SEC-009 | App | **OpenAI API key en código cliente** (`EXPO_PUBLIC_OPENAI_API_KEY`). Se embebe en el bundle JS y es extraíble del APK. Permite uso no autorizado a costa de Judith. | `services/openai.ts`, `services/voiceLog.ts`, `services/macroCoach.ts`, `services/recipeService.ts`, `services/foodDatabase.ts`, `app/label-scanner.tsx` | Crear Firebase Cloud Function como proxy. La app llama al proxy (autenticada), el proxy llama a OpenAI con la key server-side. |
-| SEC-010 | App | **InBody client_secret en código cliente** (`EXPO_PUBLIC_INBODY_CLIENT_SECRET`). El OAuth client_secret se usa en el token exchange desde el dispositivo. | `services/inBodyService.ts:148` | Mover token exchange a Cloud Function. El client_secret solo debe vivir en el servidor. |
+_Ninguna._
 
 ### Info
 
@@ -50,6 +46,8 @@
 | SEC-006 | Hosting | Sin headers seguridad | HSTS, X-Frame-Options, CSP, nosniff, Referrer-Policy, Permissions-Policy | 2026-04-14 |
 | SEC-008 | Deps | undici 10 CVEs | Override `undici@^7.10.0` | 2026-04-14 |
 | SEC-BUG | Firestore | waterLogs sin reglas | Reglas añadidas con auth + owner + schema | 2026-04-14 |
+| SEC-009 | App | OpenAI API key en código cliente | 3 Cloud Functions proxy (`openaiChat`, `openaiTranscribe`, `inbodyTokenExchange`). 7 archivos refactorizados. Key server-side. | 2026-04-15 |
+| SEC-010 | App | InBody client_secret en código cliente | Token exchange via Cloud Function. Secret server-side. | 2026-04-15 |
 | SEC-011 | App | Tokens Terra/InBody en AsyncStorage sin cifrar | Migrados a `expo-secure-store` con fallback automático | 2026-04-14 |
 | SEC-012 | App | 161 console.log sin guardia `__DEV__` | `babel-plugin-transform-remove-console` en producción | 2026-04-14 |
 | SEC-013 | Hosting | Sin Content-Security-Policy | CSP configurada con whitelist de GA4, Google Fonts | 2026-04-14 |
@@ -94,6 +92,7 @@
 
 | Fecha | Tipo | Alcance | Hallazgos | Resueltos | Abiertos |
 |-------|------|---------|-----------|-----------|----------|
+| 2026-04-15 | Completa + fix | Cloud Functions proxy para SEC-009/SEC-010 | 13 total | 13/13 | 0 |
 | 2026-04-14 | Completa | deps + secrets + rules + headers + code + auth + storage local | 13 + 2 altas | 11/13 | 2 altas (SEC-009, SEC-010) |
 
 ---
@@ -145,10 +144,11 @@
 
 ## Próximos pasos
 
-1. **[Alta prioridad]** Crear Firebase Cloud Function proxy para OpenAI API calls (SEC-009).
-2. **[Alta prioridad]** Mover InBody OAuth token exchange a Cloud Function (SEC-010).
-3. **[Recomendable]** Rotar OpenAI API key tras implementar el proxy.
-4. **[Recomendable]** Rotar InBody client_secret tras mover a servidor.
-5. **[Recomendable]** Rotar Firebase API keys si el repo fue público.
-6. **[Futuro]** Firebase App Check para proteger endpoints.
-7. **[Futuro]** Cifrar datos de salud en AsyncStorage (InBody measurements).
+1. **[Requiere Judith]** Activar plan Blaze en Firebase y hacer deploy de Cloud Functions (`firebase deploy --only functions`).
+2. **[Requiere Judith]** Configurar `functions/.env` con `OPENAI_API_KEY`, `INBODY_CLIENT_ID`, `INBODY_CLIENT_SECRET`.
+3. **[Requiere Judith]** Eliminar `EXPO_PUBLIC_OPENAI_API_KEY` y `EXPO_PUBLIC_INBODY_CLIENT_SECRET` de `.env` de la app tras verificar que el proxy funciona.
+4. **[Recomendable]** Rotar OpenAI API key tras confirmar que el proxy funciona.
+5. **[Recomendable]** Rotar InBody client_secret tras confirmar.
+6. **[Recomendable]** Rotar Firebase API keys si el repo fue público.
+7. **[Futuro]** Firebase App Check para proteger endpoints.
+8. **[Futuro]** Cifrar datos de salud en AsyncStorage (InBody measurements).

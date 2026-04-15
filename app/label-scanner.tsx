@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useMealStore } from '../store/mealStore';
 import { useColors } from '../store/themeStore';
 import { MealType } from '../types';
+import { callOpenAIChat } from '../services/apiProxy';
 
 const { width: SW } = Dimensions.get('window');
 const LABEL_SIZE = SW * 0.75;
@@ -79,47 +80,30 @@ export default function LabelScannerScreen() {
 
   const extractLabelOCR = async (base64: string) => {
     try {
-      const apiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
-      if (!apiKey) {
-        throw new Error('OpenAI API key not configured');
-      }
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-5.4',
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: 'You are a nutrition label OCR specialist. Extract ALL nutritional information from this nutrition label photo. Return ONLY valid JSON with this structure: { servingSize: number (grams), servingsPerContainer: number, nutrition: { calories, protein, carbs, fat, fiber, sugar, saturatedFat, sodium }, productName: string }',
+      const aiResponse = await callOpenAIChat({
+        model: 'gpt-5.4',
+        max_tokens: 500,
+        temperature: 0,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: 'You are a nutrition label OCR specialist. Extract ALL nutritional information from this nutrition label photo. Return ONLY valid JSON with this structure: { servingSize: number (grams), servingsPerContainer: number, nutrition: { calories, protein, carbs, fat, fiber, sugar, saturatedFat, sodium }, productName: string }',
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64}`,
                 },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:image/jpeg;base64,${base64}`,
-                  },
-                },
-              ],
-            },
-          ],
-          max_tokens: 500,
-          temperature: 0,
-        }),
+              },
+            ],
+          },
+        ],
       });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content || '';
+      const content = aiResponse.content || '';
 
       // Extract JSON from response (handle markdown code blocks)
       const jsonMatch = content.match(/\{[\s\S]*\}/);

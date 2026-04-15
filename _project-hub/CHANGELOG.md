@@ -1,5 +1,32 @@
 # Changelog - Cals2Gains
 
+## 2026-04-15 — Cloud Functions proxy: API keys fuera del cliente (SEC-009/SEC-010)
+
+### Firebase Cloud Functions (nuevas)
+- `functions/src/index.ts`: 3 funciones — `openaiChat`, `openaiTranscribe`, `inbodyTokenExchange`.
+- Rate limiting: 100 llamadas/día por usuario (via Firestore `apiUsage/`).
+- Whitelist de modelos permitidos. Cap de max_tokens a 4000.
+- `functions/.env.example` con variables requeridas.
+
+### Proxy cliente
+- `services/apiProxy.ts`: wrapper `callOpenAIChat()`, `callOpenAITranscribe()`, `exchangeInBodyToken()` via `httpsCallable`.
+
+### Archivos refactorizados (7)
+- `services/openai.ts` — 3 funciones migradas (analyzeFoodPhoto, refineAnalysis, generateAIMealSuggestions).
+- `services/voiceLog.ts` — transcribeAudio migrado a proxy Whisper.
+- `services/macroCoach.ts` — generateWeeklyRecommendation migrado.
+- `services/recipeService.ts` — importRecipeFromUrl migrado.
+- `services/foodDatabase.ts` — analyzeTextFood migrado.
+- `app/label-scanner.tsx` — extractLabelOCR migrado.
+- `services/inBodyService.ts` — handleAuthCallback migrado (client_secret eliminado del cliente).
+
+### Configuración
+- `firebase.json` — sección `functions` añadida.
+- `.gitignore` — `functions/lib/`, `functions/node_modules/`, `functions/.env` añadidos.
+
+### Estado de seguridad
+- SEC-009 y SEC-010 → RESUELTOS. 13/13 hallazgos cerrados, 0 abiertos.
+
 ## 2026-04-15 — Auditoría de seguridad completa + correcciones pendientes
 
 ### Tokens migrados a SecureStore

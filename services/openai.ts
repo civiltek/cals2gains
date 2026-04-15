@@ -5,9 +5,7 @@
 
 import { FoodAnalysisResult, AnalysisAnswers, MealType } from '../types';
 import { getAppLanguage } from '../utils/language';
-
-const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+import { callOpenAIChat } from './apiProxy';
 
 /**
  * System prompt for food analysis
@@ -161,67 +159,40 @@ export async function analyzeFoodPhoto(
   language: 'es' | 'en' = getAppLanguage(),
   userContext?: string
 ): Promise<FoodAnalysisResult> {
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
-  }
-
-  const response = await fetch(OPENAI_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-5.4',
-      max_tokens: 1000,
-      messages: [
-        {
-          role: 'system',
-          content: SYSTEM_PROMPT,
-        },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:image/jpeg;base64,${imageBase64}`,
-                detail: 'high',
-              },
+  const response = await callOpenAIChat({
+    model: 'gpt-5.4',
+    max_tokens: 1000,
+    messages: [
+      {
+        role: 'system',
+        content: SYSTEM_PROMPT,
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/jpeg;base64,${imageBase64}`,
+              detail: 'high',
             },
-            {
-              type: 'text',
-              text: buildAnalysisPrompt(language, userContext),
-            },
-          ],
-        },
-      ],
-    }),
+          },
+          {
+            type: 'text',
+            text: buildAnalysisPrompt(language, userContext),
+          },
+        ],
+      },
+    ],
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    const errorMsg = error?.error?.message || JSON.stringify(error);
-    console.error(`[OpenAI] API error ${response.status}:`, errorMsg);
-    if (response.status === 401) {
-      throw new Error('API key inválida o expirada. Revisa EXPO_PUBLIC_OPENAI_API_KEY en .env');
-    } else if (response.status === 429) {
-      throw new Error('Límite de uso de OpenAI alcanzado. Revisa tu cuenta de facturación.');
-    } else if (response.status === 400) {
-      throw new Error(`Error en la petición: ${errorMsg}`);
-    }
-    throw new Error(`Error OpenAI (${response.status}): ${errorMsg}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices[0]?.message?.content;
+  const content = response.content;
 
   if (!content) {
     throw new Error('No response from OpenAI');
   }
 
   try {
-    // Clean response in case it has markdown code blocks
     const cleanedContent = content
       .replace(/```json\n?/g, '')
       .replace(/```\n?/g, '')
@@ -272,51 +243,34 @@ export async function refineAnalysis(
   language: 'es' | 'en' = getAppLanguage(),
   userContext?: string
 ): Promise<FoodAnalysisResult> {
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
-  }
-
-  const response = await fetch(OPENAI_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-5.4',
-      max_tokens: 800,
-      messages: [
-        {
-          role: 'system',
-          content: SYSTEM_PROMPT,
-        },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:image/jpeg;base64,${imageBase64}`,
-                detail: 'low', // Lower detail for refinement to save tokens
-              },
+  const response = await callOpenAIChat({
+    model: 'gpt-5.4',
+    max_tokens: 800,
+    messages: [
+      {
+        role: 'system',
+        content: SYSTEM_PROMPT,
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/jpeg;base64,${imageBase64}`,
+              detail: 'low',
             },
-            {
-              type: 'text',
-              text: buildRefinementPrompt(originalAnalysis, answers, language, userContext),
-            },
-          ],
-        },
-      ],
-    }),
+          },
+          {
+            type: 'text',
+            text: buildRefinementPrompt(originalAnalysis, answers, language, userContext),
+          },
+        ],
+      },
+    ],
   });
 
-  if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices[0]?.message?.content;
-
+  const content = response.content;
   if (!content) throw new Error('No response from OpenAI');
 
   const cleanedContent = content
@@ -377,10 +331,6 @@ export async function generateAIMealSuggestions(params: {
   language: 'es' | 'en';
   goalMode?: string;        // lose_fat, gain_muscle, etc.
 }): Promise<AIMealSuggestion[]> {
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
-  }
-
   const {
     remainingCalories,
     remainingProtein,
@@ -436,32 +386,17 @@ Return ONLY a JSON array with exactly 5 objects:
   }
 ]`;
 
-  const response = await fetch(OPENAI_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-5.4',
-      max_tokens: 1200,
-      temperature: 0.8,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-    }),
+  const response = await callOpenAIChat({
+    model: 'gpt-5.4',
+    max_tokens: 1200,
+    temperature: 0.8,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    const errorMsg = error?.error?.message || `HTTP ${response.status}`;
-    console.error('[OpenAI] AI suggestions error:', errorMsg);
-    throw new Error(`Error generating suggestions: ${errorMsg}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices[0]?.message?.content;
+  const content = response.content;
 
   if (!content) {
     throw new Error('No response from OpenAI');

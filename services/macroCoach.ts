@@ -8,8 +8,7 @@
 import { User, UserGoals, Nutrition, WeightEntry, Meal } from '../types';
 import { healthService, HealthData, WorkoutSummary } from './healthKit';
 import { calculateTDEE, calculateBMR } from '../utils/nutrition';
-
-const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
+import { callOpenAIChat } from './apiProxy';
 
 // ============================================
 // TYPES
@@ -115,8 +114,6 @@ export async function generateWeeklyRecommendation(
   weightHistory: WeightEntry[],
   bodyComp?: BodyComposition
 ): Promise<MacroRecommendation | null> {
-  if (!OPENAI_API_KEY) return null;
-
   // Collect data
   const healthData = await healthService.getTodaySummary();
   const workouts = await healthService.getRecentWorkouts(7);
@@ -134,33 +131,23 @@ export async function generateWeeklyRecommendation(
   const context = buildCoachingContext(user, weekSummary, bodyComp, healthData, workouts);
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-5.4',
-        max_tokens: 1200,
-        temperature: 0.3,
-        messages: [
-          {
-            role: 'system',
-            content: COACHING_SYSTEM_PROMPT,
-          },
-          {
-            role: 'user',
-            content: context,
-          },
-        ],
-      }),
+    const response = await callOpenAIChat({
+      model: 'gpt-5.4',
+      max_tokens: 1200,
+      temperature: 0.3,
+      messages: [
+        {
+          role: 'system',
+          content: COACHING_SYSTEM_PROMPT,
+        },
+        {
+          role: 'user',
+          content: context,
+        },
+      ],
     });
 
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+    const content = response.content;
     if (!content) return null;
 
     const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
