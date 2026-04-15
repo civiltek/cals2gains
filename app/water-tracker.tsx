@@ -72,7 +72,7 @@ export default function WaterTrackerScreen() {
   };
 
   const handleSetGoal = (newGoal: number) => {
-    setGoal(newGoal);
+    setGoal(newGoal, user?.uid);
     Haptics.selectionAsync();
   };
 

@@ -216,6 +216,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 14,
+  },
 });
 
 
@@ -277,8 +286,8 @@ export default function ExportDataScreen() {
           .getMeals()
           .filter(
             (m) =>
-              new Date(m.date) >= dateRange.start &&
-              new Date(m.date) <= dateRange.end
+              new Date(m.timestamp) >= dateRange.start &&
+              new Date(m.timestamp) <= dateRange.end
           ).length
       : 0;
 
@@ -322,15 +331,15 @@ export default function ExportDataScreen() {
         .getMeals()
         .filter(
           (m) =>
-            new Date(m.date) >= dateRange.start &&
-            new Date(m.date) <= dateRange.end
+            new Date(m.timestamp) >= dateRange.start &&
+            new Date(m.timestamp) <= dateRange.end
         )
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
       meals.forEach((meal) => {
-        const date = new Date(meal.date).toLocaleDateString('es-ES');
+        const date = new Date(meal.timestamp).toLocaleDateString('es-ES');
         lines.push(
-          `${date},"${meal.name}",${meal.calories || 0},${meal.protein || 0},${meal.carbs || 0},${meal.fat || 0}`
+          `${date},"${meal.dishName}",${meal.nutrition?.calories || 0},${meal.nutrition?.protein || 0},${meal.nutrition?.carbs || 0},${meal.nutrition?.fat || 0}`
         );
       });
 
@@ -410,10 +419,10 @@ export default function ExportDataScreen() {
         .getMeals()
         .filter(
           (m) =>
-            new Date(m.date) >= dateRange.start &&
-            new Date(m.date) <= dateRange.end
+            new Date(m.timestamp) >= dateRange.start &&
+            new Date(m.timestamp) <= dateRange.end
         )
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
       sections.push(`
         <h2 style="color: #9C8CFF; margin-top: 20px; margin-bottom: 10px;">${t('export.meals')} (${meals.length})</h2>
@@ -433,12 +442,12 @@ export default function ExportDataScreen() {
               .map(
                 (meal) => `
               <tr style="border: 1px solid #9C8CFF;">
-                <td style="padding: 8px;">${new Date(meal.date).toLocaleDateString('es-ES')}</td>
-                <td style="padding: 8px;">${meal.name}</td>
-                <td style="padding: 8px; text-align: right;">${meal.calories || 0}</td>
-                <td style="padding: 8px; text-align: right;">${meal.protein || 0}</td>
-                <td style="padding: 8px; text-align: right;">${meal.carbs || 0}</td>
-                <td style="padding: 8px; text-align: right;">${meal.fat || 0}</td>
+                <td style="padding: 8px;">${new Date(meal.timestamp).toLocaleDateString('es-ES')}</td>
+                <td style="padding: 8px;">${meal.dishName}</td>
+                <td style="padding: 8px; text-align: right;">${meal.nutrition?.calories || 0}</td>
+                <td style="padding: 8px; text-align: right;">${meal.nutrition?.protein || 0}</td>
+                <td style="padding: 8px; text-align: right;">${meal.nutrition?.carbs || 0}</td>
+                <td style="padding: 8px; text-align: right;">${meal.nutrition?.fat || 0}</td>
               </tr>
             `
               )

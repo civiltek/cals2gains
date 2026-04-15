@@ -17,7 +17,7 @@ interface WaterState {
   loadToday: (userId: string) => Promise<void>;
   addGlass: (userId: string) => Promise<void>;
   removeGlass: (userId: string) => Promise<void>;
-  setGoal: (goal: number) => void;
+  setGoal: (goal: number, userId?: string) => void;
 
   // Computed
   getProgress: () => number;
@@ -85,7 +85,15 @@ export const useWaterStore = create<WaterState>((set, get) => ({
     }
   },
 
-  setGoal: (goal: number) => set({ goal }),
+  setGoal: (goal: number, userId?: string) => {
+    set({ goal });
+    if (!userId || Platform.OS === 'web') return;
+    const { todayGlasses } = get();
+    const today = format(new Date(), 'yyyy-MM-dd');
+    saveWaterLog({ userId, date: today, glasses: todayGlasses, goal }).catch((err: any) => {
+      console.warn('Failed to persist water goal:', err?.message || err);
+    });
+  },
 
   getProgress: () => {
     const { todayGlasses, goal } = get();

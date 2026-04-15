@@ -91,7 +91,7 @@ export default function LabelScannerScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-5.4',
+          model: 'gpt-4o',
           messages: [
             {
               role: 'user',

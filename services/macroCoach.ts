@@ -141,7 +141,7 @@ export async function generateWeeklyRecommendation(
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-5.4',
+        model: 'gpt-4o',
         max_tokens: 1200,
         temperature: 0.3,
         messages: [

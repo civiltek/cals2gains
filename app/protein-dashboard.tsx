@@ -21,6 +21,7 @@ import { useColors } from '../store/themeStore';
 import { useUserStore } from '../store/userStore';
 import { useMealStore } from '../store/mealStore';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 
 const { width } = Dimensions.get('window');
 const RING_SIZE = 200;
@@ -49,9 +50,14 @@ export default function ProteinDashboard() {
   const macroStyles = useMemo(() => createMacroStyles(C), [C]);
   const { t, i18n } = useTranslation();
   const { user } = useUserStore();
-  const { todayMeals, todayNutrition, addMeal } = useMealStore();
+  const { todayMeals, todayNutrition, addMeal, recentMeals, loadRecentMeals } = useMealStore();
 
   const proteinGoal = user?.goals?.protein || 150;
+
+  // Load recent meals for streak calculation
+  useEffect(() => {
+    if (user?.uid) loadRecentMeals(user.uid);
+  }, [user?.uid]);
 
   // Calculate from real meal data
   const proteinConsumed = useMemo(
@@ -66,9 +72,45 @@ export default function ProteinDashboard() {
   const mealsRemaining = Math.max(1, 4 - mealsEaten);
   const nextMealTarget = proteinRemaining > 0 ? Math.ceil(proteinRemaining / mealsRemaining) : 0;
 
-  // Streak — count consecutive days meeting protein goal from recent meals
-  // (simplified: just show from todayMeals context)
-  const streakDays = 0; // TODO: compute from historical data
+  // Streak — count consecutive days meeting protein goal from all available meals
+  const streakDays = useMemo(() => {
+    if (!proteinGoal) return 0;
+    const allMeals = [...todayMeals, ...recentMeals];
+    const seen = new Set<string>();
+    const uniqueMeals = allMeals.filter(m => {
+      if (seen.has(m.id)) return false;
+      seen.add(m.id);
+      return true;
+    });
+    // Aggregate protein by calendar day
+    const dayProtein = new Map<string, number>();
+    for (const m of uniqueMeals) {
+      try {
+        const day = format(new Date(m.timestamp), 'yyyy-MM-dd');
+        dayProtein.set(day, (dayProtein.get(day) || 0) + (m.nutrition?.protein || 0));
+      } catch {
+        // skip meals with invalid timestamps
+      }
+    }
+    // Count consecutive days from today backwards
+    let streak = 0;
+    const now = new Date();
+    for (let i = 0; i < 30; i++) {
+      const d = new Date(now);
+      d.setDate(now.getDate() - i);
+      const key = format(d, 'yyyy-MM-dd');
+      const protein = dayProtein.get(key) || 0;
+      if (protein >= proteinGoal) {
+        streak++;
+      } else if (i === 0) {
+        // Today not yet complete — skip and keep checking yesterday
+        continue;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }, [todayMeals, recentMeals, proteinGoal]);
 
   const handleQuickLog = async (food: ProteinFood) => {
     if (!user?.uid) return;

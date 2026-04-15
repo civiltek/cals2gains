@@ -107,7 +107,7 @@ Every scene between = deliver value fast with supporting data overlays."""
 
     headers = {"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"}
     payload = {
-        "model": "gpt-5.4",
+        "model": "gpt-4o",
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"Create a reel about: {topic}"},

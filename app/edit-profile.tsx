@@ -60,7 +60,7 @@ export default function EditProfileScreen() {
   const { t } = useTranslation();
   const { user, userId, loadUserData } = useUserStore();
 
-  const [displayName, setDisplayName] = useState(user?.displayName || user?.profile?.name || '');
+  const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [bio, setBio] = useState(user?.profile?.bio || '');
   const [photoUri, setPhotoUri] = useState<string | null>(user?.photoURL || null);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(user?.profile?.avatarType || null);
@@ -69,7 +69,7 @@ export default function EditProfileScreen() {
 
   // Track if anything changed
   const hasChanges = useMemo(() => {
-    const origName = user?.displayName || user?.profile?.name || '';
+    const origName = user?.displayName || '';
     const origBio = user?.profile?.bio || '';
     const origPhoto = user?.photoURL || null;
     const origAvatar = user?.profile?.avatarType || null;
@@ -170,7 +170,7 @@ export default function EditProfileScreen() {
       }
 
       // Update display name
-      const origName = user?.displayName || user?.profile?.name || '';
+      const origName = user?.displayName || '';
       if (displayName !== origName) {
         await updateUserDisplayName(userId, displayName);
       }
