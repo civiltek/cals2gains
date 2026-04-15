@@ -36,6 +36,7 @@ Usage:
 """
 
 import logging
+import math
 import time
 from pathlib import Path
 from typing import Optional, List, Dict, Tuple
@@ -43,7 +44,7 @@ import numpy as np
 from dataclasses import dataclass, field
 
 from moviepy import (
-    VideoFileClip, ImageClip, AudioFileClip,
+    VideoFileClip, ImageClip, AudioFileClip, VideoClip,
     CompositeVideoClip, CompositeAudioClip,
     concatenate_videoclips, concatenate_audioclips,
 )
@@ -55,7 +56,13 @@ from brand_config import (
     Colors, Fonts, Reel, Layout, TextSizes, OUTPUT_DIR,
     LOGOMARK, LOGO_DARK, GraphicElements,
 )
-from brand_overlay import add_logo, add_text_overlay, add_watermark
+from brand_overlay import (
+    add_logo, add_text_overlay, add_watermark, add_accent_line,
+    add_glow_circle, preload_logo, brand_video_frame,
+    render_scene_title, render_data_overlay,
+    render_corner_accents, render_progress_bar,
+    render_glow_dot, render_hook_flash,
+)
 from subtitle_engine import render_subtitles_on_frame, SubtitleStyle, estimate_word_timestamps
 from transitions import blend_transition
 
@@ -141,92 +148,243 @@ class Scene:
 # INTRO/OUTRO GENERATORS
 # ═══════════════════════════════════════════════════════════════════════════
 
-def create_intro_clip(duration: float = 0.8) -> ImageClip:
+def _ease_out_cubic(t: float) -> float:
+    """Ease-out cubic: fast start, gentle settle."""
+    return 1.0 - (1.0 - min(max(t, 0.0), 1.0)) ** 3
+
+
+def _get_wordmark_font(size: int) -> ImageFont.FreeTypeFont:
+    """Load Outfit Bold for wordmark rendering."""
+    try:
+        return ImageFont.truetype(str(Fonts.display_bold), size)
+    except OSError:
+        return ImageFont.load_default()
+
+
+def create_intro_clip(duration: float = 1.2) -> VideoClip:
     """
-    Create an intro clip with dark plum background and logo fade-in.
+    Create an animated intro clip with bounce-in logo + wordmark.
 
     Features:
     - Solid plum (#17121D) background
-    - Logo fade-in from center
-    - Subtle glow effect
-    - Refined, professional appearance
+    - LOGOMARK bounce animation (scale overshoot 1.08 -> settle to 1.0)
+    - PIL-rendered "CALS2GAINS" wordmark fade-in below logo
+    - Ambient glow circles (violet + coral)
+    - Brightness pulse
 
     Args:
-        duration: Intro duration in seconds
+        duration: Intro duration in seconds (default 1.2)
 
     Returns:
-        MoviePy ImageClip with animations
+        MoviePy VideoClip with per-frame animation
     """
-    logger.info(f"Creating intro clip ({duration}s)")
+    logger.info(f"Creating animated intro clip ({duration}s)")
 
-    # Create base image with plum background
-    img = Image.new("RGB", Reel.SIZE, Colors.PLUM_RGBA[:3])
+    # Pre-load assets once
+    logo_img = None
+    if LOGOMARK.exists():
+        logo_img = Image.open(LOGOMARK).convert("RGBA")
+        logo_h = 200
+        ratio = logo_h / logo_img.height
+        logo_img = logo_img.resize((int(logo_img.width * ratio), logo_h), Image.LANCZOS)
 
-    # Add logo to center
-    img_with_logo = add_logo(img, position="center", opacity=0.9, size_px=180, use_mark=True)
+    # Pre-render wordmark text
+    wordmark_font = _get_wordmark_font(48)
+    wordmark_text = "CALS2GAINS"
+    wm_bbox = ImageDraw.Draw(Image.new("RGBA", (1, 1))).textbbox((0, 0), wordmark_text, font=wordmark_font)
+    wm_w, wm_h = wm_bbox[2] - wm_bbox[0], wm_bbox[3] - wm_bbox[1]
 
-    # Add subtle glow circle around logo (optional enhancement)
-    img_with_logo = add_logo(img_with_logo, position="center", opacity=0.2, size_px=240, use_mark=True)
+    def make_frame(t):
+        """Render a single intro frame at time t."""
+        img = Image.new("RGBA", Reel.SIZE, Colors.PLUM_RGBA)
 
-    # Create clip with fade-in animation
-    clip = ImageClip(np.array(img_with_logo))
-    clip = clip.with_duration(duration)
-    clip = clip.with_fps(Reel.FPS)
+        # Ambient glow circles (always visible, subtle)
+        img = add_glow_circle(img, center=(300, 600), radius=400,
+                              color=Colors.violet, opacity=0.06)
+        img = add_glow_circle(img, center=(780, 1400), radius=350,
+                              color=Colors.coral, opacity=0.04)
 
-    logger.debug(f"Intro clip created: {duration}s @ {Reel.FPS}fps")
+        # Animation progress (0->1 over first 0.6s)
+        anim_progress = min(t / 0.6, 1.0)
+        ease = _ease_out_cubic(anim_progress)
+
+        # Logo bounce: overshoot to 1.08, settle to 1.0
+        if anim_progress < 1.0:
+            overshoot = 1.0 + 0.08 * math.sin(anim_progress * math.pi)
+            scale = ease * overshoot
+        else:
+            scale = 1.0
+
+        opacity = ease
+
+        # Logo centered
+        if logo_img and opacity > 0.01:
+            scaled_logo = logo_img.resize(
+                (int(logo_img.width * scale), int(logo_img.height * scale)),
+                Image.LANCZOS,
+            )
+            if opacity < 1.0:
+                alpha_ch = scaled_logo.split()[3].point(lambda p: int(p * opacity))
+                scaled_logo.putalpha(alpha_ch)
+            lx = (Reel.WIDTH - scaled_logo.width) // 2
+            ly = (Reel.HEIGHT - scaled_logo.height) // 2 - 60
+            img.paste(scaled_logo, (lx, ly), scaled_logo)
+
+        # Wordmark fade-in (delayed 0.3s)
+        wm_progress = max(0, min((t - 0.3) / 0.4, 1.0))
+        wm_ease = _ease_out_cubic(wm_progress)
+        if wm_ease > 0.01:
+            wm_layer = Image.new("RGBA", Reel.SIZE, (0, 0, 0, 0))
+            wd = ImageDraw.Draw(wm_layer)
+            wm_alpha = int(255 * wm_ease)
+            wm_x = (Reel.WIDTH - wm_w) // 2
+            wm_y = Reel.HEIGHT // 2 + 80
+            wd.text((wm_x, wm_y), wordmark_text, font=wordmark_font,
+                    fill=(*Colors.BONE_RGBA[:3], wm_alpha))
+            img = Image.alpha_composite(img, wm_layer)
+
+        # Brightness pulse (subtle white flash at t=0)
+        if t < 0.15:
+            flash_alpha = int(25 * (1.0 - t / 0.15))
+            flash = Image.new("RGBA", Reel.SIZE, (255, 255, 255, flash_alpha))
+            img = Image.alpha_composite(img, flash)
+
+        return np.array(img.convert("RGB"))
+
+    clip = VideoClip(make_frame, duration=duration).with_fps(Reel.FPS)
+    logger.debug(f"Animated intro clip created: {duration}s @ {Reel.FPS}fps")
     return clip
 
 
-def create_outro_clip(cta_text: str = "Send this to your gym buddy", duration: float = 2.5) -> ImageClip:
+def create_outro_clip(cta_text: str = "Send this to your gym buddy", duration: float = 2.5) -> VideoClip:
     """
-    Create an outro clip with CTA text and branding.
+    Create an animated outro clip with sequential element reveals.
 
     Features:
-    - Dark plum background
-    - Large CTA text (coral, animated)
-    - Cals2Gains logo and "Follow @cals2gains"
+    - Dark plum background with ambient glows
+    - Sequential fade-in: LOGOMARK -> wordmark -> accent line -> CTA -> handle
+    - Each element appears 0.3s after the previous
     - Professional, closing statement feel
+    - Uses PIL-rendered wordmark (avoids black rectangle bug)
 
     Args:
         cta_text: Call-to-action text
         duration: Outro duration in seconds
 
     Returns:
-        MoviePy ImageClip with animations
+        MoviePy VideoClip with per-frame animation
     """
-    logger.info(f"Creating outro clip ({duration}s): {cta_text}")
+    logger.info(f"Creating animated outro clip ({duration}s): {cta_text}")
 
-    # Base image
-    img = Image.new("RGB", Reel.SIZE, Colors.PLUM_RGBA[:3])
-    img = img.convert("RGBA")
+    # Pre-load assets
+    logo_img = None
+    if LOGOMARK.exists():
+        logo_img = Image.open(LOGOMARK).convert("RGBA")
+        logo_h = 140
+        ratio = logo_h / logo_img.height
+        logo_img = logo_img.resize((int(logo_img.width * ratio), logo_h), Image.LANCZOS)
 
-    # Add main CTA text
-    img = add_text_overlay(
-        img,
-        text=cta_text,
-        style="cta",
-        position="center",
-        custom_y=600
-    )
+    wordmark_font = _get_wordmark_font(40)
+    cta_font = _get_wordmark_font(52)
+    handle_font = _get_wordmark_font(28)
 
-    # Add follow text
-    img = add_text_overlay(
-        img,
-        text="Follow @cals2gains",
-        style="subtitle",
-        position="center",
-        custom_y=1200
-    )
+    # Element timing (sequential reveal)
+    timings = {
+        "logo":     (0.0, 0.4),   # appear_at, fade_duration
+        "wordmark": (0.3, 0.4),
+        "accent":   (0.5, 0.3),
+        "cta":      (0.7, 0.5),
+        "handle":   (1.0, 0.4),
+    }
 
-    # Add logo at bottom
-    img = add_logo(img, position="bottom-right", opacity=0.8, size_px=100)
+    def _element_opacity(t: float, appear_at: float, fade_dur: float) -> float:
+        local_t = t - appear_at
+        if local_t < 0:
+            return 0.0
+        return _ease_out_cubic(min(local_t / max(fade_dur, 0.001), 1.0))
 
-    # Create clip
-    clip = ImageClip(np.array(img))
-    clip = clip.with_duration(duration)
-    clip = clip.with_fps(Reel.FPS)
+    def make_frame(t):
+        img = Image.new("RGBA", Reel.SIZE, Colors.PLUM_RGBA)
 
-    logger.debug(f"Outro clip created: {duration}s @ {Reel.FPS}fps")
+        # Ambient glow
+        img = add_glow_circle(img, center=(250, 700), radius=400,
+                              color=Colors.violet, opacity=0.05)
+        img = add_glow_circle(img, center=(830, 1300), radius=350,
+                              color=Colors.coral, opacity=0.04)
+
+        overlay = Image.new("RGBA", Reel.SIZE, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+
+        center_x = Reel.WIDTH // 2
+        y_cursor = Reel.HEIGHT // 2 - 180
+
+        # 1. Logo mark (centered)
+        op_logo = _element_opacity(t, *timings["logo"])
+        if logo_img and op_logo > 0.01:
+            tmp_logo = logo_img.copy()
+            alpha_ch = tmp_logo.split()[3].point(lambda p: int(p * op_logo))
+            tmp_logo.putalpha(alpha_ch)
+            lx = (Reel.WIDTH - tmp_logo.width) // 2
+            overlay.paste(tmp_logo, (lx, y_cursor), tmp_logo)
+
+        y_cursor += (logo_img.height if logo_img else 140) + 30
+
+        # 2. Wordmark "CALS2GAINS"
+        op_wm = _element_opacity(t, *timings["wordmark"])
+        if op_wm > 0.01:
+            wm_text = "CALS2GAINS"
+            bbox = draw.textbbox((0, 0), wm_text, font=wordmark_font)
+            tw = bbox[2] - bbox[0]
+            wm_x = (Reel.WIDTH - tw) // 2
+            wm_alpha = int(255 * op_wm)
+            draw.text((wm_x, y_cursor), wm_text, font=wordmark_font,
+                      fill=(*Colors.BONE_RGBA[:3], wm_alpha))
+
+        y_cursor += 60
+
+        # 3. Accent line (coral)
+        op_line = _element_opacity(t, *timings["accent"])
+        if op_line > 0.01:
+            line_w = 200
+            lx1 = center_x - line_w // 2
+            lx2 = center_x + line_w // 2
+            line_alpha = int(180 * op_line)
+            draw.line([(lx1, y_cursor), (lx2, y_cursor)],
+                      fill=(*Colors.CORAL_RGBA[:3], line_alpha), width=3)
+
+        y_cursor += 50
+
+        # 4. CTA text (coral, bold)
+        op_cta = _element_opacity(t, *timings["cta"])
+        if op_cta > 0.01:
+            slide = int(15 * (1.0 - _ease_out_cubic(min((t - timings["cta"][0]) / 0.5, 1.0))))
+            cta_bbox = draw.textbbox((0, 0), cta_text, font=cta_font)
+            cta_tw = cta_bbox[2] - cta_bbox[0]
+            cta_x = (Reel.WIDTH - cta_tw) // 2
+            cta_alpha = int(255 * op_cta)
+            draw.text((cta_x + 2, y_cursor + slide + 3), cta_text, font=cta_font,
+                      fill=(0, 0, 0, int(120 * op_cta)))
+            draw.text((cta_x, y_cursor + slide), cta_text, font=cta_font,
+                      fill=(*Colors.CORAL_RGBA[:3], cta_alpha))
+
+        y_cursor += 100
+
+        # 5. Handle "@cals2gains"
+        op_handle = _element_opacity(t, *timings["handle"])
+        if op_handle > 0.01:
+            handle_text = "@cals2gains"
+            hbbox = draw.textbbox((0, 0), handle_text, font=handle_font)
+            htw = hbbox[2] - hbbox[0]
+            hx = (Reel.WIDTH - htw) // 2
+            h_alpha = int(180 * op_handle)
+            draw.text((hx, y_cursor), handle_text, font=handle_font,
+                      fill=(*Colors.VIOLET_RGBA[:3], h_alpha))
+
+        img = Image.alpha_composite(img, overlay)
+        return np.array(img.convert("RGB"))
+
+    clip = VideoClip(make_frame, duration=duration).with_fps(Reel.FPS)
+    logger.debug(f"Animated outro clip created: {duration}s @ {Reel.FPS}fps")
     return clip
 
 
@@ -240,17 +398,28 @@ def create_brand_overlay_frame(
     current_time: float,
     scene_progress: float,
     reel_progress: float,
+    scene_index: int = 0,
+    logo_img=None,
 ) -> Image.Image:
     """
-    Apply brand overlays and effects to a single video frame.
+    Apply v5.0 brand overlays to a single video frame.
 
-    Overlays applied (in order):
-    1. Logo in top-right corner
-    2. Scene title text with animation (fade in/out)
-    3. Word-by-word subtitles (if voiceover present)
-    4. Progress bar at bottom
-    5. Corner accent lines (violet)
-    6. Watermark "@cals2gains" in bottom-left
+    Delegates to brand_overlay.brand_video_frame() for the full Studio Pro
+    pipeline, then adds subtitle_engine subtitles on top.
+
+    Pipeline (via brand_video_frame):
+    1. Color grading (lightweight)
+    2. Corner accent lines (violet, cached)
+    3. Logo overlay (top-right)
+    4. Scene title -- gradient text + pill bg + slide-up animation
+    5. Data overlay stat cards -- animated counters + glassmorphism
+    6. Hook flash (scene 1 only, first 0.2s)
+    7. Glow dot (pulsing coral)
+    8. Progress bar (thin coral bar)
+
+    Then (local):
+    9. Word-by-word subtitles (subtitle_engine)
+    10. Watermark
 
     Args:
         base_frame: PIL Image of base video frame
@@ -258,181 +427,61 @@ def create_brand_overlay_frame(
         current_time: Current time in scene (seconds)
         scene_progress: 0.0-1.0 progress through scene
         reel_progress: 0.0-1.0 progress through entire reel
+        scene_index: Index of current scene (0-based)
+        logo_img: Pre-loaded logo PIL Image (from preload_logo)
 
     Returns:
         PIL Image with all overlays applied
     """
-    frame = base_frame.convert("RGBA")
+    # Convert to numpy for brand_video_frame
+    frame_array = np.array(base_frame.convert("RGB"))
 
-    # 1. Logo overlay (top-right)
-    frame = add_logo(frame, position="top-right", opacity=0.7, size_px=120)
+    # Full v5.0 pipeline via brand_overlay
+    frame_array = brand_video_frame(
+        frame_array,
+        logo_img=logo_img,
+        show_logo=True,
+        time_in_scene=current_time,
+        scene_duration=scene.duration,
+        scene_title=scene.text_overlay,
+        scene_title_style=scene.text_style,
+        is_hook=(scene_index == 0),
+        data_overlays=scene.data_overlays or None,
+        reel_progress=reel_progress,
+        scene_index=scene_index,
+        apply_grade=True,
+    )
 
-    # 2. Scene title with fade animation
-    if scene.text_overlay:
-        # Fade in/out at scene start/end
-        text_opacity = _calculate_text_opacity(scene_progress)
-        if text_opacity > 0.01:
-            frame = add_text_overlay(
-                frame,
-                text=scene.text_overlay,
-                style=scene.text_style,
-                position="top"
-            )
+    frame = Image.fromarray(frame_array).convert("RGBA")
 
-    # 3. Word-by-word subtitles
+    # Word-by-word subtitles (subtitle_engine -- not part of brand_overlay)
     if scene.voiceover_path and scene.word_timestamps:
         style = SubtitleStyle(
             font_size=48,
-            position_y=int(Layout.subtitle_y)
+            position_y=int(Layout.subtitle_y),
         )
         frame = render_subtitles_on_frame(
             frame,
             current_time=current_time,
             word_timestamps=scene.word_timestamps,
-            style=style
+            style=style,
         )
     elif scene.voiceover_text and not scene.word_timestamps:
-        # Estimate timestamps if not provided
         timestamps = estimate_word_timestamps(
             scene.voiceover_text,
             total_duration=scene.voice_duration or scene.duration,
-            start_offset=0.0
+            start_offset=0.0,
         )
         style = SubtitleStyle(font_size=48, position_y=int(Layout.subtitle_y))
         frame = render_subtitles_on_frame(
             frame,
             current_time=current_time,
             word_timestamps=timestamps,
-            style=style
+            style=style,
         )
 
-    # 4. Progress bar at bottom (shows reel progress)
-    frame = _add_progress_bar(frame, reel_progress)
-
-    # 5. Corner accent lines (violet)
-    frame = _add_corner_accents(frame)
-
-    # 6. Watermark
-    frame = add_watermark(frame, text="@cals2gains", position="bottom-left", opacity=0.6)
-
-    return frame
-
-
-def _calculate_text_opacity(scene_progress: float, fade_in_duration: float = 0.2, fade_out_start: float = 0.7) -> float:
-    """
-    Calculate opacity for scene title text animation.
-
-    Fades in quickly at start, holds, then fades out at end.
-
-    Args:
-        scene_progress: 0.0-1.0 progress through scene
-        fade_in_duration: Fraction of scene for fade-in (0.0-1.0)
-        fade_out_start: When to start fade-out (0.0-1.0)
-
-    Returns:
-        Opacity value 0.0-1.0
-    """
-    if scene_progress < fade_in_duration:
-        return scene_progress / fade_in_duration
-    elif scene_progress > fade_out_start:
-        remaining = 1.0 - fade_out_start
-        fade_progress = (scene_progress - fade_out_start) / remaining
-        return 1.0 - fade_progress
-    else:
-        return 1.0
-
-
-def _add_progress_bar(frame: Image.Image, progress: float) -> Image.Image:
-    """
-    Add a progress bar at the bottom of the frame.
-
-    Coral-colored bar showing overall reel progress.
-
-    Args:
-        frame: Input PIL Image
-        progress: 0.0-1.0 overall progress
-
-    Returns:
-        Frame with progress bar overlay
-    """
-    frame = frame.convert("RGBA")
-    draw = ImageDraw.Draw(frame)
-
-    bar_height = GraphicElements.PROGRESS_BAR_HEIGHT
-    bar_color = Colors.hex_to_rgba(GraphicElements.PROGRESS_BAR_COLOR, 255)
-
-    # Draw background bar (faint)
-    draw.rectangle(
-        [(0, frame.height - bar_height), (frame.width, frame.height)],
-        fill=(0, 0, 0, int(255 * GraphicElements.PROGRESS_BAR_BG_OPACITY))
-    )
-
-    # Draw progress bar
-    progress_width = int(frame.width * progress)
-    draw.rectangle(
-        [(0, frame.height - bar_height), (progress_width, frame.height)],
-        fill=bar_color
-    )
-
-    return frame
-
-
-def _add_corner_accents(frame: Image.Image) -> Image.Image:
-    """
-    Add violet corner accent lines.
-
-    Small decorative lines in corners for premium aesthetic.
-
-    Args:
-        frame: Input PIL Image
-
-    Returns:
-        Frame with corner accents
-    """
-    frame = frame.convert("RGBA")
-    draw = ImageDraw.Draw(frame)
-
-    length = GraphicElements.CORNER_LINE_LENGTH
-    width = GraphicElements.CORNER_LINE_WIDTH
-    color = Colors.hex_to_rgba(
-        GraphicElements.CORNER_LINE_COLOR,
-        int(255 * GraphicElements.CORNER_LINE_OPACITY)
-    )
-    margin = 40
-
-    # Top-left corner
-    draw.line([(margin, margin), (margin + length, margin)], fill=color, width=width)
-    draw.line([(margin, margin), (margin, margin + length)], fill=color, width=width)
-
-    # Top-right corner
-    draw.line(
-        [(frame.width - margin - length, margin), (frame.width - margin, margin)],
-        fill=color, width=width
-    )
-    draw.line(
-        [(frame.width - margin, margin), (frame.width - margin, margin + length)],
-        fill=color, width=width
-    )
-
-    # Bottom-left corner
-    draw.line(
-        [(margin, frame.height - margin), (margin + length, frame.height - margin)],
-        fill=color, width=width
-    )
-    draw.line(
-        [(margin, frame.height - margin - length), (margin, frame.height - margin)],
-        fill=color, width=width
-    )
-
-    # Bottom-right corner
-    draw.line(
-        [(frame.width - margin - length, frame.height - margin), (frame.width - margin, frame.height - margin)],
-        fill=color, width=width
-    )
-    draw.line(
-        [(frame.width - margin, frame.height - margin - length), (frame.width - margin, frame.height - margin)],
-        fill=color, width=width
-    )
+    # Watermark (above bottom safe zone)
+    frame = add_watermark(frame, text="@cals2gains", opacity=0.4)
 
     return frame
 
@@ -503,53 +552,58 @@ def apply_brand_overlays_to_clip(
     scene: Scene,
     scene_index: int,
     total_scenes: int,
+    logo_img=None,
 ) -> VideoFileClip:
     """
-    Apply brand overlays to every frame of a video clip.
+    Apply v5.0 brand overlays to every frame of a video clip.
 
-    This is a per-frame operation that adds:
-    - Logo, text, subtitles
-    - Progress bar, corner accents, watermark
+    Per-frame pipeline via brand_video_frame():
+    - Corner accents, logo, gradient scene titles, data overlays
+    - Hook flash, glow dot, progress bar
+    - Word-by-word subtitles (subtitle_engine)
+    - Watermark
 
     Args:
         clip: Input VideoFileClip
         scene: Scene metadata
         scene_index: Current scene index (for progress calculation)
         total_scenes: Total number of scenes
+        logo_img: Pre-loaded logo PIL Image (from preload_logo)
 
     Returns:
         VideoFileClip with brand overlays applied
     """
-    logger.debug(f"Applying brand overlays to scene {scene_index + 1}/{total_scenes}")
+    logger.debug(f"Applying v5.0 brand overlays to scene {scene_index + 1}/{total_scenes}")
+
+    # Pre-load logo once if not provided
+    if logo_img is None:
+        logo_img = preload_logo()
+
+    clip_duration = clip.duration
 
     def process_frame(get_frame, t):
         """Process a single frame at time t."""
-        # Get base frame
         base_frame = get_frame(t)
         if isinstance(base_frame, np.ndarray):
             base_frame = Image.fromarray(base_frame.astype("uint8"))
 
-        # Calculate progress metrics
-        scene_progress = t / clip.duration
-        # Approximate reel progress (not exact, but good for visual feedback)
-        reel_progress = (scene_index + scene_progress) / total_scenes
+        scene_progress = t / max(clip_duration, 0.001)
+        reel_progress = (scene_index + scene_progress) / max(total_scenes, 1)
 
-        # Apply brand overlays
         frame_with_overlays = create_brand_overlay_frame(
             base_frame=base_frame,
             scene=scene,
             current_time=t,
             scene_progress=scene_progress,
             reel_progress=reel_progress,
+            scene_index=scene_index,
+            logo_img=logo_img,
         )
 
-        # Convert back to numpy
         return np.array(frame_with_overlays.convert("RGB"))
 
-    # Create new clip with frame processing
     overlaid_clip = clip.without_audio().fl(process_frame)
 
-    # Preserve original audio if it exists
     if clip.audio is not None:
         overlaid_clip = overlaid_clip.with_audio(clip.audio)
 
@@ -708,6 +762,7 @@ def mix_audio_tracks(
 def compose_reel(
     scenes: List[Scene],
     voice_audio: Optional[Path] = None,
+    scene_voices: Optional[List[Optional[Path]]] = None,
     music_audio: Optional[Path] = None,
     output_path: Optional[Path] = None,
     add_intro: bool = True,
@@ -719,15 +774,19 @@ def compose_reel(
 
     Main assembly pipeline:
     1. Validate all input scenes
-    2. Load and prepare video clips
-    3. Apply brand overlays to each clip
-    4. Stitch clips with transitions
-    5. Load and mix audio (voiceover + music with ducking)
-    6. Render final MP4 (H.264, 1080x1920, 30fps, -14 LUFS)
+    2. Pre-load shared assets (logo)
+    3. Load and prepare video clips
+    4. Apply v5.0 brand overlays to each clip
+    5. Attach per-scene voiceover audio
+    6. Stitch clips with transitions
+    7. Mix audio (voiceover + music with ducking)
+    8. Render final MP4 (H.264, 1080x1920, 30fps, -14 LUFS)
 
     Args:
         scenes: List of Scene objects with video/audio/text content
         voice_audio: Single voiceover audio file (legacy, applies to all scenes)
+        scene_voices: Per-scene voiceover paths (overrides scene.voiceover_path).
+                      List length must match scenes. None entries = no voiceover.
         music_audio: Background music file (loops as needed)
         output_path: Output MP4 path (default: output/reel_<timestamp>.mp4)
         add_intro: Include intro clip with logo fade-in
@@ -756,6 +815,13 @@ def compose_reel(
     logger.info(f"Scenes: {len(scenes)}")
     logger.info(f"Intro: {add_intro}, Outro: {add_outro}")
 
+    # Merge scene_voices into Scene objects if provided
+    if scene_voices:
+        for i, vo_path in enumerate(scene_voices):
+            if i < len(scenes) and vo_path and Path(vo_path).exists():
+                scenes[i].voiceover_path = Path(vo_path)
+                logger.debug(f"Scene {i}: voiceover set from scene_voices -> {vo_path}")
+
     # Validate scenes
     logger.info("Validating scenes...")
     for i, scene in enumerate(scenes):
@@ -765,13 +831,16 @@ def compose_reel(
             logger.error(f"Scene {i} validation failed: {e}")
             raise
 
+    # Pre-load shared assets
+    logo_img = preload_logo()
+
     # Prepare clip list
     all_clips = []
 
     # Add intro
     if add_intro:
-        logger.info("Creating intro clip...")
-        intro_clip = create_intro_clip(duration=0.8)
+        logger.info("Creating animated intro clip...")
+        intro_clip = create_intro_clip(duration=1.2)
         all_clips.append(intro_clip)
 
     # Process each scene
@@ -782,10 +851,12 @@ def compose_reel(
         # Load video clip
         clip = load_scene_clip(scene)
 
-        # Apply brand overlays
-        clip = apply_brand_overlays_to_clip(clip, scene, i, len(scenes))
+        # Apply v5.0 brand overlays (full pipeline)
+        clip = apply_brand_overlays_to_clip(
+            clip, scene, i, len(scenes), logo_img=logo_img
+        )
 
-        # Add voiceover if present
+        # Attach per-scene voiceover if present
         if scene.voiceover_path:
             logger.debug(f"Scene {i}: attaching voiceover from {scene.voiceover_path}")
             vo_audio = AudioFileClip(str(scene.voiceover_path))
@@ -795,7 +866,7 @@ def compose_reel(
 
     # Add outro
     if add_outro:
-        logger.info("Creating outro clip...")
+        logger.info("Creating animated outro clip...")
         outro_clip = create_outro_clip(cta_text=cta_text, duration=2.5)
         all_clips.append(outro_clip)
 

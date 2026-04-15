@@ -1,5 +1,22 @@
 # Changelog - Cals2Gains
 
+## 2026-04-15 — Integración Higgsfield AI + Visual Engine v5.0 Studio Pro
+
+- **brand_config.py**: Añadidas constantes Higgsfield (base URL, modelos kling-v2.5/dop-turbo/wan-2.5, duración, resolución, aspect ratio, polling)
+- **brand_overlay.py v5.0**: Nuevo módulo de composición visual profesional
+  - Gradient text rendering (White→Violet) con pill background glassmorphism
+  - Animated scene titles con slide-up + easing
+  - Data overlay stat cards con animated counters
+  - Corner accents, glow dot, progress bar, hook flash
+  - brand_video_frame() — pipeline completo per-frame para video
+- **video_generator.py v3.0**: Cadena de fallback Higgsfield → Sora 2 → Veo 2 → Ken Burns
+- **reel_composer.py reconciliado con v5.0**:
+  - create_brand_overlay_frame() delega a brand_video_frame() (pipeline v5.0 completo)
+  - create_intro_clip() animado: VideoClip con bounce LOGOMARK + wordmark + glow + pulse
+  - create_outro_clip() animado: revelación secuencial (logo → wordmark → accent → CTA → handle)
+  - Añadido parámetro scene_voices a compose_reel() (compatibilidad create_reel.py)
+  - Pre-carga de logo compartida, eliminadas funciones duplicadas
+
 ## 2026-04-14 (noche-4) — Motor audiovisual v4.0 (Studio)
 
 ### Visual Engine — Upgrade a calidad de estudio profesional
