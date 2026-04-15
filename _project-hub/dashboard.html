@@ -170,7 +170,7 @@ tr:last-child td { border-bottom: none; }
     <div class="logo">C2G</div>
     <div>
       <h1>Cals<span>2</span>Gains — Dashboard</h1>
-      <div class="header-date">Actualizado: 13 abril 2026 (auto)</div>
+      <div class="header-date">Actualizado: 14 abril 2026</div>
     </div>
   </div>
   <div class="tabs">
@@ -187,23 +187,33 @@ tr:last-child td { border-bottom: none; }
     <div class="kpi-row">
       <div class="kpi-card highlight">
         <div class="kpi-label">Gasto Total Acumulado</div>
-        $11.120,08 €</div>
+        <div class="kpi-value coral">1.120,08 €</div>
         <div class="kpi-sub">Desde 24 marzo 2026</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Burn Rate Mensual</div>
-        <div class="kpi-value violet">~197 €/mes</div>
-        <div class="kpi-sub">Basado en suscripciones confirmadas</div>
+        <div class="kpi-label">Gasto Abril 2026</div>
+        <div class="kpi-value violet">1.097,08 €</div>
+        <div class="kpi-sub">⚠️ Incluye €595 Anthropic puntual</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Coste Recurrente Confirmado</div>
+        <div class="kpi-label">Burn Rate Recurrente</div>
         <div class="kpi-value gold">196,98 €/mes</div>
-        <div class="kpi-sub">3 suscripciones activas</div>
+        <div class="kpi-sub">3 suscripciones activas confirmadas</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Ingresos</div>
+        <div class="kpi-label">Ingresos / Ventas</div>
         <div class="kpi-value" style="color:var(--text-secondary)">0 €</div>
-        <div class="kpi-sub">App no lanzada aún</div>
+        <div class="kpi-sub">App no lanzada — ingresos pendientes</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Balance Neto</div>
+        <div class="kpi-value red">-1.120,08 €</div>
+        <div class="kpi-sub">Inversión pre-lanzamiento</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Saldo OpenAI API</div>
+        <div class="kpi-value green">$99,66</div>
+        <div class="kpi-sub">Créditos restantes (USD)</div>
       </div>
     </div>
 
@@ -264,8 +274,13 @@ tr:last-child td { border-bottom: none; }
           <tr><th>Fecha</th><th>Proveedor</th><th>Concepto</th><th>Categoría</th><th>Importe</th></tr>
         </thead>
         <tbody>
+          <tr style="background:rgba(255,106,77,0.08);">
+            <td>13/04/2026</td><td>Anthropic</td><td>⚠️ Prepaid extra usage (Invoice 5RBPQUSE-0005)</td>
+            <td><span class="badge badge-red">IA/Puntual</span></td>
+            <td style="font-weight:700; color:var(--red)">595,00 €</td>
+          </tr>
           <tr>
-            <td>13/04/2026</td><td>Anthropic</td><td>Claude Max — Prepaid extra usage</td>
+            <td>13/04/2026</td><td>Anthropic</td><td>Claude Team — Suscripción mensual</td>
             <td><span class="badge badge-violet">IA/Suscripciones</span></td>
             <td style="font-weight:600">170,00 €</td>
           </tr>
@@ -275,12 +290,17 @@ tr:last-child td { border-bottom: none; }
             <td style="font-weight:600">16,99 €</td>
           </tr>
           <tr>
+            <td>10/04/2026</td><td>OpenAI</td><td>API Credits — Pay-as-you-go ($121 USD)</td>
+            <td><span class="badge badge-violet">IA/Suscripciones</span></td>
+            <td style="font-weight:600">111,32 €</td>
+          </tr>
+          <tr>
             <td>10/04/2026</td><td>Apple</td><td>iCloud+ 2TB (Mensual)</td>
             <td><span class="badge badge-violet">IA/Suscripciones</span></td>
             <td style="font-weight:600">9,99 €</td>
           </tr>
           <tr>
-            <td>09/04/2026</td><td>Anthropic</td><td>Claude Max plan 20x — Upgrade desde Pro</td>
+            <td>09/04/2026</td><td>Anthropic</td><td>Claude Team — Upgrade desde Pro</td>
             <td><span class="badge badge-violet">IA/Suscripciones</span></td>
             <td style="font-weight:600">170,78 €</td>
           </tr>
@@ -298,11 +318,6 @@ tr:last-child td { border-bottom: none; }
             <td>24/03/2026</td><td>Anthropic</td><td>Claude Pro — Suscripción mensual (Mar–Abr)</td>
             <td><span class="badge badge-violet">IA/Suscripciones</span></td>
             <td style="font-weight:600">18,00 €</td>
-          </tr>
-          <tr>
-            <td>10/04/2026</td><td>OpenAI</td><td>API Credits — Pay-as-you-go ($121 USD)</td>
-            <td><span class="badge badge-violet">IA/Suscripciones</span></td>
-            <td style="font-weight:600">111,32 €</td>
           </tr>
           <tr style="background:rgba(255,106,77,0.06);">
             <td colspan="4" style="font-weight:700; text-align:right">TOTAL ACUMULADO</td>
@@ -572,11 +587,11 @@ Chart.defaults.plugins.legend.labels.padding = 16;
 new Chart(document.getElementById('chartCategoria'), {
   type: 'bar',
   data: {
-    labels: ['IA / Suscripciones', 'App Stores', 'Publicidad'],
+    labels: ['IA / Suscripciones', 'IA / Puntual', 'App Stores', 'Publicidad'],
     datasets: [{
       label: 'Gasto (€)',
-      data: [1080.10, 23.00, 16.99],
-      backgroundColor: ['#9C8CFF', '#60A5FA', '#FF6A4D'],
+      data: [485.10, 600.00, 23.00, 16.99],
+      backgroundColor: ['#9C8CFF', '#F87171', '#60A5FA', '#FF6A4D'],
       borderRadius: 8,
       borderSkipped: false,
       barThickness: 48,

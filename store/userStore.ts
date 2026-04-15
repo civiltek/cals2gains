@@ -12,6 +12,7 @@ import {
   updateUserGoalsAndMode,
   onAuthStateChange,
   signOut as firebaseSignOut,
+  deleteUserAccount,
 } from '../services/firebase';
 import { loginRevenueCat, logoutRevenueCat } from '../services/revenuecat';
 import { calculateTDEE, calculateBMR } from '../utils/nutrition';
@@ -35,6 +36,7 @@ interface UserState {
   updateProfile: (profile: Partial<UserProfile>, goals: Partial<UserGoals>) => Promise<void>;
   updateLanguage: (language: 'es' | 'en') => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   initAuth: () => () => void; // Returns unsubscribe function
   setDayTypeGoals: (goals: DayTypeGoals) => Promise<void>;
   setTodayDayType: (type: DayType) => void;
@@ -159,6 +161,19 @@ export const useUserStore = create<UserState>((set, get) => ({
       set({ user: null, isAuthenticated: false });
     } catch (error) {
       console.error('Sign out error:', error);
+      throw error;
+    }
+  },
+
+  deleteAccount: async () => {
+    const { user } = get();
+    if (!user) throw new Error('No user logged in');
+    try {
+      await logoutRevenueCat();
+      await deleteUserAccount(user.uid);
+      set({ user: null, isAuthenticated: false });
+    } catch (error) {
+      console.error('Delete account error:', error);
       throw error;
     }
   },

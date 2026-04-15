@@ -66,6 +66,36 @@ Cuando el copy necesita que una feature esté lista o visible.
 Informes entregados en `docs/research/YYYY-MM-DD_tema.md`.
 - Cierre: destinatario confirma lectura + aplica o descarta recomendación.
 
+### legal → web-dev
+Cuando hay cambios en textos legales (privacy.html, terms.html, aviso legal, cookies).
+- Entrega: archivos HTML actualizados + confirmación de Judith obtenida (R16).
+- B hace: deploy via `firebase deploy --only hosting` (W5).
+- Cierre: URL accesible con contenido actualizado + fecha de "Última actualización" correcta.
+
+### legal → app-dev
+Cuando se necesita implementar funcionalidad legal in-app.
+- Entrega: requisito específico (ej. "pantalla de eliminación de cuenta", "consentimiento explícito para datos de salud", "centro de privacidad").
+- B hace: implementar la feature + actualizar FEATURES.md.
+- Cierre: feature funcional + legal verifica que cumple el requisito.
+
+### legal → finance
+Cuando una acción legal tiene implicación de coste.
+- Entrega: servicio o asesor necesario + coste estimado si se conoce.
+- B hace: registrar en seguimiento financiero + escalar a Judith (R9).
+- Cierre: Judith aprueba/rechaza el gasto.
+
+### finance → legal
+Cuando se detecta un contrato o DPA que requiere revisión legal.
+- Entrega: proveedor + documento/enlace al contrato + contexto (qué datos se comparten).
+- B hace: revisar cláusulas de protección de datos + actualizar LEGAL.md.
+- Cierre: estado del DPA documentado en LEGAL.md.
+
+### legal → research
+Cuando se necesita investigar cambio normativo o requisito de mercado nuevo.
+- Entrega: tema a investigar (ej. "requisitos AI Act para apps de nutrición", "Data Safety Section formato 2026").
+- B hace: investigar + informe en `docs/research/`.
+- Cierre: informe entregado, legal aplica hallazgos.
+
 ---
 
 ## Reglas de handoff

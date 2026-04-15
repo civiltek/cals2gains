@@ -77,6 +77,18 @@ No borres ni reescribas silenciosamente la memoria en `/sessions/*/mnt/.auto-mem
 
 Si una tarea no puede completarse, si un MCP devuelve error, si un archivo no existe: dilo explícitamente en la respuesta a Judith. No inventes un resultado "bonito" para salir del paso.
 
+## R16. Textos legales
+
+**Nunca publiques ni despliegues** cambios en textos legales (privacy.html, terms.html, aviso legal, política de cookies) sin aprobación explícita de Judith. El agente `legal` genera borradores; Judith revisa y aprueba; `web-dev` despliega.
+
+## R17. Cumplimiento normativo
+
+**No afirmes cumplimiento** (RGPD, LOPD, LSSI, AI Act, requisitos de stores) sin haberlo verificado punto por punto contra los datos y funcionalidades reales de la app. Ante duda, marca como "⚠️ Pendiente de verificar" y escala.
+
+## R18. Datos de salud
+
+Los datos de salud (peso, medidas corporales, fotos de progreso, historial de ayuno) son **categoría especial** según RGPD art. 9. Requieren **consentimiento explícito** del usuario. Nunca añadir recopilación de datos de salud sin EIPD/DPIA previa.
+
 ---
 
 ## Sanción ante duda

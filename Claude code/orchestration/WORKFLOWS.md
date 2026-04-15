@@ -6,7 +6,7 @@
 
 ## W1. Nueva factura / recibo detectado
 
-**Disparadores:** tarea `receipt-collector` (lun/jue 8:00), llegada de email con factura, input manual "tengo una factura nueva".
+**Disparadores:** tarea `receipt-collector` (diario 8:00), llegada de email con factura, input manual "tengo una factura nueva".
 
 1. **ops** detecta el disparador.
 2. **finance** — invoca skill `download-receipt`:
@@ -158,8 +158,73 @@ Reglas clave: R1 (nada inventado), R6 (nunca publicar sin aprobación explícita
 
 ---
 
+## W10. Auditoría legal
+
+**Disparador:** comando `/legal-check`, pre-lanzamiento en stores, feature nueva que recopila datos, revisión trimestral.
+
+1. **legal** activa skill `legal-audit`.
+2. Escanea código fuente → inventario de datos personales tratados.
+3. Audita `privacy.html` contra datos reales (¿cubre todo?).
+4. Audita `terms.html` (disclaimers, jurisdicción, IA).
+5. Verifica requisitos de stores (eliminación de cuenta, data safety, permisos).
+6. Verifica requisitos web LSSI (aviso legal, cookies, impressum).
+7. Compara copias de textos legales entre ubicaciones (deben ser idénticas).
+8. Genera informe priorizado (🔴 crítico / 🟡 importante / 🟢 mejora).
+9. **legal** actualiza `_project-hub/LEGAL.md`.
+10. **ops** → CHANGELOG.
+11. Reporta a Judith con prioridades y acciones requeridas.
+
+Handoffs posibles:
+- Si hay cambios en HTML → handoff a `web-dev` para deploy.
+- Si falta feature in-app (ej. eliminación de cuenta) → handoff a `app-dev`.
+- Si hay coste (ej. DPA de pago, asesor externo) → handoff a `finance`.
+
+---
+
+## W11. Reporte financiero mensual
+
+**Disparador:** comando `/finance-report`, final de mes (1–3 del siguiente), petición de Judith.
+
+1. **finance** activa skill `reconciliation`:
+   - Cruza filas del Excel con recibos en `finances/receipts/`.
+   - Cruza suscripciones activas con cobros del mes.
+   - Lista discrepancias.
+2. **finance** activa skill `financial-report`:
+   - Calcula totales, desglose por proveedor, desglose por tipo.
+   - Variación vs mes anterior.
+   - Burn rate recurrente.
+   - Detecta anomalías.
+   - Genera proyecciones (si hay ≥2 meses de datos).
+   - Produce hasta 3 recomendaciones.
+3. **finance** genera reporte en `finances/reports/YYYY-MM_financial-report.md`.
+4. **finance** invoca skill `update-dashboard` (regenera HTML en ambas ubicaciones).
+5. **finance** actualiza `_project-hub/FINANCES.md`.
+6. **ops** → CHANGELOG.
+7. Reporta a Judith: resumen ejecutivo con gasto total, burn rate, anomalías, reconciliación.
+
+---
+
+## W12. EIPD / DPIA para nueva feature
+
+**Disparador:** feature nueva que trata datos personales sensibles (ej. voice logging, progress photos, health data).
+
+1. **legal** evalúa la feature:
+   - ¿Qué datos nuevos se recopilan?
+   - ¿Cuál es la base legal?
+   - ¿Hay transferencia internacional?
+   - ¿Qué riesgos para los derechos del usuario?
+2. **legal** consulta con `app-dev` la implementación técnica.
+3. **legal** genera EIPD en `docs/legal/YYYY-MM-DD_dpia_[feature].md`.
+4. Si el riesgo es alto → escalar a Judith + recomendar consulta con asesor legal.
+5. **legal** actualiza `_project-hub/LEGAL.md`.
+6. **ops** → CHANGELOG.
+
+---
+
 ## Pendiente de confirmar con Judith
 
 - ⚠️ ¿Frecuencia ideal del `/morning-brief`? (Propuesta: manual, no automático.)
 - ⚠️ ¿Qué hacer con emails de facturación que aparecen en `info@civiltek.es` (cuenta CIVILTEK general, no Cals2Gains)? ¿Reenviar? ¿Ignorar?
 - ⚠️ Umbral exacto de "anomalía" en gastos (propuesta: >2× media mensual del proveedor).
+- ⚠️ ¿Frecuencia de auditoría legal? (Propuesta: trimestral + antes de cada release en stores.)
+- ⚠️ ¿Tiene CivilTek asesor legal externo para consultas complejas?

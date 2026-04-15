@@ -298,10 +298,14 @@ const SettingsScreen = () => {
                   onPress: async () => {
                     setLoading(true);
                     try {
+                      const { deleteAccount } = useUserStore.getState();
+                      await deleteAccount();
                       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      // In production, would handle account deletion
                       Alert.alert(t('common.success'), t('settingsScreen.accountDeleted'));
-                      router.replace('/login');
+                      router.replace('/(auth)/welcome');
+                    } catch (error) {
+                      console.error('Delete account error:', error);
+                      Alert.alert(t('errors.generic'), t('settingsScreen.deleteError'));
                     } finally {
                       setLoading(false);
                     }

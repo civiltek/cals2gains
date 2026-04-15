@@ -1,5 +1,84 @@
 # Changelog - Cals2Gains
 
+## 2026-04-14 — receipt-collector a diario + cuenta info@cals2gains.com
+
+- Frecuencia de `receipt-collector` cambiada de lun/jue a **diario 8:00**.
+- Añadida cuenta `info@cals2gains.com` a la lista de cuentas a escanear.
+- Cuentas activas: `info@civiltek.es`, `cals2gains@gmail.com`, `judith.cordobes@gmail.com`, `info@cals2gains.com`.
+
+## 2026-04-14 — Implementación completa del sistema financiero y legal
+
+### Código app — Eliminación de cuenta
+- `services/firebase.ts`: nueva función `deleteUserAccount()` — borra todas las colecciones del usuario (meals, dailyLogs, weightEntries, waterLogs, progressPhotos, recipes, mealTemplates), documento de usuario, foto de perfil de Storage y cuenta de Firebase Auth.
+- `store/userStore.ts`: nueva acción `deleteAccount()` — logout de RevenueCat + eliminación completa.
+- `app/settings.tsx`: conectado el botón "Eliminar cuenta" a la función real (antes era stub).
+
+### Textos legales — Reescritura completa
+- `public/privacy.html`: reescrita desde cero para RGPD/LOPD-GDD. Ahora cubre: datos de cuenta, perfil, nutrición, salud (peso, medidas, ayuno, fotos progreso), voz, wearables, suscripciones. Incluye tabla de base legal, servicios de terceros con DPA, retención, derechos ARCO+ con mecanismos, referencia AEPD.
+- `public/terms.html`: actualizada con disclaimers de IA (sección 3), aviso de salud (sección 2: "NO sustituye consejo médico"), eliminación de cuenta (sección 6), reembolsos, IA generativa.
+- `public/aviso-legal.html`: NUEVO — aviso legal/Impressum LSSI-CE con datos de CivilTek.
+- `public/cookies.html`: NUEVO — política de cookies con tabla de cookies GA4, tipos, gestión.
+- Sincronizadas todas las copias a `public/cals2gains/`, `website/`, `website/cals2gains/`.
+
+### Web — Banner de cookies y GA4 condicionado
+- `public/index.html`: GA4 ahora solo se carga si el usuario acepta cookies analíticas (cumplimiento RGPD). Banner de consentimiento con opciones "Solo necesarias" / "Aceptar todas". Footer actualizado con links a aviso legal, cookies y redes sociales.
+
+### Dashboard financiero
+- Corregido KPI roto (HTML malformado). Añadido cargo faltante de Anthropic €595. Añadidos KPIs de balance neto, gasto mensual y saldo OpenAI. Historial ordenado por fecha.
+- Dashboard copiado a ambas ubicaciones (`finances/` y `_project-hub/`).
+
+### Data Safety Section
+- `docs/legal/data-safety-section.md`: documento preparatorio para rellenar en Google Play Console con todos los tipos de datos, servicios de terceros y prácticas de seguridad.
+
+### Hub actualizado
+- `_project-hub/LEGAL.md`: estado actualizado de 🟡 a 🟢 — todos los bloqueantes resueltos.
+
+## 2026-04-14 — Puesta en marcha del sistema de agentes financiero y legal
+
+### Nuevo agente: `legal`
+- Creado `Claude code/agents/legal.md` — agente de cumplimiento normativo (RGPD, LOPD-GDD, LSSI, AI Act, requisitos App Store / Play Store).
+- Alcance: auditoría de privacy.html y terms.html, EIPD/DPIA, derechos ARCO+, Data Safety Section, aviso legal, banner de cookies.
+
+### Nuevos skills
+- `reconciliation` — reconciliación mensual (cruza Excel con recibos y suscripciones, detecta discrepancias).
+- `financial-report` — reporte financiero completo con desglose, anomalías, proyecciones y recomendaciones.
+- `legal-audit` — auditoría legal completa (privacidad, términos, RGPD, stores, LSSI, consistencia de textos legales).
+
+### Nuevos comandos
+- `/finance-report` — genera reporte financiero con reconciliación previa.
+- `/legal-check` — ejecuta auditoría legal (completa o parcial: privacy, terms, stores, pre-launch).
+
+### Nuevos workflows
+- W10: Auditoría legal (disparada por `/legal-check`, pre-lanzamiento o feature nueva con datos personales).
+- W11: Reporte financiero mensual (disparado por `/finance-report` o final de mes).
+- W12: EIPD/DPIA para nueva feature (evalúa impacto en protección de datos).
+
+### Nuevos handoffs
+- `legal → web-dev` (deploy de textos legales tras aprobación).
+- `legal → app-dev` (features legales in-app: eliminación cuenta, consentimiento, centro privacidad).
+- `legal → finance` (costes legales: DPAs, asesor externo).
+- `finance → legal` (contratos/DPAs que requieren revisión legal).
+- `legal → research` (investigación de cambios normativos).
+
+### Nuevos archivos de estado y contexto
+- `_project-hub/LEGAL.md` — estado legal del proyecto con evaluación por área (RGPD, stores, LSSI, web).
+- `Claude code/context/LEGAL-OVERVIEW.md` — arquitectura del sistema legal, marco normativo, datos tratados, flujo de datos.
+- `docs/legal/` — directorio para DPIAs, checklists y documentos legales internos.
+
+### Actualizaciones
+- `CLAUDE.md`: añadido agente `legal` a tabla de agentes, `LEGAL.md` al hub, comandos `/finance-report` y `/legal-check`, paso legal en checklist de cierre.
+- `guardrails/RULES.md`: añadidas R16 (textos legales requieren aprobación), R17 (no afirmar cumplimiento sin verificar), R18 (datos de salud = categoría especial RGPD).
+- `guardrails/ESCALATION.md`: añadidos puntos de escalado obligatorio (textos legales, datos de salud) y recomendado (cambios normativos), operaciones rutinarias (auditorías de lectura).
+- `orchestration/WORKFLOWS.md`: añadidos W10, W11, W12.
+- `orchestration/HANDOFFS.md`: añadidos 5 nuevos handoffs.
+
+### Hallazgos iniciales (bloqueantes para lanzamiento)
+- 🔴 Falta eliminación de cuenta in-app (requisito stores desde 2024).
+- 🔴 Falta aviso legal / Impressum en web (obligatorio LSSI España).
+- 🔴 Falta banner de cookies (obligatorio con GA4).
+- 🔴 Falta Data Safety Section en Play Console.
+- 🔴 privacy.html incompleta (no cubre fasting, voice, training, measurements).
+
 ## 2026-04-14 (noche-4) — Motor audiovisual v4.0 (Studio)
 
 ### Visual Engine — Upgrade a calidad de estudio profesional
