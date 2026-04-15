@@ -1,0 +1,69 @@
+{
+  "title": "2015 Apps vs 2026 Apps",
+  "lang": "en",
+  "voice": "elevenlabs",
+  "music_mood": "motivational",
+  "setting": "Split visual concept: left half cold blue desaturated 2015 aesthetic, right half dark premium 2026 with violet and coral accents, consistent split-screen camera framing, dramatic contrast lighting",
+  "scenes": [
+    {
+      "prompt": "Old cracked smartphone with basic ugly calorie counter app interface, dusty desk, harsh fluorescent lighting, desaturated colors, intentionally dated look, 9:16 vertical",
+      "text": "Your calorie app in 2015",
+      "text_style": "hero",
+      "voiceover": "This is what calorie tracking looked like in 2015.",
+      "duration": 3,
+      "transition": "cut",
+      "effect": "zoom_in",
+      "data_overlays": [
+        {"text": "2015", "style": "stat_big", "position": "center", "appear_at": 0.3, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Person tediously typing food name letter by letter on old phone interface, bored expression, cold blue office lighting, slow and painful process visualization, 9:16 vertical",
+      "text": "Search. Scroll. Guess portions.",
+      "text_style": "title",
+      "voiceover": "Search every food. Scroll through hundreds of results. Guess your portions. Hope it's close enough.",
+      "duration": 5,
+      "transition": "zoom_cut",
+      "effect": "pan_right",
+      "data_overlays": [
+        {"text": "15+ min/day", "style": "stat_small", "position": "bottom-right", "appear_at": 1.5, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Modern premium smartphone floating in dark space showing sleek AI-powered nutrition app with glowing violet interface, holographic food scan animation, particles, futuristic, 9:16 vertical",
+      "text": "This is 2026",
+      "text_style": "hero",
+      "voiceover": "Now this is 2026. One photo. AI does everything.",
+      "duration": 4,
+      "transition": "flash_white",
+      "effect": "zoom_punch",
+      "data_overlays": [
+        {"text": "2026", "style": "stat_big", "position": "center", "appear_at": 0.3, "duration": 2.5},
+        {"text": "1 photo = done", "style": "label", "position": "bottom-left", "appear_at": 1.0, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Montage of futuristic app features: AI food scanning with glowing lines, adaptive macro recommendations with animated charts, weekly coach insights, all in dark premium aesthetic with violet and coral accents, 9:16 vertical",
+      "text": "AI Coach. Photo Scan. Adaptive.",
+      "text_style": "title",
+      "voiceover": "AI coach that adapts weekly. Photo scanning in 3 seconds. Five goal modes. Everything in one app.",
+      "duration": 5,
+      "transition": "whip_pan",
+      "effect": "orbit",
+      "data_overlays": [
+        {"text": "5 goal modes", "style": "stat_small", "position": "bottom-left", "appear_at": 1.0, "duration": 2.5},
+        {"text": "3 sec scan", "style": "stat_small", "position": "bottom-right", "appear_at": 1.5, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Person confidently using modern dark-themed nutrition app, satisfied smile, warm premium lighting with coral and violet accents, lifestyle shot, 9:16 vertical",
+      "text": "Upgrade your tracking. Free.",
+      "text_style": "cta",
+      "voiceover": "Stop living in 2015. Upgrade to Cals2Gains. Free for 7 days.",
+      "duration": 4,
+      "transition": "crossfade",
+      "effect": "zoom_out",
+      "data_overlays": []
+    }
+  ]
+}

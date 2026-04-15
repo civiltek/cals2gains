@@ -1,0 +1,67 @@
+{
+  "title": "Macros 101: The Only Guide You Need",
+  "lang": "en",
+  "format": "carousel",
+  "slides": 7,
+  "aspect_ratio": "4:5",
+  "color_scheme": "dark",
+  "slides_data": [
+    {
+      "type": "cover",
+      "prompt": "Dark premium background with floating 3D macro nutrient icons (protein, carbs, fats) in violet and coral neon glow, holographic style, clean typography space, 4:5",
+      "headline": "MACROS 101",
+      "subheadline": "The only guide you need",
+      "text_style": "hero",
+      "cta_text": "Swipe to learn →"
+    },
+    {
+      "type": "content",
+      "prompt": "Elegant split visual: left side shows protein-rich foods (chicken, eggs, fish) in dark moody lighting, right side shows muscle fiber illustration, violet accent lighting, 4:5",
+      "headline": "PROTEIN",
+      "body": "Builds and repairs muscle.\n4 cal per gram.\nGoal: 1.6-2.2g per kg bodyweight.\nBest sources: chicken, fish, eggs, Greek yogurt, legumes.",
+      "text_style": "educational",
+      "icon": "muscle"
+    },
+    {
+      "type": "content",
+      "prompt": "Dynamic shot of complex carb foods (oats, sweet potato, rice, fruits) arranged on dark surface with energy wave graphics, warm coral lighting, 4:5",
+      "headline": "CARBS",
+      "body": "Your body's main fuel source.\n4 cal per gram.\nGoal: 3-5g per kg on training days.\nBest sources: oats, rice, potatoes, fruits, whole grains.",
+      "text_style": "educational",
+      "icon": "lightning"
+    },
+    {
+      "type": "content",
+      "prompt": "Artistic arrangement of healthy fat foods (avocado, nuts, olive oil, salmon) on dark marble with golden light accents, premium food photography, 4:5",
+      "headline": "FATS",
+      "body": "Hormones, brain health, absorption.\n9 cal per gram.\nGoal: 0.8-1.2g per kg bodyweight.\nBest sources: avocado, nuts, olive oil, fatty fish.",
+      "text_style": "educational",
+      "icon": "brain"
+    },
+    {
+      "type": "content",
+      "prompt": "Infographic-style plate divided into macro sections with percentage labels, dark background with violet grid overlay, data visualization aesthetic, 4:5",
+      "headline": "THE PERFECT PLATE",
+      "body": "Muscle gain: 30% protein, 45% carbs, 25% fats\nFat loss: 35% protein, 35% carbs, 30% fats\nMaintenance: 25% protein, 45% carbs, 30% fats",
+      "text_style": "stat",
+      "icon": "chart"
+    },
+    {
+      "type": "content",
+      "prompt": "Person scanning a balanced meal with smartphone showing AI macro breakdown, dark premium app interface glowing violet, lifestyle shot, warm lighting, 4:5",
+      "headline": "SKIP THE MATH",
+      "body": "Cals2Gains scans your food and calculates macros instantly with AI. No databases. No guessing. Just snap a photo.",
+      "text_style": "feature",
+      "icon": "camera"
+    },
+    {
+      "type": "cta",
+      "prompt": "Dark premium background with Cals2Gains app mockup showing macro tracking dashboard, violet and coral gradient glow, floating food icons, aspirational, 4:5",
+      "headline": "START TRACKING SMART",
+      "body": "Free for 7 days. No credit card.",
+      "text_style": "cta",
+      "cta_text": "Link in bio 🔗",
+      "hashtags": ["#macros101", "#proteingoals", "#nutritioncoach", "#cals2gains", "#macrotracking"]
+    }
+  ]
+}

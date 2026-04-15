@@ -1,0 +1,50 @@
+[
+  {
+    "week_number": 0,
+    "label": "PRE-LANZAMIENTO",
+    "period_start": "2026-04-07",
+    "period_end": "2026-04-13",
+    "report_date": "2026-04-14",
+    "phase": "pre-campaign",
+    "publishing_summary": {
+      "scheduled": 0,
+      "published": 0,
+      "discarded": 0,
+      "pending": 0,
+      "changes_requested": 0
+    },
+    "content_by_format": {
+      "reels": 0,
+      "carousels": 0,
+      "stories": 0
+    },
+    "script_readiness": {
+      "semana_1": { "ready": 5, "total": 5, "start_date": "2026-05-01" },
+      "semana_2": { "ready": 5, "total": 5, "start_date": "2026-05-08" },
+      "semana_3": { "ready": 1, "total": 5, "start_date": "2026-05-15" },
+      "semana_4": { "ready": 0, "total": 5, "start_date": "2026-05-22" }
+    },
+    "notes": [
+      "Primera ejecución del sistema de analytics. content_status.json vacío (pre-campaña).",
+      "Campaña arranca el 2026-05-01 (T-17 desde hoy).",
+      "Semanas 3 y 4 necesitan scripts urgentemente.",
+      "Collab influencer del 22/05 sin coordinar."
+    ],
+    "actions_required": [
+      "Generar 4 scripts faltantes para Semana 3",
+      "Generar 5 scripts faltantes para Semana 4",
+      "Coordinar influencer collab 22/05",
+      "Verificar cuentas IG y TikTok activas"
+    ],
+    "telegram_sent": true,
+    "telegram_message_ids": [73, 74, 75, 76],
+    "last_run": "2026-04-14",
+    "calendar_totals": {
+      "total_entries": 65,
+      "reels": 39,
+      "carousels": 26,
+      "with_script": 11,
+      "without_script": 54
+    }
+  }
+]

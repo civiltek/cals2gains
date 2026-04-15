@@ -1,0 +1,68 @@
+{
+  "title": "5 Surprising Protein Foods",
+  "lang": "en",
+  "voice": "elevenlabs",
+  "music_mood": "upbeat",
+  "setting": "Dark marble counter food photography set, consistent dramatic side lighting from the left, violet color grading, dark slate surface, same overhead camera angle, premium food photography studio",
+  "scenes": [
+    {
+      "prompt": "Dramatic overhead shot of diverse foods on dark marble surface with dramatic lighting, question mark made of protein powder, moody violet and coral accents, premium food photography, 9:16 vertical",
+      "text": "5 foods with MORE protein than you think",
+      "text_style": "hero",
+      "voiceover": "Five foods with way more protein than you think.",
+      "duration": 3,
+      "transition": "cut",
+      "effect": "zoom_punch",
+      "data_overlays": []
+    },
+    {
+      "prompt": "Macro close-up of cottage cheese in artisan ceramic bowl with berries, dark slate background, dramatic side lighting casting long shadows, violet color grading, premium food photography, 9:16 vertical",
+      "text": "Cottage cheese: 24g per cup",
+      "text_style": "stat",
+      "voiceover": "Number one: Cottage cheese. Twenty-four grams of protein per cup. More than most protein bars.",
+      "duration": 5,
+      "transition": "zoom_cut",
+      "effect": "pan_left",
+      "data_overlays": [
+        {"text": "24g", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 3.0},
+        {"text": "vs protein bar: 20g", "style": "comparison", "position": "bottom-right", "appear_at": 1.5, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Beautiful shot of edamame beans in dark bowl with sea salt, chopsticks resting beside, moody Asian-inspired dark background, warm coral accent light, 9:16 vertical",
+      "text": "Edamame: 18g per cup",
+      "text_style": "stat",
+      "voiceover": "Number two: Edamame. Eighteen grams per cup. And it's plant-based.",
+      "duration": 4,
+      "transition": "whip_pan",
+      "effect": "zoom_in",
+      "data_overlays": [
+        {"text": "18g", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 2.5},
+        {"text": "Plant-based", "style": "label", "position": "bottom-left", "appear_at": 1.0, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Cinematic shot of lentil soup in premium dark ceramic bowl, steam rising, dark kitchen background with warm coral and violet lighting, professional food videography, 9:16 vertical",
+      "text": "Lentils: 18g per cup cooked",
+      "text_style": "stat",
+      "voiceover": "Number three: Lentils. Eighteen grams per cup cooked. Plus fiber for days.",
+      "duration": 4,
+      "transition": "zoom_cut",
+      "effect": "diagonal",
+      "data_overlays": [
+        {"text": "18g", "style": "stat_big", "position": "center-right", "appear_at": 0.5, "duration": 2.5},
+        {"text": "+ 15g fiber", "style": "stat_small", "position": "bottom-left", "appear_at": 1.0, "duration": 2.0}
+      ]
+    },
+    {
+      "prompt": "Person using dark-themed nutrition app to scan a plate of high-protein foods, app showing detailed macro breakdown, warm lifestyle lighting with coral accents, 9:16 vertical",
+      "text": "Save this + track with AI",
+      "text_style": "cta",
+      "voiceover": "Save this list and track your protein with Cals2Gains. AI does the counting for you.",
+      "duration": 4,
+      "transition": "crossfade",
+      "effect": "zoom_out",
+      "data_overlays": []
+    }
+  ]
+}

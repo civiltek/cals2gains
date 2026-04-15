@@ -1,0 +1,20 @@
+# Cals2Gains Visual Engine v5.0 (Higgsfield) — Dependencies
+# Install: pip install -r requirements.txt
+
+# Core image processing
+Pillow>=10.0.0
+
+# HTTP client for API calls (Higgsfield, ElevenLabs, OpenAI)
+httpx>=0.25.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Video composition & editing
+moviepy>=2.0.0
+
+# Numerical (required by moviepy, post-processing, music gen)
+numpy>=1.24.0
+
+# Note: Higgsfield SDK is optional — we use the REST API directly
+# pip install higgsfield-client  # Optional, for SDK-based access

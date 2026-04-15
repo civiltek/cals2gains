@@ -1,0 +1,68 @@
+{
+  "title": "3 Calorie Myths Killing Your Gains",
+  "lang": "en",
+  "voice": "elevenlabs",
+  "music_mood": "dark",
+  "setting": "Dark dramatic studio with moody directional lighting, deep plum background, tension-building cinematic color grading, consistent camera distance and height, red and violet accent lights",
+  "scenes": [
+    {
+      "prompt": "Dramatic shot of scale with question marks floating around it, dark moody background with red warning glow, cinematic tension lighting, 9:16 vertical",
+      "text": "3 calorie myths killing your gains",
+      "text_style": "hero",
+      "voiceover": "Three calorie myths that are killing your gains right now.",
+      "duration": 3,
+      "transition": "cut",
+      "effect": "zoom_punch",
+      "data_overlays": []
+    },
+    {
+      "prompt": "Visual of person eating tiny salad looking miserable, dark background with cold blue lighting, dramatic portrait, contrasted with overlay text, 9:16 vertical",
+      "text": "MYTH: Eat less = lose more",
+      "text_style": "title",
+      "voiceover": "Myth one: eating less always means losing more. Wrong. Drop too low and your metabolism crashes. You need a smart deficit, not starvation.",
+      "duration": 6,
+      "transition": "zoom_cut",
+      "effect": "pan_left",
+      "data_overlays": [
+        {"text": "MYTH #1", "style": "label", "position": "top-left", "appear_at": 0.3, "duration": 3.0},
+        {"text": "Metabolic slowdown", "style": "stat_small", "position": "bottom-right", "appear_at": 2.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Clock showing midnight with food plate crossed out, dark dramatic background, violet and coral lighting, cinematic composition, 9:16 vertical",
+      "text": "MYTH: No carbs after 6pm",
+      "text_style": "title",
+      "voiceover": "Myth two: no carbs after six pm. Total bro science. Your body doesn't have a carb curfew. Total daily intake matters, not timing.",
+      "duration": 6,
+      "transition": "whip_pan",
+      "effect": "zoom_in",
+      "data_overlays": [
+        {"text": "MYTH #2", "style": "label", "position": "top-left", "appear_at": 0.3, "duration": 3.0},
+        {"text": "Total intake matters", "style": "stat_small", "position": "bottom-right", "appear_at": 2.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Person staring at calorie counting app showing 1800 calories with confused expression, dark moody lighting, violet haze, questioning look, 9:16 vertical",
+      "text": "MYTH: All calories are equal",
+      "text_style": "title",
+      "voiceover": "Myth three: a calorie is a calorie. Not exactly. 200 calories of chicken builds muscle. 200 calories of candy doesn't. Macros matter.",
+      "duration": 6,
+      "transition": "zoom_cut",
+      "effect": "diagonal",
+      "data_overlays": [
+        {"text": "MYTH #3", "style": "label", "position": "top-left", "appear_at": 0.3, "duration": 3.0},
+        {"text": "Macros > calories", "style": "comparison", "position": "bottom-right", "appear_at": 2.0, "duration": 2.5}
+      ]
+    },
+    {
+      "prompt": "Person confidently preparing balanced meal with dark premium app showing macro tracking in background, warm coral lighting, empowered lifestyle, 9:16 vertical",
+      "text": "Track smart. Send to a friend.",
+      "text_style": "cta",
+      "voiceover": "Stop believing myths. Start tracking smart with Cals2Gains. Send this to someone who needs it.",
+      "duration": 4,
+      "transition": "crossfade",
+      "effect": "zoom_out",
+      "data_overlays": []
+    }
+  ]
+}
