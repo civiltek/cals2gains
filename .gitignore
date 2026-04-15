@@ -66,5 +66,8 @@ docs/build-logs/gcloud-token.txt
 docs/build-logs/gcloud-token2.txt
 tools/outlook-mcp-server/CREDENTIALS.md
 
+# Notion config (workspace-specific database IDs)
+.notion-config.json
+
 # Misc
 *.log
