@@ -6,6 +6,13 @@
 - **BUG 2 — weekly-coach.tsx**: `generateWins` y `generateImprovements` usaban la clave del título de sección como contenido; ahora usan claves específicas (`win5Days`, `win3Days`, `winCalories`, `winProtein`, `winDefault`, `improveLogging`, `improveCalories`, `improveProtein`, `improveVariability`)
 - **i18n/es.ts + en.ts**: añadidas 9 claves nuevas en `weeklyCoach` para los mensajes de logros y mejoras
 
+## 2026-04-16 — Merge masivo: 5 PRs integrados + auditoría TypeScript
+
+- **PRs mergeados**: #25 (DB alimentos 500+ + gamificación), #22 (Widget + Coach adaptativo), #21 (Alergias), #24 (HealthKit/Health Connect), #23 (Voice Logging)
+- **Conflictos resueltos**: `openai.ts` (allergies + urgencyMode combinados), `i18n/es.ts` (allergies + achievements), `onboarding.tsx` (state alergias + HealthKit), `profile.tsx` (HealthDashboardCard + achievements), `types/index.ts` y `userStore.ts` (campos health + allergy combinados)
+- **TypeScript**: `npx tsc --noEmit` → 0 errores
+- **Sin archivos sensibles** (.env, google-services.json) en ningún PR
+
 ## 2026-04-16 — Añadir Voice Logging (dictado por voz para registrar comidas)
 
 - **Nueva pantalla** `app/voice-log.tsx`: flujo completo idle → recording → processing → results/error
