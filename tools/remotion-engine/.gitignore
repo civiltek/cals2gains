@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.cache/
+temp/
+public/scene_*
+public/test_*
