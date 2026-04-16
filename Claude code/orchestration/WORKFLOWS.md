@@ -79,7 +79,9 @@ Anomalías a señalar:
    - Δ vs semana anterior.
    - Top 3 posts por engagement.
    - Recomendaciones accionables (máx. 3).
-4. **ops** → CHANGELOG + resumen a Judith.
+   - Apartado **"Formatos y tendencias virales"**: qué formatos tienen mejor rendimiento en las cuentas de Cals2Gains esta semana (carrusel vs reel, duración media de reels que funcionan, tipo de hooks, estilos visuales, audios trending) y qué observan los competidores del nicho fitness/nutrición.
+4. **growth** entrega el snapshot a **marketing** para ajuste del plan → dispara W16.
+5. **ops** → CHANGELOG + resumen a Judith.
 
 ---
 
@@ -155,6 +157,73 @@ Reglas clave: R1 (nada inventado), R6 (nunca publicar sin aprobación explícita
 2. Si responde a comentario "sensible" (queja, pregunta técnica, duda nutricional específica) → deja flag y no responde automáticamente, espera revisión.
 3. **marketing** revisa al día siguiente lo flaggeado.
 4. Registro en `_project-hub/METRICS.md` — sección comentarios.
+
+---
+
+## W10. Pipeline de merge de feature nueva
+
+**Disparador:** PR con feature nueva lista para merge a `main`.
+
+1. **app-dev** verifica que el PR cumple requisitos: `npx tsc --noEmit` (0 errores), lint limpio, sin archivos sensibles (`.env`, `google-services.json`, etc.).
+2. **app-dev** mergea el PR a `main`.
+3. **app-dev** invoca skill `eas-build`:
+   - `eas build --profile preview --platform android`.
+   - Anota build ID.
+4. Cuando termina el build, valida en dispositivo (`R3CR10E9LSE`):
+   - Instala APK, recorre el flujo de la feature.
+   - Si hay crash → invoca skill `crash-diagnosis` antes de continuar.
+5. **app-dev** actualiza `_project-hub/FEATURES.md` (feature a "Completada") y `_project-hub/PROJECT_STATUS.md` (nuevo build ID).
+6. **app-dev** notifica handoffs en paralelo:
+   - **6a. growth**: features notables + build ID para tracking de adopción (ver handoff app-dev → growth).
+   - **6b. web-dev**: si la feature tiene impacto visible en landing o SEO, actualiza `public/` y hace deploy (W5).
+   - **6c. marketing**: lista de features + screenshots + público objetivo → dispara W15 en paralelo.
+7. **ops** → CHANGELOG.
+
+---
+
+## W15. Actualización del plan de marketing tras features nuevas
+
+**Disparador:** Merge de PR con features visibles para el usuario (se dispara como parte de W10 tras paso 6, en paralelo con W14).
+
+1. **app-dev** notifica a **marketing** las features mergeadas: lista de features, screenshots en `marketing/screenshots/`, y público objetivo.
+2. **marketing** revisa `_project-hub/FEATURES.md` y `Claude code/context/PROJECT-OVERVIEW.md` para entender el contexto completo.
+3. **viral-strategist** consulta `Claude code/context/TREND-INSIGHTS.md` para decidir **qué formato** usar para comunicar cada feature (¿reel? ¿carrusel? ¿story? ¿serie de posts?), basándose en qué formatos están rindiendo mejor en ese momento en las cuentas y en el nicho.
+4. **marketing** actualiza `_project-hub/CONTENT_PLAN.md`:
+   - Añade piezas de contenido sobre las features nuevas (reels, carruseles, stories).
+   - El formato de cada pieza lo determina TREND-INSIGHTS.md (paso 3), no la intuición.
+   - Asigna a cada pieza: cuenta destino (`@cals2gains` EN, `@cals2gains_es` ES, `@calstogains`), formato, pilar de contenido, fecha sugerida.
+   - Prioriza features con mayor potencial viral o diferenciador vs competencia.
+5. **viral-strategist** valida que las piezas propuestas encajan con los pilares de marca (BRAND.md + ANTI-PATTERNS.md).
+6. **ops** actualiza `SHARED-CONTEXT.md` (sección RRSS) + CHANGELOG.
+
+**Cierre:** `_project-hub/CONTENT_PLAN.md` actualizado con contenido planificado para las features nuevas.
+
+---
+
+## W16. Ajuste del plan de marketing por métricas e insights
+
+**Disparador:** Tras W4 (métricas semanales) o tras `performance-analyzer` (W9 paso 8), o cuando growth detecta cambios significativos en métricas.
+
+Regla: W16 se ejecuta como mínimo 1×/semana (tras W4), pero puede dispararse ad-hoc si `performance-analyzer` detecta anomalías (3 piezas seguidas underperforming, pico viral inesperado, etc.).
+
+1. **growth** entrega a **marketing** el Performance Digest o snapshot semanal con:
+   - Posts con mejor/peor rendimiento (alcance, engagement, saves, shares).
+   - Ángulos/formatos ganadores vs perdedores.
+   - Horarios óptimos de publicación por cuenta.
+   - Tendencias de crecimiento/declive por cuenta.
+2. **marketing** analiza los datos y ajusta `_project-hub/CONTENT_PLAN.md`:
+   - Prioriza repetir ángulos ganadores (>1.5× media de cuenta).
+   - Descarta o reformula ángulos que underperforman (3 piezas seguidas bajo media).
+   - Ajusta horarios de publicación según datos reales.
+   - Rebalancea distribución por cuenta si alguna crece más que otras.
+   - Ajusta ratio reel/carrusel/story según qué formato rinde más.
+3. **viral-strategist** actualiza la estrategia de contenido si los datos sugieren cambio de pilares o enfoque.
+4. **performance-analyzer** alimenta **trend-scout** con insights para el siguiente ciclo (ya existe en W9, pero ahora también alimenta `CONTENT_PLAN.md` directamente).
+5. **trend-scout** actualiza `Claude code/context/TREND-INSIGHTS.md` con los **formatos** que están funcionando en las cuentas de Cals2Gains (no solo ángulos de contenido, sino: carrusel vs reel, duración óptima de reels, tipo de hooks que convierten, estilos visuales con más engagement, audios trending). Este paso alimenta W15 en el siguiente ciclo.
+6. **trend-scout** notifica a **marketing** de tendencias virales emergentes que se puedan capitalizar rápido (newsjacking de formatos).
+7. **ops** actualiza `SHARED-CONTEXT.md` (sección RRSS y métricas) + CHANGELOG.
+
+**Cierre:** `_project-hub/CONTENT_PLAN.md` ajustado a datos reales, no a suposiciones.
 
 ---
 

@@ -27,10 +27,16 @@ Después de un release relevante.
 - Cierre: snapshot añadido a METRICS.md con Δ vs pre-release.
 
 ### app-dev → marketing
-Cuando hay cambio visual o feature demostrable.
+Cuando hay cambio visual o feature demostrable (W3 / ad-hoc).
 - Entrega: screenshots en `marketing/screenshots/` + descripción corta ES + EN.
 - B hace: preparar post/reel + actualizar CONTENT_PLAN.md.
 - Cierre: draft de post listo para aprobación.
+
+### app-dev → marketing (W15)
+Cuando se mergean features nuevas visibles para el usuario (como parte de W10 paso 6c).
+- Entrega: lista de features mergeadas + screenshots en `marketing/screenshots/` + público objetivo por feature.
+- B hace: consultar TREND-INSIGHTS.md para elegir formato óptimo por feature (reel/carrusel/story/serie), planificar piezas en CONTENT_PLAN.md con cuenta destino, formato, pilar y fecha sugerida.
+- Cierre: CONTENT_PLAN.md actualizado con piezas sobre las features nuevas, validadas por viral-strategist.
 
 ### finance → ops
 Cada vez que finance modifica Excel o dashboard.
@@ -39,10 +45,16 @@ Cada vez que finance modifica Excel o dashboard.
 - Cierre: entrada en CHANGELOG y mensaje a Judith.
 
 ### growth → marketing
-Tras snapshot semanal.
+Tras snapshot semanal (W4 ad-hoc).
 - Entrega: top 3 / bottom 3 posts + hipótesis de qué funcionó/falló.
 - B hace: ajustar plan editorial (replicar formatos ganadores, descartar los débiles).
 - Cierre: CONTENT_PLAN.md actualizado.
+
+### growth → marketing (W16)
+Tras métricas semanales (W4) o Performance Digest (W9 paso 8) o anomalía detectada (3 piezas underperforming / pico viral inesperado).
+- Entrega: Performance Digest con métricas por cuenta (alcance, engagement, saves, shares), ángulos ganadores/perdedores, horarios óptimos, y apartado "Formatos y tendencias virales" (carrusel vs reel, duración de reels, tipos de hooks que convierten, estilos visuales, audios trending).
+- B hace: ajustar CONTENT_PLAN.md según datos (priorizar ángulos >1.5× media, descartar ángulos con 3 piezas bajo media, ajustar horarios y ratio de formatos).
+- Cierre: CONTENT_PLAN.md ajustado a métricas reales + TREND-INSIGHTS.md actualizado por trend-scout con los formatos que funcionan.
 
 ### growth → app-dev
 Cuando detecta señal de crash/uninstall alto.

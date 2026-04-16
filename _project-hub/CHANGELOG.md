@@ -1,5 +1,14 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Añadir W15 (plan marketing por features) y W16 (ajuste por métricas) — plan de contenido auto-reactivo
+
+- **W10** (nuevo): pipeline completo de merge de feature nueva (7 pasos: typecheck → merge → build EAS → validación dispositivo → FEATURES.md → handoffs growth/web-dev/marketing → CHANGELOG).
+- **W15** (nuevo): marketing actualiza CONTENT_PLAN.md tras merge de features; viral-strategist consulta TREND-INSIGHTS.md para elegir formato óptimo por feature.
+- **W16** (nuevo): ajuste semanal de CONTENT_PLAN.md por métricas; trend-scout actualiza TREND-INSIGHTS.md con formatos que funcionan (carrusel/reel, hooks, audios); notifica a marketing de tendencias virales emergentes.
+- **W4** actualizado: growth incluye apartado "Formatos y tendencias virales" en snapshot semanal; dispara W16 al entregar a marketing.
+- **HANDOFFS.md**: añadidos handoffs específicos W15 (app-dev → marketing) y W16 (growth → marketing) con criterios de cierre observables.
+- **SHARED-CONTEXT.md** (nuevo): creado en `Claude code/context/` con sección RRSS, gobernanza del plan de contenido y referencia a métricas.
+
 ## 2026-04-16 — Corregir bugs i18n en Estadísticas y Resumen Semanal
 
 - **BUG 1 — analytics.tsx**: `t('analytics.currentDays/longestStreak/totalLogged')` ahora pasa `{ count: valor }` — ya no aparece `{{count}}` literal en pantalla
