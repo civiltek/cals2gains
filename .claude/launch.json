@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Expo Metro (React Native)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "port": 8081
+    },
+    {
+      "name": "Firebase Hosting Local",
+      "runtimeExecutable": "firebase",
+      "runtimeArgs": ["serve", "--only", "hosting"],
+      "port": 5000
+    }
+  ]
+}

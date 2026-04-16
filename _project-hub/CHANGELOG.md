@@ -1,5 +1,19 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Crear motor de carruseles tools/carousel-engine/ (v1.0)
+
+- **Nuevo motor**: `tools/carousel-engine/` — equivalente al visual-engine pero para carruseles 1080×1350 (4:5)
+- **Módulos creados**: `brand_config.py` · `slide_renderer.py` · `image_generator.py` · `template_engine.py` · `carousel_composer.py` · `script_generator.py` · `html_preview.py` · `create_carousel.py`
+- **Generación de fondos**: DALL-E 3 HD (1024×1792 → crop 4:5) + fallback procedural numpy (gradientes + bokeh + grano)
+- **Tipos de slide**: cover · myth · reality · science · stats · quote · educational · practical · cta + nuevos: problem · solution · value · reflection (estructura de 7 slides del doc Google)
+- **HTML preview interactivo**: carousel swipeable autocontenido (base64, sin servidor) generado junto a los PNGs
+- **CLI**: `python create_carousel.py --spec specs/pieza-01.json [--no-ai] [--no-telegram] [--topic X --lang es]`
+- **Script generator**: GPT-4o genera spec completo a partir de tema + idioma + template (myth-buster · educational · tips-list · recipe · 7-slides)
+- **Telegram**: envío automático de álbum + botones de aprobación vía MCP existente
+- **Calidad**: mínimo 2.1 MB por slide (objetivo: ≥300 KB) con fondos DALL-E 3 HD
+- **Test PIEZA-01**: carrusel «Huevos y colesterol» generado y enviado a Telegram (C2G-ES-CAR-2026-04-15-01, 8 slides, @cals2gains_es)
+- **Bug fix**: path .env ahora busca hacia arriba en el árbol (funciona desde worktree y desde repo principal)
+
 ## 2026-04-15 — Migrar visual-engine a API open source de Higgsfield (Muapi.ai)
 
 - **higgsfield_client.py**: reescritura completa — cambia de `cloud.higgsfield.ai` (de pago) a `api.muapi.ai` (open source, tier gratuito)

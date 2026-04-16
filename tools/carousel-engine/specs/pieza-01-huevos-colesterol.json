@@ -1,0 +1,107 @@
+{
+  "id": "C2G-ES-CAR-2026-04-15-01",
+  "title": "Los huevos y el colesterol: El mito que lleva 40 años haciéndote daño",
+  "lang": "es",
+  "template": "myth-buster",
+  "account": "@cals2gains_es",
+  "slides": [
+    {
+      "type": "cover",
+      "accent_color": "coral",
+      "headline": "¿Los huevos son malos\npara el corazón?",
+      "subhead": "La verdad que la ciencia lleva años intentando contarte",
+      "bridge": "Desliza →",
+      "handle": "@cals2gains_es",
+      "bg_prompt": "Fresh organic eggs in a modern dark kitchen, natural golden morning light, shallow depth of field, moody editorial food photography, medium format aesthetic, dark wood surfaces"
+    },
+    {
+      "type": "myth",
+      "accent_color": "coral",
+      "label": "EL MITO",
+      "headline": "\"Los huevos suben el colesterol\ny dañan el corazón\"",
+      "body": "Creído y repetido por millones durante más de 50 años sin cuestionar la evidencia.",
+      "handle": "@cals2gains_es",
+      "bg_prompt": "Abstract dark red-orange gradient background, dramatic moody atmosphere, no objects, pure texture, deep shadows"
+    },
+    {
+      "type": "science",
+      "accent_color": "violet",
+      "label": "LO QUE DICE LA CIENCIA",
+      "headline": "El colesterol dietético\napenas afecta al\ncolesterol en sangre",
+      "body": "Tu hígado regula activamente la producción de colesterol. Cuando comes más, produce menos.",
+      "stat": "El 70-80% del colesterol en sangre lo fabrica tu propio cuerpo, no tu dieta",
+      "handle": "@cals2gains_es",
+      "bg_prompt": "Abstract dark blue-violet gradient with subtle scientific geometric patterns, laboratory aesthetic, deep space atmosphere, no text"
+    },
+    {
+      "type": "stats",
+      "accent_color": "violet",
+      "label": "1 HUEVO GRANDE",
+      "headline": "perfil nutricional completo",
+      "stats": [
+        {"label": "Proteína",      "value": "6 g",    "bar_pct": 0.88},
+        {"label": "Grasas totales","value": "5 g",    "bar_pct": 0.55},
+        {"label": "Calorías",      "value": "70 kcal","bar_pct": 0.40},
+        {"label": "Carbohidratos", "value": "0.6 g",  "bar_pct": 0.05}
+      ],
+      "body": "Vitamina D · B12 · Colina · Luteína · Zeaxantina · Selenio",
+      "handle": "@cals2gains_es",
+      "bg_prompt": "Minimalist dark background with subtle warm amber gradient, clean data visualization aesthetic, professional editorial style"
+    },
+    {
+      "type": "quote",
+      "accent_color": "gold",
+      "label": "ESTUDIO CLAVE",
+      "quote": "\"Consumir 6 huevos al día durante 3 semanas no alteró negativamente los marcadores de riesgo cardiovascular en adultos sanos\"",
+      "source": "Journal of Nutrition · 2020",
+      "handle": "@cals2gains_es",
+      "bg_prompt": "Dark academic background with subtle paper grain texture, deep indigo-dark gradient, scholarly warm atmosphere, no objects"
+    },
+    {
+      "type": "educational",
+      "accent_color": "violet",
+      "label": "¿POR QUÉ NO SON MALOS?",
+      "headline": "Los huevos suben el\nCOLESTEROL BUENO (HDL)",
+      "bullets": [
+        "El HDL protege activamente tu corazón y vasos sanguíneos",
+        "El LDL que generan son partículas grandes — las menos aterogénicas",
+        "La ratio HDL/LDL (lo que realmente importa) mejora o se mantiene estable"
+      ],
+      "handle": "@cals2gains_es",
+      "bg_prompt": "Dark teal-violet gradient background, health science aesthetic, abstract flowing light, no objects or text"
+    },
+    {
+      "type": "practical",
+      "accent_color": "coral",
+      "label": "¿CUÁNTOS PUEDES COMER?",
+      "tiers": [
+        {
+          "icon": "✓",
+          "title": "Persona sana y activa",
+          "desc": "1-2 huevos diarios sin problema. 3-4 si entrenas con regularidad."
+        },
+        {
+          "icon": "✓",
+          "title": "Deportista o volumen",
+          "desc": "3-6 huevos al día son habituales. Fuente de proteína completa y barata."
+        },
+        {
+          "icon": "!",
+          "title": "Diabetes tipo 2 o historial familiar",
+          "desc": "Limita a 1-2 al día y consulta con tu médico para monitorizar tus marcadores."
+        }
+      ],
+      "handle": "@cals2gains_es",
+      "bg_prompt": "Dark moody kitchen scene, overhead shot of cooking equipment, professional food photography, editorial dark aesthetic"
+    },
+    {
+      "type": "cta",
+      "accent_color": "coral",
+      "headline": "¿Tu amigo sigue pensando\nque los huevos matan?",
+      "cta_primary": "Mándale este carrusel 👆",
+      "cta_secondary": "Guárdalo para la próxima vez que te lo cuestionen",
+      "handle": "@cals2gains_es",
+      "bg_prompt": "Dark purple-coral gradient background, modern brand aesthetic, bokeh light particles, minimal professional"
+    }
+  ]
+}
