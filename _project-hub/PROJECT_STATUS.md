@@ -1,5 +1,5 @@
 # Cals2Gains - Estado del Proyecto
-> Última actualización: 2026-04-13 (23:30) — Fix crash Android (reanimated v4 + worklets)
+> Última actualización: 2026-04-16 — Motor de carruseles v1.0 creado y PIEZA-01 generada
 
 ## App
 - **Versión actual:** 1.0.0
@@ -46,6 +46,20 @@ Pantallas principales:
 - Training Day (ajuste por entreno)
 - Paywall (RevenueCat)
 - Settings completos (perfil, goals, nutrition mode)
+
+## Herramientas de Contenido
+| Herramienta | Estado | Ubicación |
+|-------------|--------|-----------|
+| Motor de Reels (visual-engine) | ✅ Activo | `tools/visual-engine/` |
+| Motor de Carruseles (carousel-engine) | ✅ Activo v1.0 | `tools/carousel-engine/` |
+| Telegram MCP (aprobaciones) | ✅ Activo | `tools/telegram-mcp-server/` |
+
+**Carousel Engine — Capacidades:**
+- DALL-E 3 HD como fondo (1024×1792 → crop 1080×1350)
+- 13 tipos de slide: cover, myth, problem, solution, reality, science, value, stats, quote, educational, practical, reflection, cta
+- Templates: myth-buster · educational · tips-list · recipe · 7-slides
+- HTML preview interactivo autocontenido (swipeable)
+- CLI: `python create_carousel.py --spec specs/X.json`
 
 ## Bugs Conocidos
 - **Firebase Storage:** Error al subir fotos de progreso (ArrayBuffer issue → usar XMLHttpRequest como workaround)
