@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
   Image,
   Dimensions,
 } from 'react-native';
@@ -57,7 +56,7 @@ const CAPTURE_MODES: CaptureMode[] = [
     labelKey: 'captureHub.voice',
     descriptionKey: 'captureHub.voiceDesc',
     icon: 'mic',
-    route: 'voice',
+    route: '/voice-log',
   },
   {
     id: 'search',
@@ -174,7 +173,6 @@ export default function CaptureHubScreen() {
   const [currentMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>(
     getMealType()
   );
-  const [isLoading, setIsLoading] = useState(false);
   const [yesterdayMeals, setYesterdayMeals] = useState<RecentMeal[]>([]);
   const [recentMeals] = useState<RecentMeal[]>(createMockRecentMeals(t));
   const [favorites] = useState<FavoriteMeal[]>(createMockFavorites(t));
@@ -186,13 +184,7 @@ export default function CaptureHubScreen() {
 
   const handleCaptureMode = async (mode: CaptureMode) => {
     await Haptics.selectionAsync();
-    if (mode.id === 'voice') {
-      // Handle voice inline
-      setIsLoading(true);
-      setTimeout(() => setIsLoading(false), 1500);
-    } else {
-      router.push(mode.route as any);
-    }
+    router.push(mode.route as any);
   };
 
   const handleRelogMeal = async (meal: RecentMeal) => {
@@ -339,17 +331,6 @@ export default function CaptureHubScreen() {
         />
       </View>
 
-      {/* Voice Recording Loading State */}
-      {isLoading && (
-        <View style={styles.voiceLoadingContainer}>
-          <ActivityIndicator
-            size="large"
-            color="#9C8CFF"
-          />
-          <Text style={styles.voiceLoadingText}>{t('captureHub.listening')}</Text>
-        </View>
-      )}
-
       {/* Yesterday Meals Section */}
       {yesterdayMeals.length > 0 && (
         <View style={styles.section}>
@@ -489,21 +470,6 @@ function createStyles(C: any) {
       fontSize: 12,
       color: C.textSecondary,
       textAlign: 'center',
-    },
-    voiceLoadingContainer: {
-      marginHorizontal: 16,
-      marginVertical: 16,
-      backgroundColor: '#9C8CFF10',
-      borderRadius: 12,
-      padding: 24,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    voiceLoadingText: {
-      marginTop: 12,
-      fontSize: 14,
-      fontWeight: '500',
-      color: '#9C8CFF',
     },
     sectionHeader: {
       flexDirection: 'row',

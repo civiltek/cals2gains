@@ -282,6 +282,29 @@ export default {
     mockMeal7: 'Café con Leche',
   },
 
+  // Voice Log
+  voiceLog: {
+    title: 'Registrar por voz',
+    tapToRecord: 'Toca el micrófono para hablar',
+    tapToStop: 'Toca para terminar',
+    recording: 'Grabando...',
+    maxDuration: 'Máximo 30 segundos',
+    processing: 'Procesando audio...',
+    transcribing: 'Transcribiendo con Whisper...',
+    analyzing: 'Analizando comida...',
+    transcription: 'Dijiste',
+    detectedFood: 'Comida detectada',
+    noFoodDetected: 'No se detectó ninguna comida',
+    noFoodDetectedHint: 'Intenta describir qué comiste con más detalle.\nEj: "Me comí una tortilla con dos huevos"',
+    retryRecording: 'Grabar de nuevo',
+    permissionDenied: 'Permiso de micrófono denegado',
+    permissionMessage: 'Activa el acceso al micrófono en Ajustes para usar el dictado de voz',
+    openSettings: 'Abrir ajustes',
+    errorFailed: 'Error al procesar el audio',
+    example: 'Ej: "Me he comido una tortilla con dos huevos y tostadas"',
+    timeRemaining: '{{seconds}}s restantes',
+  },
+
   // Analysis
   analysis: {
     title: 'Análisis nutricional',
