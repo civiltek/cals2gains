@@ -16,69 +16,78 @@ import { Watermark } from "./Watermark";
 
 interface SceneLayerProps {
   scene: SceneData;
-  /** Frame offset at which this scene starts in the global timeline */
-  startFrame: number;
-  totalDurationFrames: number;
+  /** Total frames of this scene (passed from parent, matches Sequence durationInFrames) */
+  sceneDurationFrames: number;
   sceneIndex: number;
   watermark: string;
-  showProgressBar: boolean;
 }
 
 /**
  * Renders one scene: background + title + subtitles + logo + audio.
- * Handles fade/slide transition at scene entry.
+ *
+ * useCurrentFrame() here is LOCAL because this component is wrapped in <Sequence>.
+ * frame=0 means start of this scene, frame=sceneDurationFrames-1 means last frame.
+ * <Audio> starts automatically at the correct global timeline position via Sequence.
  */
 export const SceneLayer: React.FC<SceneLayerProps> = ({
   scene,
-  startFrame,
-  totalDurationFrames,
+  sceneDurationFrames,
   sceneIndex,
   watermark,
 }) => {
+  const frame = useCurrentFrame(); // LOCAL frame — 0 = scene start
   const { fps } = useVideoConfig();
-  const globalFrame = useCurrentFrame();
-  const sceneFrame = globalFrame - startFrame;
-  const sceneDurationFrames = Math.round(scene.durationSeconds * fps);
-  const sceneTimeSeconds = sceneFrame / fps;
 
-  // Only render when this scene is active (or in transition overlap)
-  const transitionFrames = 8;
-  if (sceneFrame < -transitionFrames || sceneFrame >= sceneDurationFrames + transitionFrames) {
-    return null;
-  }
+  const sceneTimeSeconds = frame / fps;
 
-  // ---- Transition opacity ----
+  // --- Entrance transition ---
+  const transitionInFrames = 10;
   let opacity = 1;
-  if (scene.transition === "fade") {
-    opacity = interpolate(
-      sceneFrame,
-      [0, transitionFrames, sceneDurationFrames - transitionFrames, sceneDurationFrames],
-      [0, 1, 1, 0],
-      { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-    );
-  }
-
-  // ---- Slide up transition ----
   let translateY = 0;
-  if (scene.transition === "slide_up" && sceneFrame < transitionFrames) {
-    translateY = interpolate(sceneFrame, [0, transitionFrames], [60, 0], {
+  let scale = 1;
+
+  if (scene.transition === "fade") {
+    opacity = interpolate(frame, [0, transitionInFrames], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+  } else if (scene.transition === "slide_up") {
+    translateY = interpolate(frame, [0, transitionInFrames], [50, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    opacity = interpolate(frame, [0, transitionInFrames], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+  } else if (scene.transition === "slide_left") {
+    const tx = interpolate(frame, [0, transitionInFrames], [80, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    opacity = interpolate(frame, [0, transitionInFrames], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+  } else if (scene.transition === "zoom") {
+    scale = interpolate(frame, [0, transitionInFrames], [1.06, 1.0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    opacity = interpolate(frame, [0, transitionInFrames], [0, 1], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
   }
 
-  // ---- Zoom transition ----
-  let scale = 1;
-  if (scene.transition === "zoom") {
-    scale = interpolate(
-      sceneFrame,
-      [0, transitionFrames],
-      [1.08, 1.0],
-      { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-    );
+  // Fade out at end of scene
+  const fadeOutStart = sceneDurationFrames - 8;
+  if (frame > fadeOutStart) {
+    opacity = opacity * interpolate(frame, [fadeOutStart, sceneDurationFrames], [1, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
   }
-
-  const globalProgress = (startFrame + sceneFrame) / totalDurationFrames;
 
   return (
     <AbsoluteFill
@@ -87,6 +96,7 @@ export const SceneLayer: React.FC<SceneLayerProps> = ({
         transform: `translateY(${translateY}px) scale(${scale})`,
         backgroundColor: BRAND.dark,
         fontFamily: BRAND.fontDisplay,
+        overflow: "hidden",
       }}
     >
       {/* Layer 1: Background video or image */}
@@ -95,7 +105,7 @@ export const SceneLayer: React.FC<SceneLayerProps> = ({
       {/* Layer 2: Title text */}
       <TitleText
         title={scene.title}
-        sceneFrame={sceneFrame}
+        frame={frame}
         sceneDurationFrames={sceneDurationFrames}
         isHook={sceneIndex === 0}
       />
@@ -103,20 +113,19 @@ export const SceneLayer: React.FC<SceneLayerProps> = ({
       {/* Layer 3: Word-by-word subtitles */}
       <Subtitles
         subtitles={scene.subtitles}
-        sceneTimeSeconds={Math.max(0, sceneTimeSeconds)}
+        sceneTimeSeconds={sceneTimeSeconds}
       />
 
       {/* Layer 4: Logo */}
-      <Logo sceneFrame={sceneFrame} sceneDurationFrames={sceneDurationFrames} />
+      <Logo frame={frame} sceneDurationFrames={sceneDurationFrames} />
 
       {/* Layer 5: Watermark */}
       <Watermark handle={watermark} />
 
-      {/* Audio: voiceover for this scene */}
-      {scene.voiceoverFile && sceneFrame >= 0 && (
+      {/* Audio: voiceover — starts at scene start (handled by parent Sequence) */}
+      {scene.voiceoverFile && (
         <Audio
           src={staticFile(scene.voiceoverFile)}
-          startFrom={0}
           volume={1}
         />
       )}

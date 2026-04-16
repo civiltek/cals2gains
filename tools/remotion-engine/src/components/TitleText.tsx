@@ -1,36 +1,42 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
+import { AbsoluteFill, interpolate, spring, useVideoConfig } from "remotion";
 import { BRAND } from "../types";
 
 interface TitleTextProps {
   title: string;
-  /** Frame within the current scene (0-based) */
-  sceneFrame: number;
+  /** LOCAL frame (0 = scene start) */
+  frame: number;
   sceneDurationFrames: number;
-  /** Is this scene 0 (hook scene)? Hook gets bigger, coral text */
   isHook: boolean;
 }
 
 /**
- * Animated title text with slide-up entrance.
- * Hook scene: large coral text, centered, drama.
- * Regular scenes: medium bone text, upper third.
+ * Animated title text.
+ *
+ * Hook scene (index 0):
+ *   - Large coral text, centered, semi-transparent dark pill background
+ *   - Strong glow + text shadow for punch
+ *
+ * Regular scenes:
+ *   - Medium bone text, upper third, pill background
+ *   - Spring slide-up entrance
+ *
+ * Both: fade out last 8 frames.
  */
 export const TitleText: React.FC<TitleTextProps> = ({
   title,
-  sceneFrame,
+  frame,
   sceneDurationFrames,
   isHook,
 }) => {
   const { fps } = useVideoConfig();
 
-  // Slide-up + fade entrance over 12 frames
   const enterFrames = 12;
   const exitFrames = 8;
 
   const translateY = spring({
     fps,
-    frame: sceneFrame,
+    frame,
     config: { damping: 18, stiffness: 120 },
     durationInFrames: enterFrames,
     from: 40,
@@ -38,7 +44,7 @@ export const TitleText: React.FC<TitleTextProps> = ({
   });
 
   const opacity = interpolate(
-    sceneFrame,
+    frame,
     [0, enterFrames, sceneDurationFrames - exitFrames, sceneDurationFrames],
     [0, 1, 1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
@@ -51,7 +57,7 @@ export const TitleText: React.FC<TitleTextProps> = ({
           justifyContent: "center",
           alignItems: "center",
           paddingLeft: 60,
-          paddingRight: 60,
+          paddingRight: 120,
         }}
       >
         <div
@@ -59,17 +65,21 @@ export const TitleText: React.FC<TitleTextProps> = ({
             opacity,
             transform: `translateY(${translateY}px)`,
             textAlign: "center",
+            backgroundColor: "rgba(23,18,29,0.60)",
+            borderRadius: 24,
+            padding: "24px 36px",
           }}
         >
           <span
             style={{
               fontFamily: BRAND.fontDisplay,
               fontWeight: 800,
-              fontSize: 84,
+              fontSize: 80,
               lineHeight: 1.1,
               color: BRAND.coral,
-              textShadow: "0 4px 32px rgba(255,106,77,0.45)",
+              textShadow: `0 0 40px rgba(255,106,77,0.55), 0 4px 16px rgba(0,0,0,0.9)`,
               letterSpacing: "-1px",
+              display: "block",
             }}
           >
             {title}
@@ -84,26 +94,30 @@ export const TitleText: React.FC<TitleTextProps> = ({
       style={{
         justifyContent: "flex-start",
         alignItems: "flex-start",
-        paddingTop: 160,
+        paddingTop: 140,
         paddingLeft: 60,
-        paddingRight: 60,
+        paddingRight: 120,
       }}
     >
       <div
         style={{
           opacity,
-          transform: `translateY(${translateY}px`,
+          transform: `translateY(${translateY}px)`,
+          backgroundColor: "rgba(23,18,29,0.55)",
+          borderRadius: 18,
+          padding: "16px 28px",
         }}
       >
         <span
           style={{
             fontFamily: BRAND.fontDisplay,
             fontWeight: 700,
-            fontSize: 58,
-            lineHeight: 1.15,
+            fontSize: 54,
+            lineHeight: 1.2,
             color: BRAND.bone,
-            textShadow: "0 2px 16px rgba(0,0,0,0.7)",
+            textShadow: "0 2px 16px rgba(0,0,0,0.9)",
             letterSpacing: "-0.5px",
+            display: "block",
           }}
         >
           {title}
