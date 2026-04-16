@@ -37,7 +37,7 @@ Cals2Gains/
 │   ├── SCREENSHOTS.md     ← índice de screenshots
 │   └── dashboard.html     ← copia del dashboard financiero
 ├── app/, components/, services/, store/, i18n/, hooks/, utils/, constants/, theme.ts
-├── public/, website/      ← landing cals2gains.com (Firebase hosting)
+├── public/, website/      ← landing cals2gains.com (GitHub Pages — carpeta activa: website/)
 ├── finances/
 │   ├── Cals2Gains_Finances.xlsx  ← FUENTE DE VERDAD financiera
 │   ├── dashboard.html              ← dashboard generado desde el Excel
@@ -66,7 +66,7 @@ Cuando una tarea cae claramente dentro del alcance de un agente, invócalo (lée
 | Agente | Alcance corto |
 |--------|---------------|
 | `app-dev` | React Native / Expo, builds EAS, Android/iOS, i18n, tema oscuro, testing |
-| `web-dev` | Firebase hosting, SEO, landing cals2gains.com |
+| `web-dev` | GitHub Pages (website/), SEO, landing cals2gains.com |
 | `finance` | Excel + dashboard + recibos + reconciliación |
 | `marketing` | Brand voice, posts IG/FB, emails, copy |
 | `growth` | Métricas GA4, IG/FB, análisis, recomendaciones |
@@ -126,7 +126,7 @@ Lista completa y detallada en `guardrails/RULES.md`.
 - `/receipts` — escaneo manual de recibos
 - `/metrics` — snapshot de métricas
 - `/build-app` — build EAS con verificación previa
-- `/deploy-web` — deploy Firebase con checks
+- `/deploy-web` — deploy GitHub Pages con checks
 
 ### Bash útiles
 ```bash
@@ -136,8 +136,11 @@ adb -s R3CR10E9LSE logcat -s ReactNativeJS:V System.err:W AndroidRuntime:E
 # Build Android preview
 eas build --profile preview --platform android
 
-# Deploy web (desde raíz del proyecto)
-firebase deploy --only hosting
+# Deploy web — cals2gains.com = GitHub Pages (NO Firebase Hosting)
+# El deploy es automático al hacer push a main con cambios en website/
+# Para forzar deploy manual:
+gh workflow run deploy-website.yml --repo civiltek/cals2gains
+# ⚠️ NUNCA usar: firebase deploy --only hosting (no afecta a cals2gains.com)
 ```
 
 ---

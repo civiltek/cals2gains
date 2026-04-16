@@ -92,6 +92,18 @@ Ver `FINANCES.md` para detalle completo.
 - **Respuesta comentarios:** Automatizado 3x/día
 - **Reels:** Assets creados (demos cámara IA EN/ES)
 
+## Web — cals2gains.com
+
+> **⚠️ IMPORTANTE: cals2gains.com = GitHub Pages. NO Firebase Hosting.**
+
+- **DNS:** cals2gains.com apunta a IPs 185.199.x.x (GitHub Pages). NO hay hosting en Firebase para esta web.
+- **Repo:** civiltek/cals2gains → carpeta `website/` (contiene CNAME, index.html, privacy.html, terms.html, sitemap.xml…)
+- **Deploy:** automático vía `.github/workflows/deploy-website.yml` al hacer push a `main` con cambios en `website/`
+- **Deploy manual:** `gh workflow run deploy-website.yml --repo civiltek/cals2gains`
+- **Último deploy:** 2026-04-16 (run #24532164736) — ✅ OK
+- **HTTPS:** certificado aprobado, válido hasta 2026-07-13
+- **NO usar:** `firebase deploy --only hosting` — no afecta a cals2gains.com
+
 ## Cuentas
 Ver `ACCOUNTS.md` para detalle completo.
 

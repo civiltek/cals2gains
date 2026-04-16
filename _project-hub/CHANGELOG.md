@@ -1,5 +1,15 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Documentar y verificar deploy web a GitHub Pages
+
+- **cals2gains.com = GitHub Pages**, NO Firebase Hosting — dominio apunta a IPs 185.199.x.x (GitHub)
+- Workflow `.github/workflows/deploy-website.yml` despliega desde `website/` a GitHub Pages vía Actions
+- Deploy manual disparado y completado con éxito (run #24532164736, 14s)
+- `PROJECT_STATUS.md` actualizado con sección clara de web deploy
+- `CLAUDE.md` actualizado: referencia a `firebase deploy` para web cambiada a GitHub Pages
+- Carpeta correcta de la web: `website/` (tiene CNAME, WEB-CHANGELOG.md, index.html actualizado)
+- Carpeta `public/` es distinta (archivos más viejos, sin CNAME) — NO usar para deploys
+
 ## 2026-04-16 — Corregir bugs i18n en Estadísticas y Resumen Semanal
 
 - **BUG 1 — analytics.tsx**: `t('analytics.currentDays/longestStreak/totalLogged')` ahora pasa `{ count: valor }` — ya no aparece `{{count}}` literal en pantalla
