@@ -1,5 +1,18 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Widget iOS/Android + Coach adaptativo mejorado
+
+### Feature A: Widget (infraestructura JS)
+- **`services/widgetDataService.ts`** (nuevo): sincroniza datos de nutrición del día (consumido/objetivo, porcentajes de progreso, colores de marca) hacia AsyncStorage como puente para widgets nativos. Expone `sync()`, `buildSmallPayload()` y `buildMediumPayload()`.
+- **`docs/WIDGETS.md`** (nuevo): guía completa de activación para Android (AppWidgetProvider + config plugin Expo) y iOS (WidgetKit SwiftUI). Diseño small 2×2 y medium 4×2 con colores de marca Coral/Violet/Dark. Pendiente de build EAS tras configurar cuenta Apple Developer.
+
+### Feature B: Coach adaptativo mejorado
+- **`services/adaptiveCoachBridge.ts`** (nuevo): conecta `AdaptiveMacroEngine` con `macroCoach`. Cuando el motor decide ajustar macros, genera explicación en lenguaje natural vía GPT-4o-mini (con fallback sin IA). Persiste mensaje en AsyncStorage para que la UI lo recoja al abrir "Qué como hoy".
+- **`services/smartNotificationService.ts`** (nuevo): notificaciones inteligentes — "8h sin registrar comida", "¡macros cumplidos!", "proteína pendiente en cena". Usa `expo-notifications` con graceful no-op si FCM no configurado. Bilingüe ES/EN.
+- **`app/what-to-eat.tsx`**: añadido `CoachAdjustmentBanner` (muestra explicación del ajuste adaptativo con botón de dismiss), `UrgencyBanner` (alerta si >14:00 y <300kcal, o >19:00 y >50g proteína pendiente), detección de `urgencyMode` para adaptar sugerencias IA.
+- **`services/openai.ts`**: `generateAIMealSuggestions` acepta nuevo param `urgencyMode?: 'high_calories' | 'high_protein'` que modifica el system prompt para priorizar comidas sustanciosas o altas en proteína según el contexto.
+- **`i18n/es.ts` + `i18n/en.ts`**: nuevas claves `coachAdjustedTitle`, `urgencyCaloriesTitle/Body`, `urgencyProteinTitle/Body`.
+
 ## 2026-04-16 — Motor Remotion v2: 6 fixes de calidad (tildes, voz, CTA, textos, Sora, música)
 
 - **Fix UTF-8**: `create_reel_v2.py` — todos los `write_text()` ahora usan `encoding="utf-8"` explícito (corrige tildes/acentos en subtítulos karaoke en Windows)
