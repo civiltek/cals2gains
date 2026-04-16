@@ -40,8 +40,8 @@ export const SceneLayer: React.FC<SceneLayerProps> = ({
 
   const sceneTimeSeconds = frame / fps;
 
-  // --- Entrance transition ---
-  const transitionInFrames = 10;
+  // --- Entrance transition (viral pacing: corta y seca, 6 frames ≈ 0.2s) ---
+  const transitionInFrames = 6;
   let opacity = 1;
   let translateY = 0;
   let scale = 1;
@@ -52,7 +52,7 @@ export const SceneLayer: React.FC<SceneLayerProps> = ({
       extrapolateRight: "clamp",
     });
   } else if (scene.transition === "slide_up") {
-    translateY = interpolate(frame, [0, transitionInFrames], [50, 0], {
+    translateY = interpolate(frame, [0, transitionInFrames], [60, 0], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
@@ -70,7 +70,8 @@ export const SceneLayer: React.FC<SceneLayerProps> = ({
       extrapolateRight: "clamp",
     });
   } else if (scene.transition === "zoom") {
-    scale = interpolate(frame, [0, transitionInFrames], [1.06, 1.0], {
+    // Zoom-punch viral: 1.15 → 1.0 en 6 frames (sensación de golpe)
+    scale = interpolate(frame, [0, transitionInFrames], [1.15, 1.0], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
@@ -80,8 +81,8 @@ export const SceneLayer: React.FC<SceneLayerProps> = ({
     });
   }
 
-  // Fade out at end of scene
-  const fadeOutStart = sceneDurationFrames - 8;
+  // Fade out corto al final (4f ≈ 0.13s) — corte duro viral
+  const fadeOutStart = sceneDurationFrames - 4;
   if (frame > fadeOutStart) {
     opacity = opacity * interpolate(frame, [fadeOutStart, sceneDurationFrames], [1, 0], {
       extrapolateLeft: "clamp",

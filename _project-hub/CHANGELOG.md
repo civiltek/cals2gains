@@ -1,5 +1,31 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Reels v3: formato viral impersonal 2026 (text-forward, 10-12s, karaoke)
+
+Rediseño completo basado en investigación deep research del formato de reels virales 2026 para cuentas impersonales (sin cara presentadora) en fitness/nutrición. Hallazgos clave aplicados: duración 7-14s (no 30s), cortes cada 1.5-2.5s, texto como protagonista (video de fondo), subtítulos karaoke con palabra activa en gold 72px uppercase, hook 110px zoom-punch, pattern interrupt en escena 3, CTA con 2 acciones (save + download).
+
+- **Estructura 5-escenas obligatoria** (10-12s total): HOOK 1.5-2s → PROBLEMA 2-2.5s → VALOR #1 2-2.5s (pattern interrupt) → VALOR #2 2-2.5s → CTA 2.5-3s
+- **`tools/remotion-engine/create_reel_v2.py`**: `SCRIPT_SYSTEM_PROMPT` reescrito para formato viral impersonal. Reglas específicas: títulos ≤5 palabras (hook) / ≤6 palabras (resto), voiceover autoritativo 8-14 palabras por escena, NO filler, al menos un número por reel, peninsular con tildes obligatorias. Video prompts marcados como B-roll (espacio negativo top/bottom-third, NO cara a cámara, NO boca moviéndose)
+- **`tools/visual-engine/script_generator.py`**: `VIRAL_SYSTEM_PROMPT` alineado con el mismo formato. Validaciones actualizadas: scenes 1.2-3.5s (antes 3-6s), text ≤6 palabras (antes 7), target 11s (antes 30s)
+- **`tools/visual-engine/voice_generator.py`**: `generate_voice_elevenlabs()` extendido con parámetros `style`, `speed`, `use_speaker_boost`. Permite voz autoritativa en lugar de íntima
+- **`create_reel_v2.py` → voz**: stability 0.75→0.45 (más expresiva), similarity 0.75→0.78 (acento fiel), style 0.6 (autoritativa), speed 1.08 (ritmo viral)
+- **`tools/remotion-engine/src/components/TitleText.tsx`**: hook 80→110px con zoom-punch scale 1.25→1.0, triple glow coral. Values 52→78px en pill coral saturada. Animaciones más rápidas (8f entrada, 4f salida)
+- **`tools/remotion-engine/src/components/Subtitles.tsx`**: karaoke agresivo — palabra activa 58→72px gold uppercase, scale 1.12→1.18, peso 800→900. Ventana rolling 2.5s→2s (más ritmo). Pill más opaco (0.72→0.82) para legibilidad sobre B-roll
+- **`tools/remotion-engine/src/components/Background.tsx`**: vignette intensificado — top-third 0.40→0.55 (título legible), bottom-third 0.90→0.92 (subs legibles sobre cualquier escena)
+- **`tools/remotion-engine/src/components/SceneLayer.tsx`**: pacing viral — transitionInFrames 10→6, zoom scale 1.06→1.15 (zoom-punch), fadeOut 8→4 frames (corte seco)
+- **`tools/visual-engine/brand_config.py`**: nuevos `TextSizes` (hook 110, title 78, subtitle_active 72, stat 180, cta 78). `BRAND_VIDEO_SUFFIX` añade "composition leaves dark negative space in top-third and bottom-third", "no subject looking at camera, no mouth movement", "B-roll style". `BRAND_VIDEO_SUFFIX_HOOK` pide macro close-up sin cara. `BRAND_VIDEO_SUFFIX_CTA` favorece flat-lay sobre personas
+- **`tools/remotion-engine/generate_sora_clips.py`**: `BRAND_VIDEO_SUFFIX` y `BRAND_IMAGE_SUFFIX` alineados con el nuevo formato B-roll impersonal
+- **Fuentes investigación**: Opus.pro (hook formulas, 3-second hold), Later.com (trending audio 2026), Captivateur (faceless reels formats), Margalla Tribune (pattern interrupts), Multipostdigital (7-second trick)
+
+## 2026-04-16 — Rediseñar motor de reels: calidad cinematográfica + brand coherente
+
+- **CRÍTICO corregido**: `generate_sora_clips.py` y `create_reel_v2.py` tenían sufijo que prohibía efectos cinematográficos ("no neon colors, no cinematic color grading, smartphone look") — reemplazado por estética premium oscura
+- **`brand_config.py`**: `BRAND_VIDEO_SUFFIX` reescrito con guía cinematográfica detallada (sujetos fitness, gym moderno/cocina marble, iluminación rim + coral, color grade Hollywood). Añadidos `BRAND_VIDEO_SUFFIX_HOOK` y `BRAND_VIDEO_SUFFIX_CTA`
+- **`create_reel_v2.py` → `SCRIPT_SYSTEM_PROMPT`**: reescrito con guía exhaustiva de prompts de vídeo fitness (sujeto+entorno+iluminación+cámara), ejemplos por tipo de escena
+- **`create_reel.py`**: system prompt y `generate_protein_myth_script()` actualizados con prompts específicos (gym de acero negro, cocina Calacatta, slow-motion f/0.95)
+- **`script_generator.py` → `VIRAL_SYSTEM_PROMPT`**: mejorado con ejemplos de prompts fitness por escena
+- **`reel_composer.py`**: gradiente coral→violeta en outro (igual que CTASlide Remotion), barra de gradiente detrás de títulos, `create_intro_clip()` con fondo degradado
+
 ## 2026-04-16 — Corregir errores críticos web cals2gains.com + validador pre-deploy
 
 - **Tildes en español**: corregidas ~50 palabras sin acento en todo el HTML (nutrición, función, código, calorías, visión, etc.) tanto en contenido visible como en atributos data-es

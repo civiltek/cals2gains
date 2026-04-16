@@ -141,14 +141,62 @@ class Scene:
 # INTRO/OUTRO GENERATORS
 # ═══════════════════════════════════════════════════════════════════════════
 
+def _make_gradient_bg(width: int, height: int) -> Image.Image:
+    """
+    Create a diagonal coral→violet gradient background (matches CTASlide in Remotion).
+    Colors: coral #FF6A4D → mid-purple #C97AFF → violet #9C8CFF at 150° angle.
+    """
+    coral = np.array([255, 106, 77], dtype=np.float32)    # #FF6A4D
+    mid   = np.array([201, 122, 255], dtype=np.float32)   # #C97AFF
+    violet = np.array([156, 140, 255], dtype=np.float32)  # #9C8CFF
+
+    # Diagonal gradient at ~150°: use combined x+y projection
+    xs = np.linspace(0, 1, width)
+    ys = np.linspace(0, 1, height)
+    xg, yg = np.meshgrid(xs, ys)
+    # Project onto 150° direction (cos150≈-0.866, sin150=0.5)
+    t_raw = -0.866 * xg + 0.5 * yg
+    # Normalize to [0, 1]
+    t = (t_raw - t_raw.min()) / (t_raw.max() - t_raw.min() + 1e-8)
+
+    # Two-stop interpolation: coral (0→0.55) → mid (0.55) → violet (0.55→1.0)
+    t1 = np.clip(t / 0.55, 0, 1)[..., np.newaxis]
+    t2 = np.clip((t - 0.55) / 0.45, 0, 1)[..., np.newaxis]
+    color_array = (coral * (1 - t1) + mid * t1) * (1 - t2) + (mid * (1 - t2) + violet * t2) * t2
+
+    img_array = np.clip(color_array, 0, 255).astype(np.uint8)
+    return Image.fromarray(img_array, "RGB")
+
+
+def _add_title_gradient_bar(frame: Image.Image) -> Image.Image:
+    """
+    Add a subtle semi-transparent gradient bar at the top of the frame
+    to improve title text legibility — matches the carousel visual style.
+    """
+    frame = frame.convert("RGBA")
+    w, h = frame.size
+    bar_h = 280  # Covers the title area
+
+    overlay = Image.new("RGBA", (w, bar_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+
+    # Gradient from dark plum (80% opacity) at top to transparent at bottom
+    for y in range(bar_h):
+        alpha = int(200 * (1.0 - y / bar_h))
+        r, g, b = Colors.PLUM_RGBA[:3]
+        draw.line([(0, y), (w, y)], fill=(r, g, b, alpha))
+
+    frame.paste(overlay, (0, 0), overlay)
+    return frame
+
+
 def create_intro_clip(duration: float = 0.8) -> ImageClip:
     """
-    Create an intro clip with dark plum background and logo fade-in.
+    Create an intro clip with diagonal gradient background and logo.
 
     Features:
-    - Solid plum (#17121D) background
-    - Logo fade-in from center
-    - Subtle glow effect
+    - Diagonal coral→violet gradient (brand premium look)
+    - Logo centered with soft drop shadow glow
     - Refined, professional appearance
 
     Args:
@@ -159,16 +207,21 @@ def create_intro_clip(duration: float = 0.8) -> ImageClip:
     """
     logger.info(f"Creating intro clip ({duration}s)")
 
-    # Create base image with plum background
-    img = Image.new("RGB", Reel.SIZE, Colors.PLUM_RGBA[:3])
+    # Create gradient background
+    img = _make_gradient_bg(Reel.WIDTH, Reel.HEIGHT)
+
+    # Add a dark overlay to keep it premium (gradient is intense at full opacity)
+    dark_overlay = Image.new("RGBA", Reel.SIZE, (23, 18, 29, 180))
+    img = img.convert("RGBA")
+    img = Image.alpha_composite(img, dark_overlay)
+    img = img.convert("RGB")
 
     # Add logo to center
-    img_with_logo = add_logo(img, position="center", opacity=0.9, size_px=180, use_mark=True)
+    img_with_logo = add_logo(img, position="center", opacity=0.95, size_px=180, use_mark=True)
 
-    # Add subtle glow circle around logo (optional enhancement)
-    img_with_logo = add_logo(img_with_logo, position="center", opacity=0.2, size_px=240, use_mark=True)
+    # Subtle second pass for glow effect
+    img_with_logo = add_logo(img_with_logo, position="center", opacity=0.25, size_px=260, use_mark=True)
 
-    # Create clip with fade-in animation
     clip = ImageClip(np.array(img_with_logo))
     clip = clip.with_duration(duration)
     clip = clip.with_fps(Reel.FPS)
@@ -177,28 +230,35 @@ def create_intro_clip(duration: float = 0.8) -> ImageClip:
     return clip
 
 
-def create_outro_clip(cta_text: str = "Send this to your gym buddy", duration: float = 2.5) -> ImageClip:
+def create_outro_clip(cta_text: str = "Send this to your gym buddy", duration: float = 3.0) -> ImageClip:
     """
-    Create an outro clip with CTA text and branding.
+    Create an outro CTA slide — diagonal coral→violet gradient, premium brand finish.
 
     Features:
-    - Dark plum background
-    - Large CTA text (coral, animated)
-    - Cals2Gains logo and "Follow @cals2gains"
-    - Professional, closing statement feel
+    - Diagonal coral→violet gradient background (matches Remotion CTASlide)
+    - Large CTA text centered, white with drop shadow
+    - Cals2Gains logo + "@cals2gains" handle
+    - Professional closing slide feel
 
     Args:
         cta_text: Call-to-action text
-        duration: Outro duration in seconds
+        duration: Outro duration in seconds (default extended to 3.0s)
 
     Returns:
-        MoviePy ImageClip with animations
+        MoviePy ImageClip
     """
     logger.info(f"Creating outro clip ({duration}s): {cta_text}")
 
-    # Base image
-    img = Image.new("RGB", Reel.SIZE, Colors.PLUM_RGBA[:3])
+    # Gradient background
+    img = _make_gradient_bg(Reel.WIDTH, Reel.HEIGHT)
     img = img.convert("RGBA")
+
+    # Semi-transparent dark vignette to keep text readable
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([(0, 0), (Reel.WIDTH, Reel.HEIGHT)], fill=(23, 18, 29, 80))
+
+    # Add logo above center
+    img = add_logo(img, position="center", opacity=0.95, size_px=160, use_mark=False)
 
     # Add main CTA text
     img = add_text_overlay(
@@ -206,23 +266,22 @@ def create_outro_clip(cta_text: str = "Send this to your gym buddy", duration: f
         text=cta_text,
         style="cta",
         position="center",
-        custom_y=600
+        custom_y=780
     )
 
-    # Add follow text
+    # Add handle
     img = add_text_overlay(
         img,
-        text="Follow @cals2gains",
+        text="@cals2gains",
         style="subtitle",
         position="center",
         custom_y=1200
     )
 
-    # Add logo at bottom
-    img = add_logo(img, position="bottom-right", opacity=0.8, size_px=100)
+    # Corner accent lines for brand consistency
+    img = _add_corner_accents(img)
 
-    # Create clip
-    clip = ImageClip(np.array(img))
+    clip = ImageClip(np.array(img.convert("RGB")))
     clip = clip.with_duration(duration)
     clip = clip.with_fps(Reel.FPS)
 
@@ -246,11 +305,12 @@ def create_brand_overlay_frame(
 
     Overlays applied (in order):
     1. Logo in top-right corner
-    2. Scene title text with animation (fade in/out)
-    3. Word-by-word subtitles (if voiceover present)
-    4. Progress bar at bottom
-    5. Corner accent lines (violet)
-    6. Watermark "@cals2gains" in bottom-left
+    2. Gradient bar behind title area (plum→transparent, carousel-style)
+    3. Scene title text with animation (fade in/out)
+    4. Word-by-word subtitles (if voiceover present)
+    5. Progress bar at bottom (coral)
+    6. Corner accent lines (violet)
+    7. Watermark "@cals2gains" in bottom-left
 
     Args:
         base_frame: PIL Image of base video frame
@@ -267,7 +327,11 @@ def create_brand_overlay_frame(
     # 1. Logo overlay (top-right)
     frame = add_logo(frame, position="top-right", opacity=0.7, size_px=120)
 
-    # 2. Scene title with fade animation
+    # 2. Gradient bar behind title area for legibility (matches carousel style)
+    if scene.text_overlay:
+        frame = _add_title_gradient_bar(frame)
+
+    # 3. Scene title with fade animation
     if scene.text_overlay:
         # Fade in/out at scene start/end
         text_opacity = _calculate_text_opacity(scene_progress)
@@ -279,7 +343,7 @@ def create_brand_overlay_frame(
                 position="top"
             )
 
-    # 3. Word-by-word subtitles
+    # 4. Word-by-word subtitles
     if scene.voiceover_path and scene.word_timestamps:
         style = SubtitleStyle(
             font_size=48,
@@ -306,13 +370,13 @@ def create_brand_overlay_frame(
             style=style
         )
 
-    # 4. Progress bar at bottom (shows reel progress)
+    # 5. Progress bar at bottom (shows reel progress)
     frame = _add_progress_bar(frame, reel_progress)
 
-    # 5. Corner accent lines (violet)
+    # 6. Corner accent lines (violet)
     frame = _add_corner_accents(frame)
 
-    # 6. Watermark
+    # 7. Watermark
     frame = add_watermark(frame, text="@cals2gains", opacity=0.6)
 
     return frame

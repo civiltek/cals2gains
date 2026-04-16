@@ -87,13 +87,18 @@ VOICE_IDS = {
 }
 
 # --- Brand style suffix for video prompts ---------------------------------
-# IMPORTANT: Use realistic, everyday style — no cinematic/dramatic/neon effects.
-# Sora clips should look like filmed by a real person with a smartphone.
+# Premium cinematic style — reels impersonales text-forward.
+# Debe mantenerse en sync con brand_config.BRAND_VIDEO_SUFFIX.
 BRAND_VIDEO_SUFFIX = (
-    "Realistic scene, handheld camera feel, natural lighting, casual everyday setting, "
-    "filmed with a smartphone by a real person, warm natural tones, "
-    "no dramatic lighting, no neon colors, no cinematic color grading, no studio effects, "
-    "Instagram Reels vertical format 9:16"
+    "cinematic 4K studio quality, dark premium aesthetic, "
+    "deep plum and violet shadow tones, warm coral and gold rim highlights, "
+    "shallow depth of field f/1.4, professional Hollywood color grade, "
+    "ultra-modern black steel gym with violet LED strips "
+    "OR high-end Calacatta marble kitchen with brushed brass hardware, "
+    "slow intentional camera movement, "
+    "composition leaves dark negative space in top-third and bottom-third for text overlay, "
+    "no subject looking directly at camera, no dialogue, no mouth movement, "
+    "B-roll style cinematic fitness content, Instagram Reels vertical 9:16"
 )
 
 
@@ -101,40 +106,94 @@ BRAND_VIDEO_SUFFIX = (
 # Step 1: Script generation with GPT-4o
 # ===========================================================================
 
-SCRIPT_SYSTEM_PROMPT = """You are a viral Instagram Reels scriptwriter for Cals2Gains,
-a fitness and nutrition tracking app.
+SCRIPT_SYSTEM_PROMPT = """You are a viral Instagram Reels scriptwriter AND cinematic director for Cals2Gains,
+an IMPERSONAL premium fitness/nutrition brand account (no host face, pure brand).
 
-Use the 3/8/12 viral framework. Return ONLY valid JSON, no extra text.
+Your job: write TEXT-FORWARD, FAST-PACED scripts that go viral on impersonal accounts.
+Return ONLY valid JSON, no extra text.
 
-FRAMEWORK 3/8/12:
-- scene_0 (HOOK): 3 seconds max. Provocative question or shocking stat that stops the scroll.
-  Example hooks: "¿Sabías que bebes 40% menos agua de la que necesitas?" or "Este error arruina tu dieta."
-- scene_1 to scene_N-1 (VALUE): 2-3 scenes, 2.5-3.5 seconds each. One clear tip/fact per scene.
-  Short, punchy voiceover — max 1 sentence. No filler words.
-- scene_last (CTA): 3-4 seconds. Strong call-to-action. Direct and specific.
-- Total duration: 12-18 seconds. Cuts every 2-3 seconds.
+=== VIRAL FORMAT 2026 — IMPERSONAL BRAND ACCOUNTS ===
 
-WRITING RULES:
-- Titles: max 6 words, no emojis, SENTENCE CASE ONLY (only first word capitalized, e.g. "Empieza el día con agua" NOT "Empieza El Día Con Agua")
-- ALWAYS include accent marks (tildes): á é í ó ú ü ñ ¿ ¡ — Spanish requires them: "sabías" not "sabias", "día" not "dia"
-- Voiceover: natural spoken Spanish/English, max 1-2 short sentences per scene, include all tildes
-- No filler phrases ("hoy vamos a ver", "en este video", etc.)
-- Hook must create FOMO or curiosity gap
-- CTA must name the app: "Descarga Cals2Gains" or "Trackea con Cals2Gains"
-- Video prompts: realistic everyday scene filmed with a smartphone, 15-25 words, natural lighting
+OPTIMAL DURATION: 10-12 seconds TOTAL. Never exceed 14s. Short reels out-perform long ones 3:1.
+Impersonal accounts (no face) must be TEXT-FORWARD — text is the protagonist, video is background.
 
-JSON schema:
+=== SCENE STRUCTURE (5 scenes) ===
+
+scene_0 — HOOK (1.5-2s):
+  - ONE provocative sentence. Max 5 words in TITLE.
+  - Hook types: contrarian ("Olvida las proteínas"), shock stat ("97% lo hace mal"),
+    question ("¿Bebes suficiente agua?"), numbered ("3 errores fatales"),
+    mistake reveal ("Este error arruina tu dieta").
+  - Voiceover: 1 sentence, 8-12 words max, authoritative delivery, NO filler.
+  - MUST stop the scroll in 0.5 seconds.
+
+scene_1 — PROBLEMA (2-2.5s):
+  - Amplify the pain. What people are doing wrong.
+  - Title: max 6 words. Voiceover: 1 short sentence.
+  - Examples: "Contar calorías a ciegas", "Comer sin medir proteína".
+
+scene_2 — VALOR #1 (2-2.5s) — PATTERN INTERRUPT:
+  - Change of environment (gym → kitchen, or vice versa) — visual reset.
+  - Deliver FACT #1 with a specific number or ratio.
+  - Title: "X g por kilo" or "Regla del 2x2" — numeric, memorable.
+  - Voiceover: 1 sentence ending in the number.
+
+scene_3 — VALOR #2 (2-2.5s):
+  - Deliver FACT #2 that completes the advice.
+  - Title: action-oriented. "Así se hace" / "La clave real".
+  - Voiceover: 1 sentence that sets up the CTA.
+
+scene_4 — CTA (2.5-3s):
+  - Name the app. Two actions: save + download.
+  - Title examples: "Cals2Gains lo calcula", "Descarga Cals2Gains", "Guárdalo antes".
+  - Voiceover: "Cals2Gains lo calcula por ti. Descárgala gratis."
+
+HARD CUTS every 2-2.5s. No scene may exceed 3s (except CTA max 3s).
+
+=== WRITING RULES (TEXT-FORWARD) ===
+
+- Titles: MAX 5 WORDS for hook, MAX 6 WORDS for rest. NO emojis. SENTENCE CASE (only first word capitalized).
+- Spanish MUST include accents and marks: á é í ó ú ü ñ ¿ ¡. NEVER "sabias" (use "sabías"), NEVER "dia" (use "día").
+- Spanish is PENINSULAR (Spain): use "coge", "vosotros" if plural, NEVER "agarra" or "ustedes".
+- Voiceover: 1 sentence per scene, 8-14 words. AUTHORITATIVE tone (not intimate, not whisper). Direct "tú" address.
+- NO filler phrases ever: "hoy vamos a ver", "en este video", "como veis", "os cuento" — PROHIBITED.
+- Hook MUST create curiosity gap or pattern interrupt.
+- At least ONE scene between scene_1–scene_3 must contain a specific NUMBER (%, g, ratio, seconds).
+- CTA must name "Cals2Gains" verbatim and include a save cue ("Guarda" or similar).
+
+=== VIDEO PROMPT RULES (B-ROLL under text) ===
+
+Since impersonal accounts are TEXT-FORWARD, video is SECONDARY to text — but must look cinematic.
+Write prompts in ENGLISH, 25-40 words. ALWAYS specify:
+1. SUBJECT: athletic person (toned, 22-35, premium activewear) OR premium food/ingredient close-up
+2. ENVIRONMENT: ultra-modern black-steel gym with violet LED strips / Calacatta marble kitchen with brass hardware / premium wellness studio
+3. LIGHTING: dramatic key + violet rim backlight + warm coral/gold accent
+4. CAMERA: slow push-in / macro close-up / rack focus / locked-off low-angle — ALWAYS slow and intentional (text needs to be readable on top)
+
+CINEMATIC EXAMPLES:
+- HOOK: "Extreme close-up of hands pouring protein powder into shaker, slow-motion dust cloud, dramatic top-down spotlight, violet rim light, dark plum background, ultra-shallow depth of field, cinematic 4K"
+- PROBLEM: "Overhead shot of messy kitchen with processed food wrappers and empty plates, low warm tungsten light, violet LED accent in background, slow dolly-in, moody editorial, cinematic 4K"
+- VALUE (food): "Macro close-up of perfectly grilled salmon fillet on Calacatta marble, slow 360 orbit, warm brass pendant light, violet LED background, steam rising, editorial food photography, cinematic 4K"
+- VALUE (training): "Low-angle slow-motion shot of athletic legs mid-squat in minimalist black steel gym, violet rim backlight highlights sweat, single spotlight, dark plum background, cinematic 4K"
+- CTA: "Elegant flat-lay of smartphone next to dumbbells and protein on dark plum wood surface, violet LED rim, coral warm accent, slow zoom-in on phone screen, cinematic 4K"
+
+KEY RULE: Background video must have DARK/EMPTY TOP-THIRD so overlay text is readable.
+Avoid video prompts with people looking at camera or talking — text must not compete with faces.
+
+=== JSON SCHEMA ===
 {
   "scenes": [
     {
       "id": "scene_0",
-      "title": "Short punchy title",
+      "title": "Short punchy title (≤5 words for hook, ≤6 for rest)",
       "voiceover": "Spoken text for this scene.",
-      "video_prompt": "Visual description for Sora 2 video generation.",
-      "duration_seconds": 3
+      "video_prompt": "Cinematic English prompt, 25-40 words, specify subject+environment+lighting+camera.",
+      "duration_seconds": 2
     }
   ]
 }
+
+EXACTLY 5 scenes. Total duration 10-12 seconds.
 """
 
 def generate_script(topic: str, lang: str = "es") -> list[dict]:
@@ -274,10 +333,13 @@ def generate_voiceovers(
                 voice_id=voice_id,
                 lang=lang,
                 output_path=mp3_path,
-                # Alta stability para mantener el acento castellano peninsular
-                # consistente. Similarity 0.75 mantiene la voz fiel al entrenamiento.
-                stability=0.75,
-                similarity_boost=0.75,
+                # Stability baja (0.45) + style alto (0.6) = voz autoritativa con
+                # inflexiones marcadas, necesarias para reels virales impersonales.
+                # Similarity 0.78 mantiene el acento peninsular de Lucia intacto.
+                stability=0.45,
+                similarity_boost=0.78,
+                style=0.6,
+                speed=1.08,
             )
             scene["voiceoverFile"] = mp3_path.name
             scene["subtitles"] = result.get("word_timestamps", [])

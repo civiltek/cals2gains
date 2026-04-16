@@ -11,18 +11,19 @@ interface TitleTextProps {
 }
 
 /**
- * Animated title text.
+ * Animated title text — viral impersonal reel format 2026.
  *
  * Hook scene (index 0):
- *   - Large coral text, centered, semi-transparent dark pill background
- *   - Strong glow + text shadow for punch
+ *   - MASSIVE coral text (110px), centered, zoom-punch entrance (scale 1.2 → 1.0)
+ *   - Strong glow + triple text shadow for punch
+ *   - Occupies ≥60% horizontal space (text-forward)
  *
  * Regular scenes:
- *   - Medium bone text, upper third, pill with coral/violet tint (0.75 opacity)
- *   - Spring slide-up entrance
+ *   - Bold bone text (78px), upper third on coral pill
+ *   - Spring slide-up entrance + subtle scale
  *
- * Both: fade out last 8 frames.
- * Titles are converted to sentence case (only first letter uppercase).
+ * Both: snap fade-out last 4 frames (no lingering).
+ * Titles auto sentence-case.
  */
 
 /**
@@ -47,15 +48,16 @@ export const TitleText: React.FC<TitleTextProps> = ({
 
   const displayTitle = toSentenceCase(title);
 
-  const enterFrames = 12;
-  const exitFrames = 8;
+  // Viral pacing: entrada rápida (8f ≈ 0.27s), salida seca (4f ≈ 0.13s)
+  const enterFrames = 8;
+  const exitFrames = 4;
 
   const translateY = spring({
     fps,
     frame,
-    config: { damping: 18, stiffness: 120 },
+    config: { damping: 14, stiffness: 180 },
     durationInFrames: enterFrames,
-    from: 40,
+    from: 60,
     to: 0,
   });
 
@@ -66,36 +68,51 @@ export const TitleText: React.FC<TitleTextProps> = ({
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
+  // HOOK: zoom-punch scale desde 1.25 → 1.0 en primeros 8 frames
+  const hookScale = spring({
+    fps,
+    frame,
+    config: { damping: 12, stiffness: 200 },
+    durationInFrames: enterFrames,
+    from: 1.25,
+    to: 1.0,
+  });
+
   if (isHook) {
     return (
       <AbsoluteFill
         style={{
           justifyContent: "center",
           alignItems: "center",
-          paddingLeft: 60,
-          paddingRight: 120,
+          paddingLeft: 40,
+          paddingRight: 40,
         }}
       >
         <div
           style={{
             opacity,
-            transform: `translateY(${translateY}px)`,
+            transform: `scale(${hookScale})`,
             textAlign: "center",
-            backgroundColor: "rgba(23,18,29,0.65)",
-            borderRadius: 24,
-            padding: "24px 36px",
+            // Pill oscuro translúcido + sombra profunda para legibilidad sobre cualquier fondo
+            backgroundColor: "rgba(23,18,29,0.72)",
+            borderRadius: 28,
+            padding: "32px 44px",
+            boxShadow: "0 24px 60px rgba(0,0,0,0.45)",
           }}
         >
           <span
             style={{
               fontFamily: BRAND.fontDisplay,
               fontWeight: 800,
-              fontSize: 80,
-              lineHeight: 1.1,
+              fontSize: 110,
+              lineHeight: 1.05,
               color: BRAND.coral,
-              textShadow: `0 0 40px rgba(255,106,77,0.55), 0 4px 16px rgba(0,0,0,0.9)`,
-              letterSpacing: "-1px",
+              // Glow coral triple: disperso, medio, duro
+              textShadow:
+                "0 0 48px rgba(255,106,77,0.65), 0 0 16px rgba(255,106,77,0.85), 0 6px 20px rgba(0,0,0,0.95)",
+              letterSpacing: "-2px",
               display: "block",
+              textTransform: "none",
             }}
           >
             {displayTitle}
@@ -110,30 +127,31 @@ export const TitleText: React.FC<TitleTextProps> = ({
       style={{
         justifyContent: "flex-start",
         alignItems: "flex-start",
-        paddingTop: 140,
-        paddingLeft: 60,
-        paddingRight: 120,
+        paddingTop: 180,
+        paddingLeft: 50,
+        paddingRight: 50,
       }}
     >
       <div
         style={{
           opacity,
           transform: `translateY(${translateY}px)`,
-          // Pill con fondo coral translúcido — distintivo, sin ser plano gris
-          backgroundColor: "rgba(255,106,77,0.78)",
-          borderRadius: 18,
-          padding: "14px 26px",
+          // Pill coral saturado — impacto tipográfico viral 2026
+          backgroundColor: "rgba(255,106,77,0.88)",
+          borderRadius: 22,
+          padding: "20px 32px",
+          boxShadow: "0 14px 40px rgba(255,106,77,0.35), 0 4px 12px rgba(0,0,0,0.35)",
         }}
       >
         <span
           style={{
             fontFamily: BRAND.fontDisplay,
-            fontWeight: 700,
-            fontSize: 52,
-            lineHeight: 1.2,
+            fontWeight: 800,
+            fontSize: 78,
+            lineHeight: 1.12,
             color: "#FFFFFF",
-            textShadow: "0 2px 12px rgba(0,0,0,0.5)",
-            letterSpacing: "-0.5px",
+            textShadow: "0 3px 16px rgba(0,0,0,0.55)",
+            letterSpacing: "-1px",
             display: "block",
           }}
         >

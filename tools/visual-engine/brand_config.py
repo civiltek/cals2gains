@@ -106,16 +106,20 @@ class Reel:
     TARGET_LUFS = -14.0
     MUSIC_DUCK_DB = -12  # dB reduction when voice is present
 
-# -- Text Sizes (scaled for 1080x1920) ------------------------------------
+# -- Text Sizes (scaled for 1080x1920) — viral impersonal format 2026 -----
+# Regla principal: el texto es el protagonista. Tamaños grandes, pesos 700-900.
 class TextSizes:
-    hero     = 96    # Big hook text
-    title    = 72    # Scene titles
-    subtitle = 48    # Subtitles / descriptions
-    body     = 36    # Body text
-    caption  = 28    # Captions / small text
-    stat     = 120   # Big numbers / statistics
-    cta      = 56    # Call-to-action text
-    watermark = 24   # @cals2gains watermark
+    hook     = 110   # Título hook (pantalla completa, zoom-punch)
+    hero     = 96    # Texto grande alternativo
+    title    = 78    # Títulos escena value (pill coral)
+    subtitle_active = 72   # Palabra karaoke activa (gold)
+    subtitle_idle   = 60   # Palabras karaoke pasivas (bone)
+    subtitle = 60    # Alias heredado
+    body     = 44    # Texto cuerpo
+    caption  = 32    # Captions / small text
+    stat     = 180   # Números grandes / estadísticas
+    cta      = 78    # Call-to-action text
+    watermark = 28   # @cals2gains watermark
 
 # -- Margins & Padding -----------------------------------------------------
 class Layout:
@@ -184,15 +188,49 @@ class DataOverlayConfig:
 
 # -- Brand Prompt Suffix (appended to every AI image prompt) ---------------
 BRAND_STYLE_SUFFIX = (
-    "Dark premium aesthetic, moody lighting, deep plum (#17121D) and violet (#9C8CFF) "
-    "color accents, fitness/wellness mood, clean modern composition, "
-    "cinematic quality, shot on RED camera look, shallow depth of field, "
-    "professional color grading with warm coral (#FF6A4D) highlights"
+    "dark premium aesthetic, studio moody lighting, deep plum (#17121D) background "
+    "with violet (#9C8CFF) color accents and warm coral (#FF6A4D) rim highlights, "
+    "fitness and wellness mood, clean modern editorial composition, "
+    "shot on Arri Alexa with anamorphic prime lens, shallow depth of field f/1.4, "
+    "professional Hollywood color grading, 9:16 vertical format"
 )
 
+# Appended to every AI video prompt — defines the baseline visual quality bar.
+# IMPORTANTE: reels impersonales son TEXT-FORWARD. El vídeo es B-roll bajo texto,
+# por eso pedimos composición con espacio negativo (top-third y bottom-third oscuros).
 BRAND_VIDEO_SUFFIX = (
-    "Cinematic 4K quality, smooth camera movement, dark premium aesthetic, "
-    "moody gym/fitness lighting, deep plum and violet color palette, "
-    "professional color grading, shallow depth of field, "
-    "fitness influencer production quality, Instagram Reels style"
+    "cinematic 4K studio quality, dark premium aesthetic, "
+    "deep plum and violet shadow tones, warm coral and gold rim highlights, "
+    "shallow depth of field f/1.4, professional Hollywood color grade, "
+    "ultra-modern black steel gym with violet LED strips "
+    "OR high-end Calacatta marble kitchen with brushed brass hardware, "
+    "slow intentional camera movement, "
+    "composition leaves dark negative space in top-third and bottom-third for text overlay, "
+    "no subject looking directly at camera, no dialogue, no mouth movement, "
+    "B-roll style cinematic fitness content, Instagram Reels vertical 9:16"
+)
+
+# Hook scene — maximum visual impact, must stop the scroll in under 0.5 seconds.
+# Text-forward: el vídeo bajo el hook necesita contraste alto pero NO competir con el texto.
+BRAND_VIDEO_SUFFIX_HOOK = (
+    "EXTREME VISUAL IMPACT: dramatic slow-motion macro close-up, "
+    "single top-right key light creating deep shadow on the opposite side, "
+    "violet rim light tracing the subject silhouette, "
+    "ultra-shallow depth of field f/0.95, dark plum background with violet bokeh, "
+    "focus on a single cinematic detail (hands lifting barbell, dumbbell hitting floor, "
+    "protein powder dust cloud, water droplets on skin, sweat drop at 500fps), "
+    "composition leaves dark empty center-vertical band for large text overlay, "
+    "NO face in frame, NO mouth movement, pure abstract cinematic fitness B-roll, 9:16 vertical"
+)
+
+# CTA scene — warm, aspirational, invites engagement.
+# Preferir flat-lays o still-life sobre personas mirando a cámara (evita competir con texto CTA).
+BRAND_VIDEO_SUFFIX_CTA = (
+    "elegant cinematic flat-lay OR macro still-life, cinematic 4K, "
+    "smartphone showing fitness app next to dumbbells and protein jar on dark plum wood surface "
+    "OR lifestyle shot of premium gym equipment with warm coral side-light, "
+    "coral and gold warm tones, violet LED rim light, "
+    "shallow depth of field, soft violet bokeh background, "
+    "slow zoom-in toward phone screen, invites viewer action, "
+    "editorial product lifestyle photography, NO face looking at camera, 9:16 vertical"
 )
