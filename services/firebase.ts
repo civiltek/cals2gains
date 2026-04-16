@@ -243,6 +243,18 @@ export async function updateUserProfile(
 }
 
 /**
+ * Update user allergies and intolerances
+ */
+export async function updateUserAllergies(
+  uid: string,
+  allergies: string[],
+  intolerances: string[]
+): Promise<void> {
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, { allergies, intolerances });
+}
+
+/**
  * Update user goals, goal mode, and related fields
  */
 export async function updateUserGoalsAndMode(

@@ -10,6 +10,7 @@ import {
   updateUserProfile,
   updateUserLanguage,
   updateUserGoalsAndMode,
+  updateUserAllergies,
   onAuthStateChange,
   signOut as firebaseSignOut,
 } from '../services/firebase';
@@ -39,6 +40,9 @@ interface UserState {
   setDayTypeGoals: (goals: DayTypeGoals) => Promise<void>;
   setTodayDayType: (type: DayType) => void;
   getActiveGoals: () => UserGoals;
+
+  // Allergy actions
+  updateAllergies: (allergies: string[], intolerances: string[]) => Promise<void>;
 
   // Goal mode actions (NEW)
   setNutritionMode: (mode: NutritionMode) => Promise<void>;
@@ -273,6 +277,20 @@ export const useUserStore = create<UserState>((set, get) => ({
       // Revert
       set({ user: { ...user, adaptiveMode: user.adaptiveMode } });
       console.error('Failed to toggle adaptive mode:', error);
+      throw error;
+    }
+  },
+
+  updateAllergies: async (allergies, intolerances) => {
+    const { user } = get();
+    if (!user) return;
+
+    set({ user: { ...user, allergies, intolerances } });
+    try {
+      await updateUserAllergies(user.uid, allergies, intolerances);
+    } catch (error) {
+      set({ user: { ...user, allergies: user.allergies, intolerances: user.intolerances } });
+      console.error('Failed to update allergies:', error);
       throw error;
     }
   },

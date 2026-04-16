@@ -78,7 +78,13 @@ export default function AnalysisScreen() {
   const runAnalysis = async (context?: string) => {
     setState('loading');
     try {
-      const result = await analyzeFoodPhoto(imageBase64, lang, context || userContext || undefined);
+      const result = await analyzeFoodPhoto(
+        imageBase64,
+        lang,
+        context || userContext || undefined,
+        user?.allergies || [],
+        user?.intolerances || []
+      );
       setAnalysis(result);
       setMealType(result.mealType);
       setCustomWeight(String(result.estimatedWeight));
@@ -276,6 +282,23 @@ export default function AnalysisScreen() {
             {/* Food image */}
             {displayImageUri && (
               <Image source={{ uri: displayImageUri }} style={styles.foodImage} />
+            )}
+
+            {/* Allergen Warning Banner */}
+            {analysis.allergenWarnings && analysis.allergenWarnings.length > 0 && (
+              <View style={styles.allergenBanner}>
+                <Ionicons name="warning" size={20} color="#FFFFFF" />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.allergenBannerTitle}>{t('allergies.allergenWarningTitle')}</Text>
+                  <Text style={styles.allergenBannerText}>
+                    {t('allergies.allergenWarning', {
+                      allergens: analysis.allergenWarnings
+                        .map(a => t(`allergies.${a}` as any, { defaultValue: a }))
+                        .join(', '),
+                    })}
+                  </Text>
+                </View>
+              </View>
             )}
 
             {/* Dish name and confidence */}
@@ -604,6 +627,27 @@ function createStyles(C: any) {
       width: '100%',
       height: 240,
       resizeMode: 'cover',
+    },
+    allergenBanner: {
+      marginHorizontal: 16,
+      marginBottom: 4,
+      backgroundColor: '#CC0000',
+      borderRadius: 12,
+      padding: 14,
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 10,
+    },
+    allergenBannerTitle: {
+      fontSize: 14,
+      fontWeight: '800',
+      color: '#FFFFFF',
+      marginBottom: 2,
+    },
+    allergenBannerText: {
+      fontSize: 13,
+      color: '#FFFFFF',
+      lineHeight: 18,
     },
     dishSection: {
       padding: 20,

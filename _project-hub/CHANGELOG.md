@@ -1,5 +1,20 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Feature: Sistema de alergias e intolerancias (seguridad del usuario)
+
+- **Modelo de datos**: `types/index.ts` — campos `allergies: string[]` e `intolerances: string[]` en `User`; `allergenWarnings?: string[]` en `FoodAnalysisResult` y `Recipe`
+- **Firebase**: `updateUserAllergies(uid, allergies, intolerances)` en `services/firebase.ts`
+- **Zustand store**: acción `updateAllergies` en `userStore.ts` con optimistic update y rollback
+- **i18n**: traducciones completas ES + EN (`allergies.*`) — 14 alérgenos + 4 intolerancias + disclaimer médico
+- **Onboarding**: nuevo step 5 (de 8) con chips seleccionables para alérgenos e intolerancias + campo libre "Otras"
+- **Pantalla nueva**: `app/allergy-settings.tsx` — edición de alergias desde ajustes en cualquier momento
+- **Settings**: enlace en `app/settings.tsx` en sección propia entre "Objetivo" y "Modo nutricional"
+- **Filtro IA — sugerencias**: `openai.ts generateAIMealSuggestions` nunca sugiere alimentos con alérgenos declarados
+- **Filtro IA — análisis de foto**: `openai.ts analyzeFoodPhoto` añade `allergenWarnings[]` cuando detecta alérgenos; banner rojo prominente en `analysis.tsx`
+- **Filtro IA — macro coach**: `macroCoach.ts buildCoachingContext` incluye las alergias en el contexto del coach
+- **Filtro IA — recetas**: `recipeService.ts` — función `detectRecipeAllergens()` con mapa de keywords; `importRecipeFromUrl` marca `allergenWarnings` automáticamente
+- **Disclaimer médico** en pantalla de alergias y en step de onboarding
+
 ## 2026-04-16 — Widget iOS/Android + Coach adaptativo mejorado
 
 ### Feature A: Widget (infraestructura JS)

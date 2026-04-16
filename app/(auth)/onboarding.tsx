@@ -18,7 +18,31 @@ import { calculateGoalsFromPreset, getPresetById, MACRO_PRESETS } from '../../co
 
 const { width: SW } = Dimensions.get('window');
 
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 8;
+
+const ALLERGENS = [
+  { id: 'gluten', key: 'allergies.gluten' },
+  { id: 'lactose', key: 'allergies.lactose' },
+  { id: 'nuts', key: 'allergies.nuts' },
+  { id: 'peanuts', key: 'allergies.peanuts' },
+  { id: 'shellfish', key: 'allergies.shellfish' },
+  { id: 'fish', key: 'allergies.fish' },
+  { id: 'egg', key: 'allergies.egg' },
+  { id: 'soy', key: 'allergies.soy' },
+  { id: 'sesame', key: 'allergies.sesame' },
+  { id: 'mustard', key: 'allergies.mustard' },
+  { id: 'celery', key: 'allergies.celery' },
+  { id: 'molluscs', key: 'allergies.molluscs' },
+  { id: 'lupin', key: 'allergies.lupin' },
+  { id: 'sulphites', key: 'allergies.sulphites' },
+];
+
+const INTOLERANCES = [
+  { id: 'fructose', key: 'allergies.fructose' },
+  { id: 'sorbitol', key: 'allergies.sorbitol' },
+  { id: 'histamine', key: 'allergies.histamine' },
+  { id: 'fodmap', key: 'allergies.fodmap' },
+];
 const GENDERS = [
   { id: 'male', labelKey: 'onboarding.male', icon: 'male-outline' },
   { id: 'female', labelKey: 'onboarding.female', icon: 'female-outline' },
@@ -113,6 +137,13 @@ function createStyles(C: any) {
     nextBtnText: { fontSize: 17, fontWeight: '700', color: C.white },
     finishBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: C.accent, paddingVertical: 16, borderRadius: 14 },
     finishBtnText: { fontSize: 17, fontWeight: '700', color: C.white },
+    chipsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
+    chip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: C.card, borderWidth: 1, borderColor: C.border },
+    chipActive: { backgroundColor: C.error + '20', borderColor: C.error },
+    chipText: { fontSize: 13, fontWeight: '600', color: C.textSecondary },
+    chipTextActive: { color: C.error },
+    disclaimerBox: { backgroundColor: C.warning + '15', borderRadius: 10, padding: 12, marginTop: 16, borderWidth: 1, borderColor: C.warning + '40' },
+    disclaimerText: { fontSize: 12, color: C.textSecondary, lineHeight: 18 },
   });
 }
 
@@ -120,7 +151,7 @@ export default function OnboardingScreen() {
   const C = useColors();
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { updateProfile, user, loadUserData } = useUserStore();
+  const { updateProfile, updateAllergies, user, loadUserData } = useUserStore();
   const scrollRef = useRef<ScrollView>(null);
   const s = useMemo(() => createStyles(C), [C]);
 
@@ -148,6 +179,11 @@ export default function OnboardingScreen() {
 
   // Step 5: Macro preset
   const [preset, setPreset] = useState('balanced');
+
+  // Step 5: Allergies & intolerances
+  const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
+  const [selectedIntolerances, setSelectedIntolerances] = useState<string[]>([]);
+  const [otherAllergy, setOtherAllergy] = useState('');
 
   // Step 6: Health integration (simplified - no native modules)
   const [healthConnected, setHealthConnected] = useState(false);
@@ -231,6 +267,13 @@ export default function OnboardingScreen() {
         }
       );
 
+      // Save allergies & intolerances
+      const allAllergies = [
+        ...selectedAllergies,
+        ...otherAllergy.split(',').map(s => s.trim()).filter(Boolean),
+      ];
+      await updateAllergies(allAllergies, selectedIntolerances);
+
       // Mark onboarding as completed in Firestore
       if (user?.uid) {
         await markOnboardingCompleted(user.uid);
@@ -256,8 +299,9 @@ export default function OnboardingScreen() {
       case 2: return goal;
       case 3: return activity;
       case 4: return preset;
-      case 5: return true;
-      case 6: return true;
+      case 5: return true; // allergies — optional
+      case 6: return true; // health integration
+      case 7: return true; // summary
       default: return false;
     }
   };
@@ -418,7 +462,68 @@ export default function OnboardingScreen() {
     </View>
   );
 
-  const renderStep5 = () => (
+  const renderStep5 = () => {
+    const toggleAllergy = (id: string) => {
+      setSelectedAllergies(prev =>
+        prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+      );
+      Haptics.selectionAsync();
+    };
+    const toggleIntolerance = (id: string) => {
+      setSelectedIntolerances(prev =>
+        prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+      );
+      Haptics.selectionAsync();
+    };
+
+    return (
+      <View style={s.stepContent}>
+        <Text style={s.stepTitle}>{t('allergies.title')}</Text>
+        <Text style={s.stepDesc}>{t('allergies.subtitle')}</Text>
+
+        <Text style={s.label}>{t('allergies.allergiesSection')}</Text>
+        <Text style={[s.stepDesc, { fontSize: 13, marginBottom: 8 }]}>{t('allergies.allergiesDesc')}</Text>
+        <View style={s.chipsContainer}>
+          {ALLERGENS.map(a => {
+            const active = selectedAllergies.includes(a.id);
+            return (
+              <TouchableOpacity key={a.id} style={[s.chip, active && s.chipActive]} onPress={() => toggleAllergy(a.id)}>
+                <Text style={[s.chipText, active && s.chipTextActive]}>{t(a.key)}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <Text style={[s.label, { marginTop: 20 }]}>{t('allergies.intolerancesSection')}</Text>
+        <Text style={[s.stepDesc, { fontSize: 13, marginBottom: 8 }]}>{t('allergies.intolerancesDesc')}</Text>
+        <View style={s.chipsContainer}>
+          {INTOLERANCES.map(a => {
+            const active = selectedIntolerances.includes(a.id);
+            return (
+              <TouchableOpacity key={a.id} style={[s.chip, active && s.chipActive]} onPress={() => toggleIntolerance(a.id)}>
+                <Text style={[s.chipText, active && s.chipTextActive]}>{t(a.key)}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <Text style={[s.label, { marginTop: 20 }]}>{t('allergies.other')}</Text>
+        <TextInput
+          style={s.input}
+          placeholder={t('allergies.otherPlaceholder')}
+          placeholderTextColor={C.textSecondary}
+          value={otherAllergy}
+          onChangeText={setOtherAllergy}
+        />
+
+        <View style={s.disclaimerBox}>
+          <Text style={s.disclaimerText}>⚕️ {t('allergies.disclaimer')}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderStep6 = () => (
     <View style={s.stepContent}>
       <Text style={s.stepTitle}>{t('onboarding.healthIntegrations')}</Text>
       <Text style={s.stepDesc}>{t('onboarding.healthIntegrationsDesc')}</Text>
@@ -466,7 +571,7 @@ export default function OnboardingScreen() {
     </View>
   );
 
-  const renderStep6 = () => {
+  const renderStep7 = () => {
     const bmrRounded = Math.round(bmr);
     const activityBonus = tdee - bmrRounded;
     const calorieAdjustment = Math.max(1200, goalCalories) - tdee;
@@ -586,6 +691,7 @@ export default function OnboardingScreen() {
       case 4: return renderStep4();
       case 5: return renderStep5();
       case 6: return renderStep6();
+      case 7: return renderStep7();
       default: return null;
     }
   };

@@ -154,16 +154,32 @@ Fill in accurate nutritional values based on ALL the ingredient information now 
 }
 
 /**
+ * Build allergen warning block to inject into prompts
+ */
+function buildAllergenBlock(allergies: string[], intolerances: string[]): string {
+  const all = [...allergies, ...intolerances];
+  if (all.length === 0) return '';
+  return `\n\nALLERGEN SAFETY — CRITICAL:
+User has declared the following allergies/intolerances: ${all.join(', ')}.
+If ANY detected ingredient may contain these allergens, you MUST add an "allergenWarnings" array to the JSON with the matching allergen IDs found (e.g. ["gluten","lactose"]). If none detected, return allergenWarnings as an empty array [].`;
+}
+
+/**
  * Analyze a food photo using gpt-4o Vision
  */
 export async function analyzeFoodPhoto(
   imageBase64: string,
   language: 'es' | 'en' = getAppLanguage(),
-  userContext?: string
+  userContext?: string,
+  userAllergies: string[] = [],
+  userIntolerances: string[] = []
 ): Promise<FoodAnalysisResult> {
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key not configured');
   }
+
+  const allergenBlock = buildAllergenBlock(userAllergies, userIntolerances);
+  const systemPromptWithAllergens = SYSTEM_PROMPT + allergenBlock;
 
   const response = await fetch(OPENAI_API_URL, {
     method: 'POST',
@@ -177,7 +193,7 @@ export async function analyzeFoodPhoto(
       messages: [
         {
           role: 'system',
-          content: SYSTEM_PROMPT,
+          content: systemPromptWithAllergens,
         },
         {
           role: 'user',
@@ -255,6 +271,7 @@ export async function analyzeFoodPhoto(
       },
       portionDescription: result.portionDescription || `Approximately ${result.estimatedWeight || 200}g`,
       mealType: (result.mealType as MealType) || detectMealType(),
+      allergenWarnings: Array.isArray(result.allergenWarnings) ? result.allergenWarnings : [],
     };
   } catch (parseError) {
     console.error('Failed to parse OpenAI response:', content);
@@ -376,6 +393,8 @@ export async function generateAIMealSuggestions(params: {
   recentMeals: string[];    // names of meals logged in the last few days
   language: 'es' | 'en';
   goalMode?: string;        // lose_fat, gain_muscle, etc.
+  allergies?: string[];     // user's allergies — NEVER suggest these
+  intolerances?: string[];  // user's intolerances — avoid or flag
   urgencyMode?: 'high_calories' | 'high_protein'; // proactive context
 }): Promise<AIMealSuggestion[]> {
   if (!OPENAI_API_KEY) {
@@ -392,8 +411,15 @@ export async function generateAIMealSuggestions(params: {
     recentMeals,
     language,
     goalMode,
+    allergies = [],
+    intolerances = [],
     urgencyMode,
   } = params;
+
+  const allergenList = [...allergies, ...intolerances];
+  const allergenLine = allergenList.length > 0
+    ? ` CRITICAL SAFETY: NEVER suggest meals containing ${allergenList.join(', ')}. The user has declared allergies/intolerances to these.`
+    : '';
 
   // Urgency context modifies the system prompt priority
   const urgencyInstruction =
@@ -403,7 +429,7 @@ export async function generateAIMealSuggestions(params: {
       ? ' PRIORITY: User still needs a lot of protein before end of day — prioritize high-protein options (≥30g protein per meal).'
       : '';
 
-  const systemPrompt = `Nutrition assistant. Generate 5 meal suggestions fitting remaining macros. Return ONLY valid JSON array. Rules: realistic meals, accurate USDA/BEDCA nutrition, don't exceed remaining calories by >15%. Provide nameEs+nameEn always. Language: ${language === 'es' ? 'Spanish' : 'English'}.${urgencyInstruction}`;
+  const systemPrompt = `Nutrition assistant. Generate 5 meal suggestions fitting remaining macros. Return ONLY valid JSON array. Rules: realistic meals, accurate USDA/BEDCA nutrition, don't exceed remaining calories by >15%. Provide nameEs+nameEn always. Language: ${language === 'es' ? 'Spanish' : 'English'}.${allergenLine}${urgencyInstruction}`;
 
   const urgencyNote =
     urgencyMode === 'high_calories'
