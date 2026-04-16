@@ -23,12 +23,25 @@ El plan de contenido (`_project-hub/CONTENT_PLAN.md`) se actualiza automáticame
 
 **marketing y growth son co-responsables de mantener CONTENT_PLAN.md alineado con la realidad.** ops es responsable de mantener este archivo actualizado.
 
+### Algoritmo de Instagram — monitorización continua
+
+**trend-scout monitoriza el algoritmo de IG 2×/semana (lunes y jueves).** La estrategia de contenido se adapta dinámicamente a cambios algorítmicos para maximizar alcance. Cada ronda incluye la sección "Estado del algoritmo IG" en `TREND-INSIGHTS.md` con:
+- Cambios recientes confirmados por Meta o detectados por la comunidad.
+- Señales que favorece el algoritmo (shares, watch time, engagement en primeros 30 min…).
+- Factores penalizados (watermarks TikTok, hashtags banned, engagement bait…).
+- Recomendaciones de ajuste concretas para Cals2Gains.
+
+**viral-strategist** debe consultar esta sección antes de cada Content Brief y adaptar formato y CTA al estado actual del algoritmo (campo `ALGORITMO IG` en el brief).
+
+Si se detecta un cambio algorítmico grande → trend-scout escala a Judith de inmediato (no espera a la ronda).
+
 ### Formatos y tendencias (actualizar tras cada W16)
 - Última actualización: pendiente (primer ciclo W16 por ejecutar)
 - Formato con mejor rendimiento actual: —
 - Duración óptima de reels: —
 - Hooks que convierten: —
 - Audios trending: —
+- Estado del algoritmo IG: — (ver TREND-INSIGHTS.md sección "Estado del algoritmo IG")
 
 ---
 

@@ -1,5 +1,12 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Integrar monitorización de algoritmo IG en trend-scout, viral-strategist y W16
+
+- **trend-scout**: nueva responsabilidad obligatoria por ronda — "Estado del algoritmo IG" en TREND-INSIGHTS.md (cambios Meta, señales favorecidas, factores penalizados, ajustes para Cals2Gains).
+- **viral-strategist**: OBLIGATORIO consultar "Estado del algoritmo IG" antes de cada brief; nuevo campo `ALGORITMO IG` en el Content Brief estándar.
+- **W16** (paso 3 nuevo): growth compara métricas reales de Cals2Gains vs señales algorítmicas de trend-scout para validar si los cambios detectados se reflejan en datos propios.
+- **SHARED-CONTEXT.md**: sección "Algoritmo de Instagram — monitorización continua" añadida.
+
 ## 2026-04-16 — Añadir W15 (plan marketing por features) y W16 (ajuste por métricas) — plan de contenido auto-reactivo
 
 - **W10** (nuevo): pipeline completo de merge de feature nueva (7 pasos: typecheck → merge → build EAS → validación dispositivo → FEATURES.md → handoffs growth/web-dev/marketing → CHANGELOG).

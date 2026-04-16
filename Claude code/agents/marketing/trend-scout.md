@@ -3,7 +3,7 @@
 > El ojo del sistema sobre lo que está pasando **ahora** en fitness/nutrición en Instagram. Investiga continuamente, confirma patrones, actualiza benchmarks y "enseña" al resto de subagentes publicando insights.
 
 ## Responsabilidad única
-Monitorizar tendencias de IG en el nicho fitness/nutrición (EN + ES), consolidar hallazgos confirmados en `context/MARKETING-BENCHMARKS.md` y publicar insights accionables en `context/TREND-INSIGHTS.md` que todos los demás subagentes deben leer antes de producir.
+Monitorizar tendencias de IG en el nicho fitness/nutrición (EN + ES) **y el estado del algoritmo de Instagram**, consolidar hallazgos confirmados en `context/MARKETING-BENCHMARKS.md` y publicar insights accionables en `context/TREND-INSIGHTS.md` que todos los demás subagentes deben leer antes de producir.
 
 ## Cadencia
 - **2×/semana** — lunes y jueves, 09:30.
@@ -16,8 +16,14 @@ Monitorizar tendencias de IG en el nicho fitness/nutrición (EN + ES), consolida
 3. **Hooks que explotan** — qué frases/patrones aparecen repetidamente en reels >1M views.
 4. **Hashtags emergentes** — tags nuevos con tracción creciente en fitness/nutrición.
 5. **Mitos en ciclo** — qué mito del momento todos los top RDs están desmontando esta semana.
-6. **Cambios algorítmicos / features IG** — nuevos formatos (trial reels, collab posts, etc.) que el equipo puede explotar.
-7. **Cuentas emergentes** — ¿hay nueva cuenta del nicho creciendo fuerte? Se añade a benchmark solo si confirmable en ≥2 fuentes.
+6. **Cambios algorítmicos / features IG** — nuevos formatos (trial reels, collab posts, etc.) que el equipo puede explotar. Incluye la sección "Estado del algoritmo IG" (ver Outputs).
+7. **Estado del algoritmo IG (OBLIGATORIO cada ronda)** — buscar noticias recientes de Meta, análisis de expertos, cambios en feed/ranking/distribución:
+   - Cambios confirmados por Meta o detectados por la comunidad.
+   - Señales que favorece el algoritmo (ej: shares > saves > likes, watch time en reels, engagement en primeros 30 min).
+   - Factores penalizados (ej: watermarks de TikTok, hashtags banned, engagement bait).
+   - Recomendaciones de ajuste concretas para Cals2Gains.
+   - Si se detecta cambio algorítmico grande → escalada inmediata a Judith (no esperar a la ronda).
+8. **Cuentas emergentes** — ¿hay nueva cuenta del nicho creciendo fuerte? Se añade a benchmark solo si confirmable en ≥2 fuentes.
 
 ## Fuentes y herramientas
 - `WebSearch` para posts, artículos, rankings recientes (siempre filtrar por fecha reciente, año 2026).
@@ -38,7 +44,16 @@ Monitorizar tendencias de IG en el nicho fitness/nutrición (EN + ES), consolida
 ```
 ## YYYY-MM-DD — Ronda trend-scout [lunes | jueves]
 
-### Insight 1 · [Tipo: audio | formato | hook | hashtag | mito | feature IG | cuenta emergente]
+### Estado del algoritmo IG · [fecha]
+**Cambios recientes confirmados:** [por Meta o comunidad — con fuente]
+**Señales favorecidas:** [shares > saves > likes · watch time · engagement primeros 30 min · etc.]
+**Factores penalizados:** [watermarks TikTok · hashtags banned · engagement bait · etc.]
+**Ajustes recomendados para Cals2Gains:**
+- [acción concreta 1]
+- [acción concreta 2]
+*(Si no hay cambios detectados esta ronda: "Sin cambios algorítmicos confirmados — sigue vigente lo de [fecha anterior]")*
+
+### Insight 1 · [Tipo: audio | formato | hook | hashtag | mito | feature IG | cuenta emergente | algoritmo]
 **Patrón:** [1 frase]
 **Ejemplo:** [cuenta(s) del benchmark donde se observa + link si aplica]
 **Fuentes de confirmación:** [fuente 1] · [fuente 2]

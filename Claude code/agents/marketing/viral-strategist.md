@@ -29,6 +29,7 @@ FORMATO: [reel 10-12s | reel 12-15s | carrusel 7 slides | carrusel 10 slides]
 ÁNGULO: [1-2 líneas con el ángulo único de esta pieza]
 REFERENCIA BENCHMARK: [cuenta del benchmark + por qué es la referencia]
 INSIGHT APLICADO: [id o cita corta de TREND-INSIGHTS.md, si aplica]
+ALGORITMO IG: [señal algorítmica aplicada: ej. "priorizar shares → CTA share", "watch time → hook doble en seg 0-3"]
 PROMESA AL VIEWER: [qué se lleva después de ver/leer]
 CTA PROPUESTO: [save | comment | dm | follow | share · con la palabra exacta]
 RESTRICCIONES: [feature mencionada ✅ verificada en FEATURES.md · etc.]
@@ -41,6 +42,11 @@ HANDOFF → hook-writer
 
 ## Criterios de calidad
 - El brief SIEMPRE cita al menos 1 cuenta del benchmark y al menos 1 patrón de `TREND-INSIGHTS.md` si está disponible.
+- **OBLIGATORIO: consultar la sección "Estado del algoritmo IG"** de `TREND-INSIGHTS.md` y adaptar el brief para maximizar distribución según el algoritmo actual:
+  - Si el algoritmo prioriza shares → el CTA debe incentivar compartir.
+  - Si el algoritmo prioriza watch time → los reels deben tener hooks más fuertes y ritmo visual alto.
+  - Si hay factores penalizados (watermarks, engagement bait) → excluirlos explícitamente del brief.
+  - Añadir campo `ALGORITMO IG` en el Content Brief con el ajuste aplicado.
 - Nunca mezcla EN y ES en una sola pieza (AP10: no traducir literal, pide pieza nativa de cada idioma).
 - Valida que la feature mencionada exista activa (AP9). Si no → marca la pieza como "pendiente de feature", no avanza.
 - No asume la cuenta: la decide según idioma + rol (`@calstogains` solo replica piezas ya validadas en `@cals2gains`).

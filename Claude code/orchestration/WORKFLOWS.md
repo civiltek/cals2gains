@@ -217,11 +217,12 @@ Regla: W16 se ejecuta como mínimo 1×/semana (tras W4), pero puede dispararse a
    - Ajusta horarios de publicación según datos reales.
    - Rebalancea distribución por cuenta si alguna crece más que otras.
    - Ajusta ratio reel/carrusel/story según qué formato rinde más.
-3. **viral-strategist** actualiza la estrategia de contenido si los datos sugieren cambio de pilares o enfoque.
-4. **performance-analyzer** alimenta **trend-scout** con insights para el siguiente ciclo (ya existe en W9, pero ahora también alimenta `CONTENT_PLAN.md` directamente).
-5. **trend-scout** actualiza `Claude code/context/TREND-INSIGHTS.md` con los **formatos** que están funcionando en las cuentas de Cals2Gains (no solo ángulos de contenido, sino: carrusel vs reel, duración óptima de reels, tipo de hooks que convierten, estilos visuales con más engagement, audios trending). Este paso alimenta W15 en el siguiente ciclo.
-6. **trend-scout** notifica a **marketing** de tendencias virales emergentes que se puedan capitalizar rápido (newsjacking de formatos).
-7. **ops** actualiza `SHARED-CONTEXT.md` (sección RRSS y métricas) + CHANGELOG.
+3. **growth** compara las métricas reales de Cals2Gains con las señales del algoritmo reportadas en la sección "Estado del algoritmo IG" de `TREND-INSIGHTS.md`: ¿los cambios algorítmicos detectados se reflejan en los datos propios? (ej: si trend-scout reporta que IG prioriza shares y Cals2Gains tiene pocos shares → confirma el patrón y refuerza el ajuste).
+4. **viral-strategist** actualiza la estrategia de contenido si los datos sugieren cambio de pilares o enfoque.
+5. **performance-analyzer** alimenta **trend-scout** con insights para el siguiente ciclo (ya existe en W9, pero ahora también alimenta `CONTENT_PLAN.md` directamente).
+6. **trend-scout** actualiza `Claude code/context/TREND-INSIGHTS.md` con los **formatos** que están funcionando en las cuentas de Cals2Gains (carrusel vs reel, duración óptima de reels, tipo de hooks que convierten, estilos visuales con más engagement, audios trending) y con el estado actualizado del algoritmo IG. Este paso alimenta W15 en el siguiente ciclo.
+7. **trend-scout** notifica a **marketing** de tendencias virales emergentes que se puedan capitalizar rápido (newsjacking de formatos).
+8. **ops** actualiza `SHARED-CONTEXT.md` (sección RRSS y métricas) + CHANGELOG.
 
 **Cierre:** `_project-hub/CONTENT_PLAN.md` ajustado a datos reales, no a suposiciones.
 
