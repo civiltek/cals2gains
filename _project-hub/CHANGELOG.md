@@ -9,6 +9,20 @@
 - **Fix aplicado**: Config plugin `plugins/withMinSdkVersion.js` → `minSdkVersion=26` vía `withGradleProperties` (requerido por `react-native-health-connect` / `androidx.health.connect:connect-client:1.1.0-alpha11`)
 - **Listo para subir** a Google Play Console (internal testing track)
 
+## 2026-04-16 — Formato viral + fixes pipeline render (PR #16, PR #18)
+
+- **Subtítulos karaoke**: palabra activa en dorado #FFD700 con glow, font 52-58px bold, zona segura IG (340px bottom)
+- **Logo esquina izquierda**: movido de top-right a top-left, opacidad 75%
+- **Ken Burns effect**: imágenes estáticas con zoom lento 100→108% + pan sutil
+- **TitleText pill**: fondo semi-transparente en hook y escenas regulares, mejor shadow
+- **Zona segura Instagram**: subtítulos 340px bottom, watermark 330px
+- **Framework 3/8/12**: GPT-4o genera hooks 3s, contenido 2-3s por escena, CTA 4s
+- **Voz Lucía (ElevenLabs)**: castellana España peninsular (pFZP5JQG7iQjIQuC4Bku)
+- **Fix fonts**: fonts.css con rutas relativas para webpack (antes fallaba en bundling)
+- **Fix video faststart**: `_apply_faststart()` en generate_sora_clips.py — Chrome headless requiere moov atom al inicio
+- **Fix render concurrency**: concurrency=1 para evitar timeout al cargar videos Sora en paralelo
+- **Reel de prueba v2**: `output/2026-04-16T12-26-42_3_tips_viral.mp4` (14MB, 19.4s, 5 clips Sora 2)
+
 ## 2026-04-16 — Motor de reels v2: Remotion + Sora 2 + ElevenLabs
 
 - **Nuevo motor**: `tools/remotion-engine/` creado desde cero (NO toca visual-engine existente)
