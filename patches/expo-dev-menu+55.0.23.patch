@@ -1,0 +1,15 @@
+diff --git a/node_modules/expo-dev-menu/ios/DevMenuDevOptionsDelegate.swift b/node_modules/expo-dev-menu/ios/DevMenuDevOptionsDelegate.swift
+index 6271fad..205a42f 100644
+--- a/node_modules/expo-dev-menu/ios/DevMenuDevOptionsDelegate.swift
++++ b/node_modules/expo-dev-menu/ios/DevMenuDevOptionsDelegate.swift
+@@ -25,8 +25,8 @@ class DevMenuDevOptionsDelegate {
+     // No native splash screen registered for given view controller. Call 'SplashScreen.show' for given view controller first.
+     DevMenuManager.shared.hideMenu()
+ 
+-    let emc = self.bridge?.moduleRegistry.module(forName: "ExpoModulesCore") as? ExpoBridgeModule
+-    emc?.appContext?.reloadAppAsync()
++    // Use bridge.reload() as AppContext.reloadAppAsync() is not available in expo-modules-core 3.x
++    self.bridge?.reload()
+   }
+ 
+   internal func toggleElementInsector() {
