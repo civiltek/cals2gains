@@ -413,6 +413,23 @@ const SettingsScreen = () => {
           </View>
         </View>
 
+        {/* Allergies & Intolerances */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>{t('allergies.title')}</Text>
+          <View style={[styles.sectionContent, { backgroundColor: C.background }]}>
+            <TouchableOpacity
+              style={[styles.linkItem, { borderBottomColor: C.border }]}
+              onPress={() => router.push('/allergy-settings')}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                <Ionicons name="warning-outline" size={20} color={C.error} />
+                <Text style={[styles.linkText, { color: C.text }]}>{t('allergies.title')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={C.textSecondary} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Nutrition Mode */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: C.text }]}>{t('settings.nutritionMode')}</Text>

@@ -237,6 +237,8 @@ export default function WhatToEatScreen() {
         recentMeals: recentNames,
         language: (user?.language as 'es' | 'en') || 'es',
         goalMode: user?.goalMode,
+        allergies: user?.allergies || [],
+        intolerances: user?.intolerances || [],
       });
 
       setAiSuggestions(suggestions);
