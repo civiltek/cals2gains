@@ -4,29 +4,27 @@
  * Necesario porque react-native-health-connect@3.x usa
  * androidx.health.connect:connect-client que requiere API 26+.
  *
- * El campo android.minSdkVersion en app.json no es válido en Expo
- * managed workflow - se usa este plugin en su lugar.
+ * Usa withProjectBuildGradle para modificar android/build.gradle.
  */
-const { withBuildGradle } = require('@expo/config-plugins');
+const { withProjectBuildGradle } = require('@expo/config-plugins');
 
 const withMinSdkVersion = (config, { minSdkVersion = 26 } = {}) => {
-  return withBuildGradle(config, (config) => {
-    const buildGradle = config.modResults.contents;
+  return withProjectBuildGradle(config, (config) => {
+    let contents = config.modResults.contents;
 
-    // Replace default minSdkVersion with our required value
-    // Expo generates: minSdkVersion = Integer.parseInt(safeExtGet('minSdkVersion', '24'))
-    // or: minSdkVersion = 24
-    const updated = buildGradle
-      .replace(
-        /minSdkVersion\s*=\s*Integer\.parseInt\s*\(\s*safeExtGet\s*\(\s*['"]minSdkVersion['"]\s*,\s*['"]\d+['"]\s*\)\s*\)/,
-        `minSdkVersion = ${minSdkVersion}`
-      )
-      .replace(
-        /minSdkVersion\s*=\s*\d+/,
-        `minSdkVersion = ${minSdkVersion}`
-      );
+    // Pattern 1: minSdkVersion = Integer.parseInt(safeExtGet('minSdkVersion', '24'))
+    contents = contents.replace(
+      /minSdkVersion\s*=\s*Integer\.parseInt\s*\(\s*safeExtGet\s*\(\s*['"]minSdkVersion['"]\s*,\s*['"]\d+['"]\s*\)\s*\)/g,
+      `minSdkVersion = ${minSdkVersion}`
+    );
 
-    config.modResults.contents = updated;
+    // Pattern 2: minSdkVersion = 24 (direct assignment)
+    contents = contents.replace(
+      /minSdkVersion\s*=\s*\d+/g,
+      `minSdkVersion = ${minSdkVersion}`
+    );
+
+    config.modResults.contents = contents;
     return config;
   });
 };
