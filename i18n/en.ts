@@ -274,6 +274,28 @@ export default {
     mockMeal7: 'Coffee with Milk',
   },
 
+  voiceLog: {
+    title: 'Log by voice',
+    tapToRecord: 'Tap the mic to start speaking',
+    tapToStop: 'Tap to stop',
+    recording: 'Recording...',
+    maxDuration: 'Maximum 30 seconds',
+    processing: 'Processing audio...',
+    transcribing: 'Transcribing with Whisper...',
+    analyzing: 'Analyzing food...',
+    transcription: 'You said',
+    detectedFood: 'Detected food',
+    noFoodDetected: 'No food detected',
+    noFoodDetectedHint: 'Try describing what you ate in more detail.\nE.g.: "I had a chicken salad with olive oil"',
+    retryRecording: 'Record again',
+    permissionDenied: 'Microphone permission denied',
+    permissionMessage: 'Enable microphone access in Settings to use voice logging',
+    openSettings: 'Open Settings',
+    errorFailed: 'Failed to process audio',
+    example: 'E.g.: "I had a chicken salad with two boiled eggs"',
+    timeRemaining: '{{seconds}}s left',
+  },
+
   analysis: {
     title: 'Nutritional analysis',
     detected: 'Detected',
