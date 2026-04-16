@@ -5,6 +5,8 @@ import {
   Img,
   staticFile,
   useVideoConfig,
+  useCurrentFrame,
+  interpolate,
 } from "remotion";
 import { SceneData, BRAND } from "../types";
 
@@ -14,51 +16,81 @@ interface BackgroundProps {
 
 /**
  * Renders either a Sora 2 video clip or a DALL-E 3 still image as background.
- * Video clips loop if shorter than scene duration.
- * Images use a subtle Ken Burns zoom to add motion.
+ *
+ * Video clips: loop if shorter than scene duration.
+ * Images: Ken Burns effect — slow zoom-in + subtle pan for motion feel.
+ *
+ * Dark vignette overlay on both types for text readability.
  */
 export const Background: React.FC<BackgroundProps> = ({ scene }) => {
-  const { width, height } = useVideoConfig();
+  const { width, height, fps } = useVideoConfig();
+  const frame = useCurrentFrame(); // LOCAL frame via Sequence
+  const sceneDurationFrames = Math.round(scene.durationSeconds * fps);
 
-  const style: React.CSSProperties = {
+  const baseStyle: React.CSSProperties = {
     width,
     height,
     objectFit: "cover",
   };
+
+  const vignette = (
+    <AbsoluteFill
+      style={{
+        background:
+          "linear-gradient(to bottom, rgba(23,18,29,0.40) 0%, rgba(23,18,29,0.0) 35%, rgba(23,18,29,0.0) 55%, rgba(23,18,29,0.90) 100%)",
+      }}
+    />
+  );
 
   if (scene.backgroundType === "video") {
     return (
       <AbsoluteFill>
         <Video
           src={staticFile(scene.backgroundFile)}
-          style={style}
+          style={baseStyle}
           loop
           muted
         />
-        {/* Dark vignette overlay for text readability */}
-        <AbsoluteFill
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(23,18,29,0.35) 0%, rgba(23,18,29,0.0) 40%, rgba(23,18,29,0.0) 55%, rgba(23,18,29,0.85) 100%)",
-          }}
-        />
+        {vignette}
       </AbsoluteFill>
     );
   }
 
-  // Static image fallback (DALL-E 3)
+  // --- Ken Burns effect for static images ---
+  // Slow zoom from 100% to 108% + subtle pan right-to-left
+  const scale = interpolate(
+    frame,
+    [0, sceneDurationFrames],
+    [1.0, 1.08],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+  const translateX = interpolate(
+    frame,
+    [0, sceneDurationFrames],
+    [0, -30],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+  const translateY = interpolate(
+    frame,
+    [0, sceneDurationFrames],
+    [0, -10],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
   return (
-    <AbsoluteFill style={{ backgroundColor: BRAND.dark }}>
-      <Img
-        src={staticFile(scene.backgroundFile)}
-        style={style}
-      />
+    <AbsoluteFill style={{ backgroundColor: BRAND.dark, overflow: "hidden" }}>
       <AbsoluteFill
         style={{
-          background:
-            "linear-gradient(to bottom, rgba(23,18,29,0.40) 0%, rgba(23,18,29,0.0) 40%, rgba(23,18,29,0.0) 55%, rgba(23,18,29,0.88) 100%)",
+          transform: `scale(${scale}) translate(${translateX}px, ${translateY}px)`,
+          transformOrigin: "center center",
         }}
-      />
+      >
+        <Img
+          src={staticFile(scene.backgroundFile)}
+          style={baseStyle}
+        />
+      </AbsoluteFill>
+      {vignette}
     </AbsoluteFill>
   );
 };

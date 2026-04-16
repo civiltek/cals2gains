@@ -8,19 +8,19 @@ interface LogoProps {
 }
 
 /**
- * Cals2Gains logomark — top-right corner.
+ * Cals2Gains logomark — top-LEFT corner (Instagram safe zone).
  *
- * Uses C2G-Logomark-2048.png which has a TRANSPARENT background
- * and brand colors (violet + coral). CSS filter makes it white
- * so it's visible on any video background.
+ * Uses C2G-Logomark-2048.png (transparent background).
+ * CSS filter converts brand colors to white for visibility on any background.
  *
+ * Opacity: 75% at steady state (per brand guidelines).
  * Fades in during first 15 frames, fades out last 8 frames.
  */
 export const Logo: React.FC<LogoProps> = ({ frame, sceneDurationFrames }) => {
   const opacity = interpolate(
     frame,
     [0, 15, sceneDurationFrames - 8, sceneDurationFrames],
-    [0, 0.85, 0.85, 0],
+    [0, 0.75, 0.75, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
@@ -28,10 +28,10 @@ export const Logo: React.FC<LogoProps> = ({ frame, sceneDurationFrames }) => {
     <AbsoluteFill
       style={{
         justifyContent: "flex-start",
-        alignItems: "flex-end",
+        alignItems: "flex-start",
         flexDirection: "column",
-        paddingTop: 55,
-        paddingRight: 50,
+        paddingTop: 120,
+        paddingLeft: 60,
       }}
     >
       <Img
@@ -40,7 +40,7 @@ export const Logo: React.FC<LogoProps> = ({ frame, sceneDurationFrames }) => {
           height: 52,
           width: 52,
           opacity,
-          // Convert brand colors to white so it's visible on any background
+          // brightness(0) = black silhouette, invert(1) = white
           filter: "brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0,0,0,0.6))",
         }}
       />
