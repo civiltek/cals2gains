@@ -101,6 +101,7 @@
         "backgroundColor": "#17121D"
       },
       "package": "com.civiltek.cals2gains",
+      "minSdkVersion": 26,
       "versionCode": 1,
       "useNextNotificationsApi": true,
       "permissions": [
