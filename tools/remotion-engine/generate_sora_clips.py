@@ -60,13 +60,18 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # --- Brand style suffix (from brand_config) --------------------------------
-# IMPORTANT: Realistic everyday style — no cinematic/dramatic/neon effects.
-# Videos must look like filmed by a real person with a smartphone.
+# Premium cinematic style — text-forward impersonal reel B-roll.
+# Debe mantenerse en sync con brand_config.BRAND_VIDEO_SUFFIX.
 BRAND_VIDEO_SUFFIX = (
-    "Realistic scene, handheld camera movement, natural light, everyday casual setting, "
-    "filmed with a smartphone by a real person, warm neutral tones, "
-    "no dramatic lighting, no neon or colored lights, no studio effects, "
-    "fitness or wellness everyday moment, Instagram Reels vertical format 9:16"
+    "cinematic 4K studio quality, dark premium aesthetic, "
+    "deep plum and violet shadow tones, warm coral and gold rim highlights, "
+    "shallow depth of field f/1.4, professional Hollywood color grade, "
+    "ultra-modern black steel gym with violet LED strips "
+    "OR high-end Calacatta marble kitchen with brushed brass hardware, "
+    "slow intentional camera movement, "
+    "composition leaves dark negative space in top-third and bottom-third for text overlay, "
+    "no subject looking directly at camera, no dialogue, no mouth movement, "
+    "B-roll style cinematic fitness content, Instagram Reels vertical 9:16"
 )
 
 # Vertical size supported by Sora 2
@@ -206,10 +211,14 @@ def generate_sora_clip(
 # ===========================================================================
 
 BRAND_IMAGE_SUFFIX = (
-    "Realistic photography, natural lighting, everyday setting, "
-    "fitness or wellness lifestyle scene, warm natural tones, "
-    "no dramatic or neon lighting, clean composition, "
-    "vertical 9:16 composition for Instagram Reels"
+    "dark premium aesthetic, studio moody lighting, "
+    "deep plum (#17121D) background with violet (#9C8CFF) color accents "
+    "and warm coral (#FF6A4D) rim highlights, "
+    "ultra-modern black-steel gym or high-end Calacatta marble kitchen, "
+    "professional editorial fitness photography, shallow depth of field, "
+    "composition leaves dark empty space at top and bottom for text overlay, "
+    "no face looking at camera, no mouth movement, "
+    "cinematic B-roll composition, 9:16 vertical for Instagram Reels"
 )
 
 

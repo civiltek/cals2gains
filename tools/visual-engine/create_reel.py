@@ -55,55 +55,60 @@ def generate_script_from_topic(topic: str, lang: str = "en", n_scenes: int = 5) 
     reel_specs = get_reel_specs()
     pacing = reel_specs.get("pacing", {})
 
-    system_prompt = f"""You are a viral content strategist AND professional video producer for Cals2Gains, a premium fitness/nutrition app.
+    system_prompt = f"""You are a viral content strategist AND cinematic director for Cals2Gains, a premium fitness/nutrition app.
 Create a {n_scenes}-scene Instagram Reel script optimized for MAXIMUM virality and production quality.
 
-Think like a professional video producer. Each scene should have multiple layers of visual information:
-- The base AI-generated video clip
-- A brief scene title that appears for ~2 seconds (the "text" field — max 7 words)
-- Word-by-word subtitles synced to the narration (the "voiceover" field)
+Think like a Hollywood director. Each scene must have:
+- AI-generated video clip with cinematic quality (the "prompt" field)
+- A brief scene title overlay (the "text" field — max 7 words, punchy)
+- Word-by-word voiceover narration synced to subtitles (the "voiceover" field)
 - 1-3 data overlays that add informational value (stats, numbers, comparisons)
 
 BRAND IDENTITY:
-- Dark premium aesthetic: plum #17121D backgrounds
-- Accent colors: violet #9C8CFF, coral #FF6A4D
-- Target: Fitness enthusiasts who track macros
-- Tone: Confident, modern, slightly edgy, educational
+- Dark premium aesthetic: plum #17121D backgrounds, violet #9C8CFF accents, coral #FF6A4D highlights
+- Target: Fitness enthusiasts who track macros — they know their stuff, be direct
+- Tone: Confident, modern, slightly edgy, science-backed
 
-VIRAL FORMAT RULES (2026 research):
-- HOOK in first 0.5-1.5 seconds: pattern interrupt, curiosity gap, or contrarian statement
-- 85% of viewers watch WITHOUT SOUND — text must carry the message alone
-- Keep text overlays ("text" field) to max 7 words per screen (punchy, readable on mobile)
-- Optimal duration: 15-30 seconds for educational content
+VIRAL FORMAT RULES (2026):
+- HOOK in first 0.5s: visual shock + curiosity gap or contrarian statement
+- Keep text overlays to max 7 words per screen
+- Optimal duration: 15-30 seconds
 - Scene durations: 3-6 seconds each, fast pacing
-- End with shareable CTA: "Send this to your gym buddy" / "Share with someone who needs this"
-- Use myth-busting, data reveals, and "did you know" formats for maximum saves
+- End with shareable CTA: "Envía esto a tu compañero de gym" / "Guarda esto"
+- Use myth-busting, data reveals, "did you know" formats for maximum saves
 
-VOICEOVER STYLE:
-- Conversational and punchy — like a friend telling you something surprising
-- NOT robotic or formal. Short sentences. Use pauses via punctuation.
-- CTA scene should feel like a natural conclusion, not an ad. Use "save this" or "send this to..." language.
+VIDEO PROMPT RULES (CRITICAL — determines AI video quality):
+- Write prompts in English, 25-40 words, highly specific
+- ALWAYS specify: subject (athletic person, exact action) + environment + lighting + camera movement
+- Subjects: athletic man or woman, toned physique, mid-20s to 35, premium activewear (Nike/Lululemon aesthetic)
+- Environments: ultra-modern black steel gym with violet LED accent strips / high-end Calacatta marble kitchen with brass hardware / premium wellness studio with concrete walls
+- Lighting: dramatic overhead spotlight + violet rim backlight + coral practical highlight OR warm brass pendant over marble counter
+- Camera: slow push-in / tracking dolly / locked-off close-up / extreme shallow depth of field
+- HOOK scene: slow-motion action shot, maximum impact, stops scroll in 0.5 seconds
+- VALUE scenes: intercut food close-ups on marble / training with perfect form / supplement staging
+- CTA scene: person looking at phone smiling, warm coral tones, aspirational energy
 
 VISUAL CONTINUITY (CRITICAL):
-- ALL scene prompts MUST share the same visual setting, lighting style, color temperature, and camera approach.
-- Imagine these are consecutive shots from the SAME video shoot in the SAME location.
-- Each prompt must reference the specific set/location established in scene 1.
-- Include a "setting" field in the top-level JSON that describes the unified visual environment. Reference this setting in every scene prompt.
+- ALL scene prompts MUST share the same visual setting, lighting palette, and camera language.
+- Scene 1 establishes the look — gym or kitchen. ALL subsequent scenes reference this.
+- Include a "setting" field at top level describing the unified visual environment.
 
 DATA OVERLAYS:
-- For each scene, include "data_overlays" — 1-3 animated data points, statistics, or labels that appear over the video.
-- These add production value and make the content more informative and shareable.
-- Each overlay has: text, style (stat_big|stat_small|comparison|label), position (center|top-left|top-right|bottom-left|bottom-right|center-left|center-right), appear_at (seconds from scene start), duration (seconds).
-- stat_big: large numbers/percentages. stat_small: secondary data. comparison: "vs X" comparisons. label: descriptive tags.
+- 1-3 animated data points per scene. Each: text, style (stat_big|stat_small|comparison|label), position (center|top-left|top-right|bottom-left|bottom-right), appear_at (seconds), duration (seconds).
 
-Language: {"Spanish" if lang == "es" else "English"}
+VOICEOVER STYLE:
+- {"Spanish peninsular (with all accent marks: á é í ó ú ü ñ ¿ ¡)" if lang == "es" else "English, conversational and punchy"}
+- Conversational and punchy — like a knowledgeable friend, NOT a robot
+- Short sentences. Pauses via punctuation. NO filler words.
+
+Language: {"Spanish (include ALL tildes/accents in voiceover and text fields)" if lang == "es" else "English"}
 
 Return ONLY valid JSON:
-{{"title":"Short title","lang":"{lang}","voice":"elevenlabs","music_mood":"upbeat","setting":"Unified visual environment description — lighting, surface, camera style, color temperature, shared across ALL scenes","scenes":[{{"prompt":"Detailed video prompt (ALWAYS English, cinematic) referencing the shared setting","text":"Short overlay text (max 7 words, used as brief scene title)","text_style":"hero|title|subtitle|cta|stat","voiceover":"Full narrator text — conversational, punchy, like a friend","duration":4,"transition":"crossfade|fade_black|cut","effect":"zoom_in|zoom_out|pan_left|pan_right|diagonal|zoom_punch","data_overlays":[{{"text":"612 kcal","style":"stat_big","position":"center","appear_at":0.5,"duration":2.5}}]}}]}}
+{{"title":"Short title","lang":"{lang}","voice":"elevenlabs","music_mood":"upbeat","setting":"Unified visual environment — specify gym type OR kitchen style, lighting rig, camera language, color temperature. Shared across ALL scenes.","scenes":[{{"prompt":"Cinematic video prompt in English, 25-40 words, subject+environment+lighting+camera","text":"Short overlay text (max 7 words)","text_style":"hero|title|subtitle|cta|stat","voiceover":"Full narrator text — conversational, punchy, friend-tone","duration":4,"transition":"crossfade|fade_black|cut","effect":"zoom_in|zoom_out|pan_left|pan_right|diagonal|zoom_punch","data_overlays":[{{"text":"612 kcal","style":"stat_big","position":"center","appear_at":0.5,"duration":2.5}}]}}]}}
 
-Scene 1 = HOOK (pattern interrupt, make them stop scrolling).
-Last scene = CTA (shareable action, natural conclusion not an ad).
-Every scene between = deliver value fast with supporting data overlays."""
+Scene 1 = HOOK (stop the scroll — visual impact + curiosity gap).
+Last scene = CTA (natural, shareable, names the app).
+Every scene between = one clear value delivery with supporting data overlay."""
 
     headers = {"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"}
     payload = {
@@ -136,89 +141,99 @@ def generate_protein_myth_script(lang: str = "en") -> dict:
         "voice": "elevenlabs",
         "music_mood": "upbeat",
         "setting": (
-            "Dark premium kitchen with black marble counter, single dramatic spotlight "
-            "from top-left, purple LED strip ambient light in background, shallow depth "
-            "of field, consistent camera height and angle, moody cinematic color grading"
+            "Ultra-modern black steel gym, polished concrete floors, violet LED strips "
+            "lining equipment racks, single dramatic overhead key light, "
+            "coral and gold rim backlight, shallow depth of field f/1.4, "
+            "moody cinematic color grade — consistent look across all scenes"
         ),
         "scenes": [
             {
                 "prompt": (
-                    "Dramatic close-up of a protein shake being poured in slow motion, "
-                    "dark moody kitchen with purple neon backlighting, liquid splashing "
-                    "with dynamic frozen droplets, cinematic shallow depth of field, "
-                    "9:16 vertical format, professional food videography"
+                    "Athletic man mid-30s slow-motion lift of heavy barbell in ultra-modern black steel gym, "
+                    "dramatic top-down spotlight, violet LED rim backlight catching sweat drops, "
+                    "coral backlight on shoulders, dark plum background, "
+                    "extreme shallow depth of field f/0.95, Phantom Flex 4K slow-motion, "
+                    "9:16 vertical, stops scroll in 0.5 seconds"
                 ),
-                "text": "The protein myth nobody talks about",
+                "text": "El mito de la proteína que nadie cuenta" if lang == "es" else "The protein myth nobody talks about",
                 "text_style": "hero",
-                "voiceover": "There's a protein myth that nobody talks about.",
-                "duration": 4,
+                "voiceover": "Hay un mito sobre la proteína que nadie en el gimnasio te cuenta." if lang == "es" else "There's a protein myth nobody at the gym talks about.",
+                "duration": 3,
                 "transition": "cut",
                 "effect": "zoom_punch",
                 "data_overlays": [],
             },
             {
                 "prompt": (
-                    "Overhead flat lay of various high-protein foods: chicken breast, eggs, "
-                    "greek yogurt, lentils, tofu, fish, arranged on dark slate surface, "
-                    "dramatic side lighting casting long shadows, premium food photography, "
-                    "dark moody aesthetic with violet color grading, 9:16 vertical"
+                    "Close-up hands of athletic woman arranging grilled chicken breast, eggs, "
+                    "Greek yogurt and salmon on Calacatta marble counter, "
+                    "warm brass pendant light from above casting dramatic shadows on food, "
+                    "violet LED strip ambient light in background, "
+                    "slow push-in macro lens, editorial food photography, "
+                    "ultra-modern kitchen, 9:16 vertical"
                 ),
-                "text": "You DON'T need 200g per day",
+                "text": "No necesitas 200g al día" if lang == "es" else "You don't need 200g per day",
                 "text_style": "hero",
-                "voiceover": "Most people think they need 200 grams of protein per day. But science says otherwise.",
+                "voiceover": "La mayoría cree que necesita 200 gramos de proteína al día. La ciencia dice otra cosa." if lang == "es" else "Most people think they need 200 grams daily. But science says otherwise.",
                 "duration": 5,
                 "transition": "crossfade",
                 "effect": "pan_left",
                 "data_overlays": [
                     {"text": "200g?", "style": "stat_big", "position": "center", "appear_at": 0.5, "duration": 2.0},
-                    {"text": "Common myth", "style": "label", "position": "bottom-left", "appear_at": 1.0, "duration": 2.5},
+                    {"text": "Mito común" if lang == "es" else "Common myth", "style": "label", "position": "bottom-left", "appear_at": 1.0, "duration": 2.5},
                 ],
             },
             {
                 "prompt": (
-                    "Cinematic shot of an athletic person in a dark premium gym, "
-                    "lifting weights with perfect form, purple ambient lighting, "
-                    "sweat glistening, dramatic rim light, professional sports videography, "
-                    "shallow depth of field, motivational energy, 9:16 vertical"
+                    "Athletic man perfect-form dumbbell curl in ultra-modern black steel gym, "
+                    "dramatic side key light illuminating muscle definition, "
+                    "violet rim backlight highlighting sweat on skin, "
+                    "slow tracking dolly shot following the movement, "
+                    "shallow depth of field with gym equipment bokeh background, "
+                    "professional sports cinematography, 9:16 vertical"
                 ),
-                "text": "0.7-1g per lb is ENOUGH",
+                "text": "0.7-1g por libra es suficiente" if lang == "es" else "0.7-1g per lb is enough",
                 "text_style": "stat",
-                "voiceover": "Research shows 0.7 to 1 gram per pound of bodyweight is enough for maximum muscle growth.",
+                "voiceover": "La investigación muestra que 0,7 a 1 gramo por kilo de peso corporal es suficiente para el máximo crecimiento muscular." if lang == "es" else "Research shows 0.7 to 1 gram per pound of bodyweight is enough for maximum muscle growth.",
                 "duration": 5,
                 "transition": "crossfade",
                 "effect": "zoom_in",
                 "data_overlays": [
                     {"text": "0.7-1.0g/lb", "style": "stat_big", "position": "center", "appear_at": 0.3, "duration": 3.0},
-                    {"text": "Meta-analysis 2024", "style": "label", "position": "bottom-right", "appear_at": 1.5, "duration": 2.0},
+                    {"text": "Metaanálisis 2024" if lang == "es" else "Meta-analysis 2024", "style": "label", "position": "bottom-right", "appear_at": 1.5, "duration": 2.0},
                 ],
             },
             {
                 "prompt": (
-                    "Abstract 3D visualization of protein molecules breaking down into "
-                    "amino acids, colorful particles flowing through a dark space, "
-                    "scientific yet artistic, neon violet and coral color palette, "
-                    "motion graphics style, clean modern aesthetic, 9:16 vertical"
+                    "Athletic woman preparing protein smoothie in high-end marble kitchen, "
+                    "premium blender on Calacatta marble counter, fresh fruits and whey powder visible, "
+                    "warm brass overhead pendant light, violet LED strip under cabinets, "
+                    "slow push-in from wide kitchen to close-up hands and blender, "
+                    "coral highlight on steam from blending, editorial lifestyle fitness photography, "
+                    "9:16 vertical"
                 ),
-                "text": "More protein != more muscle",
+                "text": "Más proteína no es más músculo" if lang == "es" else "More protein ≠ more muscle",
                 "text_style": "title",
-                "voiceover": "Eating more protein beyond this point does NOT build more muscle. Your body simply can't use it all.",
+                "voiceover": "Comer más proteína de este punto no construye más músculo. Tu cuerpo simplemente no puede usarla toda." if lang == "es" else "Eating more protein beyond this point does NOT build more muscle. Your body can't use it all.",
                 "duration": 5,
                 "transition": "crossfade",
                 "effect": "diagonal",
                 "data_overlays": [
-                    {"text": "Diminishing returns", "style": "comparison", "position": "bottom-left", "appear_at": 1.0, "duration": 2.5},
+                    {"text": "Rendimientos decrecientes" if lang == "es" else "Diminishing returns", "style": "comparison", "position": "bottom-left", "appear_at": 1.0, "duration": 2.5},
                 ],
             },
             {
                 "prompt": (
-                    "Person smiling while using a sleek dark-themed nutrition tracking app "
-                    "on their phone, cozy kitchen background with warm coral accent lighting, "
-                    "close-up of hands and screen, premium lifestyle photography, "
-                    "soft bokeh background, 9:16 vertical format"
+                    "Athletic woman mid-30s smiling at smartphone showing dark nutrition app interface, "
+                    "sitting on modern gym bench in ultra-modern black steel gym, "
+                    "coral warm key light from right, violet rim backlight from left, "
+                    "confident aspirational expression looking directly at camera, "
+                    "shallow depth of field with gym equipment bokeh, "
+                    "locked-off camera, lifestyle fitness photography, 9:16 vertical"
                 ),
-                "text": "Send this to your gym buddy",
+                "text": "Mándalo a tu compañero de gym" if lang == "es" else "Send this to your gym buddy",
                 "text_style": "cta",
-                "voiceover": "Save this and send it to your gym buddy who's chugging 5 shakes a day.",
+                "voiceover": "Guarda esto y mándaselo al amigo que se toma 5 batidos al día." if lang == "es" else "Save this and send it to your gym buddy who's chugging 5 shakes a day.",
                 "duration": 4,
                 "transition": "crossfade",
                 "effect": "zoom_out",

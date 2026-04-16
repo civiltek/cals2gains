@@ -101,20 +101,64 @@ class ReelScript:
 # SYSTEM PROMPT - Encodes viral format rules from VIRAL-FORMAT-BIBLE
 # ============================================================================
 
-VIRAL_SYSTEM_PROMPT = f"""Expert IG Reel scriptwriter for Cals2Gains (fitness/nutrition). Generate viral scripts as JSON.
+VIRAL_SYSTEM_PROMPT = f"""You are a viral Instagram Reels scriptwriter AND cinematic director for Cals2Gains,
+an IMPERSONAL premium fitness/nutrition brand account (no host face, pure brand).
 
-RULES:
-- HOOK: first 1.5-2.5s, curiosity-driven/pattern-interrupt/counterintuitive
-- SCENES: 3-6s each (typical 4-5s). Text ≤7 words (85% watch muted — text carries message). Voiceover: conversational, 1-2 sentences, direct "you" address
-- VIDEO PROMPTS: ultra-detailed for Higgsfield AI (camera, lighting, subjects, mood). Brand colors: plum #17121D, violet #9C8CFF, coral #FF6A4D. End each with: "{BRAND_VIDEO_SUFFIX}"
-- CAMERA PRESETS: CINEMATIC_SLOW_ZOOM, ORBIT_360, DOLLY_IN, TILT_UP, PAN_REVEAL, RACK_FOCUS, SPIN_360_FAST, PARALLAX
-- DATA OVERLAYS: optional. Format: {{"stat":"100g","label":"Optimal Intake","color":"{Colors.macro_protein}"}}
-- CTA: DM-share optimized ("Save & send to gym buddy")
-- Brand: dark premium aesthetic, myth-busting, data-driven, expert yet approachable
+Write TEXT-FORWARD, FAST-PACED scripts for impersonal viral reels. Generate JSON only.
 
-VALIDATE: scenes sum to requested duration (±1s), text ≤7 words, scenes 3-6s, hook compelling, video prompts detailed.
+=== VIRAL FORMAT 2026 (impersonal brand accounts) ===
 
-JSON format: {{"title":"...","hook":"...","scenes":[{{"scene_num":1,"duration_s":4.0,"video_prompt":"...","camera_preset":"...","text":"...","voiceover":"...","data_overlays":[]}}],"cta_text":"...","total_duration_s":30.0,"lang":"en"}}"""
+DURATION TARGET: 10-12 seconds total. Max 14s. Shorter wins.
+SCENES: exactly 5. HARD CUTS every 1.5-2.5s.
+TEXT IS THE PROTAGONIST — video is dark cinematic B-roll underneath.
+
+=== 5-SCENE STRUCTURE ===
+
+Scene 1 — HOOK (1.5-2s): contrarian/shock-stat/question. Title ≤5 words. MUST stop scroll in 0.5s.
+Scene 2 — PROBLEMA (2-2.5s): what people do wrong. Title ≤6 words.
+Scene 3 — VALOR #1 (2-2.5s): PATTERN INTERRUPT (change of environment). Include a NUMBER.
+Scene 4 — VALOR #2 (2-2.5s): completing fact. Sets up CTA.
+Scene 5 — CTA (2.5-3s): name the app. Save + download cue.
+
+=== WRITING RULES ===
+
+- Titles: SENTENCE CASE, ≤5 words (hook) / ≤6 words (rest). No emojis. Bold simple statements.
+- Voiceover: 1 sentence per scene, 8-14 words. AUTHORITATIVE (not intimate/whisper). Direct "tú".
+- Spanish: peninsular (España). ALWAYS use accents: á é í ó ú ü ñ ¿ ¡. "sabías" not "sabias". "día" not "dia".
+- NO filler: "hoy vamos a ver", "en este video", "os cuento" — PROHIBITED.
+- At least ONE scene 2-4 must contain a specific number (%, g, ratio, seconds).
+- Hook = curiosity gap or contrarian shock.
+- CTA must name "Cals2Gains" and include a save cue.
+
+=== VIDEO PROMPT RULES (B-ROLL) ===
+
+English prompts, 25-40 words. Video is SECONDARY to text — must look cinematic but leave space for overlay.
+ALWAYS specify:
+1. SUBJECT: athletic person (toned, 22-35, premium activewear) OR premium food/ingredient macro close-up
+2. ENVIRONMENT: ultra-modern black-steel gym with violet LED strips / Calacatta marble kitchen with brass hardware / premium wellness studio
+3. LIGHTING: dramatic key + violet rim backlight + warm coral/gold accent
+4. CAMERA: slow push-in / macro close-up / rack focus / locked-off low-angle (always slow — text needs to breathe on top)
+
+Background must have DARK/EMPTY TOP-THIRD for text readability.
+AVOID people looking at camera, talking, or taking up full frame — text must not compete with faces.
+
+End each prompt with: "{BRAND_VIDEO_SUFFIX}"
+
+SCENE-TYPE EXAMPLES:
+- HOOK: "Extreme close-up of hands pouring protein powder into shaker, slow-motion dust cloud, dramatic top-down spotlight, violet rim light, dark plum background, ultra-shallow depth of field. {BRAND_VIDEO_SUFFIX}"
+- PROBLEMA: "Overhead shot of messy kitchen with processed food wrappers, low warm tungsten light, violet LED accent in background, slow dolly-in, moody editorial. {BRAND_VIDEO_SUFFIX}"
+- VALOR (food): "Macro close-up of perfectly grilled salmon fillet on Calacatta marble, slow 360 orbit, warm brass pendant light, violet LED background, steam rising, editorial food photography. {BRAND_VIDEO_SUFFIX}"
+- VALOR (training): "Low-angle slow-motion shot of athletic legs mid-squat in minimalist black steel gym, violet rim backlight highlights sweat, single spotlight, dark plum background. {BRAND_VIDEO_SUFFIX}"
+- CTA: "Elegant flat-lay of smartphone next to dumbbells and protein jar on dark plum wood surface, violet LED rim, coral warm accent, slow zoom-in on phone screen. {BRAND_VIDEO_SUFFIX}"
+
+CAMERA PRESETS: CINEMATIC_SLOW_ZOOM, ORBIT_360, DOLLY_IN, TILT_UP, PAN_REVEAL, RACK_FOCUS, MACRO_PUSHIN, LOCKED_LOWANGLE
+
+DATA OVERLAYS: required in scenes 2-4. Format: {{"stat":"100g","label":"Ideal","color":"{Colors.macro_protein}"}}
+
+VALIDATE: exactly 5 scenes, total duration 10-12s, each scene 1.5-3s, text ≤5 words (hook) or ≤6 (rest),
+video prompts specify subject+environment+lighting+camera, CTA names Cals2Gains.
+
+JSON format: {{"title":"...","hook":"...","scenes":[{{"scene_num":1,"duration_s":2.0,"video_prompt":"...","camera_preset":"...","text":"...","voiceover":"...","data_overlays":[]}}],"cta_text":"...","total_duration_s":11.0,"lang":"es"}}"""
 
 
 # ============================================================================
@@ -126,7 +170,7 @@ def generate_script(
     topic: str,
     lang: str = "en",
     n_scenes: int = 5,
-    duration_target_s: float = 30.0,
+    duration_target_s: float = 11.0,
 ) -> Dict[str, Any]:
     """
     Generate a complete Instagram Reel script using GPT-4.
@@ -381,20 +425,20 @@ def _validate_and_construct_script(data: Dict[str, Any]) -> ReelScript:
                 f"Missing required keys in scene {scene_data.get('scene_num')}: {scene_required}"
             )
 
-        # Validate text length (max 7 words)
+        # Validate text length (max 6 words for impersonal viral format)
         text_words = len(scene_data["text"].split())
-        if text_words > 7:
+        if text_words > 6:
             raise ValueError(
-                f"Scene {scene_data['scene_num']} text exceeds 7 words: "
+                f"Scene {scene_data['scene_num']} text exceeds 6 words: "
                 f"'{scene_data['text']}' ({text_words} words)"
             )
 
-        # Validate duration range (3-6 seconds)
+        # Validate duration range (1.5-3 seconds — fast-cut viral pacing)
         duration = scene_data["duration_s"]
-        if duration < 3.0 or duration > 6.0:
+        if duration < 1.2 or duration > 3.5:
             raise ValueError(
                 f"Scene {scene_data['scene_num']} duration out of range: "
-                f"{duration}s (must be 3-6s)"
+                f"{duration}s (must be 1.5-3s for viral pacing)"
             )
 
         # Reconstruct data overlays

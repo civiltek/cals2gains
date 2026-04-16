@@ -33,11 +33,14 @@ export const Background: React.FC<BackgroundProps> = ({ scene }) => {
     objectFit: "cover",
   };
 
+  // Vignette intensificado para reels virales impersonales:
+  // top-third 0.55 (título legible), middle 0.20 (mantiene B-roll visible),
+  // bottom-third 0.92 (subs legibles sobre cualquier escena).
   const vignette = (
     <AbsoluteFill
       style={{
         background:
-          "linear-gradient(to bottom, rgba(23,18,29,0.40) 0%, rgba(23,18,29,0.0) 35%, rgba(23,18,29,0.0) 55%, rgba(23,18,29,0.90) 100%)",
+          "linear-gradient(to bottom, rgba(23,18,29,0.55) 0%, rgba(23,18,29,0.15) 28%, rgba(23,18,29,0.20) 55%, rgba(23,18,29,0.92) 100%)",
       }}
     />
   );

@@ -9,13 +9,16 @@ interface SubtitlesProps {
 }
 
 /**
- * Karaoke-style subtitle renderer.
+ * Karaoke-style subtitle renderer — viral impersonal format 2026.
  *
- * Active word: gold (#FFD700) bold, scale-up pop animation, glow.
- * Recent words: semi-transparent bone, fade out.
- * Future words: hidden.
+ * Active word: GOLD (#FFD700), 72px, scale 1.18, intense glow.
+ * Past words: fade ~0.35 alpha (mantienen contexto sin distraer).
+ * Future words: fade ~0.75 alpha (visible pero secundario).
+ * Ventana: 2s rolling (más ritmo que la anterior 3s).
  *
- * Instagram safe zone: positioned above 320px bottom margin.
+ * Posicionamiento: tercio central-inferior, 360px desde abajo
+ * (respeta safe zone Instagram 320px + margen visual).
+ * Peso 900 en activa, 700 en resto — jerarquía tipográfica clara.
  */
 export const Subtitles: React.FC<SubtitlesProps> = ({
   subtitles,
@@ -23,24 +26,25 @@ export const Subtitles: React.FC<SubtitlesProps> = ({
 }) => {
   if (!subtitles || subtitles.length === 0) return null;
 
-  // Rolling 3-second window of visible words
-  const windowStart = Math.max(0, sceneTimeSeconds - 2.5);
+  // Ventana rodante 2s — ritmo viral, 4-6 palabras visibles máx
+  const windowStart = Math.max(0, sceneTimeSeconds - 1.8);
+  const windowEnd = sceneTimeSeconds + 0.8;
 
   const visibleWords = subtitles.filter(
-    (w) => w.start <= sceneTimeSeconds + 0.05 && w.end >= windowStart
+    (w) => w.start <= windowEnd && w.end >= windowStart
   );
 
   if (visibleWords.length === 0) return null;
 
   return (
-    // paddingBottom: 340px keeps subtitles above Instagram safe zone (320px bottom)
+    // paddingBottom 360px deja aire sobre la UI de Instagram
     <AbsoluteFill
       style={{
         justifyContent: "flex-end",
         alignItems: "center",
-        paddingBottom: 340,
-        paddingLeft: 60,
-        paddingRight: 120,
+        paddingBottom: 360,
+        paddingLeft: 40,
+        paddingRight: 40,
       }}
     >
       <div
@@ -49,41 +53,47 @@ export const Subtitles: React.FC<SubtitlesProps> = ({
           flexWrap: "wrap",
           justifyContent: "center",
           alignItems: "center",
-          gap: "0 10px",
-          backgroundColor: "rgba(23,18,29,0.72)",
-          borderRadius: 20,
-          padding: "16px 28px",
-          maxWidth: 900,
+          gap: "4px 12px",
+          // Pill oscuro más opaco para contraste sobre B-roll cinemático
+          backgroundColor: "rgba(23,18,29,0.82)",
+          borderRadius: 24,
+          padding: "22px 34px",
+          maxWidth: 960,
+          boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
         }}
       >
         {visibleWords.map((w, i) => {
           const isActive =
             sceneTimeSeconds >= w.start && sceneTimeSeconds <= w.end;
           const isPast = sceneTimeSeconds > w.end + 0.05;
+          const isFuture = sceneTimeSeconds < w.start - 0.05;
 
-          // Scale pop for active word
-          const scale = isActive ? 1.12 : 1.0;
+          // Scale pop más agresivo en activa
+          const scale = isActive ? 1.18 : 1.0;
 
           return (
             <span
               key={`${w.word}-${i}`}
               style={{
                 fontFamily: BRAND.fontDisplay,
-                fontWeight: isActive ? 800 : 600,
-                fontSize: isActive ? 58 : 52,
-                lineHeight: 1.35,
+                fontWeight: isActive ? 900 : 700,
+                fontSize: isActive ? 72 : 60,
+                lineHeight: 1.25,
                 color: isActive
                   ? "#FFD700"
                   : isPast
-                  ? "rgba(247,242,234,0.45)"
+                  ? "rgba(247,242,234,0.38)"
+                  : isFuture
+                  ? "rgba(247,242,234,0.72)"
                   : BRAND.bone,
                 textShadow: isActive
-                  ? "0 0 24px rgba(255,215,0,0.7), 0 2px 8px rgba(0,0,0,0.9)"
-                  : "0 2px 6px rgba(0,0,0,0.8)",
+                  ? "0 0 32px rgba(255,215,0,0.85), 0 0 12px rgba(255,215,0,0.6), 0 3px 10px rgba(0,0,0,0.95)"
+                  : "0 2px 8px rgba(0,0,0,0.85)",
                 transform: `scale(${scale})`,
                 display: "inline-block",
-                transition: "transform 0.05s, color 0.05s",
-                letterSpacing: isActive ? "0.5px" : "0px",
+                transition: "transform 0.06s, color 0.06s",
+                letterSpacing: isActive ? "0.3px" : "-0.2px",
+                textTransform: "uppercase",
               }}
             >
               {w.word}

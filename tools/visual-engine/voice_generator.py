@@ -126,6 +126,9 @@ def generate_voice_elevenlabs(
     model: str = "eleven_multilingual_v2",
     stability: float = 0.5,
     similarity_boost: float = 0.75,
+    style: float = 0.0,
+    speed: float = 1.0,
+    use_speaker_boost: bool = True,
     output_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """
@@ -136,8 +139,11 @@ def generate_voice_elevenlabs(
         voice_id: ElevenLabs voice ID (default: Rachel - 21m00Tcm4TlvDq8ikWAM)
         lang: Language code (e.g., 'en', 'es', 'fr')
         model: Model ID (default: eleven_multilingual_v2)
-        stability: Voice stability (0.0 - 1.0, default: 0.5)
-        similarity_boost: Similarity boost (0.0 - 1.0, default: 0.75)
+        stability: Voice stability (0.0 - 1.0, default: 0.5) — baja = más expresiva.
+        similarity_boost: Similarity boost (0.0 - 1.0, default: 0.75) — alta = acento fiel.
+        style: Style exaggeration (0.0 - 1.0, default: 0.0) — alto = más dramático/autoritativo.
+        speed: Speech speed (0.7 - 1.2, default: 1.0) — ritmo viral reels: 1.05-1.15.
+        use_speaker_boost: Boost claridad del altavoz (default True).
         output_path: Path to save MP3 file
 
     Returns:
@@ -165,7 +171,10 @@ def generate_voice_elevenlabs(
         "model_id": model,
         "voice_settings": {
             "stability": stability,
-            "similarity_boost": similarity_boost
+            "similarity_boost": similarity_boost,
+            "style": style,
+            "use_speaker_boost": use_speaker_boost,
+            "speed": speed,
         }
     }
 
