@@ -1,5 +1,14 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Añadir Voice Logging (dictado por voz para registrar comidas)
+
+- **Nueva pantalla** `app/voice-log.tsx`: flujo completo idle → recording → processing → results/error
+- **Grabación** con `expo-audio` (`useAudioRecorder` + `RecordingPresets.HIGH_QUALITY`); auto-stop a 30s; animación pulsante durante grabación
+- **Pipeline IA**: Whisper (auto-detect idioma) → `analyzeTextFood` (GPT-4o-mini) → resultado nutricional editable
+- **Integración**: editor de peso, selector de tipo de comida, guardado con `useMealStore().addMeal()`; transcripción guardada en `notes` (`🎙️ "..."`)
+- **Limpieza `services/voiceLog.ts`**: eliminado `expo-file-system` (base64 no se usaba); Whisper ahora sin parámetro `language` para mejor auto-detección bilingüe
+- **`capture-hub.tsx`**: botón Voz navega a `/voice-log` (eliminado mock inline + estado `isLoading` no usado)
+- **i18n**: añadidas ~20 claves `voiceLog.*` en `es.ts` y `en.ts`
 ## 2026-04-16 — Activación HealthKit / Health Connect: TDEE dinámico y UI de actividad
 
 - **Desbloquear onboarding**: `app/(auth)/onboarding.tsx` — botón de integración de salud ahora pide permisos reales de HealthKit (iOS) / Health Connect (Android) en lugar de mostrar "Coming Soon"
