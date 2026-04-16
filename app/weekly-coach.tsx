@@ -95,15 +95,15 @@ function generateWins(
 ): string[] {
   const wins: string[] = [];
   if (daysLogged >= 5)
-    wins.push(t('weeklyCoach.wins'));
+    wins.push(t('weeklyCoach.win5Days'));
   else if (daysLogged >= 3)
-    wins.push(t('weeklyCoach.wins'));
+    wins.push(t('weeklyCoach.win3Days', { count: daysLogged }));
   if (calorieAdh >= 85)
-    wins.push(t('weeklyCoach.wins'));
+    wins.push(t('weeklyCoach.winCalories'));
   if (proteinAdh >= 85)
-    wins.push(t('weeklyCoach.wins'));
+    wins.push(t('weeklyCoach.winProtein'));
   if (wins.length === 0)
-    wins.push(t('weeklyCoach.wins'));
+    wins.push(t('weeklyCoach.winDefault'));
   return wins;
 }
 
@@ -118,17 +118,17 @@ function generateImprovements(
 ): string[] {
   const improvements: string[] = [];
   if (daysLogged < 5)
-    improvements.push(t('weeklyCoach.improvements'));
+    improvements.push(t('weeklyCoach.improveLogging'));
   if (calorieAdh < 70)
-    improvements.push(t('weeklyCoach.improvements'));
+    improvements.push(t('weeklyCoach.improveCalories'));
   if (proteinAdh < 70 && goals.protein > 0)
-    improvements.push(t('weeklyCoach.improvements'));
+    improvements.push(t('weeklyCoach.improveProtein'));
 
   // Find the day with highest calories
   if (dailyCalories.length >= 2) {
     const sorted = [...dailyCalories].sort((a, b) => b.calories - a.calories);
     if (sorted[0].calories > sorted[sorted.length - 1].calories * 1.3) {
-      improvements.push(t('weeklyCoach.improvements'));
+      improvements.push(t('weeklyCoach.improveVariability'));
     }
   }
   return improvements;

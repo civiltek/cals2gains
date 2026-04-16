@@ -789,6 +789,15 @@ export default {
     consistency: 'Consistencia',
     wins: 'Logros',
     improvements: 'A Mejorar',
+    win5Days: '¡Registraste 5 días o más esta semana! La constancia es tu superpoder 💪',
+    win3Days: '¡Lleva {{count}} días registrados esta semana, buen ritmo!',
+    winCalories: '¡Excelente control calórico! Muy cerca de tu objetivo 🎯',
+    winProtein: '¡Objetivo de proteína cumplido! Tus músculos te lo agradecen 🥩',
+    winDefault: '¡Registraste datos esta semana! Cada dato cuenta 📊',
+    improveLogging: 'Intenta registrar más días — al menos 5 de 7 para mejores análisis',
+    improveCalories: 'Tu adherencia calórica tiene margen de mejora — revisa tus porciones',
+    improveProtein: 'Aumenta tu ingesta de proteína para acercarte a tu objetivo diario',
+    improveVariability: 'Hay mucha variación entre días — busca más regularidad en tus comidas',
   },
 
   // Adherence

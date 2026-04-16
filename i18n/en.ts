@@ -762,6 +762,15 @@ export default {
     consistency: 'Consistency',
     wins: 'Wins',
     improvements: 'To Improve',
+    win5Days: 'You logged 5+ days this week! Consistency is your superpower 💪',
+    win3Days: '{{count}} days logged this week — keep it up!',
+    winCalories: 'Excellent calorie control! Right on target 🎯',
+    winProtein: 'Protein goal met! Your muscles thank you 🥩',
+    winDefault: 'You logged data this week! Every entry counts 📊',
+    improveLogging: 'Try to log more days — aim for at least 5 out of 7',
+    improveCalories: 'Calorie adherence has room to improve — review your portions',
+    improveProtein: 'Increase your protein intake to get closer to your daily goal',
+    improveVariability: 'There is high day-to-day variation — aim for more consistency',
   },
 
   adherence: {
