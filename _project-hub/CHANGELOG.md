@@ -1,5 +1,15 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Fix iOS build: corregir expo-sharing y expo-print a versiones SDK 54
+
+- **Causa raíz**: `expo-sharing ^55.0.18` y `expo-print ^55.0.13` eran versiones de SDK 55, incompatibles con `expo-modules-core 3.0.29` (SDK 54)
+- **Error**: `type 'FileSystemUtilities' has no member 'isReadableFile'` — el `SharingModule.swift` de v55 llamaba a un método eliminado en expo-modules-core 3.0.29
+- **Fix**: Corregido `package.json` y `package-lock.json`:
+  - `expo-sharing`: `^55.0.18` → `~14.0.8`
+  - `expo-print`: `^55.0.13` → `~15.0.8`
+- **Verificado**: la v14.0.8 usa la API correcta (`grantedPermissions.contains(.read)`)
+- **Estado**: commit `f374232` en rama `claude/sweet-gould`, pendiente PR y build #19
+
 ## 2026-04-15 — Pipeline visual-engine end-to-end validado + corrección de 8 bugs moviepy v2
 
 - **API key Muapi**: `MUAPI_KEY` y `MUAPI_API_KEY` añadidas al `.env` raíz
