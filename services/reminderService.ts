@@ -21,6 +21,8 @@ if (Notifications) {
       shouldShowAlert: true,
       shouldPlaySound: true,
       shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
     }),
   });
 }
@@ -106,7 +108,7 @@ export async function scheduleDailyReminder(
 export async function cancelReminder(notificationId: string): Promise<void> {
   if (!Notifications) return;
   try {
-    await Notifications.cancelNotificationAsync(notificationId);
+    await Notifications.cancelScheduledNotificationAsync(notificationId);
   } catch (error) {
     console.error('[ReminderService] Cancel failed:', error);
   }
@@ -115,7 +117,7 @@ export async function cancelReminder(notificationId: string): Promise<void> {
 export async function cancelAllReminders(): Promise<void> {
   if (!Notifications) return;
   try {
-    await Notifications.cancelAllNotificationsAsync();
+    await Notifications.cancelAllScheduledNotificationsAsync();
   } catch (error) {
     console.error('[ReminderService] Cancel all failed:', error);
   }

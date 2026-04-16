@@ -228,7 +228,7 @@ const DARK_COMPAT = {
 };
 
 // Light palette equivalents
-const LIGHT_COMPAT: typeof DARK_COMPAT = {
+const LIGHT_COMPAT = {
   background: '#F5F2ED',
   card: '#FFFFFF',
   cardHover: '#F0ECE6',

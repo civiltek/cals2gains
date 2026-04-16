@@ -68,7 +68,7 @@ export default function HistoryScreen() {
 
   const selectedDateKey = format(selectedDate, 'yyyy-MM-dd');
   const selectedMeals = groupedMeals[selectedDateKey] || [];
-  const totalCalories = selectedMeals.reduce((s, m) => s + (m.nutrition?.calories ?? m.calories ?? 0), 0);
+  const totalCalories = selectedMeals.reduce((s, m) => s + (m.nutrition?.calories ?? 0), 0);
 
   const handleEditMeal = (meal: any) => {
     router.push({
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: C.text + '10',
+    backgroundColor: 'rgba(247, 242, 234, 0.06)',
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -17,7 +17,7 @@ import { PersonalEngine, QuickAction } from '../services/personalEngine';
 import { format } from 'date-fns';
 
 // Mock store imports
-import { userStore } from '../store/userStore';
+import { useUserStore } from '../store/userStore';
 
 const { width } = Dimensions.get('window');
 
@@ -398,7 +398,7 @@ export default function TrainingDay() {
       <View style={styles.autoDetectContent}>
         <View style={styles.autoDetectLeft}>
           <Ionicons
-            name={autoDetect ? 'checkmark-circle' : 'circle-outline'}
+            name={(autoDetect ? 'checkmark-circle' : 'circle-outline') as any}
             size={24}
             color={autoDetect ? C.success : C.textSecondary}
           />

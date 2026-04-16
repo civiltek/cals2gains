@@ -310,7 +310,7 @@ export default function MealPlanScreen() {
                         slot.meal.completed && styles.mealNameStrikethrough,
                       ]}
                     >
-                      {slot.meal.name}
+                      {slot.meal.customName || ''}
                     </Text>
                     {slot.meal.nutrition && (
                       <Text style={[styles.mealMacros, { color: C.textSecondary }]}>
@@ -465,7 +465,7 @@ export default function MealPlanScreen() {
           <View style={styles.modalOverlay}>
             <View style={[styles.modalContent, { backgroundColor: C.card }]}>
               <View style={styles.modalHeader}>
-                <Text style={[styles.modalTitle, { color: C.bone }]}>{longPressedMeal.meal.name}</Text>
+                <Text style={[styles.modalTitle, { color: C.bone }]}>{longPressedMeal.meal.customName || ''}</Text>
                 <TouchableOpacity
                   onPress={() =>
                     setLongPressedMeal({ ...longPressedMeal, visible: false })

@@ -141,8 +141,8 @@ export async function generateWeeklyRecommendation(
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
-        max_tokens: 1200,
+        model: 'gpt-4o-mini',
+        max_tokens: 800,
         temperature: 0.3,
         messages: [
           {
@@ -198,37 +198,8 @@ export async function generateWeeklyRecommendation(
 // INTERNAL HELPERS
 // ============================================
 
-const COACHING_SYSTEM_PROMPT = `You are Cals2Gains AI Macro Coach. You analyze a user's weekly data (nutrition, weight, activity, body composition) and provide personalized macro adjustments.
-
-RULES:
-1. Respond ONLY in valid JSON
-2. Never change calories by more than ±200 kcal per week
-3. Never drop protein below 1.6g/kg of body weight for muscle-building goals
-4. Factor in activity level from wearable data (steps, active calories, workouts)
-5. Adjust for metabolic adaptation if weight has stalled for 2+ weeks
-6. Provide bilingual (ES/EN) summaries and insights
-
-Response format:
-{
-  "recommendedCalories": 2100,
-  "recommendedProtein": 160,
-  "recommendedCarbs": 210,
-  "recommendedFat": 70,
-  "confidence": 0.85,
-  "summaryEs": "Spanish summary of recommendation",
-  "summaryEn": "English summary of recommendation",
-  "insights": [
-    {
-      "type": "weight|activity|nutrition|recommendation",
-      "titleEs": "Title in Spanish",
-      "titleEn": "Title in English",
-      "messageEs": "Message in Spanish",
-      "messageEn": "Message in English",
-      "icon": "emoji",
-      "severity": "info|warning|success"
-    }
-  ]
-}`;
+const COACHING_SYSTEM_PROMPT = `AI Macro Coach. Analyze weekly nutrition/weight/activity data, provide personalized macro adjustments. JSON only. Rules: max ±200 kcal/week change, protein ≥1.6g/kg for muscle goals, factor wearable data, adjust for metabolic adaptation if stalled 2+ weeks. Bilingual ES/EN.
+Format: {"recommendedCalories":N,"recommendedProtein":N,"recommendedCarbs":N,"recommendedFat":N,"confidence":0-1,"summaryEs":"...","summaryEn":"...","insights":[{"type":"weight|activity|nutrition|recommendation","titleEs":"","titleEn":"","messageEs":"","messageEn":"","icon":"emoji","severity":"info|warning|success"}]}`;
 
 function calculateWeekSummary(
   user: User,
@@ -287,8 +258,8 @@ function buildCoachingContext(
 ): string {
   const parts: string[] = [];
 
-  parts.push(`User Profile: ${user.gender || 'unknown'}, ${user.age || '?'}y, ${user.weight || '?'}kg, ${user.height || '?'}cm`);
-  parts.push(`Goal: ${user.goal || 'maintain_weight'}`);
+  parts.push(`User Profile: ${user.profile?.gender || 'unknown'}, ${user.profile?.age || '?'}y, ${user.weight || '?'}kg, ${user.profile?.height || '?'}cm`);
+  parts.push(`Goal: ${user.profile?.goal || 'maintain_weight'}`);
   parts.push(`Current macros: ${user.goals?.calories ?? '?'} kcal, P:${user.goals?.protein ?? '?'}g, C:${user.goals?.carbs ?? '?'}g, F:${user.goals?.fat ?? '?'}g`);
 
   parts.push(`\nWeek Summary (${weekSummary.daysLogged} days logged):`);
@@ -306,7 +277,7 @@ function buildCoachingContext(
   if (workouts.length > 0) {
     parts.push(`Workouts this week: ${workouts.length}`);
     workouts.forEach((w) => {
-      parts.push(`- ${w.type}: ${w.duration}min, ${w.caloriesBurned} kcal`);
+      parts.push(`- ${w.type}: ${w.duration}min, ${w.calories} kcal`);
     });
   }
 

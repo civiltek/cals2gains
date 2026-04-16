@@ -124,9 +124,8 @@ export default function GroceryListScreen() {
       name: manualInput.trim(),
       quantity: 1,
       unit: 'unidad',
-      category: detectCategory(manualInput),
+      category: detectCategory(manualInput) as GroceryItem['category'],
       checked: false,
-      linkedRecipes: [],
     };
 
     setLocalItems([...localItems, newItem]);
@@ -259,7 +258,7 @@ export default function GroceryListScreen() {
           <Text style={styles.itemQuantity}>
             {item.quantity} {item.unit}
           </Text>
-          {item.linkedRecipes && item.linkedRecipes.length > 0 && (
+          {(item as any).linkedRecipes && (item as any).linkedRecipes.length > 0 && (
             <View style={styles.recipeLink}>
               <Ionicons
                 name="bookmark"
@@ -267,7 +266,7 @@ export default function GroceryListScreen() {
                 color={C.textMuted}
               />
               <Text style={styles.recipeLinkText}>
-                {item.linkedRecipes.length}
+                {(item as any).linkedRecipes.length}
               </Text>
             </View>
           )}
@@ -280,7 +279,7 @@ export default function GroceryListScreen() {
     <View style={styles.sectionHeader}>
       <View style={styles.sectionHeaderContent}>
         <Ionicons
-          name={CATEGORY_ICONS[section.title] || 'cube'}
+          name={(CATEGORY_ICONS[section.title] || 'cube') as any}
           size={16}
           color="#9C8CFF"
         />

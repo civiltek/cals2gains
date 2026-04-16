@@ -1,14 +1,48 @@
 # Changelog - Cals2Gains
 
-## 2026-04-16 — Fix iOS build: corregir expo-sharing y expo-print a versiones SDK 54
+## 2026-04-16 — Carousel engine: correcciones visuales ronda 2 (PIEZA-01)
 
-- **Causa raíz**: `expo-sharing ^55.0.18` y `expo-print ^55.0.13` eran versiones de SDK 55, incompatibles con `expo-modules-core 3.0.29` (SDK 54)
-- **Error**: `type 'FileSystemUtilities' has no member 'isReadableFile'` — el `SharingModule.swift` de v55 llamaba a un método eliminado en expo-modules-core 3.0.29
-- **Fix**: Corregido `package.json` y `package-lock.json`:
-  - `expo-sharing`: `^55.0.18` → `~14.0.8`
-  - `expo-print`: `^55.0.13` → `~15.0.8`
-- **Verificado**: la v14.0.8 usa la API correcta (`grantedPermissions.contains(.read)`)
-- **Estado**: commit `f374232` en rama `claude/sweet-gould`, pendiente PR y build #19
+- **Slide 4 (stats)**: eliminados dividers que solapaban el texto; añadidos 18px de padding explícito entre filas de macros
+- **Slide 7 (practical)**: añadido overlay oscuro redondeado (`dark, alpha=165`) detrás del área de contenido para legibilidad sobre fondo DALL-E de cocina
+- **Slide 8 (CTA)**: texto del botón cambiado de coral→bone (blanco) para contraste; centrado corregido (`x=MH, canvas_width=CW`)
+- **Emojis eliminados**: `✗`, `✓`, `👆`, `\u201c` reemplazados por ASCII (`X`, `+`, `"`) en carousel_composer.py, slide_renderer.py y spec JSON
+- **Overlay DALL-E**: opacidad `solid_dark` reducida 148→90 para que los fondos DALL-E sean visibles; `solid_heavy` 175→130
+- **Caché DALL-E**: `get_background()` ahora detecta imágenes DALL-E existentes (>1.6 MB) y no las sobreescribe en ejecuciones `--no-ai`
+- **Flag `--no-telegram`**: ya implementado — documentado en docstring del script
+- Las 3 slides corregidas enviadas individualmente a Telegram para revisión de Judith
+
+## 2026-04-16 — Carousel engine: nuevas features inspiradas en guía de referencia
+
+- **hashtag_generator.py** (nuevo): estrategia 3 capas alcance/comunidad/nicho, 80+ hashtags curados de nutrición/fitness ES+EN, detección automática por topic, integración opcional GPT-4o-mini
+- **Export caption + hashtags**: pipeline genera `{id}_ig_content.txt` junto al ZIP — caption con GPT-4o-mini + hashtags listos para pegar en IG
+- **Nuevas plantillas narrativas** en script_generator.py: `before_after`, `comparison`, `storytelling`, `motivational` (añadidas a las 5 existentes)
+- **Nuevo tipo de slide `before_after`**: dos columnas visuales ANTES (coral) / DESPUÉS (violet) con fondos tintados, bullets ✗/✓ y soporte en template_engine + carousel_composer
+- **argparse** actualizado con todos los templates: myth-buster, educational, tips-list, recipe, before_after, comparison, storytelling, motivational, 7-slides
+
+## 2026-04-16 — Motor de carruseles: fix 4 bugs visuales + envío Telegram PIEZA-01
+
+- **Carousel engine (PR #11)**: separado logo y dots — `ZONE_DOTS` movido de 1262 a 1185, logo posicionado a ~1220px (35px de margen limpio)
+- **Carousel engine**: eliminado fondo oscuro del logo programáticamente — función `_remove_dark_bg()` con distancia euclídea al color dark del brand (#17121D), fade suave en antialiasing
+- **Carousel engine**: TypeScale aumentado ~12% para legibilidad móvil (hero 94→106, display 72→82, title 56→64, subtitle 42→50, body 34→40, caption 27→33, micro 22→27)
+- **Carousel engine**: comillas decorativas reposicionadas por encima del ZONE_HEADLINE y alpha reducido 35→18 para que el texto siempre tenga prioridad visual
+- **Carousel engine**: corregido bug `_REPO_ROOT` no definido en `create_carousel.py` (impedía envío Telegram)
+- **PIEZA-01** ("Huevos y colesterol"): regenerado con todos los fixes y enviado a Telegram (@cals2gains_es) para aprobación de Judith
+
+## 2026-04-16 — Optimización masiva de tokens en todo el ecosistema
+
+- **OpenAI app**: 4 servicios migrados de `gpt-4o` a `gpt-4o-mini` (meal suggestions, macro coach, recetas, text food analysis) — ahorro ~94% en esas llamadas
+- **OpenAI app**: `analyzeFoodPhoto()` cambiado de `detail: high` a `detail: low` — ahorro ~1000 tokens/foto
+- **OpenAI app**: max_tokens reducido en 5 funciones (20-37% menos por llamada)
+- **OpenAI app**: system prompts comprimidos en meal suggestions (-67%) y macro coach (-55%)
+- **Visual engine**: `script_generator.py` migrado a `gpt-4o-mini`, max_tokens 4000→2500, VIRAL_SYSTEM_PROMPT comprimido de ~190 lineas a ~13 lineas (~80% reduccion)
+- **Visual engine**: `voice_generator.py` default cambiado de `tts-1-hd` a `tts-1` (2x mas barato)
+- **Tareas programadas**: creado `instagram-comments-outbound.md` consolidando morning+afternoon (eran 90% identicos). Archivos originales marcados DEPRECADO
+- **Tareas programadas**: `instagram-comment-replies.md` comprimido de 83 a ~30 lineas, rutas obsoletas corregidas
+- **Tareas programadas**: `trend-scout.md` comprimido, añadido modelo recomendado
+- **Tareas programadas**: todos los prompts ahora incluyen `model: sonnet` o `model: haiku` segun complejidad
+- **Proyecto**: creado `CLAUDE-COMPACT.md` (~50 lineas vs ~175 de CLAUDE.md) para tareas rutinarias
+- **Git**: ejecutado `git worktree prune` (15 worktrees huerfanos limpiados de referencias; directorios fisicos pendientes de borrar en Windows)
+- **Informe completo**: generado en outputs/Informe-Optimizacion-Tokens-Cals2Gains.md
 
 ## 2026-04-15 — Pipeline visual-engine end-to-end validado + corrección de 8 bugs moviepy v2
 

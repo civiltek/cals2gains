@@ -4,27 +4,32 @@
  * Necesario porque react-native-health-connect@3.x usa
  * androidx.health.connect:connect-client que requiere API 26+.
  *
- * Usa withProjectBuildGradle para modificar android/build.gradle.
+ * En Expo SDK 50+ / RN 0.73+, minSdkVersion viene de gradle.properties
+ * via findProperty('android.minSdkVersion'). Usamos withGradleProperties
+ * para sobreescribir ese valor.
  */
-const { withProjectBuildGradle } = require('@expo/config-plugins');
+const { withGradleProperties } = require('@expo/config-plugins');
 
 const withMinSdkVersion = (config, { minSdkVersion = 26 } = {}) => {
-  return withProjectBuildGradle(config, (config) => {
-    let contents = config.modResults.contents;
+  return withGradleProperties(config, (config) => {
+    const props = config.modResults;
 
-    // Pattern 1: minSdkVersion = Integer.parseInt(safeExtGet('minSdkVersion', '24'))
-    contents = contents.replace(
-      /minSdkVersion\s*=\s*Integer\.parseInt\s*\(\s*safeExtGet\s*\(\s*['"]minSdkVersion['"]\s*,\s*['"]\d+['"]\s*\)\s*\)/g,
-      `minSdkVersion = ${minSdkVersion}`
+    // Find and update existing android.minSdkVersion property
+    const existing = props.find(
+      (item) => item.type === 'property' && item.key === 'android.minSdkVersion'
     );
 
-    // Pattern 2: minSdkVersion = 24 (direct assignment)
-    contents = contents.replace(
-      /minSdkVersion\s*=\s*\d+/g,
-      `minSdkVersion = ${minSdkVersion}`
-    );
+    if (existing) {
+      existing.value = String(minSdkVersion);
+    } else {
+      // Add if not present
+      props.push({
+        type: 'property',
+        key: 'android.minSdkVersion',
+        value: String(minSdkVersion),
+      });
+    }
 
-    config.modResults.contents = contents;
     return config;
   });
 };

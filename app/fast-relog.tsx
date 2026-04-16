@@ -18,7 +18,7 @@ import { useColors } from '../store/themeStore';
 
 // Mock store imports
 import { mealStore } from '../store/mealStore';
-import { templateStore } from '../store/templateStore';
+import { useTemplateStore } from '../store/templateStore';
 
 const { width } = Dimensions.get('window');
 

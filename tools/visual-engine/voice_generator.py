@@ -234,7 +234,7 @@ def generate_voice_elevenlabs(
 def generate_voice_openai(
     text: str,
     voice: str = "nova",
-    model: str = "tts-1-hd",
+    model: str = "tts-1",
     speed: float = 1.0,
     output_path: Optional[Path] = None,
 ) -> Dict[str, Any]:

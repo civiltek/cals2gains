@@ -96,7 +96,7 @@ export default function FastingScreen() {
   }, []);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (activeFast && isFasting) {
       interval = setInterval(() => {
         const now = new Date();

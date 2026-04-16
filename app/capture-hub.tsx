@@ -291,7 +291,7 @@ export default function CaptureHubScreen() {
       <View style={styles.recentMealLeft}>
         <View style={styles.recentMealIcon}>
           <Ionicons
-            name={getMealTypeIcon(item.type)}
+            name={getMealTypeIcon(item.type) as any}
             size={20}
             color="#9C8CFF"
           />
@@ -317,7 +317,7 @@ export default function CaptureHubScreen() {
         <Text style={styles.title}>{t('captureHub.title')}</Text>
         <View style={styles.mealTypePill}>
           <Ionicons
-            name={getMealTypeIcon(currentMealType)}
+            name={getMealTypeIcon(currentMealType) as any}
             size={14}
             color="#FFFFFF"
           />

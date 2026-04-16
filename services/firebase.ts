@@ -6,7 +6,6 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getAuth,
   initializeAuth,
-  getReactNativePersistence,
   GoogleAuthProvider,
   OAuthProvider,
   signInWithCredential,
@@ -17,6 +16,12 @@ import {
   onAuthStateChanged,
   User as FirebaseUser,
 } from 'firebase/auth';
+// getReactNativePersistence is available in the React Native bundle at runtime but not in the
+// browser-targeted TypeScript type definitions for firebase v10.14. Use require to access it.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { getReactNativePersistence } = require('firebase/auth') as {
+  getReactNativePersistence: (storage: typeof AsyncStorage) => any;
+};
 import {
   getFirestore,
   doc,
@@ -37,7 +42,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Meal, DailyLog, UserGoals, UserProfile, ProgressPhoto, PhotoAngle, Recipe, Nutrition } from '../types';
+import { User, Meal, DailyLog, UserGoals, UserProfile, ProgressPhoto, PhotoAngle, Recipe, Nutrition, FastingConfig, FastingSession, BodyMeasurement } from '../types';
 import { emptyNutrition, addNutrition } from '../utils/nutrition';
 import { format } from 'date-fns';
 
@@ -937,4 +942,68 @@ export async function logRecipeAsMealFb(
     createdAt: Timestamp.fromDate(now),
   });
   return mealDoc.id;
+}
+
+// ============================================
+// FASTING
+// ============================================
+
+export async function saveFastingConfig(userId: string, config: FastingConfig): Promise<void> {
+  await setDoc(doc(db, 'users', userId, 'config', 'fasting'), config);
+}
+
+export async function getFastingConfig(userId: string): Promise<FastingConfig | null> {
+  const snap = await getDoc(doc(db, 'users', userId, 'config', 'fasting'));
+  return snap.exists() ? (snap.data() as FastingConfig) : null;
+}
+
+export async function saveFastingSession(
+  session: Omit<FastingSession, 'id'> | FastingSession
+): Promise<string> {
+  const s = session as FastingSession;
+  if (s.id) {
+    await setDoc(doc(db, 'fastingSessions', s.id), session);
+    return s.id;
+  }
+  const ref = await addDoc(collection(db, 'fastingSessions'), session);
+  return ref.id;
+}
+
+export async function getFastingSessions(
+  userId: string,
+  limitCount: number = 30
+): Promise<FastingSession[]> {
+  const q = query(
+    collection(db, 'fastingSessions'),
+    where('userId', '==', userId),
+    orderBy('startTime', 'desc'),
+    limit(limitCount)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ ...d.data(), id: d.id } as FastingSession));
+}
+
+// ============================================
+// BODY MEASUREMENTS
+// ============================================
+
+export async function saveMeasurement(
+  measurement: Omit<BodyMeasurement, 'id'>
+): Promise<string> {
+  const ref = await addDoc(collection(db, 'measurements'), measurement);
+  return ref.id;
+}
+
+export async function getMeasurements(userId: string): Promise<BodyMeasurement[]> {
+  const q = query(
+    collection(db, 'measurements'),
+    where('userId', '==', userId),
+    orderBy('date', 'desc')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ ...d.data(), id: d.id } as BodyMeasurement));
+}
+
+export async function deleteMeasurement(id: string): Promise<void> {
+  await deleteDoc(doc(db, 'measurements', id));
 }

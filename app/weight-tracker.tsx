@@ -12,6 +12,7 @@ import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 import { useWeightStore } from '../store/weightStore';
 import { useColors } from '../store/themeStore';
+import { useUserStore } from '../store/userStore';
 import { format, subDays, isAfter } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -82,11 +83,12 @@ export default function WeightTrackerScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { entries: history = [], loadHistory, addEntry, getLatestWeight, getWeightChange, getTrend } = useWeightStore();
+  const { user } = useUserStore();
   const [weightInput, setWeightInput] = useState('');
   const [range, setRange] = useState('30d');
   const [showAdd, setShowAdd] = useState(false);
 
-  useEffect(() => { loadHistory(); }, []);
+  useEffect(() => { loadHistory(user?.uid || ''); }, [user?.uid]);
 
   const latest = getLatestWeight();
   const change7d = getWeightChange(7);
@@ -100,7 +102,7 @@ export default function WeightTrackerScreen() {
       Alert.alert('Error', t('weightTracker.invalidWeight'));
       return;
     }
-    await addEntry(w);
+    await addEntry({ userId: user?.uid || '', weight: w, date: new Date() });
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setWeightInput('');
     setShowAdd(false);

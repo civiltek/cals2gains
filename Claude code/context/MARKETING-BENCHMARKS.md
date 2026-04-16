@@ -225,3 +225,48 @@ Los subagentes de marketing que leen este archivo operan con los siguientes mode
 - **GPT-5.4** (estándar): `hook-writer`, `caption-hashtag`, `reels-scriptwriter`, `carousel-designer`, `trend-scout` — producción y volumen.
 
 > Migración desde GPT-4o completada en abril 2026. La API key es la misma del `.env`. Ver `META-API-SETUP.md § 13` para detalle completo.
+
+
+---
+
+## Actualización trend-scout · 2026-04-16
+
+### Nuevas features IG accionables para el pipeline (confirmadas ≥2 fuentes)
+
+**1. "Edits" app — usar para producción sin watermark + efectos IA**
+Instagram ha actualizado su app Edits (editor de vídeo propio) con: efectos IA (SAM 3) para highlight de objetos/personas, links internos a perfiles/reels sobre el vídeo, storyboards mejorados. Exportar desde Edits = sin watermark = beneficio directo del Originality Score. Fuentes: creators.instagram.com (oficial), SocialMediaToday, BuzzInContent, EmbedSocial.
+
+→ **Recomendación para todos los subagentes:** producir reels en Edits siempre que sea posible. Sin watermark = +40-60% reach potencial vs. CapCut con watermark.
+
+**2. Links clicables en Reels (Meta Verified)**
+Cuentas con Meta Verified Plus o superior pueden añadir enlaces clicables directamente sobre reels (2-6 links/mes según tier). Product tagging se expande a 22 países con hasta 30 links de producto. Fuentes: SocialMediaExaminer, inro.social, napoleoncat.com, Instagram oficial.
+
+→ **Pendiente para Cals2Gains:** @cals2gains tiene verificación Meta pendiente (ver ACCOUNTS.md). Si se activa, priorizar linkear reels de demo a app stores.
+
+**3. "Blend" — feed compartido de Reels en DMs (lanzado ~17/04/2026)**
+Nueva feature que crea un feed compartido de reels entre amigos/grupos dentro de DMs. Amplifica la señal de "sends per reach" (share rate = señal #1 algoritmo). Fuentes: metricool.com, napoleoncat.com, heyorca.com, socialbee.com.
+
+→ `caption-hashtag`: considerar CTA experimental "Añádelo a tu Blend" como variante de DM-bait.
+
+**4. Trial Reels programables**
+Los Trial Reels (reels mostrados solo a no-seguidores para testear) ahora se pueden programar. Fuentes: napoleoncat.com, embedsocial.com, heyorca.com.
+
+→ Implementar flujo A/B testing: 2 variantes de hook como Trial Reels → publicar ganadora a seguidores.
+
+### Mito en ciclo — adición (abril 2026)
+
+Añadir a la lista de mitos activos ya documentados (seed oils, huevos, detox, diversidad dietética, proteína vegetal):
+- **GLP-1/Ozempic: ¿magia para perder peso?** — EL debate nutricional más caliente de abril 2026. Subtemas: resistencia genética (~10% no responden), pérdida de masa magra (40% del peso perdido), ciclo quit/restart sin guía. Fuentes: NPR (×2 artículos), ScienceDaily, Healthline, OurHealtho, WashPost, Buzops. Brand voice: ciencia > hype, sin posición anti/pro fármaco, enfoque en "la nutrición es la base con o sin GLP-1."
+
+### Patrones de hook — adición (confirmado 2026-04-16)
+
+**12. "GLP-1 science" hook:** "Lo que tu médico no te dice sobre Ozempic" / "3 cosas que la ciencia dice sobre GLP-1 que nadie te cuenta." Hook de curiosity gap con ángulo médico-nutricional. Alto potencial de share en EN y ES por la polarización del tema. Clave: mantener tono informativo, nunca alarmista.
+
+### Qué falta / pendientes actualizado (2026-04-16)
+
+- ⚠️ Pendiente: verificación Meta para @cals2gains → desbloquea links clicables en reels (ACCOUNTS.md).
+- ⚠️ Pendiente: Nieves Bolós (@nievesbolos, ~929K) — sigue sin 2ª fuente para añadir a Tabla B ES.
+- ⚠️ Pendiente: confirmar si reels públicos están indexados por Google/Bing (1 fuente: invideo.io).
+- ⚠️ Pendiente: ratio exacto reel/carrusel de cuentas top (sigue sin dato duro verificado).
+- ✅ RESUELTO: Central Cee "WAGWAN" confirmado en ≥2 fuentes como audio trending fitness (ver TREND-INSIGHTS.md 2026-04-16, Insight 5).
+

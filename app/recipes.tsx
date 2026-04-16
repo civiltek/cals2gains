@@ -337,7 +337,7 @@ export default function RecipesScreen() {
               </View>
             )}
             <View style={styles.timeItem}>
-              <Ionicons name="bowl" size={14} color={C.textSecondary} />
+              <Ionicons name={"bowl" as any} size={14} color={C.textSecondary} />
               <Text style={styles.timeText}>{recipe.servings} {recipe.servings > 1 ? t('recipes.servings') : t('recipes.serving')}</Text>
             </View>
           </View>
@@ -418,7 +418,7 @@ export default function RecipesScreen() {
               <Text style={styles.infoValue}>{recipe.cookTime || 0}m</Text>
             </View>
             <View style={styles.infoCard}>
-              <Ionicons name="bowl" size={24} color={C.primary} />
+              <Ionicons name={"bowl" as any} size={24} color={C.primary} />
               <Text style={styles.infoLabel}>{t('recipes.servings')}</Text>
               <Text style={styles.infoValue}>{recipe.servings}</Text>
             </View>

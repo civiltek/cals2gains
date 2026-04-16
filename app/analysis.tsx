@@ -44,8 +44,8 @@ export default function AnalysisScreen() {
 
   // Read image from shared store (preferred) or fall back to route params
   const analysisStore = useAnalysisStore();
-  const imageUri = analysisStore.imageUri || imageUri;
-  const imageBase64 = analysisStore.imageBase64 || imageBase64;
+  const imageUri = analysisStore.imageUri || params.imageUri;
+  const imageBase64 = analysisStore.imageBase64 || params.imageBase64;
   const lang = (analysisStore.language || params.language as 'es' | 'en') || 'es';
 
   // On web, file:// URIs don't work — use base64 data URI instead
@@ -168,7 +168,7 @@ export default function AnalysisScreen() {
         mealData.notes = `📌 ${userContext.trim()} | ${notes.trim()}`;
       }
 
-      await addMeal(mealData, imageBase64 || undefined);
+      await addMeal(mealData);
 
       router.back();
       router.push('/(tabs)');
@@ -264,7 +264,7 @@ export default function AnalysisScreen() {
             <Ionicons name="alert-circle" size={56} color={C.error} />
             <Text style={styles.errorTitle}>{t('errors.analysisFailedTitle')}</Text>
             <Text style={styles.errorMessage}>{errorMessage}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={runAnalysis}>
+            <TouchableOpacity style={styles.retryButton} onPress={() => runAnalysis()}>
               <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
             </TouchableOpacity>
           </View>

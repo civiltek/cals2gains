@@ -23,6 +23,7 @@ import { useProgressPhotoStore } from '../store/progressPhotoStore';
 import { useMeasurementStore } from '../store/measurementStore';
 import { useWeightStore } from '../store/weightStore';
 import { useUserStore } from '../store/userStore';
+import { ProgressPhoto } from '../types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '../store/themeStore';
 
@@ -187,7 +188,7 @@ export default function ProgressPhotosScreen() {
   const insets = useSafeAreaInsets();
   const { photos, addPhoto, getPhotosByAngle, deletePhoto, loadPhotos } = useProgressPhotoStore();
   const { measurements } = useMeasurementStore();
-  const { weights } = useWeightStore();
+  const { entries: weights } = useWeightStore();
   const { user } = useUserStore();
 
   const [activeTab, setActiveTab] = useState<PhotoAngle>('front');
@@ -289,10 +290,10 @@ export default function ProgressPhotosScreen() {
         const localPath = await savePhotoLocally(photoUri);
 
         // Get current weight and body fat
-        const currentWeight = weights && weights.length > 0 ? weights[0].peso : undefined;
+        const currentWeight = weights && weights.length > 0 ? weights[0].weight : undefined;
         const currentBodyFat =
           measurements && measurements.length > 0
-            ? measurements[0].grasaCorporal
+            ? measurements[0].bodyFat
             : undefined;
 
         // Save to Firestore — use localPath as photoUri for persistence
@@ -345,10 +346,10 @@ export default function ProgressPhotosScreen() {
         // Save locally so URI persists
         const localPath = await savePhotoLocally(photoUri);
 
-        const currentWeight = weights && weights.length > 0 ? weights[0].peso : undefined;
+        const currentWeight = weights && weights.length > 0 ? weights[0].weight : undefined;
         const currentBodyFat =
           measurements && measurements.length > 0
-            ? measurements[0].grasaCorporal
+            ? measurements[0].bodyFat
             : undefined;
 
         if (!user?.uid) {
@@ -420,7 +421,7 @@ export default function ProgressPhotosScreen() {
   const getPhotoMetadata = (photo: any) => {
     const lines = [];
     if (photo.weight) lines.push(t('progressPhotos.weight', { value: photo.weight.toFixed(1) }));
-    else if (photo.peso) lines.push(t('progressPhotos.weight', { value: photo.peso.toFixed(1) }));
+    else if (photo.weight) lines.push(t('progressPhotos.weight', { value: photo.weight.toFixed(1) }));
     if (photo.bodyFat !== undefined) lines.push(`Grasa: ${photo.bodyFat.toFixed(1)}%`);
     else if (photo.grasaCorporal !== undefined) lines.push(`Grasa: ${photo.grasaCorporal.toFixed(1)}%`);
     return lines;
@@ -563,10 +564,10 @@ export default function ProgressPhotosScreen() {
                   </View>
                 )}
 
-                {(selectedPhoto.notas || selectedPhoto.note) && (
+                {(selectedPhoto.note || selectedPhoto.note) && (
                   <View style={[styles.notasSection, { borderTopColor: C.border }]}>
                     <Text style={[styles.notasLabel, { color: C.primary }]}>{t('progressPhotos.notes')}</Text>
-                    <Text style={[styles.notasText, { color: C.textSecondary }]}>{selectedPhoto.notas || selectedPhoto.note}</Text>
+                    <Text style={[styles.notasText, { color: C.textSecondary }]}>{selectedPhoto.note || selectedPhoto.note}</Text>
                   </View>
                 )}
 
@@ -629,11 +630,11 @@ export default function ProgressPhotosScreen() {
                   </View>
                 </View>
 
-                {(tabPhotos[0].weight || tabPhotos[0].peso) && (tabPhotos[tabPhotos.length - 1].weight || tabPhotos[tabPhotos.length - 1].peso) && (
+                {(tabPhotos[0].weight || tabPhotos[0].weight) && (tabPhotos[tabPhotos.length - 1].weight || tabPhotos[tabPhotos.length - 1].weight) && (
                   <View style={[styles.comparisonStats, { backgroundColor: C.background, borderColor: C.border }]}>
                     <Text style={[styles.statsLabel, { color: C.textTertiary }]}>{t('progressPhotos.weightChange')}</Text>
                     <Text style={[styles.statsValue, { color: C.accent }]}>
-                      {((tabPhotos[0].weight || tabPhotos[0].peso) - (tabPhotos[tabPhotos.length - 1].weight || tabPhotos[tabPhotos.length - 1].peso)).toFixed(1)} kg
+                      {((tabPhotos[0].weight || tabPhotos[0].weight) - (tabPhotos[tabPhotos.length - 1].weight || tabPhotos[tabPhotos.length - 1].weight)).toFixed(1)} kg
                     </Text>
                   </View>
                 )}

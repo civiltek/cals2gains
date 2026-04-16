@@ -61,10 +61,10 @@ export default function FoodSearchScreen() {
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
   const [servings, setServings] = useState(1);
   const [mealType, setMealType] = useState(params.mealType || 'lunch');
-  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    loadTemplates();
+    loadTemplates(user?.uid || '');
   }, []);
 
   // Debounced search
@@ -248,7 +248,7 @@ export default function FoodSearchScreen() {
       <View style={styles.templateInfo}>
         <Text style={[styles.templateName, { color: C.text }]}>{item.name}</Text>
         <Text style={[styles.templateMacros, { color: C.textSecondary }]}>
-          {item.calories} kcal · {t('foodSearch.protAbbr')} {item.protein}g · {t('foodSearch.carbAbbr')} {item.carbs}g · {t('foodSearch.fatAbbr')} {item.fat}g
+          {item.nutrition.calories} kcal · {t('foodSearch.protAbbr')} {item.nutrition.protein}g · {t('foodSearch.carbAbbr')} {item.nutrition.carbs}g · {t('foodSearch.fatAbbr')} {item.nutrition.fat}g
         </Text>
       </View>
       <Ionicons name="add-circle-outline" size={22} color={C.accent} />

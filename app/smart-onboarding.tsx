@@ -151,7 +151,7 @@ const ACTIVITY_CARDS_METADATA: Array<{ id: ActivityLevel; emoji: string; labelKe
 export default function SmartOnboardingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { setOnboardingComplete, setUserGoals } = useUserStore();
+  const { setUser, user } = useUserStore();
   const C = useColors();
   const styles = useMemo(() => createStyles(C), [C]);
 
@@ -207,8 +207,15 @@ export default function SmartOnboardingScreen() {
     const calculatedGoals = calculateGoals(data);
 
     // Save to store
-    setUserGoals(calculatedGoals);
-    setOnboardingComplete(true);
+    if (user) {
+      setUser({ ...user, goals: {
+        calories: calculatedGoals.dailyCalories,
+        protein: calculatedGoals.proteinGrams,
+        carbs: calculatedGoals.carbsGrams,
+        fat: calculatedGoals.fatGrams,
+        fiber: 0,
+      }, onboardingCompleted: true });
+    }
 
     // Navigate to dashboard
     router.replace('/(app)/home');

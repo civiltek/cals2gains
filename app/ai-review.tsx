@@ -119,7 +119,7 @@ function parseAnalysisFromParams(params: RouteParams): AnalysisResult {
         })),
         nutrition: meal.nutrition || { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
         portion: meal.estimatedWeight || 200,
-        dataSource: t('aiReview.previousRecord'),
+        dataSource: 'previousRecord',
         mealType: meal.mealType || 'lunch',
       };
     } catch (e) {
@@ -367,7 +367,7 @@ export default function AIReviewScreen() {
     <View style={[
       styles.ingredientChip,
       isLowConfidence && styles.ingredientChipLowConf,
-      { backgroundColor: C.surface, borderColor: isLowConfidence ? `${C.warning}50` : C.border, backgroundColor: isLowConfidence ? `${C.warning}08` : C.surface },
+      { backgroundColor: isLowConfidence ? `${C.warning}08` : C.surface, borderColor: isLowConfidence ? `${C.warning}50` : C.border },
     ]}>
       <View style={styles.ingredientContent}>
         <View style={styles.ingredientNameRow}>

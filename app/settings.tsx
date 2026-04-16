@@ -101,18 +101,18 @@ const SettingsScreen = () => {
 
   const handleNutritionModeToggle = (mode: 'simple' | 'advanced') => {
     setSettings({ ...settings, nutritionMode: mode });
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const handleDayTypeChange = (type: 'training' | 'rest' | 'refeed') => {
     setSettings({ ...settings, dayType: type });
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const handleReminderToggle = async (key: ReminderKey) => {
     const success = await reminderState.toggleReminder(key, t);
     if (success) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } else {
       // Permission denied — inform user
       Alert.alert(
@@ -127,7 +127,7 @@ const SettingsScreen = () => {
       ...settings,
       units: settings.units === 'metric' ? 'imperial' : 'metric',
     });
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const handleLanguageSelect = async (lang: LanguageOption) => {
@@ -135,7 +135,7 @@ const SettingsScreen = () => {
     await changeLanguage(lang.code);
     setSettings({ ...settings, language: lang.code as any });
     setShowLanguageModal(false);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const handleConnectService = async (service: string) => {

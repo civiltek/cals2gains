@@ -213,8 +213,8 @@ export async function analyzeTextFood(
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
-        max_tokens: 500,
+        model: 'gpt-4o-mini',
+        max_tokens: 400,
         messages: [
           {
             role: 'system',
@@ -311,7 +311,6 @@ function searchSpanishFoodsAsFoodItems(query: string): FoodItem[] {
     nutritionPerServing: sf.nutritionPerServing,
     source: 'local' as const,
     verified: true,
-    category: sf.category,
   }));
 }
 

@@ -236,7 +236,7 @@ export default function NutritionSettingsScreen() {
                   s.chip,
                   { backgroundColor: gender === g.id ? C.primary + '20' : C.background, borderColor: gender === g.id ? C.primary : C.border },
                 ]}
-                onPress={() => { setGender(g.id); Haptics.selectionAsync(); }}
+                onPress={() => { setGender(g.id as 'male' | 'female' | 'other'); Haptics.selectionAsync(); }}
               >
                 <Ionicons name={g.icon as any} size={18} color={gender === g.id ? C.primary : C.textMuted} />
                 <Text style={[s.chipText, { color: gender === g.id ? C.primary : C.textSecondary }]}>{t(g.labelKey)}</Text>

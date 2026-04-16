@@ -186,7 +186,7 @@ export async function analyzeFoodPhoto(
               type: 'image_url',
               image_url: {
                 url: `data:image/jpeg;base64,${imageBase64}`,
-                detail: 'high',
+                detail: 'low',
               },
             },
             {
@@ -393,18 +393,7 @@ export async function generateAIMealSuggestions(params: {
     goalMode,
   } = params;
 
-  const systemPrompt = `You are Cals2Gains, a smart nutrition assistant. Generate personalized meal suggestions that fit the user's remaining macros for the day.
-
-RULES:
-1. Return ONLY valid JSON — no markdown, no explanation
-2. Suggest 5 meals that fit the remaining macros budget
-3. Prioritize meals that are realistic, common, and easy to track
-4. Consider the time of day (meal type) for appropriate suggestions
-5. If the user frequently eats certain foods, include variations of those
-6. Each meal should have accurate nutritional estimates based on USDA/BEDCA databases
-7. Do NOT suggest meals that exceed remaining calories by more than 15%
-8. Language for "name", "reason", and "ingredients": ${language === 'es' ? 'Spanish' : 'English'}
-9. Always provide both nameEs and nameEn regardless of language`;
+  const systemPrompt = `Nutrition assistant. Generate 5 meal suggestions fitting remaining macros. Return ONLY valid JSON array. Rules: realistic meals, accurate USDA/BEDCA nutrition, don't exceed remaining calories by >15%. Provide nameEs+nameEn always. Language: ${language === 'es' ? 'Spanish' : 'English'}.`;
 
   const userPrompt = `Suggest 5 meals for the following situation:
 
@@ -443,8 +432,8 @@ Return ONLY a JSON array with exactly 5 objects:
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
-      max_tokens: 1200,
+      model: 'gpt-4o-mini',
+      max_tokens: 800,
       temperature: 0.8,
       messages: [
         { role: 'system', content: systemPrompt },

@@ -59,10 +59,11 @@ export const useMealPlanStore = create<MealPlanState>()(
             const plan: MealPlan = {
               id: `plan-${userId}-${weekStartDate.getTime()}`,
               userId,
-              weekStartDate,
+              name: 'Plan semanal',
+              startDate: weekStartDate.toISOString().split('T')[0],
+              endDate: new Date(weekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
               meals: [],
               createdAt: new Date(),
-              updatedAt: new Date(),
             };
             set({ currentPlan: plan });
           } catch (error) {
@@ -123,8 +124,9 @@ export const useMealPlanStore = create<MealPlanState>()(
             const ingredientMap = new Map<string, GroceryItem>();
 
             state.currentPlan.meals.forEach((meal) => {
-              if (meal.ingredients) {
-                meal.ingredients.forEach((ingredient) => {
+              const mealAny = meal as any;
+              if (mealAny.ingredients) {
+                mealAny.ingredients.forEach((ingredient: any) => {
                   const key = ingredient.name.toLowerCase();
                   const existing = ingredientMap.get(key);
 
@@ -137,9 +139,8 @@ export const useMealPlanStore = create<MealPlanState>()(
                       name: ingredient.name,
                       quantity: ingredient.quantity,
                       unit: ingredient.unit,
-                      category: ingredient.category || 'Otros',
+                      category: (ingredient.category || 'other') as GroceryItem['category'],
                       checked: false,
-                      linkedRecipes: [meal.id],
                     });
                   }
                 });
@@ -149,6 +150,7 @@ export const useMealPlanStore = create<MealPlanState>()(
             const groceryList: GroceryList = {
               id: `grocery-${userId}-${Date.now()}`,
               userId,
+              name: 'Lista de compras',
               items: Array.from(ingredientMap.values()),
               createdAt: new Date(),
               updatedAt: new Date(),
@@ -213,15 +215,16 @@ export const useMealPlanStore = create<MealPlanState>()(
               protein: acc.protein + (meal.nutrition?.protein || 0),
               carbs: acc.carbs + (meal.nutrition?.carbs || 0),
               fat: acc.fat + (meal.nutrition?.fat || 0),
+              fiber: acc.fiber + (meal.nutrition?.fiber || 0),
             }),
-            { calories: 0, protein: 0, carbs: 0, fat: 0 }
+            { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
           );
         },
 
         getWeekNutrition: () => {
           const state = get();
           if (!state.currentPlan) {
-            return { calories: 0, protein: 0, carbs: 0, fat: 0 };
+            return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
           }
 
           return state.currentPlan.meals.reduce(
@@ -230,8 +233,9 @@ export const useMealPlanStore = create<MealPlanState>()(
               protein: acc.protein + (meal.nutrition?.protein || 0),
               carbs: acc.carbs + (meal.nutrition?.carbs || 0),
               fat: acc.fat + (meal.nutrition?.fat || 0),
+              fiber: acc.fiber + (meal.nutrition?.fiber || 0),
             }),
-            { calories: 0, protein: 0, carbs: 0, fat: 0 }
+            { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
           );
         },
       }),

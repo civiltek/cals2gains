@@ -139,7 +139,7 @@ export default function MeasurementsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { measurements, addMeasurement, getMeasurementHistory } = useMeasurementStore();
-  const { weights } = useWeightStore();
+  useWeightStore(); // accessed via selector if needed
 
   const [inputs, setInputs] = useState<MeasurementInput>({});
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -154,8 +154,8 @@ export default function MeasurementsScreen() {
   const loadHistory = async () => {
     const hist = getMeasurementHistory();
     if (hist && hist.length > 0) {
-      setHistory(hist.slice(0, 10));
-      calculateComparisons(hist);
+      setHistory(hist.slice(0, 10) as any);
+      calculateComparisons(hist as any);
     }
   };
 
@@ -248,25 +248,26 @@ export default function MeasurementsScreen() {
     try {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-      const measurement = {
+      const measurement: import('../types').BodyMeasurement = {
         id: Date.now().toString(),
-        fecha: new Date().toISOString().split('T')[0],
-        cuello: inputs.cuello ? parseFloat(inputs.cuello) : undefined,
-        pecho: inputs.pecho ? parseFloat(inputs.pecho) : undefined,
-        cintura: inputs.cintura ? parseFloat(inputs.cintura) : undefined,
-        cadera: inputs.cadera ? parseFloat(inputs.cadera) : undefined,
-        bicepsI: inputs.bicepsI ? parseFloat(inputs.bicepsI) : undefined,
-        biceipsD: inputs.biceipsD ? parseFloat(inputs.biceipsD) : undefined,
-        musloI: inputs.musloI ? parseFloat(inputs.musloI) : undefined,
-        musloD: inputs.musloD ? parseFloat(inputs.musloD) : undefined,
-        gemeloI: inputs.gemeloI ? parseFloat(inputs.gemeloI) : undefined,
-        gemeloD: inputs.gemeloD ? parseFloat(inputs.gemeloD) : undefined,
-        grasaCorporal: inputs.grasaCorporal ? parseFloat(inputs.grasaCorporal) : undefined,
-        masaMuscular: inputs.masaMuscular ? parseFloat(inputs.masaMuscular) : undefined,
-        notas: inputs.notas,
+        userId: '',
+        date: new Date(),
+        neck: inputs.cuello ? parseFloat(inputs.cuello) : undefined,
+        chest: inputs.pecho ? parseFloat(inputs.pecho) : undefined,
+        waist: inputs.cintura ? parseFloat(inputs.cintura) : undefined,
+        hips: inputs.cadera ? parseFloat(inputs.cadera) : undefined,
+        bicepLeft: inputs.bicepsI ? parseFloat(inputs.bicepsI) : undefined,
+        bicepRight: inputs.biceipsD ? parseFloat(inputs.biceipsD) : undefined,
+        thighLeft: inputs.musloI ? parseFloat(inputs.musloI) : undefined,
+        thighRight: inputs.musloD ? parseFloat(inputs.musloD) : undefined,
+        calfLeft: inputs.gemeloI ? parseFloat(inputs.gemeloI) : undefined,
+        calfRight: inputs.gemeloD ? parseFloat(inputs.gemeloD) : undefined,
+        bodyFat: inputs.grasaCorporal ? parseFloat(inputs.grasaCorporal) : undefined,
+        muscleMass: inputs.masaMuscular ? parseFloat(inputs.masaMuscular) : undefined,
+        note: inputs.notas,
       };
-
-      addMeasurement(measurement);
+      const { id: _id, ...measurementWithoutId } = measurement;
+      addMeasurement(measurementWithoutId);
       setInputs({});
       Alert.alert(t('common.success'), t('measurements.saved'));
       loadHistory();

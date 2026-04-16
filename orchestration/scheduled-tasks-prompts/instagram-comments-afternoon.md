@@ -1,7 +1,13 @@
 ---
 name: instagram-comments-afternoon
-description: Afternoon round: post ~10 high-value nutritional comments on fitness influencer Instagram posts rotating between @cals2gains + @calstogains (English) and @cals2gains_es (Spanish)
+description: "DEPRECADO — Usar instagram-comments-outbound.md en su lugar. Este archivo se mantiene como backup."
+deprecated: true
+replaced_by: instagram-comments-outbound.md
 ---
+
+> **⚠️ DEPRECADO:** Este prompt ha sido consolidado con instagram-comments-morning.md en un unico archivo: `instagram-comments-outbound.md`. Migrar las tareas programadas al nuevo archivo y luego eliminar este.
+
+<!-- CONTENIDO ORIGINAL DEBAJO (backup) -->
 
 ## REGLAS DE CUENTA (LEER PRIMERO — CRÍTICO)
 

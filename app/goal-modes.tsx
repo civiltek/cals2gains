@@ -441,11 +441,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     marginBottom: 8,
-    fontFamily: BRAND_FONTS.bold,
+    fontFamily: BRAND_FONTS.display.family,
   },
   headerSubtitle: {
     fontSize: 14,
-    fontFamily: BRAND_FONTS.regular,
+    fontFamily: BRAND_FONTS.body.family,
   },
   gridContainer: {
     paddingHorizontal: 20,
@@ -475,18 +475,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 4,
-    fontFamily: BRAND_FONTS.semibold,
+    fontFamily: BRAND_FONTS.body.family,
   },
   modeDescription: {
     fontSize: 13,
     textAlign: 'center',
     marginBottom: 8,
-    fontFamily: BRAND_FONTS.regular,
+    fontFamily: BRAND_FONTS.body.family,
   },
   macroSummary: {
     fontSize: 11,
     textAlign: 'center',
-    fontFamily: BRAND_FONTS.regular,
+    fontFamily: BRAND_FONTS.body.family,
   },
   previewSection: {
     paddingHorizontal: 20,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 12,
-    fontFamily: BRAND_FONTS.semibold,
+    fontFamily: BRAND_FONTS.body.family,
   },
   summaryCard: {
     borderRadius: 12,
@@ -507,11 +507,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
-    fontFamily: BRAND_FONTS.semibold,
+    fontFamily: BRAND_FONTS.body.family,
   },
   summaryDuration: {
     fontSize: 12,
-    fontFamily: BRAND_FONTS.regular,
+    fontFamily: BRAND_FONTS.body.family,
   },
   macroPreviewCard: {
     borderRadius: 12,
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 16,
-    fontFamily: BRAND_FONTS.semibold,
+    fontFamily: BRAND_FONTS.body.family,
   },
   macroBarsContainer: {
     marginBottom: 16,
@@ -551,17 +551,17 @@ const styles = StyleSheet.create({
   macroLabel: {
     fontSize: 11,
     marginBottom: 4,
-    fontFamily: BRAND_FONTS.regular,
+    fontFamily: BRAND_FONTS.body.family,
   },
   macroNumber: {
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: BRAND_FONTS.bold,
+    fontFamily: BRAND_FONTS.display.family,
   },
   macroUnit: {
     fontSize: 10,
     marginTop: 2,
-    fontFamily: BRAND_FONTS.regular,
+    fontFamily: BRAND_FONTS.body.family,
   },
   adaptiveToggleCard: {
     borderRadius: 12,
@@ -577,11 +577,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
-    fontFamily: BRAND_FONTS.semibold,
+    fontFamily: BRAND_FONTS.body.family,
   },
   adaptiveToggleDescription: {
     fontSize: 12,
-    fontFamily: BRAND_FONTS.regular,
+    fontFamily: BRAND_FONTS.body.family,
   },
   applyButton: {
     borderRadius: 12,
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
   applyButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    fontFamily: BRAND_FONTS.semibold,
+    fontFamily: BRAND_FONTS.body.family,
   },
 });
 

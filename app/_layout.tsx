@@ -95,8 +95,8 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StatusBar style={colors.statusBarStyle} backgroundColor={colors.background} />
-        <Stack screenOptions={{ headerShown: false, headerBackTitle: ' ', headerBackTitleVisible: false }}>
+        <StatusBar style={colors.statusBarStyle as any} backgroundColor={colors.background} />
+        <Stack screenOptions={{ headerShown: false, headerBackTitle: ' ' }}>
           {/* Core screens — no header */}
           <Stack.Screen name="index" />
           <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />

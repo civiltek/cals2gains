@@ -172,3 +172,114 @@ Notas de la ronda · resumen ejecutivo para Judith:
 - **Sin cambios en MARKETING-BENCHMARKS.md esta ronda** (no se han confirmado cuentas nuevas en ≥2 fuentes). Se añade nota de actualización en sección "pendientes".
 
 ---
+
+
+## 2026-04-16 — Ronda trend-scout [jueves]
+
+> Tercera ejecución real del trend-scout. Insights de la ronda anterior (2026-04-14) siguen vigentes salvo actualizaciones indicadas abajo.
+
+---
+
+### Insight 1 · Mito — GLP-1 / Ozempic es EL debate nutricional de abril 2026
+
+**Patrón:** El debate sobre fármacos GLP-1 (Ozempic, Wegovy, Mounjaro) ha escalado a ser el tema nutricional más viral de mediados de abril 2026, superando en volumen al debate de seed oils. Tres subtemas dominan: (1) "Resistencia GLP-1" — un estudio del 11/04/2026 revela que ~10% de personas tienen variantes genéticas que impiden respuesta al fármaco. (2) Pérdida muscular — hasta 40% del peso perdido con GLP-1 es masa magra, fenómeno bautizado "Ozempic face". (3) Ciclo quit/restart — ~50% de usuarios abandonan en el primer año y recuperan peso rápidamente; NPR (15/04/2026) cubre que muchos reinician sin guía médica.
+**Ejemplo:** Dietistas y médicos en IG están generando contenido de alto engagement explicando por qué "Ozempic no es magia" y enfatizando que sin cambio nutricional, los resultados no son sostenibles. El ángulo "el fármaco sin nutrición no funciona" es perfecto para cuentas science-based.
+**Fuentes:** NPR "GLP-1 Friendly Diet" (23/03/2026) · NPR "Quit a GLP-1?" (15/04/2026) · ScienceDaily "GLP-1 Resistance" (11/04/2026) · Healthline "GLP-1 Effectiveness Varies" (abril 2026) · OurHealtho "Ozempic for Everyone?" (2026) · Buzops "GLP-1s Myths vs Reality" (2026).
+**⚠️ Flag brand voice Cals2Gains:** NO tomar posición anti-fármaco ni pro-fármaco. El ángulo correcto es: "los fármacos son herramientas médicas legítimas, pero la nutrición es la base — Cals2Gains te ayuda a construir esa base, con o sin GLP-1." Ciencia > hype, sin shaming.
+**Cómo aplicarlo en Cals2Gains:**
+- Cuenta EN: Carrusel "3 things your doctor won't tell you about GLP-1 weight loss" → enfoque en nutrición como complemento esencial, no sustituto.
+- Cuenta EN+ES: Reel "¿Ozempic = magia? Lo que dice la ciencia" → mito vs. realidad, 10-15 s.
+- Pilar: Mito vs. Realidad nutricional.
+- `caption-hashtag`: usar keywords "GLP-1", "Ozempic", "weight loss science", "nutrición basada en evidencia" en caption (señal distribución temática).
+
+---
+
+### Insight 2 · Feature IG — "Edits" app: actualizaciones de abril 2026 con IA y links internos
+
+**Patrón:** Instagram ha lanzado actualizaciones significativas a su app "Edits" (editor de vídeo propio de IG) en abril 2026: (1) Efectos de vídeo potenciados por IA (modelo SAM 3) que permiten aplicar efectos como Scribble, Outline o Glitter a personas u objetos específicos. (2) Links internos: se pueden añadir enlaces clicables a otros perfiles o reels directamente sobre el vídeo. (3) Storyboard mejorado con controles de movimiento y velocidad. (4) Exportación sin watermark — lo cual alimenta directamente el Originality Score del algoritmo.
+**Ejemplo:** Creadores que usan Edits para producir reels nativos de IG evitan watermarks de CapCut/TikTok, beneficiándose del Originality Score (+40-60% reach). Los efectos IA permiten crear content más dinámico sin herramientas externas.
+**Fuentes:** creators.instagram.com (oficial) · SocialMediaToday "Edits Gets IG Links" · BuzzInContent "Instagram expands Edits features" · EmbedSocial "New Instagram Features 2026".
+**Cómo aplicarlo en Cals2Gains:**
+- Evaluar migración de edición de vídeo a Edits para reels — exportación sin watermark es ventaja directa.
+- Links internos útiles para cross-promotion @cals2gains ↔ @cals2gains_es.
+- Efectos IA SAM 3 pueden usarse para highlight de alimentos en reels de "foto → macros" (demo de la app).
+
+---
+
+### Insight 3 · Feature IG — Links clicables en Reels (Meta Verified + Product Tags)
+
+**Patrón:** Instagram permite ahora añadir enlaces clicables directamente sobre reels, pero con restricciones: (1) Vía Meta Verified: Plus = 2 reels con link/mes, Premium = 4, Max = 6. (2) Product tagging: expandiéndose a 22 países, permite hasta 30 links de producto por post. (3) Non-verified: siguen dependiendo de link in bio, Story link sticker, o automatización DM. El feature "link in bio" podría quedar obsoleto para cuentas verificadas.
+**Ejemplo:** Social Media Examiner publicó análisis detallado sobre cómo esta feature cambia la estrategia de conversión en IG. Para apps como Cals2Gains, poder linkear directamente al app store desde un reel es un game-changer para descargas.
+**Fuentes:** SocialMediaExaminer "Clickable Reels Links 2026" · inro.social "Meta Verified Clickable Links" · napoleoncat.com "New Features 2026" · Instagram oficial (@instagram, post DNn3ulMxmP4) · TechTimes "Meta Adds Clickable Shopping Links to Reels".
+**⚠️ Dependencia:** Cals2Gains tiene Meta Verified pendiente (ver ACCOUNTS.md). Si se activa, es prioridad alta vincular reels de demo de la app con link directo a app stores.
+**Cómo aplicarlo en Cals2Gains:**
+- PRIORIDAD: acelerar verificación Meta para @cals2gains si es posible — desbloquea links directos en reels.
+- Mientras tanto: seguir con CTA "link in bio" + Story link sticker.
+- `caption-hashtag` ajustar CTA según estado de verificación.
+
+---
+
+### Insight 4 · Feature IG — "Blend" (feed compartido de Reels) lanzado oficialmente
+
+**Patrón:** "Blend" se ha lanzado oficialmente (17/04/2026 previsto, ya en rollout). Permite crear un feed compartido de Reels dentro de DMs con amigos o grupos. Vector de distribución adicional al DM share: el contenido que se comparte por DM ahora tiene un espacio permanente de consumo compartido, lo que amplifica la señal "sends per reach" ya documentada como señal #1 del algoritmo.
+**Ejemplo:** Contenido tipo "manda esto a tu grupo de gym" o "comparte con tu amigo de meal prep" ahora tiene un destino natural (el Blend), incentivando aún más los DM shares.
+**Fuentes:** metricool.com "Instagram Updates 2026" · napoleoncat.com "New Features 2026" · heyorca.com "Instagram Changes 2026" · socialbee.com "Instagram Updates April 7, 2026".
+**Cómo aplicarlo en Cals2Gains:**
+- Refuerza la estrategia de DM-bait CTA (patrón hook #9). Blend convierte los DM shares en experiencia continua, no puntual.
+- Considerar mencionar Blend explícitamente en CTAs: "Crea un Blend con tu partner de gym y comparte esto" → engagement loop.
+- `caption-hashtag`: variante experimental de CTA → "Añádelo a tu Blend."
+
+---
+
+### Insight 5 · Audio — Upgrade: Central Cee "WAGWAN" confirmado en ≥2 fuentes
+
+**Patrón:** "WAGWAN" de Central Cee, que estaba como observación pendiente en la ronda anterior (1 fuente), ahora se confirma en ≥2 fuentes como audio trending para contenido fitness de alta intensidad y food content energético. UK grime, beat agresivo, ideal para clips de entrenamiento intenso o food prep dinámico.
+**Ejemplo:** Creadores de fitness lo usan para montajes de gym y clips de comida tipo "prep like a beast". Tono alto, no apto para talking-head educativo.
+**Fuentes:** socialpilot.co "Trending Audio This Week 2026" · scottsocialmarketing.com "50+ Trending Reels Audio April 2026" · buffer.com "Trending Sounds April 2026".
+**Cómo aplicarlo en Cals2Gains:**
+- Cuenta EN: apto para reel de "high-protein meal prep in 60s" — montaje rápido de cocina con beat fuerte.
+- NO apto para contenido educativo o myth-busting (tono no encaja con brand voice ciencia > hype).
+- Duración ideal: 10-15 s, cortes rápidos.
+
+---
+
+### Insight 6 · Audio — "Everything Is Romantic" (Charli XCX remix) y "Uncanny Valley" (Melanie Martinez) trending en fitness
+
+**Patrón:** Dos audios adicionales con tracción creciente en abril 2026: (1) "Everything Is Romantic" (Charli XCX remix) — sección "fall in love again and again" usada con motivación y progreso gym. (2) "Uncanny Valley" (Melanie Martinez) — energía cool y desenfadada, versátil para cocina y workout. Ambos encajan con contenido de rutina/hábito más que con educativo.
+**Ejemplo:** Creadores usando "Everything Is Romantic" para montajes de progreso en el gym con cortes rápidos; "Uncanny Valley" para food prep con vibes relajadas.
+**Fuentes:** buffer.com "Trending Sounds April 2026" · socialbee.com "Trending Instagram Songs April 7, 2026" · newengen.com "Instagram Trends April 2026".
+**Cómo aplicarlo en Cals2Gains:**
+- "Everything Is Romantic": reel de "falling in love with nutrition" / demo de la app con transiciones suaves. Tono positivo, alineado con brand voice motivadora.
+- "Uncanny Valley": reel de "lo que como en un día" con vibes ASMR-light. Cocina overhead.
+- Ambos para cuenta EN; evaluar recepción antes de replicar en ES.
+
+---
+
+### Insight 7 · Feature IG — Trial Reels programables
+
+**Patrón:** Adam Mosseri confirmó que los Trial Reels (reels que se muestran solo a no-seguidores para testear rendimiento) ahora se pueden programar con antelación. Esto permite testear contenido en horarios óptimos sin estar online, y evaluar qué content funciona con audiencia fría antes de publicarlo a seguidores.
+**Ejemplo:** Creadores usan Trial Reels para A/B testing de hooks: suben dos versiones del mismo reel a audiencia fría y publican la ganadora a seguidores.
+**Fuentes:** napoleoncat.com "Instagram New Features 2026" · embedsocial.com "New Instagram Features 2026" · heyorca.com "Instagram Changes 2026".
+**Cómo aplicarlo en Cals2Gains:**
+- Implementar flujo de A/B testing: `reels-scriptwriter` produce 2 variantes de hook → se suben como Trial Reels → la ganadora (mayor watch time) se publica a seguidores.
+- Especialmente útil para @cals2gains (868 seguidores) donde la audiencia orgánica es pequeña y la audiencia fría del Trial Reel es más representativa del público objetivo.
+
+---
+
+### Observaciones pendientes (1 sola fuente, NO accionables aún)
+
+- **Stanford BRP peptide ("natural Ozempic"):** Estudio publicado 12/04/2026 en ScienceDaily. Una sola inyección del péptido BRP redujo consumo de comida un 50% en una hora en ratones. Solo 1 fuente científica primaria, pendiente cobertura más amplia. Si confirma, será contenido de alto potencial viral para Cals2Gains.
+- **"Pretty Little Baby" audio para fitness:** Sigue con 1 fuente. No accionable.
+- **Reels públicos indexados por Google/Bing:** 1 fuente (invideo.io). Si se confirma, implicaría que SEO de caption importa más allá de IG. Pendiente.
+- **Nieves Bolós (@nievesbolos, ~929K):** Pendiente de ronda anterior. No se encontraron nuevas fuentes confirmatorias esta ronda. Mantener como pendiente.
+
+---
+
+Notas de la ronda · resumen ejecutivo para Judith:
+- **GLP-1/Ozempic es el mega-tema nutricional de abril 2026.** Múltiples ángulos science-based perfectos para Cals2Gains: resistencia genética, pérdida muscular, importancia de la nutrición como base. Prioridad alta para crear contenido esta semana.
+- **3 features IG nuevas accionables:** (1) Edits app con IA y sin watermark → usarla para producción. (2) Links clicables en reels vía Meta Verified → acelerar verificación de @cals2gains. (3) Blend amplifica DM-shares → reforzar DM-bait CTAs.
+- **Trial Reels programables** → implementar A/B testing de hooks con audiencia fría.
+- **Audio trending:** WAGWAN (Central Cee) confirmado para contenido high-energy. "Everything Is Romantic" y "Uncanny Valley" como opciones versátiles.
+- **Sin cambios de alarma algorítmica.** Las señales principales (shares > saves > likes, Originality Score, keywords en caption) siguen vigentes sin cambios.
+
+---

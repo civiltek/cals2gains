@@ -124,7 +124,7 @@ export const LIGHT_COLORS = {
   statusBarStyle: 'dark' as const,
 } as const;
 
-export type ThemeColors = typeof DARK_COLORS;
+export type ThemeColors = { readonly [K in keyof typeof DARK_COLORS]: string };
 
 interface ThemeState {
   mode: ThemeMode;
