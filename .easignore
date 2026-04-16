@@ -20,6 +20,28 @@ docs/
 # Git & IDE
 .git/
 .vscode/
+.claude/
+
+# Tools & local artifacts NOT needed for build
+tools/
+builds/
+finances/
+_project-hub/
+memory/
+agents/
+guardrails/
+orchestration/
+skills/
+Claude code/
+website/
+
+# Temp files from CI/local scripts
+_*.txt
+_*.log
+_*.png
+*.bat
+gitcommit.log
+eas-build*.log
 
 # Sensitive files NOT needed for build
 google-play-service-account.json
