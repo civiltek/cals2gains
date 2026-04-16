@@ -267,6 +267,8 @@ export async function updateUserGoalsAndMode(
     tdee?: number;
     bmr?: number;
     weight?: number;
+    healthEnabled?: boolean;
+    dynamicTDEEEnabled?: boolean;
   }
 ): Promise<void> {
   const userRef = doc(db, 'users', uid);
@@ -279,6 +281,8 @@ export async function updateUserGoalsAndMode(
   if (data.tdee !== undefined) update.tdee = data.tdee;
   if (data.bmr !== undefined) update.bmr = data.bmr;
   if (data.weight !== undefined) update.weight = data.weight;
+  if (data.healthEnabled !== undefined) update.healthEnabled = data.healthEnabled;
+  if (data.dynamicTDEEEnabled !== undefined) update.dynamicTDEEEnabled = data.dynamicTDEEEnabled;
 
   if (Object.keys(update).length > 0) {
     await updateDoc(userRef, update);

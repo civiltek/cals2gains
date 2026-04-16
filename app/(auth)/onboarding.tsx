@@ -15,6 +15,7 @@ import { useColors } from '../../store/themeStore';
 import { useUserStore } from '../../store/userStore';
 import { markOnboardingCompleted } from '../../services/firebase';
 import { calculateGoalsFromPreset, getPresetById, MACRO_PRESETS } from '../../constants/macroPresets';
+import { healthService } from '../../services/healthKit';
 
 const { width: SW } = Dimensions.get('window');
 
@@ -185,8 +186,10 @@ export default function OnboardingScreen() {
   const [selectedIntolerances, setSelectedIntolerances] = useState<string[]>([]);
   const [otherAllergy, setOtherAllergy] = useState('');
 
-  // Step 6: Health integration (simplified - no native modules)
+  // Step 6: Health integration
   const [healthConnected, setHealthConnected] = useState(false);
+  const [healthLoading, setHealthLoading] = useState(false);
+  const setHealthEnabled = useUserStore((s) => s.setHealthEnabled);
 
   // Navigation
   const goNext = () => {
@@ -528,15 +531,35 @@ export default function OnboardingScreen() {
       <Text style={s.stepTitle}>{t('onboarding.healthIntegrations')}</Text>
       <Text style={s.stepDesc}>{t('onboarding.healthIntegrationsDesc')}</Text>
 
-      <TouchableOpacity style={[s.integrationCard, healthConnected && s.integrationCardActive]}
-        onPress={() => {
-          Alert.alert(t('onboarding.comingSoon'),
-            Platform.OS === 'ios'
-              ? t('onboarding.comingSoon')
-              : t('onboarding.comingSoon'));
-        }}>
-        <Ionicons name={Platform.OS === 'ios' ? 'heart' : 'fitness'} size={28}
-          color={healthConnected ? C.success : C.textSecondary} />
+      <TouchableOpacity
+        style={[s.integrationCard, healthConnected && s.integrationCardActive]}
+        disabled={healthLoading || healthConnected}
+        onPress={async () => {
+          setHealthLoading(true);
+          try {
+            const granted = await healthService.requestAuthorization();
+            if (granted) {
+              setHealthConnected(true);
+              await setHealthEnabled(true);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } else {
+              Alert.alert(
+                t('health.permissionDeniedTitle'),
+                t('health.permissionDeniedDesc')
+              );
+            }
+          } catch {
+            Alert.alert(t('errors.generic'));
+          } finally {
+            setHealthLoading(false);
+          }
+        }}
+      >
+        <Ionicons
+          name={Platform.OS === 'ios' ? 'heart' : 'fitness'}
+          size={28}
+          color={healthConnected ? C.success : C.textSecondary}
+        />
         <View style={{ flex: 1 }}>
           <Text style={s.integrationName}>
             {Platform.OS === 'ios' ? 'Apple Health' : 'Google Health Connect'}
@@ -547,7 +570,11 @@ export default function OnboardingScreen() {
         </View>
         <View style={[s.connectBadge, healthConnected && { backgroundColor: C.success + '20' }]}>
           <Text style={[s.connectText, healthConnected && { color: C.success }]}>
-            {healthConnected ? t('onboarding.connected') : t('onboarding.comingSoon')}
+            {healthLoading
+              ? '...'
+              : healthConnected
+              ? t('onboarding.connected')
+              : t('health.connect')}
           </Text>
         </View>
       </TouchableOpacity>

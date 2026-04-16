@@ -26,6 +26,9 @@ export interface User {
   bmr?: number;
   weight?: number;
 
+  // Health integration
+  healthEnabled?: boolean;      // HealthKit / Health Connect authorized
+  dynamicTDEEEnabled?: boolean; // Use real activity data for TDEE
   // Allergies & intolerances (safety feature)
   allergies?: string[];
   intolerances?: string[];
