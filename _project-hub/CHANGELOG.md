@@ -1,5 +1,14 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Build AAB Android producción (versionCode 14) generado
+
+- **AAB generado**: `builds/app-release.aab` (75 MB, firmado con keystore EAS)
+- **versionCode**: autoincrement desde EAS (~v14 según intentos fallidos previos)
+- **Método**: GitHub Actions ubuntu-latest + `eas build --local` (sin cuota EAS cloud)
+- **Workflow reutilizable**: `.github/workflows/build-android-production.yml`
+- **Fix aplicado**: Config plugin `plugins/withMinSdkVersion.js` → `minSdkVersion=26` vía `withGradleProperties` (requerido por `react-native-health-connect` / `androidx.health.connect:connect-client:1.1.0-alpha11`)
+- **Listo para subir** a Google Play Console (internal testing track)
+
 ## 2026-04-16 — Motor de reels v2: Remotion + Sora 2 + ElevenLabs
 
 - **Nuevo motor**: `tools/remotion-engine/` creado desde cero (NO toca visual-engine existente)
