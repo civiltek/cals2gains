@@ -706,15 +706,15 @@ export default function AnalyticsScreen() {
           <View style={styles.streakContainer}>
             <View style={styles.streakItem}>
               <Text style={styles.streakValue}>🔥 {streakData.currentStreak}</Text>
-              <Text style={styles.streakLabel}>{t('analytics.currentDays')}</Text>
+              <Text style={styles.streakLabel}>{t('analytics.currentDays', { count: streakData.currentStreak })}</Text>
             </View>
             <View style={styles.streakItem}>
               <Text style={styles.streakValue}>{streakData.longestStreak}</Text>
-              <Text style={styles.streakLabel}>{t('analytics.longestStreak')}</Text>
+              <Text style={styles.streakLabel}>{t('analytics.longestStreak', { count: streakData.longestStreak })}</Text>
             </View>
             <View style={styles.streakItem}>
               <Text style={styles.streakValue}>{streakData.totalDaysLogged}</Text>
-              <Text style={styles.streakLabel}>{t('analytics.totalLogged')}</Text>
+              <Text style={styles.streakLabel}>{t('analytics.totalLogged', { count: streakData.totalDaysLogged })}</Text>
             </View>
           </View>
         </View>

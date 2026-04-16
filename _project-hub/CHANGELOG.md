@@ -1,5 +1,11 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Corregir bugs i18n en Estadísticas y Resumen Semanal
+
+- **BUG 1 — analytics.tsx**: `t('analytics.currentDays/longestStreak/totalLogged')` ahora pasa `{ count: valor }` — ya no aparece `{{count}}` literal en pantalla
+- **BUG 2 — weekly-coach.tsx**: `generateWins` y `generateImprovements` usaban la clave del título de sección como contenido; ahora usan claves específicas (`win5Days`, `win3Days`, `winCalories`, `winProtein`, `winDefault`, `improveLogging`, `improveCalories`, `improveProtein`, `improveVariability`)
+- **i18n/es.ts + en.ts**: añadidas 9 claves nuevas en `weeklyCoach` para los mensajes de logros y mejoras
+
 ## 2026-04-16 — Añadir Voice Logging (dictado por voz para registrar comidas)
 
 - **Nueva pantalla** `app/voice-log.tsx`: flujo completo idle → recording → processing → results/error
