@@ -1,5 +1,15 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Actualizar landing cals2gains.com: features completas + precios correctos
+
+- **6 nuevas feature cards**: registro por voz, alergias e intolerancias, HealthKit & Health Connect, gamificación y rachas, widget y coach adaptativo, multiidioma ES/EN
+- **Base de datos**: actualizado a "500+ alimentos verificados" en card de búsqueda
+- **Precios corregidos** (fuente: RevenueCat product IDs): €8.90→€9.99/mes, €49.90→€49.99/año, ahorro 53%→58%
+- **Price features lists** ampliadas en ambos planes (mensual y anual)
+- **FAQ + Schema.org** actualizados con precios correctos
+- **public/index.html** sincronizado con website/index.html
+- **PR #27** — deploy automático via GitHub Actions al mergear a main
+
 ## 2026-04-16 — Corregir bugs i18n en Estadísticas y Resumen Semanal
 
 - **BUG 1 — analytics.tsx**: `t('analytics.currentDays/longestStreak/totalLogged')` ahora pasa `{ count: valor }` — ya no aparece `{{count}}` literal en pantalla
