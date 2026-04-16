@@ -1,5 +1,22 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Corregir errores críticos web cals2gains.com + validador pre-deploy
+
+- **Tildes en español**: corregidas ~50 palabras sin acento en todo el HTML (nutrición, función, código, calorías, visión, etc.) tanto en contenido visible como en atributos data-es
+- **Enlace Google Play**: `href="#"` → `https://play.google.com/store/apps/details?id=com.civiltek.cals2gains`
+- **Enlace App Store**: `href="#"` → `https://apps.apple.com/app/cals2gains/id6744253498`
+- **Logo Instagram**: emojis de bandera en social cards reemplazados por SVG oficial de Instagram
+- **&copy; en footer**: `&amp;copy;` en atributos data-es/data-en → `©` directo (el JS usaba textContent y mostraba `&copy;` literal)
+- **website/validate-web.py**: script de validación pre-deploy que verifica tildes, URLs de stores, SVG de Instagram, símbolo ©, charset UTF-8 y lang=es
+- **.github/workflows/deploy-website.yml**: añadido job `validate` (ejecuta validate-web.py) como prerequisito del deploy — si hay errores, el deploy se bloquea
+- **public/index.html** sincronizado con website/index.html
+
+## 2026-04-16 — Configurar EAS env vars para builds Android/iOS
+
+- **12 variables EXPO_PUBLIC_* creadas** en EAS (production + preview + development) vía `eas env:create`
+- Variables incluidas: FIREBASE_API_KEY (sensitive), FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID, OPENAI_API_KEY (sensitive), REVENUECAT_ANDROID_API_KEY (sensitive), GOOGLE_WEB_CLIENT_ID, GOOGLE_IOS_CLIENT_ID, BUNDLE_ID
+- **Build Android lanzado** en GitHub Actions para verificar fix: https://github.com/civiltek/cals2gains/actions/runs/24535633430
+
 ## 2026-04-16 — Actualizar landing cals2gains.com: features completas + precios correctos
 
 - **6 nuevas feature cards**: registro por voz, alergias e intolerancias, HealthKit & Health Connect, gamificación y rachas, widget y coach adaptativo, multiidioma ES/EN
