@@ -1,5 +1,13 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Crear SHARED-CONTEXT.md — contexto unificado obligatorio para todos los agentes
+
+- **Nuevo archivo:** `Claude code/context/SHARED-CONTEXT.md` — documento maestro con visión completa del ecosistema (funcionalidades app, estado web, RRSS, stores, stack técnico, brand, finanzas)
+- **7 agentes actualizados** (app-dev, finance, growth, marketing, ops, research, web-dev): sección "Contexto obligatorio" con lectura+actualización obligatoria, y sección "Actualización de contexto" con responsabilidades específicas por sección
+- **WORKFLOWS.md:** Añadido W13 (sincronización de contexto compartido) como paso obligatorio de cierre de cualquier tarea
+- **HANDOFFS.md:** Regla 5 — el handoff NO se considera cerrado hasta que SHARED-CONTEXT.md esté actualizado
+- **CLAUDE.md:** Regla de oro 1 actualizada para incluir lectura+actualización de SHARED-CONTEXT.md
+
 ## 2026-04-16 — Corregir bugs i18n en Estadísticas y Resumen Semanal
 
 - **BUG 1 — analytics.tsx**: `t('analytics.currentDays/longestStreak/totalLogged')` ahora pasa `{ count: valor }` — ya no aparece `{{count}}` literal en pantalla

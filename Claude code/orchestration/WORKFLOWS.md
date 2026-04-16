@@ -158,6 +158,31 @@ Reglas clave: R1 (nada inventado), R6 (nunca publicar sin aprobación explícita
 
 ---
 
+## W13. Sincronización de contexto compartido
+
+**Disparador:** Cualquier tarea que modifique el estado del proyecto: merge PR, nuevo build, deploy web, posts programados o publicados en RRSS, nueva versión en stores, nuevo gasto registrado, cambio de suscripción.
+
+> ⚠️ **OBLIGATORIO — no es opcional.** Ninguna tarea se considera cerrada hasta que `Claude code/context/SHARED-CONTEXT.md` esté actualizado. Es el último paso de cualquier tarea con impacto en el estado del proyecto.
+
+**Responsabilidades por agente:**
+- **app-dev** → secciones A (features, bugs, build) y D (stores)
+- **marketing** → sección C (RRSS, plan editorial)
+- **web-dev** → sección B (web, GA4)
+- **finance** → sección G (finanzas, suscripciones)
+- **growth** → secciones C (métricas RRSS), B (Analytics), D (descargas stores)
+- **research** → secciones relevantes según hallazgo (sin sección fija)
+- **ops** → guardián de coherencia general, acciones pendientes, encabezado
+
+**Pasos:**
+1. El agente que realizó el cambio abre `Claude code/context/SHARED-CONTEXT.md`.
+2. Actualiza **la sección que le corresponde** con los nuevos datos reales (no inventados).
+3. Actualiza el campo "Última actualización" en el encabezado.
+4. **ops** verifica coherencia entre `SHARED-CONTEXT.md` y el estado real del hub.
+5. **ops** → CHANGELOG.
+6. **Cierre verificable:** `SHARED-CONTEXT.md` muestra el nuevo estado, entrada en CHANGELOG registrada.
+
+---
+
 ## Pendiente de confirmar con Judith
 
 - ⚠️ ¿Frecuencia ideal del `/morning-brief`? (Propuesta: manual, no automático.)

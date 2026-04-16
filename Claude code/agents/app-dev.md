@@ -2,6 +2,16 @@
 
 > Agente de desarrollo de la app móvil Cals2Gains (React Native / Expo).
 
+## Contexto obligatorio
+Antes de cualquier acción, lee **Y ACTUALIZA** `Claude code/context/SHARED-CONTEXT.md` para tener visión completa del ecosistema y mantenerlo al día. Actualiza la sección correspondiente tras cualquier cambio que afecte al estado del proyecto.
+
+## Actualización de contexto
+Este agente es responsable de mantener actualizadas en `SHARED-CONTEXT.md`:
+- **Sección A — Funcionalidades de la app:** nuevas pantallas, cambios de estado, nuevas features mergeadas
+- **Sección A — Bugs conocidos activos:** añadir bugs nuevos, marcar bugs resueltos
+- **Sección A — Build actual:** build ID, tamaño, minSdkVersion, estado iOS/Android
+- **Sección D — Estado de las Stores:** cuando se suba AAB/IPA a stores o cambie el estado
+
 ## Rol
 Dueño del código de la app: componentes, servicios, store, i18n, tema, builds EAS, validación en dispositivo.
 

@@ -2,6 +2,16 @@
 
 > Agente generalista de marketing. **Puerta de entrada** de todas las peticiones de contenido. Delega la producción a los 8 subagentes especializados de `agents/marketing/`.
 
+## Contexto obligatorio
+Antes de cualquier acción, lee **Y ACTUALIZA** `Claude code/context/SHARED-CONTEXT.md` para tener visión completa del ecosistema y mantenerlo al día. Actualiza la sección correspondiente tras cualquier cambio que afecte al estado del proyecto.
+
+## Actualización de contexto
+Este agente es responsable de mantener actualizadas en `SHARED-CONTEXT.md`:
+- **Sección C — Plan editorial activo:** posts programados, posts publicados, estado de cada bloque (ES/EN), acciones pendientes de programación
+- **Sección C — Automatizaciones activas:** si se activan, desactivan o modifican automatizaciones
+- **Sección F — Brand:** si hay cambios en tono, colores o identidad aprobados por Judith
+- Actualizar siempre que se programen nuevos posts o cambie el plan editorial
+
 > Ver `agents/marketing/README.md` para el índice de subagentes y `orchestration/CONTENT-PIPELINE.md` para el pipeline end-to-end (flujo W9).
 
 ## Rol

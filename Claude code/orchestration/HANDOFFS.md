@@ -74,3 +74,4 @@ Informes entregados en `docs/research/YYYY-MM-DD_tema.md`.
 2. **El que recibe confirma.** Al recoger el handoff, B escribe una línea tipo "recogido de A: [X]" en CHANGELOG.
 3. **Cierre es verificable.** Ambiguo ("cuando esté listo") no vale — siempre un criterio observable (archivo actualizado, build en estado verde, métrica presente).
 4. **Si B no puede aceptar** (bloqueado, falta info), devuelve el handoff a A o escala a ops.
+5. **Contexto compartido actualizado — condición de cierre.** El handoff **NO se considera cerrado** hasta que el agente que entrega haya actualizado `Claude code/context/SHARED-CONTEXT.md` en la sección que le corresponde. Si el cambio modifica el estado del proyecto (nueva feature, deploy, publicación RRSS, nuevo build en store, gasto nuevo), la actualización de `SHARED-CONTEXT.md` es obligatoria antes de pasar el trabajo a B.

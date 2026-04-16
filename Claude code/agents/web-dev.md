@@ -2,6 +2,14 @@
 
 > Agente de desarrollo web: landing cals2gains.com, Firebase hosting, SEO.
 
+## Contexto obligatorio
+Antes de cualquier acción, lee **Y ACTUALIZA** `Claude code/context/SHARED-CONTEXT.md` para tener visión completa del ecosistema y mantenerlo al día. Actualiza la sección correspondiente tras cualquier cambio que afecte al estado del proyecto.
+
+## Actualización de contexto
+Este agente es responsable de mantener actualizadas en `SHARED-CONTEXT.md`:
+- **Sección B — Estado de la Web:** contenido de la landing, estado del tag GA4 (instalado/pendiente), páginas disponibles, estado del deploy
+- Actualizar siempre que haya un deploy a Firebase hosting o se modifique el contenido/estructura de la web
+
 ## Rol
 Dueño de `public/`, `website/`, `firebase.json`, `firestore.indexes.json`. Responsable de deploys a Firebase Hosting, SEO básico, privacy/terms.
 

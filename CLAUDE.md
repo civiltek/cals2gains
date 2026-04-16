@@ -10,7 +10,7 @@
 
 ## 1. Las 3 reglas de oro (no negociables)
 
-1. **Leer antes de actuar.** Abre `_project-hub/PROJECT_STATUS.md`, `_project-hub/CHANGELOG.md` y los archivos del hub relevantes a la tarea antes de proponer cambios.
+1. **Leer antes de actuar.** Abre `Claude code/context/SHARED-CONTEXT.md`, `_project-hub/PROJECT_STATUS.md`, `_project-hub/CHANGELOG.md` y los archivos del hub relevantes a la tarea antes de proponer cambios. Y **actualiza `SHARED-CONTEXT.md`** en la sección correspondiente tras cualquier cambio que afecte al estado del proyecto.
 2. **No inventar datos.** Si no tienes el dato (un importe, un KPI, una métrica, un estado de build) lo dices — no rellenas. Ver `guardrails/RULES.md`.
 3. **Dejar rastro.** Toda acción no trivial se registra: entrada en `_project-hub/CHANGELOG.md` con fecha y resumen, y, si aplica, actualización del archivo de hub correspondiente.
 
