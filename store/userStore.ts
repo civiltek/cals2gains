@@ -10,11 +10,13 @@ import {
   updateUserProfile,
   updateUserLanguage,
   updateUserGoalsAndMode,
+  updateUserAllergies,
   onAuthStateChange,
   signOut as firebaseSignOut,
 } from '../services/firebase';
 import { loginRevenueCat, logoutRevenueCat } from '../services/revenuecat';
 import { calculateTDEE, calculateBMR } from '../utils/nutrition';
+import { HealthData } from '../services/healthKit';
 import { differenceInDays } from 'date-fns';
 
 interface UserState {
@@ -24,6 +26,9 @@ interface UserState {
   authInitialized: boolean;
   dayTypeGoals: DayTypeGoals | null;
   todayDayType: DayType;
+
+  // Health integration
+  healthData: HealthData | null;
 
   // Convenience getters
   userId: string | null;
@@ -39,6 +44,13 @@ interface UserState {
   setDayTypeGoals: (goals: DayTypeGoals) => Promise<void>;
   setTodayDayType: (type: DayType) => void;
   getActiveGoals: () => UserGoals;
+
+  // Health actions
+  updateHealthData: (data: HealthData) => void;
+  setHealthEnabled: (enabled: boolean) => Promise<void>;
+  setDynamicTDEEEnabled: (enabled: boolean) => Promise<void>;
+  // Allergy actions
+  updateAllergies: (allergies: string[], intolerances: string[]) => Promise<void>;
 
   // Goal mode actions (NEW)
   setNutritionMode: (mode: NutritionMode) => Promise<void>;
@@ -64,6 +76,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   authInitialized: false,
   dayTypeGoals: null,
   todayDayType: 'rest',
+  healthData: null,
 
   // Convenience — derived at read time (not reactive, use user?.uid in components)
   userId: null as string | null,
@@ -207,6 +220,40 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
 
   // =========================================================================
+  // HEALTH ACTIONS
+  // =========================================================================
+
+  updateHealthData: (data: HealthData) => {
+    set({ healthData: data });
+  },
+
+  setHealthEnabled: async (enabled: boolean) => {
+    const { user } = get();
+    if (!user) return;
+    set({ user: { ...user, healthEnabled: enabled } });
+    try {
+      await updateUserGoalsAndMode(user.uid, { healthEnabled: enabled });
+    } catch (error) {
+      set({ user: { ...user, healthEnabled: user.healthEnabled } });
+      console.error('Failed to set healthEnabled:', error);
+      throw error;
+    }
+  },
+
+  setDynamicTDEEEnabled: async (enabled: boolean) => {
+    const { user } = get();
+    if (!user) return;
+    set({ user: { ...user, dynamicTDEEEnabled: enabled } });
+    try {
+      await updateUserGoalsAndMode(user.uid, { dynamicTDEEEnabled: enabled });
+    } catch (error) {
+      set({ user: { ...user, dynamicTDEEEnabled: user.dynamicTDEEEnabled } });
+      console.error('Failed to set dynamicTDEEEnabled:', error);
+      throw error;
+    }
+  },
+
+  // =========================================================================
   // GOAL MODE ACTIONS (NEW)
   // =========================================================================
 
@@ -273,6 +320,20 @@ export const useUserStore = create<UserState>((set, get) => ({
       // Revert
       set({ user: { ...user, adaptiveMode: user.adaptiveMode } });
       console.error('Failed to toggle adaptive mode:', error);
+      throw error;
+    }
+  },
+
+  updateAllergies: async (allergies, intolerances) => {
+    const { user } = get();
+    if (!user) return;
+
+    set({ user: { ...user, allergies, intolerances } });
+    try {
+      await updateUserAllergies(user.uid, allergies, intolerances);
+    } catch (error) {
+      set({ user: { ...user, allergies: user.allergies, intolerances: user.intolerances } });
+      console.error('Failed to update allergies:', error);
       throw error;
     }
   },

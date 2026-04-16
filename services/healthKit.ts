@@ -173,6 +173,35 @@ class HealthService {
     }
   }
 
+  /** Whether the user has granted health permissions in this session */
+  getIsAuthorized(): boolean {
+    return this.isAuthorized;
+  }
+
+  /**
+   * Fetch average active calories per day over the last `days` days.
+   * Returns { avgCalories, daysWithData } so callers can decide whether
+   * the sample is large enough to trust.
+   */
+  async get7DayCalorieAverage(days: number = 7): Promise<{ avgCalories: number; daysWithData: number }> {
+    if (!this.isAuthorized) return { avgCalories: 0, daysWithData: 0 };
+
+    try {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      startDate.setHours(0, 0, 0, 0);
+
+      if (Platform.OS === 'ios') {
+        return await this.getIOS7DayCalorieAverage(startDate, endDate, days);
+      } else {
+        return await this.getAndroid7DayCalorieAverage(startDate, endDate, days);
+      }
+    } catch {
+      return { avgCalories: 0, daysWithData: 0 };
+    }
+  }
+
   /**
    * Get recent workouts
    */
@@ -236,6 +265,74 @@ class HealthService {
   // ============================================
   // PRIVATE PLATFORM-SPECIFIC METHODS
   // ============================================
+
+  private async getIOS7DayCalorieAverage(
+    start: Date,
+    end: Date,
+    days: number
+  ): Promise<{ avgCalories: number; daysWithData: number }> {
+    const AppleHealthKit = await getAppleHealthKit();
+    if (!AppleHealthKit) return { avgCalories: 0, daysWithData: 0 };
+
+    return new Promise((resolve) => {
+      AppleHealthKit.getActiveEnergyBurned(
+        { startDate: start.toISOString(), endDate: end.toISOString() },
+        (err: any, results: any[]) => {
+          if (err || !results || results.length === 0) {
+            return resolve({ avgCalories: 0, daysWithData: 0 });
+          }
+
+          // Group by day and sum
+          const byDay: Record<string, number> = {};
+          results.forEach((r) => {
+            const day = new Date(r.startDate || r.startDate).toISOString().split('T')[0];
+            byDay[day] = (byDay[day] ?? 0) + (r.value || 0);
+          });
+
+          const daysWithData = Object.keys(byDay).length;
+          const total = Object.values(byDay).reduce((s, v) => s + v, 0);
+          resolve({
+            avgCalories: daysWithData > 0 ? Math.round(total / daysWithData) : 0,
+            daysWithData,
+          });
+        }
+      );
+    });
+  }
+
+  private async getAndroid7DayCalorieAverage(
+    start: Date,
+    end: Date,
+    days: number
+  ): Promise<{ avgCalories: number; daysWithData: number }> {
+    const HealthConnect = await getHealthConnect();
+    if (!HealthConnect) return { avgCalories: 0, daysWithData: 0 };
+
+    const caloriesData = await HealthConnect.readRecords('ActiveCaloriesBurned', {
+      timeRangeFilter: {
+        operator: 'between' as const,
+        startTime: start.toISOString(),
+        endTime: end.toISOString(),
+      },
+    });
+
+    const records = caloriesData.records || [];
+    if (records.length === 0) return { avgCalories: 0, daysWithData: 0 };
+
+    // Group by day
+    const byDay: Record<string, number> = {};
+    records.forEach((r: any) => {
+      const day = new Date(r.startTime || r.time).toISOString().split('T')[0];
+      byDay[day] = (byDay[day] ?? 0) + (r.energy?.inKilocalories || 0);
+    });
+
+    const daysWithData = Object.keys(byDay).length;
+    const total = Object.values(byDay).reduce((s, v) => s + v, 0);
+    return {
+      avgCalories: daysWithData > 0 ? Math.round(total / daysWithData) : 0,
+      daysWithData,
+    };
+  }
 
   private async getIOSSummary(start: Date, end: Date): Promise<HealthData> {
     const AppleHealthKit = await getAppleHealthKit();

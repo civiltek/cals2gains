@@ -26,6 +26,8 @@ import { useUserStore } from '../../store/userStore';
 import { useMealStore } from '../../store/mealStore';
 import { useAdaptiveStore } from '../../store/adaptiveStore';
 import { useAdaptiveEngines } from '../../hooks/useAdaptiveEngines';
+import { useStreakStore } from '../../store/streakStore';
+import StreakBadge from '../../components/ui/StreakBadge';
 import * as Haptics from 'expo-haptics';
 
 // ============================================
@@ -61,6 +63,13 @@ export default function HomeScreen() {
 
   // Adaptive engines — runs weekly check + memory analysis on mount
   const { isAnalyzing } = useAdaptiveEngines();
+
+  // Streak & achievements
+  const loadGameProgress = useStreakStore((s) => s.loadGameProgress);
+  const refreshStreak = useStreakStore((s) => s.refreshStreak);
+  const newlyUnlocked = useStreakStore((s) => s.newlyUnlocked);
+  const clearNewlyUnlocked = useStreakStore((s) => s.clearNewlyUnlocked);
+  const isStreakLoaded = useStreakStore((s) => s.isLoaded);
   const currentRecommendation = useAdaptiveStore((s) => s.currentRecommendation);
   const lastAdherenceScore = useAdaptiveStore((s) => s.lastAdherenceScore);
   const acceptRecommendation = useAdaptiveStore((s) => s.acceptRecommendation);
@@ -73,8 +82,18 @@ export default function HomeScreen() {
   useEffect(() => {
     if (user) {
       loadTodayMeals(user.uid);
+      if (!isStreakLoaded) {
+        loadGameProgress(user.uid);
+      }
     }
   }, [user?.uid]);
+
+  // Refresh streak whenever meals are loaded for the day
+  useEffect(() => {
+    if (user && todayMeals.length >= 2) {
+      refreshStreak(user.uid);
+    }
+  }, [todayMeals.length >= 2, user?.uid]);
 
   const onRefresh = useCallback(() => {
     if (user) loadTodayMeals(user.uid);
@@ -185,7 +204,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Greeting + Date */}
+        {/* Greeting + Date + Streak badge */}
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>
@@ -193,7 +212,36 @@ export default function HomeScreen() {
             </Text>
             <Text style={styles.date}>{today}</Text>
           </View>
+          <StreakBadge compact />
         </View>
+
+        {/* Achievement celebration overlay */}
+        {newlyUnlocked.length > 0 && (() => {
+          const { ACHIEVEMENT_DEFS } = require('../../store/streakStore');
+          const latest = newlyUnlocked[newlyUnlocked.length - 1];
+          const def = ACHIEVEMENT_DEFS.find((d: any) => d.id === latest.id);
+          if (!def) return null;
+          return (
+            <TouchableOpacity
+              style={styles.celebrationOverlay}
+              activeOpacity={1}
+              onPress={clearNewlyUnlocked}
+            >
+              <View style={[styles.celebrationCard, { backgroundColor: C.card, borderColor: C.primary }]}>
+                <Text style={styles.celebrationEmoji}>{def.icon}</Text>
+                <Text style={[styles.celebrationTitle, { color: C.primary }]}>
+                  {t('achievements.milestoneReached')}
+                </Text>
+                <Text style={[styles.celebrationName, { color: C.text }]}>
+                  {i18n.language === 'es' ? def.nameEs : def.nameEn}
+                </Text>
+                <Text style={[styles.celebrationDesc, { color: C.textSecondary }]}>
+                  {i18n.language === 'es' ? def.descriptionEs : def.descriptionEn}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })()}
 
         {/* Trial banner */}
         {isOnTrial() && trialDaysRemaining() <= 3 && (
@@ -898,5 +946,46 @@ const getStyles = (C: ReturnType<typeof useColors>) =>
       fontSize: 14,
       color: C.primary,
       fontWeight: '600',
+    },
+    // Achievement celebration overlay
+    celebrationOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.55)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 999,
+    },
+    celebrationCard: {
+      width: 300,
+      borderRadius: 24,
+      borderWidth: 2,
+      padding: 28,
+      alignItems: 'center',
+      gap: 8,
+      elevation: 12,
+    },
+    celebrationEmoji: {
+      fontSize: 64,
+      marginBottom: 8,
+    },
+    celebrationTitle: {
+      fontSize: 12,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    celebrationName: {
+      fontSize: 22,
+      fontWeight: '800',
+      textAlign: 'center',
+    },
+    celebrationDesc: {
+      fontSize: 14,
+      textAlign: 'center',
+      lineHeight: 20,
     },
   });

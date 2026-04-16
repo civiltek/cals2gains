@@ -2,6 +2,9 @@
 
 import { ActivityLevel, FitnessGoal, Nutrition, UserGoals, UserProfile } from '../types';
 
+// Minimum days of health data required to trust the moving average
+const MIN_HEALTH_DAYS = 3;
+
 export function calculateBMR(profile: UserProfile): number {
   const { weight, height, age, gender } = profile;
   if (gender === 'male') {
@@ -20,6 +23,29 @@ const ACTIVITY_MULTIPLIERS: Record<ActivityLevel, number> = {
 
 export function calculateTDEE(profile: UserProfile): number {
   return Math.round(calculateBMR(profile) * ACTIVITY_MULTIPLIERS[profile.activityLevel]);
+}
+
+/**
+ * Calculate TDEE using real activity data from HealthKit / Health Connect.
+ * Uses a 7-day moving average of active calories to smooth daily variance.
+ *
+ * @param bmr         Basal metabolic rate (kcal/day) from Mifflin-St Jeor
+ * @param avgActiveCalories7d  Average active kcal/day over last 7 days (0 = no data)
+ * @param daysWithData         How many of the 7 days actually had data
+ * @returns Dynamic TDEE, or null when there's insufficient data (falls back to static)
+ */
+export function calculateDynamicTDEE(
+  bmr: number,
+  avgActiveCalories7d: number,
+  daysWithData: number
+): number | null {
+  if (daysWithData < MIN_HEALTH_DAYS || avgActiveCalories7d <= 0) return null;
+
+  // Apply a small discount (0.9) to account for wearable over-estimation
+  const adjustedActive = Math.round(avgActiveCalories7d * 0.9);
+
+  // Dynamic TDEE = BMR + real active calories
+  return Math.round(bmr + adjustedActive);
 }
 
 export function calculateRecommendedGoals(profile: UserProfile): UserGoals {

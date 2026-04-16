@@ -22,6 +22,11 @@ import {
   generateAIMealSuggestions,
   AIMealSuggestion,
 } from '../services/openai';
+import {
+  getPendingMessage,
+  clearPendingMessage,
+  CoachAdjustmentMessage,
+} from '../services/adaptiveCoachBridge';
 
 // ============================================================================
 // Types
@@ -90,6 +95,7 @@ export default function WhatToEatScreen() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [coachMessage, setCoachMessage] = useState<CoachAdjustmentMessage | null>(null);
 
   // ---- Computed ----
   const goals = getActiveGoals?.() || user?.goals;
@@ -121,6 +127,17 @@ export default function WhatToEatScreen() {
   const currentMealType = detectCurrentMealType();
   const mealTypeLabel = getMealTypeLabel(currentMealType, t);
 
+  // ---- Urgency detection ----
+  // "high_calories": después de las 14:00 y menos de 300 kcal registradas
+  // "high_protein": hora de cenar (≥19h) y quedan ≥50g de proteína
+  const hour = new Date().getHours();
+  const urgencyMode: 'high_calories' | 'high_protein' | undefined =
+    hour >= 19 && remaining.protein >= 50
+      ? 'high_protein'
+      : hour >= 14 && consumed.calories < 300
+      ? 'high_calories'
+      : undefined;
+
   const favoriteRecipes = useMemo(() => {
     try {
       const favs = getFavorites?.();
@@ -134,6 +151,10 @@ export default function WhatToEatScreen() {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
+
+      // Cargar mensaje pendiente del coach adaptativo
+      const pending = await getPendingMessage();
+      setCoachMessage(pending);
 
       // Load meals if needed
       if (user?.uid) {
@@ -237,6 +258,9 @@ export default function WhatToEatScreen() {
         recentMeals: recentNames,
         language: (user?.language as 'es' | 'en') || 'es',
         goalMode: user?.goalMode,
+        allergies: user?.allergies || [],
+        intolerances: user?.intolerances || [],
+        urgencyMode,
       });
 
       setAiSuggestions(suggestions);
@@ -435,6 +459,32 @@ export default function WhatToEatScreen() {
         </View>
       </View>
 
+      {/* Coach Adaptive Adjustment Banner */}
+      {coachMessage && (
+        <CoachAdjustmentBanner
+          message={coachMessage}
+          language={(user?.language as 'es' | 'en') || 'es'}
+          onDismiss={async () => {
+            await clearPendingMessage();
+            setCoachMessage(null);
+          }}
+          C={C}
+          t={t}
+        />
+      )}
+
+      {/* Urgency Banner */}
+      {urgencyMode && !coachMessage && (
+        <UrgencyBanner
+          urgencyMode={urgencyMode}
+          consumed={consumed.calories}
+          remainingProtein={remaining.protein}
+          language={(user?.language as 'es' | 'en') || 'es'}
+          C={C}
+          t={t}
+        />
+      )}
+
       {/* Context Suggestions (MemoryEngine) */}
       {contextSuggestions.length > 0 && (
         <View style={styles.section}>
@@ -576,6 +626,156 @@ export default function WhatToEatScreen() {
 // ============================================================================
 // Sub-components
 // ============================================================================
+
+// ============================================================================
+// Coach Adjustment Banner
+// ============================================================================
+
+function CoachAdjustmentBanner({
+  message,
+  language,
+  onDismiss,
+  C,
+  t,
+}: {
+  message: CoachAdjustmentMessage;
+  language: 'es' | 'en';
+  onDismiss: () => void;
+  C: any;
+  t: any;
+}) {
+  const explanation =
+    language === 'es' ? message.explanationEs : message.explanationEn;
+
+  const changeSign = message.calorieChange > 0 ? '+' : '';
+  const calChangeLabel =
+    message.calorieChange !== 0
+      ? ` (${changeSign}${message.calorieChange} kcal)`
+      : '';
+
+  return (
+    <View
+      style={{
+        marginHorizontal: 16,
+        marginBottom: 14,
+        borderRadius: 14,
+        backgroundColor: '#9C8CFF18',
+        borderWidth: 1,
+        borderColor: '#9C8CFF40',
+        padding: 14,
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
+        <View
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            backgroundColor: '#9C8CFF25',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <Ionicons name="fitness" size={18} color="#9C8CFF" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{ fontSize: 13, fontWeight: '700', color: '#9C8CFF', marginBottom: 4 }}
+          >
+            {t('whatToEat.coachAdjustedTitle')}
+            {calChangeLabel}
+          </Text>
+          <Text
+            style={{ fontSize: 13, color: C.text, lineHeight: 18 }}
+          >
+            {explanation}
+          </Text>
+        </View>
+        <TouchableOpacity onPress={onDismiss} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Ionicons name="close" size={18} color={C.textSecondary} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+// ============================================================================
+// Urgency Banner
+// ============================================================================
+
+function UrgencyBanner({
+  urgencyMode,
+  consumed,
+  remainingProtein,
+  language,
+  C,
+  t,
+}: {
+  urgencyMode: 'high_calories' | 'high_protein';
+  consumed: number;
+  remainingProtein: number;
+  language: 'es' | 'en';
+  C: any;
+  t: any;
+}) {
+  const isHighCalories = urgencyMode === 'high_calories';
+  const color = isHighCalories ? '#FF9800' : '#FF6A4D';
+
+  const titleKey = isHighCalories
+    ? 'whatToEat.urgencyCaloriesTitle'
+    : 'whatToEat.urgencyProteinTitle';
+  const bodyKey = isHighCalories
+    ? 'whatToEat.urgencyCaloriesBody'
+    : 'whatToEat.urgencyProteinBody';
+
+  const bodyParams = isHighCalories
+    ? { calories: Math.round(consumed) }
+    : { protein: Math.round(remainingProtein) };
+
+  return (
+    <View
+      style={{
+        marginHorizontal: 16,
+        marginBottom: 14,
+        borderRadius: 14,
+        backgroundColor: color + '18',
+        borderWidth: 1,
+        borderColor: color + '40',
+        padding: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+      }}
+    >
+      <View
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          backgroundColor: color + '25',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexShrink: 0,
+        }}
+      >
+        <Ionicons
+          name={isHighCalories ? 'alert-circle' : 'barbell'}
+          size={18}
+          color={color}
+        />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 13, fontWeight: '700', color, marginBottom: 3 }}>
+          {t(titleKey)}
+        </Text>
+        <Text style={{ fontSize: 12, color: C.textSecondary, lineHeight: 17 }}>
+          {t(bodyKey, bodyParams)}
+        </Text>
+      </View>
+    </View>
+  );
+}
 
 function MacroCircle({
   label,

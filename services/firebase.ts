@@ -243,6 +243,18 @@ export async function updateUserProfile(
 }
 
 /**
+ * Update user allergies and intolerances
+ */
+export async function updateUserAllergies(
+  uid: string,
+  allergies: string[],
+  intolerances: string[]
+): Promise<void> {
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, { allergies, intolerances });
+}
+
+/**
  * Update user goals, goal mode, and related fields
  */
 export async function updateUserGoalsAndMode(
@@ -255,6 +267,8 @@ export async function updateUserGoalsAndMode(
     tdee?: number;
     bmr?: number;
     weight?: number;
+    healthEnabled?: boolean;
+    dynamicTDEEEnabled?: boolean;
   }
 ): Promise<void> {
   const userRef = doc(db, 'users', uid);
@@ -267,6 +281,8 @@ export async function updateUserGoalsAndMode(
   if (data.tdee !== undefined) update.tdee = data.tdee;
   if (data.bmr !== undefined) update.bmr = data.bmr;
   if (data.weight !== undefined) update.weight = data.weight;
+  if (data.healthEnabled !== undefined) update.healthEnabled = data.healthEnabled;
+  if (data.dynamicTDEEEnabled !== undefined) update.dynamicTDEEEnabled = data.dynamicTDEEEnabled;
 
   if (Object.keys(update).length > 0) {
     await updateDoc(userRef, update);
