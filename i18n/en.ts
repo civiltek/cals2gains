@@ -1220,6 +1220,11 @@ export default {
     overBudget: "You've exceeded today's macros",
     overBudgetMsg: "You've consumed more than planned. Tomorrow is a new day!",
     smartTips: 'Smart tips',
+    coachAdjustedTitle: 'Your coach adjusted your macros',
+    urgencyCaloriesTitle: "It's 2 PM and you've barely eaten!",
+    urgencyCaloriesBody: "You've only had {{calories}} kcal today. The suggestions below are more substantial.",
+    urgencyProteinTitle: '{{protein}}g of protein still needed',
+    urgencyProteinBody: "It's dinner time. Suggestions are prioritizing high-protein options.",
   },
 
   tools: {
@@ -1383,6 +1388,24 @@ export default {
     fastingBody: 'Check your fasting window',
     permissionDeniedTitle: 'Permissions required',
     permissionDeniedBody: 'Enable notification permissions in Settings to receive reminders.',
+  },
+
+  // Achievements & Streaks (gamification)
+  achievements: {
+    title: 'Achievements',
+    activityTitle: 'Activity & Achievements',
+    subtitle: 'Your streaks and unlocked achievements',
+    currentStreak: 'Current streak',
+    bestStreak: 'Best streak',
+    days: 'days',
+    unlocked: 'Achievements',
+    streakNote: 'Streak: consecutive days with ≥2 meals logged',
+    milestoneReached: 'Achievement unlocked!',
+    keepGoing: 'Keep it up!',
+    tapToDismiss: 'Tap to dismiss',
+    locked: 'Locked',
+    unlockedOn: 'Unlocked on {{date}}',
+    seeAll: 'See all achievements',
   },
 
   // Export

@@ -1263,6 +1263,11 @@ export default {
     overBudget: 'Has superado tus macros del día',
     overBudgetMsg: 'Ya has consumido más de lo planificado. ¡Mañana será mejor!',
     smartTips: 'Sugerencias inteligentes',
+    coachAdjustedTitle: 'Tu coach ha ajustado tus macros',
+    urgencyCaloriesTitle: '¡Son las 14:00 y apenas has comido!',
+    urgencyCaloriesBody: 'Solo llevas {{calories}} kcal hoy. Las sugerencias de abajo son más sustanciosas.',
+    urgencyProteinTitle: 'Te faltan {{protein}}g de proteína',
+    urgencyProteinBody: 'Es hora de cenar. Las sugerencias priorizan opciones altas en proteína.',
   },
 
   // Tools screen
@@ -1648,6 +1653,24 @@ export default {
     histamine: 'Histamina',
     fodmap: 'FODMAP',
   },
+  // Achievements & Streaks (gamification)
+  achievements: {
+    title: 'Logros',
+    activityTitle: 'Actividad y Logros',
+    subtitle: 'Tus rachas y logros desbloqueados',
+    currentStreak: 'Racha actual',
+    bestStreak: 'Racha máxima',
+    days: 'días',
+    unlocked: 'Logros',
+    streakNote: 'Racha: días consecutivos con ≥2 comidas registradas',
+    milestoneReached: '¡Logro desbloqueado!',
+    keepGoing: '¡Sigue así!',
+    tapToDismiss: 'Toca para cerrar',
+    locked: 'Bloqueado',
+    unlockedOn: 'Conseguido el {{date}}',
+    seeAll: 'Ver todos los logros',
+  },
+
   export: {
     title: 'Exportación Cals2Gains',
     period: 'Período',
