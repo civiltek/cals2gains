@@ -203,11 +203,23 @@ def generate_dalle3_fallback(
             return {"type": None, "file": None, "duration": 0,
                     "error": "No URL in DALL-E 3 response"}
 
-        # Download image
+        # Download image and fix EXIF rotation
         import urllib.request
+        from PIL import Image, ImageOps
         png_path = output_path.with_suffix(".png")
         png_path.parent.mkdir(parents=True, exist_ok=True)
         urllib.request.urlretrieve(image_url, png_path)
+
+        # Apply EXIF auto-rotation so images don't appear sideways in the player
+        try:
+            img = Image.open(png_path)
+            img = ImageOps.exif_transpose(img)
+            # Ensure it's RGBA for consistent handling in Remotion
+            if img.mode != "RGBA":
+                img = img.convert("RGBA")
+            img.save(png_path, "PNG")
+        except Exception as img_err:
+            log.warning(f"[DALL-E3] EXIF fix failed (non-critical): {img_err}")
 
         log.info(f"[DALL-E3] Saved -> {png_path}")
         return {

@@ -68,8 +68,20 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # --- ElevenLabs voice IDs -------------------------------------------------
+# Para cambiar la voz:
+#   1. Ve a https://elevenlabs.io/voice-library
+#   2. Filtra por Language: Spanish, Accent: Spain
+#   3. Copia el voice_id de la voz elegida
+#   4. Reemplaza el valor de "es" abajo
+#
+# Voces probadas para castellano:
+#   "Sergi" (Castilian male):  SOYHLrjzK2X1ezoPC6cr  -- verificar en ElevenLabs
+#   "Laura" (Castilian female): XrExE9yKIg1WjnnlVkGX -- verificar en ElevenLabs
+#   Alternativa cross-lingüe (funciona bien en ES): ErXwobaYiN019PkySvjV (Antoni)
 VOICE_IDS = {
-    "es": "pNInz6obpgDQGcFmaJgB",  # Adam (multilingual, good ES)
+    # Voz masculina Castilla/España — model eleven_multilingual_v2
+    # Cambiar por voz verificada desde https://elevenlabs.io/voice-library
+    "es": "ErXwobaYiN019PkySvjV",  # Antoni — multilingual, acento neutro-europeo
     "en": "21m00Tcm4TlvDq8ikWAM",  # Rachel (EN)
 }
 
