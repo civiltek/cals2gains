@@ -10,6 +10,30 @@
 - **public/index.html** sincronizado con website/index.html
 - **PR #27** — deploy automático via GitHub Actions al mergear a main
 
+## 2026-04-16 — Lanzar build Android GitHub Actions (PRs #21-#26)
+
+- **GH Actions workflow** `build-android-production.yml` lanzado — run ID `24524771335`
+- URL: https://github.com/civiltek/cals2gains/actions/runs/24524771335
+- Incluye PRs #21-#26: i18n bugs, voice logging, alergias, HealthKit/Health Connect, gamificación, DB 500+
+- Tiempo estimado: ~23 min (igual que build anterior exitoso)
+
+## 2026-04-16 — Relanzar build iOS production para App Store (con fix expo-dev-menu)
+
+- **EAS Build iOS** `b7cd8dc2-f6f0-4eac-9f00-b9dc16660eef` en cola (free tier)
+- Profile: `production`, buildNumber: 21 (autoIncrement; 19=cancelado, 20=fallo disco)
+- Fix aplicado: `patches/expo-dev-menu+55.0.23.patch` — `reloadAppAsync()` → `self.bridge?.reload()`
+- Verificaciones previas: patch ✅, postinstall ✅, npm install ✅, TS 0 errores ✅
+- URL seguimiento: https://expo.dev/accounts/civiltek/projects/cals2gains/builds/b7cd8dc2-f6f0-4eac-9f00-b9dc16660eef
+- ⚠️ Créditos EAS al 96% — riesgo cancelación; considerar upgrade de plan
+
+## 2026-04-16 — Lanzar build iOS production para App Store
+
+- **EAS Build iOS** `254b9c6e-7099-4640-8795-2d4e3c1d80bb` en cola (free tier) — CANCELADO
+- Profile: `production`, buildNumber: 18 → 19 (autoIncrement)
+- Certificado distribución App Store válido hasta Apr 2027 (Apple Team UX7W6U98F5)
+- URL seguimiento: https://expo.dev/accounts/civiltek/projects/cals2gains/builds/254b9c6e-7099-4640-8795-2d4e3c1d80bb
+- ⚠️ Créditos EAS al 96% — revisar plan antes del próximo build
+
 ## 2026-04-16 — Corregir bugs i18n en Estadísticas y Resumen Semanal
 
 - **BUG 1 — analytics.tsx**: `t('analytics.currentDays/longestStreak/totalLogged')` ahora pasa `{ count: valor }` — ya no aparece `{{count}}` literal en pantalla
