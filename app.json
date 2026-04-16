@@ -101,7 +101,6 @@
         "backgroundColor": "#17121D"
       },
       "package": "com.civiltek.cals2gains",
-      "minSdkVersion": 26,
       "versionCode": 1,
       "useNextNotificationsApi": true,
       "permissions": [
@@ -125,6 +124,7 @@
       "googleServicesFile": "./google-services.json"
     },
     "plugins": [
+      ["./plugins/withMinSdkVersion", { "minSdkVersion": 26 }],
       "expo-router",
       "expo-apple-authentication",
       [
