@@ -1,5 +1,11 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Corregir bugs i18n en Estadísticas y Resumen Semanal
+
+- **BUG 1 — analytics.tsx**: `t('analytics.currentDays/longestStreak/totalLogged')` ahora pasa `{ count: valor }` — ya no aparece `{{count}}` literal en pantalla
+- **BUG 2 — weekly-coach.tsx**: `generateWins` y `generateImprovements` usaban la clave del título de sección como contenido; ahora usan claves específicas (`win5Days`, `win3Days`, `winCalories`, `winProtein`, `winDefault`, `improveLogging`, `improveCalories`, `improveProtein`, `improveVariability`)
+- **i18n/es.ts + en.ts**: añadidas 9 claves nuevas en `weeklyCoach` para los mensajes de logros y mejoras
+
 ## 2026-04-16 — Activación HealthKit / Health Connect: TDEE dinámico y UI de actividad
 
 - **Desbloquear onboarding**: `app/(auth)/onboarding.tsx` — botón de integración de salud ahora pide permisos reales de HealthKit (iOS) / Health Connect (Android) en lugar de mostrar "Coming Soon"
