@@ -1,13 +1,16 @@
 import React, { useMemo } from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 import { ReelProps, BRAND } from "./types";
 import { SceneLayer } from "./components/SceneLayer";
 import { ProgressBar } from "./components/ProgressBar";
 
 /**
  * Main Cals2Gains Reel Composition.
- * Stacks all scenes sequentially on the timeline.
- * Each scene is absolutely positioned and transitions in/out independently.
+ *
+ * Uses <Sequence> per scene so that:
+ * - useCurrentFrame() inside each SceneLayer is LOCAL (0 = scene start)
+ * - <Audio> components are automatically placed at the correct global timeline position
+ * - Scene duration is enforced — audio stops when the scene ends
  */
 export const ReelComposition: React.FC<ReelProps> = ({
   scenes,
@@ -36,22 +39,27 @@ export const ReelComposition: React.FC<ReelProps> = ({
     <AbsoluteFill
       style={{
         backgroundColor: BRAND.dark,
-        width: BRAND.reelWidth,
-        height: BRAND.reelHeight,
         overflow: "hidden",
       }}
     >
-      {scenes.map((scene, index) => (
-        <SceneLayer
-          key={scene.id}
-          scene={scene}
-          startFrame={sceneOffsets[index]}
-          totalDurationFrames={durationInFrames}
-          sceneIndex={index}
-          watermark={watermark}
-          showProgressBar={showProgressBar}
-        />
-      ))}
+      {scenes.map((scene, index) => {
+        const sceneDurationFrames = Math.round(scene.durationSeconds * fps);
+        return (
+          <Sequence
+            key={scene.id}
+            from={sceneOffsets[index]}
+            durationInFrames={sceneDurationFrames}
+            layout="none"
+          >
+            <SceneLayer
+              scene={scene}
+              sceneDurationFrames={sceneDurationFrames}
+              sceneIndex={index}
+              watermark={watermark}
+            />
+          </Sequence>
+        );
+      })}
 
       {showProgressBar && <ProgressBar progress={globalProgress} />}
     </AbsoluteFill>

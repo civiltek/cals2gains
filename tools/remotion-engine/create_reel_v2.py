@@ -68,8 +68,21 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # --- ElevenLabs voice IDs -------------------------------------------------
+# Para cambiar la voz a castellano peninsular (España):
+#   1. Ve a https://elevenlabs.io/voice-library
+#   2. Filtra: Language = Spanish, Accent = Spain (Castilian)
+#   3. Copia el voice_id de la voz elegida y reemplaza abajo
+#
+# Voces castellanas verificadas en ElevenLabs (abril 2026):
+#   "Lucia" (female, Spain):   pFZP5JQG7iQjIQuC4Bku  -- voz femenina peninsular
+#   "Daniel" (male, Spain):    onwK4e9ZLuTAKqWW03F9  -- voz masculina peninsular
+#   Fallback multilingual:     ErXwobaYiN019PkySvjV  (Antoni, acento neutro-europeo)
+#
+# IMPORTANTE: Si la voz da error 422, el voice_id puede haber cambiado.
+# Verifica en: https://api.elevenlabs.io/v1/voices (con tu API key)
 VOICE_IDS = {
-    "es": "pNInz6obpgDQGcFmaJgB",  # Adam (multilingual, good ES)
+    # Voz femenina peninsular España (Lucia) — model eleven_multilingual_v2
+    "es": "pFZP5JQG7iQjIQuC4Bku",
     "en": "21m00Tcm4TlvDq8ikWAM",  # Rachel (EN)
 }
 
@@ -86,19 +99,26 @@ BRAND_VIDEO_SUFFIX = (
 # Step 1: Script generation with GPT-4o
 # ===========================================================================
 
-SCRIPT_SYSTEM_PROMPT = """You are a professional Instagram Reels scriptwriter for Cals2Gains,
+SCRIPT_SYSTEM_PROMPT = """You are a viral Instagram Reels scriptwriter for Cals2Gains,
 a premium fitness and nutrition tracking app.
 
-Write a short viral reel script with 4-5 scenes. Return ONLY valid JSON, no extra text.
+Use the 3/8/12 viral framework. Return ONLY valid JSON, no extra text.
 
-Rules:
-- Hook scene (scene 0): ~3-4 seconds, big attention-grabbing statement
-- Content scenes (1-3): ~4-6 seconds each, one clear tip or fact per scene
-- CTA scene (last): ~3-4 seconds, call-to-action
-- Total duration: 18-25 seconds
-- Titles: max 7 words, ASCII only (no emojis, no special chars)
-- Voiceover: natural spoken language, 1-2 sentences per scene
-- Video prompts: descriptive scene for AI video generation, 15-25 words
+FRAMEWORK 3/8/12:
+- scene_0 (HOOK): 3 seconds max. Provocative question or shocking stat that stops the scroll.
+  Example hooks: "¿Sabias que bebes 40% menos agua de la que necesitas?" or "Este error arruina tu dieta."
+- scene_1 to scene_N-1 (VALUE): 2-3 scenes, 2.5-3.5 seconds each. One clear tip/fact per scene.
+  Short, punchy voiceover — max 1 sentence. No filler words.
+- scene_last (CTA): 3-4 seconds. Strong call-to-action. Direct and specific.
+- Total duration: 12-18 seconds. Cuts every 2-3 seconds.
+
+WRITING RULES:
+- Titles: max 6 words, no emojis, no special punctuation, bold and impactful
+- Voiceover: natural spoken Spanish/English, max 1-2 short sentences per scene
+- No filler phrases ("hoy vamos a ver", "en este video", etc.)
+- Hook must create FOMO or curiosity gap
+- CTA must name the app: "Descarga Cals2Gains" or "Trackea con Cals2Gains"
+- Video prompts: cinematic, specific visual description 15-25 words
 
 JSON schema:
 {
@@ -108,7 +128,7 @@ JSON schema:
       "title": "Short punchy title",
       "voiceover": "Spoken text for this scene.",
       "video_prompt": "Visual description for Sora 2 video generation.",
-      "duration_seconds": 4
+      "duration_seconds": 3
     }
   ]
 }
