@@ -1390,6 +1390,24 @@ export default {
     permissionDeniedBody: 'Enable notification permissions in Settings to receive reminders.',
   },
 
+  // Achievements & Streaks (gamification)
+  achievements: {
+    title: 'Achievements',
+    activityTitle: 'Activity & Achievements',
+    subtitle: 'Your streaks and unlocked achievements',
+    currentStreak: 'Current streak',
+    bestStreak: 'Best streak',
+    days: 'days',
+    unlocked: 'Achievements',
+    streakNote: 'Streak: consecutive days with ≥2 meals logged',
+    milestoneReached: 'Achievement unlocked!',
+    keepGoing: 'Keep it up!',
+    tapToDismiss: 'Tap to dismiss',
+    locked: 'Locked',
+    unlockedOn: 'Unlocked on {{date}}',
+    seeAll: 'See all achievements',
+  },
+
   // Export
   export: {
     title: 'Cals2Gains Export',

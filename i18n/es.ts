@@ -1617,6 +1617,24 @@ export default {
     permissionDeniedTitle: 'Permisos necesarios',
     permissionDeniedBody: 'Activa los permisos de notificaciones en Ajustes para recibir recordatorios.',
   },
+  // Achievements & Streaks (gamification)
+  achievements: {
+    title: 'Logros',
+    activityTitle: 'Actividad y Logros',
+    subtitle: 'Tus rachas y logros desbloqueados',
+    currentStreak: 'Racha actual',
+    bestStreak: 'Racha máxima',
+    days: 'días',
+    unlocked: 'Logros',
+    streakNote: 'Racha: días consecutivos con ≥2 comidas registradas',
+    milestoneReached: '¡Logro desbloqueado!',
+    keepGoing: '¡Sigue así!',
+    tapToDismiss: 'Toca para cerrar',
+    locked: 'Bloqueado',
+    unlockedOn: 'Conseguido el {{date}}',
+    seeAll: 'Ver todos los logros',
+  },
+
   export: {
     title: 'Exportación Cals2Gains',
     period: 'Período',

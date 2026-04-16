@@ -13,6 +13,21 @@
 - **`services/openai.ts`**: `generateAIMealSuggestions` acepta nuevo param `urgencyMode?: 'high_calories' | 'high_protein'` que modifica el system prompt para priorizar comidas sustanciosas o altas en proteína según el contexto.
 - **`i18n/es.ts` + `i18n/en.ts`**: nuevas claves `coachAdjustedTitle`, `urgencyCaloriesTitle/Body`, `urgencyProteinTitle/Body`.
 
+## 2026-04-16 — Feature: DB alimentos 500+ y gamificación (streaks + logros)
+
+### Feature A — Base de datos de alimentos expandida (167 → 500 alimentos)
+- `data/spanishFoods.ts`: ampliado de 167 a 500 alimentos con nuevas categorías: mexicana, argentina, colombiana/venezolana, peruana, centroamericana, caribeña, tapas, desayunos latinos, postres, bebidas latinas, comida italiana/asiática/internacional
+- Nuevas categorías en DB: `mexicana`, `argentina`, `colombiana`, `peruana`, `centroamericana`, `caribena`, `tapas`, `desayunos`, `postres`
+- Mantenido formato exacto f() con nutritionPer100g + nutritionPerServing, locale es/en, aliases
+
+### Feature B — Gamificación: streaks y logros
+- `store/streakStore.ts` (nuevo): Zustand store con streak (≥2 comidas/día), 13 logros, persistencia en Firestore `users/{uid}/gameProgress/main`
+- `components/ui/StreakBadge.tsx` (nuevo): badge compacto con animación pulse, navega a pantalla de logros
+- `app/achievements.tsx` (nuevo): pantalla completa con streak actual/máximo, barra de progreso, lista de 13 logros con estado bloqueado/desbloqueado + celebración animada al desbloquear
+- `app/(tabs)/index.tsx`: añadido StreakBadge en greeting, overlay celebración cuando se desbloquea logro, refresh streak cuando hay ≥2 comidas
+- `app/(tabs)/profile.tsx`: sección "Actividad y Logros" con streak + link a pantalla achievements
+- `i18n/es.ts` + `i18n/en.ts`: claves `achievements.*` añadidas (es + en)
+
 ## 2026-04-16 — Motor Remotion v2: 6 fixes de calidad (tildes, voz, CTA, textos, Sora, música)
 
 - **Fix UTF-8**: `create_reel_v2.py` — todos los `write_text()` ahora usan `encoding="utf-8"` explícito (corrige tildes/acentos en subtítulos karaoke en Windows)
