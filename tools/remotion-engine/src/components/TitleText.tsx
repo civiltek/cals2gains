@@ -11,9 +11,17 @@ interface TitleTextProps {
 }
 
 /**
- * Animated title text with slide-up spring entrance.
- * Hook scene (index 0): large coral text, centered.
- * Regular scenes: medium bone text, upper third.
+ * Animated title text.
+ *
+ * Hook scene (index 0):
+ *   - Large coral text, centered, semi-transparent dark pill background
+ *   - Strong glow + text shadow for punch
+ *
+ * Regular scenes:
+ *   - Medium bone text, upper third, pill background
+ *   - Spring slide-up entrance
+ *
+ * Both: fade out last 8 frames.
  */
 export const TitleText: React.FC<TitleTextProps> = ({
   title,
@@ -49,19 +57,29 @@ export const TitleText: React.FC<TitleTextProps> = ({
           justifyContent: "center",
           alignItems: "center",
           paddingLeft: 60,
-          paddingRight: 60,
+          paddingRight: 120,
         }}
       >
-        <div style={{ opacity, transform: `translateY(${translateY}px)`, textAlign: "center" }}>
+        <div
+          style={{
+            opacity,
+            transform: `translateY(${translateY}px)`,
+            textAlign: "center",
+            backgroundColor: "rgba(23,18,29,0.60)",
+            borderRadius: 24,
+            padding: "24px 36px",
+          }}
+        >
           <span
             style={{
               fontFamily: BRAND.fontDisplay,
               fontWeight: 800,
-              fontSize: 84,
+              fontSize: 80,
               lineHeight: 1.1,
               color: BRAND.coral,
-              textShadow: `0 4px 32px rgba(255,106,77,0.45)`,
+              textShadow: `0 0 40px rgba(255,106,77,0.55), 0 4px 16px rgba(0,0,0,0.9)`,
               letterSpacing: "-1px",
+              display: "block",
             }}
           >
             {title}
@@ -78,19 +96,28 @@ export const TitleText: React.FC<TitleTextProps> = ({
         alignItems: "flex-start",
         paddingTop: 140,
         paddingLeft: 60,
-        paddingRight: 60,
+        paddingRight: 120,
       }}
     >
-      <div style={{ opacity, transform: `translateY(${translateY}px)` }}>
+      <div
+        style={{
+          opacity,
+          transform: `translateY(${translateY}px)`,
+          backgroundColor: "rgba(23,18,29,0.55)",
+          borderRadius: 18,
+          padding: "16px 28px",
+        }}
+      >
         <span
           style={{
             fontFamily: BRAND.fontDisplay,
             fontWeight: 700,
-            fontSize: 56,
+            fontSize: 54,
             lineHeight: 1.2,
             color: BRAND.bone,
-            textShadow: "0 2px 16px rgba(0,0,0,0.8)",
+            textShadow: "0 2px 16px rgba(0,0,0,0.9)",
             letterSpacing: "-0.5px",
+            display: "block",
           }}
         >
           {title}

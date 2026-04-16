@@ -6,14 +6,18 @@ interface WatermarkProps {
   handle: string;
 }
 
-/** Small @handle watermark at bottom-left */
+/**
+ * @handle watermark at bottom-left, within Instagram safe zone.
+ * paddingBottom: 330px ensures it stays above the 320px bottom clip zone.
+ * paddingLeft: 60px matches left safe margin.
+ */
 export const Watermark: React.FC<WatermarkProps> = ({ handle }) => (
   <AbsoluteFill
     style={{
       justifyContent: "flex-end",
       alignItems: "flex-start",
-      paddingBottom: 100,
-      paddingLeft: 50,
+      paddingBottom: 330,
+      paddingLeft: 60,
     }}
   >
     <span
