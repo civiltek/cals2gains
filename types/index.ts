@@ -29,6 +29,9 @@ export interface User {
   // Health integration
   healthEnabled?: boolean;      // HealthKit / Health Connect authorized
   dynamicTDEEEnabled?: boolean; // Use real activity data for TDEE
+  // Allergies & intolerances (safety feature)
+  allergies?: string[];
+  intolerances?: string[];
 }
 
 export interface UserProfile {
@@ -126,6 +129,7 @@ export interface FoodAnalysisResult {
   totalNutrition: Nutrition;
   portionDescription: string;
   mealType: MealType;
+  allergenWarnings?: string[]; // Detected allergens matching user's list
 }
 
 export type AnalysisAnswers = Record<string, string>;
@@ -260,6 +264,7 @@ export interface Recipe {
   timesUsed: number;
   createdAt: Date;
   updatedAt: Date;
+  allergenWarnings?: string[]; // Allergen IDs found matching user's declared allergies
 }
 
 // ============================================

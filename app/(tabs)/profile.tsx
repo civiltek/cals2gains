@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { useUserStore } from '../../store/userStore';
 import { useColors, useThemeStore } from '../../store/themeStore';
+import { useStreakStore } from '../../store/streakStore';
 
 // Brand logo assets
 const LOGO_MARK = require('../../brand-assets/C2G-Mark-512.png');
@@ -38,6 +39,9 @@ export default function ProfileScreen() {
   } = useUserStore();
   const C = useColors(); // Reactive theme colors
   const isDark = useThemeStore(s => s.isDark);
+
+  const currentStreak = useStreakStore((s) => s.currentStreak);
+  const achievements = useStreakStore((s) => s.achievements);
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
@@ -204,6 +208,38 @@ export default function ProfileScreen() {
         <View style={[styles.section, { backgroundColor: C.surface, borderColor: C.border }]}>
           <Text style={[styles.sectionTitle, { color: C.textSecondary }]}>{t('health.title')}</Text>
           <HealthDashboardCard />
+        </View>
+
+        {/* Activity & Achievements section */}
+        <View style={[styles.section, { backgroundColor: C.surface, borderColor: C.border }]}>
+          <Text style={[styles.sectionTitle, { color: C.textSecondary }]}>{t('achievements.activityTitle')}</Text>
+
+          {/* Streak summary row */}
+          <View style={[styles.streakRow, { backgroundColor: C.background }]}>
+            <View style={styles.streakItem}>
+              <Text style={styles.streakEmoji}>🔥</Text>
+              <Text style={[styles.streakValue, { color: C.primary }]}>{currentStreak}</Text>
+              <Text style={[styles.streakLabel, { color: C.textSecondary }]}>{t('achievements.currentStreak')}</Text>
+            </View>
+            <View style={[styles.streakDivider, { backgroundColor: C.border }]} />
+            <View style={styles.streakItem}>
+              <Text style={styles.streakEmoji}>🏆</Text>
+              <Text style={[styles.streakValue, { color: C.primary }]}>{achievements.length}</Text>
+              <Text style={[styles.streakLabel, { color: C.textSecondary }]}>{t('achievements.unlocked')}</Text>
+            </View>
+          </View>
+
+          {/* Link to achievements screen */}
+          <TouchableOpacity
+            style={[styles.achievementsLink, { backgroundColor: C.background }]}
+            onPress={() => router.push('/achievements')}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 18 }}>🎖️</Text>
+              <Text style={[styles.achievementsLinkText, { color: C.text }]}>{t('achievements.title')}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={C.textMuted} />
+          </TouchableOpacity>
         </View>
 
         {/* Subscription section */}
@@ -532,5 +568,46 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginTop: 16,
+  },
+  // Streak & achievements styles
+  streakRow: {
+    flexDirection: 'row',
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  streakItem: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 2,
+  },
+  streakEmoji: {
+    fontSize: 22,
+  },
+  streakValue: {
+    fontSize: 26,
+    fontWeight: '800',
+  },
+  streakLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  streakDivider: {
+    width: 1,
+    height: 50,
+    marginHorizontal: 12,
+  },
+  achievementsLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 12,
+    padding: 14,
+  },
+  achievementsLinkText: {
+    fontSize: 15,
+    fontWeight: '600',
   },
 });

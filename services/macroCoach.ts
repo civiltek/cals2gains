@@ -262,6 +262,11 @@ function buildCoachingContext(
   parts.push(`Goal: ${user.profile?.goal || 'maintain_weight'}`);
   parts.push(`Current macros: ${user.goals?.calories ?? '?'} kcal, P:${user.goals?.protein ?? '?'}g, C:${user.goals?.carbs ?? '?'}g, F:${user.goals?.fat ?? '?'}g`);
 
+  const allergenList = [...(user.allergies || []), ...(user.intolerances || [])];
+  if (allergenList.length > 0) {
+    parts.push(`ALLERGIES/INTOLERANCES (CRITICAL — never recommend foods containing): ${allergenList.join(', ')}`);
+  }
+
   parts.push(`\nWeek Summary (${weekSummary.daysLogged} days logged):`);
   parts.push(`Avg: ${weekSummary.avgCalories} kcal, P:${weekSummary.avgProtein}g, C:${weekSummary.avgCarbs}g, F:${weekSummary.avgFat}g`);
   parts.push(`Adherence: ${weekSummary.adherenceScore}%`);

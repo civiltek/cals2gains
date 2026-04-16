@@ -168,11 +168,64 @@ ${pageContent}`;
 }
 
 /**
+ * Allergen keyword map: allergen ID → ingredient keywords to match
+ */
+const ALLERGEN_KEYWORDS: Record<string, string[]> = {
+  gluten:    ['gluten', 'wheat', 'flour', 'harina', 'trigo', 'bread', 'pan', 'pasta', 'barley', 'cebada', 'rye', 'centeno', 'oat', 'avena'],
+  lactose:   ['milk', 'leche', 'dairy', 'cheese', 'queso', 'butter', 'mantequilla', 'cream', 'nata', 'yogurt', 'yogur', 'lactose', 'lactosa'],
+  nuts:      ['almond', 'almendra', 'walnut', 'nuez', 'cashew', 'anacardo', 'pistachio', 'pistacho', 'hazelnut', 'avellana', 'pecan', 'macadamia', 'frutos secos'],
+  peanuts:   ['peanut', 'cacahuete', 'cacahuate', 'groundnut', 'maní'],
+  shellfish: ['shrimp', 'gamba', 'prawn', 'langostino', 'crab', 'cangrejo', 'lobster', 'langosta', 'crayfish', 'marisco'],
+  fish:      ['fish', 'pescado', 'salmon', 'salmón', 'tuna', 'atún', 'cod', 'bacalao', 'anchovy', 'anchoa', 'sardine', 'sardina'],
+  egg:       ['egg', 'huevo', 'yolk', 'yema', 'mayonnaise', 'mayonesa'],
+  soy:       ['soy', 'soja', 'tofu', 'edamame', 'tempeh', 'miso'],
+  sesame:    ['sesame', 'sésamo', 'tahini'],
+  mustard:   ['mustard', 'mostaza'],
+  celery:    ['celery', 'apio'],
+  molluscs:  ['squid', 'calamar', 'octopus', 'pulpo', 'mussel', 'mejillón', 'clam', 'almeja', 'oyster', 'ostra', 'scallop', 'vieira'],
+  lupin:     ['lupin', 'altramuz', 'lupini'],
+  sulphites: ['wine', 'vino', 'vinegar', 'vinagre', 'dried fruit', 'fruta seca'],
+  fructose:  ['apple', 'manzana', 'honey', 'miel', 'fructose', 'fructosa', 'pear', 'pera', 'mango'],
+  sorbitol:  ['sorbitol', 'sorbitol', 'plum', 'ciruela', 'peach', 'melocotón', 'cherry', 'cereza'],
+  histamine: ['wine', 'vino', 'fermented', 'fermentado', 'cheese', 'queso', 'spinach', 'espinaca', 'tomato', 'tomate', 'chocolate'],
+  fodmap:    ['onion', 'cebolla', 'garlic', 'ajo', 'wheat', 'trigo', 'apple', 'manzana', 'legume', 'legumbre'],
+};
+
+/**
+ * Detect which user allergens are present in a recipe's ingredients
+ */
+export function detectRecipeAllergens(
+  ingredientNames: string[],
+  userAllergies: string[],
+  userIntolerances: string[] = []
+): string[] {
+  const allUserAllergens = [...userAllergies, ...userIntolerances];
+  if (allUserAllergens.length === 0) return [];
+
+  const ingredientsLower = ingredientNames.map(n => n.toLowerCase());
+  const found: string[] = [];
+
+  for (const allergenId of allUserAllergens) {
+    const keywords = ALLERGEN_KEYWORDS[allergenId] || [allergenId];
+    const matched = ingredientsLower.some(ing =>
+      keywords.some(kw => ing.includes(kw))
+    );
+    if (matched && !found.includes(allergenId)) {
+      found.push(allergenId);
+    }
+  }
+
+  return found;
+}
+
+/**
  * Import a recipe from a URL
  */
 export async function importRecipeFromUrl(
   url: string,
-  language: 'es' | 'en' = getAppLanguage()
+  language: 'es' | 'en' = getAppLanguage(),
+  userAllergies: string[] = [],
+  userIntolerances: string[] = []
 ): Promise<Recipe> {
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key not configured');
@@ -300,6 +353,11 @@ export async function importRecipeFromUrl(
       timesUsed: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
+      allergenWarnings: detectRecipeAllergens(
+        (recipeData.ingredients || []).map((i: any) => i.name || ''),
+        userAllergies,
+        userIntolerances
+      ),
     };
 
     return recipe;
