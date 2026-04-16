@@ -88,6 +88,10 @@ async function main() {
     inputProps: props,
     imageFormat: "jpeg",
     jpegQuality: 90,
+    // Increase timeout: Sora video files can take longer to preload in Chrome
+    timeoutInMilliseconds: 60000,
+    // Serialize rendering to avoid parallel Chrome workers fighting over video files
+    concurrency: 1,
     onProgress: ({ progress, renderedFrames, encodedFrames }) => {
       const pct = Math.round(progress * 100);
       process.stdout.write(`\r[Remotion] ${pct}% (rendered=${renderedFrames} encoded=${encodedFrames})`);

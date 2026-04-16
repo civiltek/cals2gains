@@ -81,6 +81,46 @@ def _snap_sora_seconds(seconds: int) -> int:
     return min(valid, key=lambda v: abs(v - seconds))
 
 
+def _apply_faststart(input_path: Path, output_path: Path) -> None:
+    """
+    Re-encode MP4 with -movflags +faststart so Chrome headless can load it.
+
+    Sora 2 downloads often have the moov atom at the end of the file.
+    Chrome requires it at the start for streamable playback. Without this fix
+    Remotion throws a delayRender 28s timeout during rendering.
+
+    Falls back to a simple copy if ffmpeg is not available.
+    """
+    import subprocess
+    try:
+        result = subprocess.run(
+            [
+                "ffmpeg", "-y",
+                "-i", str(input_path),
+                "-c:v", "libx264",
+                "-preset", "fast",
+                "-crf", "20",
+                "-pix_fmt", "yuv420p",
+                "-movflags", "+faststart",
+                "-an",  # strip audio — background video doesn't need it
+                str(output_path),
+            ],
+            capture_output=True,
+            timeout=120,
+        )
+        if result.returncode == 0:
+            size_mb = output_path.stat().st_size / (1024 * 1024)
+            log.info(f"[faststart] {output_path.name} -> {size_mb:.1f}MB OK")
+        else:
+            log.warning(f"[faststart] ffmpeg failed (rc={result.returncode}), copying raw file")
+            import shutil
+            shutil.copy2(input_path, output_path)
+    except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
+        log.warning(f"[faststart] ffmpeg not available ({exc}), copying raw file")
+        import shutil
+        shutil.copy2(input_path, output_path)
+
+
 def generate_sora_clip(
     prompt: str,
     output_path: Path,
@@ -134,11 +174,17 @@ def generate_sora_clip(
             data = bytes(content)
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, "wb") as f:
+        raw_path = output_path.with_suffix(".raw.mp4")
+        with open(raw_path, "wb") as f:
             f.write(data)
 
         file_size_mb = len(data) / (1024 * 1024)
-        log.info(f"[Sora2] Saved {file_size_mb:.1f}MB -> {output_path}")
+        log.info(f"[Sora2] Downloaded {file_size_mb:.1f}MB -> {raw_path}")
+
+        # Re-encode with faststart so Chrome headless can stream/seek the video.
+        # Sora downloads often lack the moov atom at the start, causing 28s timeout.
+        _apply_faststart(raw_path, output_path)
+        raw_path.unlink(missing_ok=True)
 
         return {
             "type": "video",
