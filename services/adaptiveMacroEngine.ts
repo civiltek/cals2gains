@@ -5,6 +5,7 @@
  */
 
 import { COLORS, BRAND_COLORS, BRAND_FONTS } from '../theme';
+import { HealthData } from './healthKit';
 
 // ============================================================================
 // Types
@@ -55,6 +56,15 @@ export interface WeightEntry {
   date: Date;
   weight: number;
   unit: 'kg' | 'lbs';
+}
+
+export interface ActivityAdjustment {
+  /** Positive = user burned more than expected (suggest eating more) */
+  calorieChange: number;
+  messageEs: string;
+  messageEn: string;
+  /** Relative magnitude: low (<200 kcal), medium (200-500), high (>500) */
+  magnitude: 'low' | 'medium' | 'high';
 }
 
 export interface GoalModeConfig {
@@ -227,6 +237,52 @@ export class AdaptiveMacroEngine {
     }
 
     return null;
+  }
+
+  /**
+   * Determines whether today's macro target should be adjusted based on
+   * real activity data from HealthKit / Health Connect.
+   *
+   * Returns an ActivityAdjustment when the gap between actual active calories
+   * and the expected active calories (derived from the static multiplier) is
+   * ≥ 200 kcal, otherwise null (no suggestion needed).
+   *
+   * @param healthData  Today's summary from HealthKit / Health Connect
+   * @param staticTDEE  Static TDEE computed from profile + activity multiplier
+   * @param bmr         Basal metabolic rate (used to derive expected active cal)
+   */
+  public static shouldAdjustForActivity(
+    healthData: HealthData,
+    staticTDEE: number,
+    bmr: number
+  ): ActivityAdjustment | null {
+    const THRESHOLD = 200; // kcal
+
+    const expectedActiveCalories = Math.max(0, staticTDEE - bmr);
+    const actualActiveCalories = healthData.activeCalories;
+    const delta = actualActiveCalories - expectedActiveCalories;
+
+    if (Math.abs(delta) < THRESHOLD) return null;
+
+    const rounded = Math.round(Math.abs(delta) / 50) * 50; // round to nearest 50
+    const magnitude: ActivityAdjustment['magnitude'] =
+      Math.abs(delta) < 300 ? 'low' : Math.abs(delta) < 600 ? 'medium' : 'high';
+
+    if (delta > 0) {
+      return {
+        calorieChange: rounded,
+        messageEs: `Hoy has quemado ~${rounded} kcal extra. ¿Quieres ajustar tus macros?`,
+        messageEn: `You burned ~${rounded} extra kcal today. Adjust your macros?`,
+        magnitude,
+      };
+    } else {
+      return {
+        calorieChange: -rounded,
+        messageEs: `Hoy has quemado ~${rounded} kcal menos de lo estimado. Puedes reducir tu objetivo.`,
+        messageEn: `You burned ~${rounded} fewer kcal than estimated. You may reduce your target.`,
+        magnitude,
+      };
+    }
   }
 
   /**

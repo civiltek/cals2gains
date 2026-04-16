@@ -24,6 +24,8 @@ import { useColors, useThemeStore } from '../../store/themeStore';
 // Brand logo assets
 const LOGO_MARK = require('../../brand-assets/C2G-Mark-512.png');
 import { calculateTDEE, calculateBMR } from '../../utils/nutrition';
+import { HealthDashboardCard } from '../../components/ui/HealthDashboardCard';
+import { useHealthSync } from '../../hooks/useHealthSync';
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -63,6 +65,9 @@ export default function ProfileScreen() {
 
   const tdee = user?.profile ? calculateTDEE(user.profile) : null;
   const bmr = user?.profile ? calculateBMR(user.profile) : null;
+
+  // Activate periodic health sync for this screen
+  useHealthSync();
 
   const subscriptionStatus = () => {
     if (!user) return '';
@@ -194,6 +199,12 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
         )}
+
+        {/* Health & Activity section */}
+        <View style={[styles.section, { backgroundColor: C.surface, borderColor: C.border }]}>
+          <Text style={[styles.sectionTitle, { color: C.textSecondary }]}>{t('health.title')}</Text>
+          <HealthDashboardCard />
+        </View>
 
         {/* Subscription section */}
         <View style={[styles.section, { backgroundColor: C.surface, borderColor: C.border }]}>

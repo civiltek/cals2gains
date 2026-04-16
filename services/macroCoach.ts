@@ -271,13 +271,38 @@ function buildCoachingContext(
   }
 
   if (healthData) {
-    parts.push(`\nHealth data: ${healthData.steps} steps, ${healthData.activeCalories} active kcal`);
+    const totalKcal = healthData.activeCalories + healthData.restingCalories;
+    parts.push(`\nToday's health data:`);
+    parts.push(`- Steps: ${healthData.steps.toLocaleString()}`);
+    parts.push(`- Active calories: ${healthData.activeCalories} kcal`);
+    parts.push(`- Resting calories: ${healthData.restingCalories} kcal`);
+    parts.push(`- Total energy: ${totalKcal} kcal`);
+    if (healthData.exerciseMinutes > 0) {
+      parts.push(`- Exercise minutes: ${healthData.exerciseMinutes} min`);
+    }
+    if (healthData.heartRate) {
+      parts.push(`- Heart rate: ${healthData.heartRate} bpm`);
+    }
+
+    // Compare active calories vs expected (from user TDEE/BMR)
+    const expectedActive = user.tdee && user.bmr ? user.tdee - user.bmr : 0;
+    if (expectedActive > 0) {
+      const delta = healthData.activeCalories - expectedActive;
+      if (Math.abs(delta) >= 150) {
+        parts.push(`- Activity vs expected: ${delta > 0 ? '+' : ''}${Math.round(delta)} kcal (${delta > 0 ? 'more active than usual' : 'less active than usual'})`);
+      }
+    }
+  }
+
+  if (weekSummary.avgSteps > 0) {
+    parts.push(`\nWeekly activity avg: ${weekSummary.avgSteps.toLocaleString()} steps/day, ${weekSummary.avgActiveCalories} active kcal/day`);
   }
 
   if (workouts.length > 0) {
-    parts.push(`Workouts this week: ${workouts.length}`);
+    const totalWorkoutKcal = workouts.reduce((s, w) => s + w.calories, 0);
+    parts.push(`\nWorkouts this week: ${workouts.length} sessions, ${Math.round(totalWorkoutKcal)} kcal total`);
     workouts.forEach((w) => {
-      parts.push(`- ${w.type}: ${w.duration}min, ${w.calories} kcal`);
+      parts.push(`- ${w.type}: ${Math.round(w.duration)}min, ${w.calories} kcal`);
     });
   }
 

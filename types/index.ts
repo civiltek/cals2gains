@@ -25,6 +25,10 @@ export interface User {
   tdee?: number;
   bmr?: number;
   weight?: number;
+
+  // Health integration
+  healthEnabled?: boolean;      // HealthKit / Health Connect authorized
+  dynamicTDEEEnabled?: boolean; // Use real activity data for TDEE
 }
 
 export interface UserProfile {

@@ -1,5 +1,20 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Activación HealthKit / Health Connect: TDEE dinámico y UI de actividad
+
+- **Desbloquear onboarding**: `app/(auth)/onboarding.tsx` — botón de integración de salud ahora pide permisos reales de HealthKit (iOS) / Health Connect (Android) en lugar de mostrar "Coming Soon"
+- **TDEE dinámico**: `utils/nutrition.ts` — nueva función `calculateDynamicTDEE(bmr, avgActiveCalories7d, daysWithData)` que usa calorías activas reales con media móvil de 7 días y descuento de sobre-estimación (×0.9); fallback al multiplicador estático si hay <3 días de datos
+- **Extensión HealthService**: `services/healthKit.ts` — nuevos métodos `get7DayCalorieAverage()` (media de calorías activas por plataforma) y `getIsAuthorized()` (expone estado de autorización)
+- **Sync periódico**: `hooks/useHealthSync.ts` (nuevo) — sincroniza datos de salud al abrir la app, cada 30 minutos en foreground, y al volver de background; si `dynamicTDEEEnabled`, recalcula y persiste TDEE dinámico
+- **Motor adaptativo**: `services/adaptiveMacroEngine.ts` — nuevo tipo `ActivityAdjustment` y método estático `shouldAdjustForActivity()` que detecta desviaciones ≥200 kcal respecto al TDEE estático y genera mensajes ES/EN
+- **MacroCoach mejorado**: `services/macroCoach.ts` — `buildCoachingContext()` ahora incluye datos detallados de pasos, calorías activas/reposo, minutos de ejercicio, ritmo cardíaco y comparativa actividad vs. esperada; workouts muestran total kcal semanal
+- **UI de salud**: `components/ui/HealthDashboardCard.tsx` (nuevo) — tarjeta con pasos, calorías activas, minutos de ejercicio, comparativa TDEE estático vs. dinámico, indicador de actividad extra, y toggle para activar/desactivar TDEE dinámico
+- **Perfil actualizado**: `app/(tabs)/profile.tsx` — nueva sección "Salud y Actividad" con `HealthDashboardCard` + hook `useHealthSync` activo
+- **Store extendido**: `store/userStore.ts` — nuevo campo `healthData`, acciones `updateHealthData`, `setHealthEnabled`, `setDynamicTDEEEnabled`
+- **Firebase extendido**: `services/firebase.ts` — `updateUserGoalsAndMode` acepta `healthEnabled` y `dynamicTDEEEnabled`
+- **Tipos**: `types/index.ts` — `User` ahora incluye `healthEnabled?` y `dynamicTDEEEnabled?`
+- **i18n**: `i18n/en.ts` + `i18n/es.ts` — nueva sección `health` (ES+EN) con todos los textos de la UI
+
 ## 2026-04-16 — Motor Remotion v2: 6 fixes de calidad (tildes, voz, CTA, textos, Sora, música)
 
 - **Fix UTF-8**: `create_reel_v2.py` — todos los `write_text()` ahora usan `encoding="utf-8"` explícito (corrige tildes/acentos en subtítulos karaoke en Windows)
