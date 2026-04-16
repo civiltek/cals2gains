@@ -1,5 +1,12 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Fix iOS build: patch expo-dev-menu reloadAppAsync
+
+- **Error**: Build iOS #19 fallaba con `AppContext has no member reloadAppAsync` (Swift compile error)
+- **Causa**: `expo-dev-menu 55.0.23` llama `appContext?.reloadAppAsync()` pero `AppContext` en `expo-modules-core 3.0.29` no tiene ese método nativo
+- **Fix**: `patch-package` → parche en `patches/expo-dev-menu+55.0.23.patch` que sustituye la llamada por `bridge?.reload()`
+- **Archivos**: `patches/expo-dev-menu+55.0.23.patch` (nuevo), `package.json` (añadido `patch-package ^8.0.1` + script `postinstall`)
+
 ## 2026-04-16 — Motor de reels v2: Remotion + Sora 2 + ElevenLabs
 
 - **Nuevo motor**: `tools/remotion-engine/` creado desde cero (NO toca visual-engine existente)

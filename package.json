@@ -11,6 +11,7 @@
     "build:all": "eas build --platform all",
     "submit:ios": "eas submit --platform ios",
     "submit:android": "eas submit --platform android",
+    "postinstall": "patch-package",
     "eas-build-post-install": "node -e \"const fs=require('fs');if(!fs.existsSync('metro.config.js')){fs.writeFileSync('metro.config.js','const{getDefaultConfig}=require(\\\"@expo/metro-config\\\");\\nconst config=getDefaultConfig(__dirname);\\nconfig.resolver.unstable_enablePackageExports=false;\\nmodule.exports=config;\\n');console.log('metro.config.js recreated by eas-build-post-install');}\""
   },
   "dependencies": {
@@ -68,6 +69,7 @@
     "@expo/metro-config": "~54.0.14",
     "@types/react": "~19.1.10",
     "babel-preset-expo": "~55.0.16",
+    "patch-package": "^8.0.1",
     "typescript": "~5.8.0"
   },
   "private": true
