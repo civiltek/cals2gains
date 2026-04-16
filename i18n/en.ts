@@ -1220,6 +1220,11 @@ export default {
     overBudget: "You've exceeded today's macros",
     overBudgetMsg: "You've consumed more than planned. Tomorrow is a new day!",
     smartTips: 'Smart tips',
+    coachAdjustedTitle: 'Your coach adjusted your macros',
+    urgencyCaloriesTitle: "It's 2 PM and you've barely eaten!",
+    urgencyCaloriesBody: "You've only had {{calories}} kcal today. The suggestions below are more substantial.",
+    urgencyProteinTitle: '{{protein}}g of protein still needed',
+    urgencyProteinBody: "It's dinner time. Suggestions are prioritizing high-protein options.",
   },
 
   tools: {

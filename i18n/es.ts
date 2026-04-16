@@ -1263,6 +1263,11 @@ export default {
     overBudget: 'Has superado tus macros del día',
     overBudgetMsg: 'Ya has consumido más de lo planificado. ¡Mañana será mejor!',
     smartTips: 'Sugerencias inteligentes',
+    coachAdjustedTitle: 'Tu coach ha ajustado tus macros',
+    urgencyCaloriesTitle: '¡Son las 14:00 y apenas has comido!',
+    urgencyCaloriesBody: 'Solo llevas {{calories}} kcal hoy. Las sugerencias de abajo son más sustanciosas.',
+    urgencyProteinTitle: 'Te faltan {{protein}}g de proteína',
+    urgencyProteinBody: 'Es hora de cenar. Las sugerencias priorizan opciones altas en proteína.',
   },
 
   // Tools screen

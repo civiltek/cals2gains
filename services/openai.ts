@@ -376,6 +376,7 @@ export async function generateAIMealSuggestions(params: {
   recentMeals: string[];    // names of meals logged in the last few days
   language: 'es' | 'en';
   goalMode?: string;        // lose_fat, gain_muscle, etc.
+  urgencyMode?: 'high_calories' | 'high_protein'; // proactive context
 }): Promise<AIMealSuggestion[]> {
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key not configured');
@@ -391,9 +392,25 @@ export async function generateAIMealSuggestions(params: {
     recentMeals,
     language,
     goalMode,
+    urgencyMode,
   } = params;
 
-  const systemPrompt = `Nutrition assistant. Generate 5 meal suggestions fitting remaining macros. Return ONLY valid JSON array. Rules: realistic meals, accurate USDA/BEDCA nutrition, don't exceed remaining calories by >15%. Provide nameEs+nameEn always. Language: ${language === 'es' ? 'Spanish' : 'English'}.`;
+  // Urgency context modifies the system prompt priority
+  const urgencyInstruction =
+    urgencyMode === 'high_calories'
+      ? ' PRIORITY: User has eaten very few calories today — suggest substantial, calorie-dense but nutritious meals they can prepare now.'
+      : urgencyMode === 'high_protein'
+      ? ' PRIORITY: User still needs a lot of protein before end of day — prioritize high-protein options (≥30g protein per meal).'
+      : '';
+
+  const systemPrompt = `Nutrition assistant. Generate 5 meal suggestions fitting remaining macros. Return ONLY valid JSON array. Rules: realistic meals, accurate USDA/BEDCA nutrition, don't exceed remaining calories by >15%. Provide nameEs+nameEn always. Language: ${language === 'es' ? 'Spanish' : 'English'}.${urgencyInstruction}`;
+
+  const urgencyNote =
+    urgencyMode === 'high_calories'
+      ? '\nURGENT: User has eaten very little today. Suggest substantial, filling meals.'
+      : urgencyMode === 'high_protein'
+      ? '\nURGENT: User needs high-protein options to close out the day. Minimum 30g protein per suggestion.'
+      : '';
 
   const userPrompt = `Suggest 5 meals for the following situation:
 
@@ -406,7 +423,7 @@ REMAINING MACROS FOR TODAY:
 MEAL TYPE: ${mealType}
 ${goalMode ? `FITNESS GOAL: ${goalMode}` : ''}
 ${frequentFoods.length > 0 ? `FOODS USER FREQUENTLY EATS: ${frequentFoods.join(', ')}` : ''}
-${recentMeals.length > 0 ? `RECENTLY LOGGED (avoid exact repeats): ${recentMeals.slice(0, 10).join(', ')}` : ''}
+${recentMeals.length > 0 ? `RECENTLY LOGGED (avoid exact repeats): ${recentMeals.slice(0, 10).join(', ')}` : ''}${urgencyNote}
 
 Return ONLY a JSON array with exactly 5 objects:
 [
