@@ -60,11 +60,13 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # --- Brand style suffix (from brand_config) --------------------------------
+# IMPORTANT: Realistic everyday style — no cinematic/dramatic/neon effects.
+# Videos must look like filmed by a real person with a smartphone.
 BRAND_VIDEO_SUFFIX = (
-    "Cinematic quality, smooth camera movement, dark premium aesthetic, "
-    "moody fitness/nutrition lighting, deep plum and violet color palette, "
-    "professional color grading, shallow depth of field, "
-    "fitness influencer production quality, Instagram Reels vertical format"
+    "Realistic scene, handheld camera movement, natural light, everyday casual setting, "
+    "filmed with a smartphone by a real person, warm neutral tones, "
+    "no dramatic lighting, no neon or colored lights, no studio effects, "
+    "fitness or wellness everyday moment, Instagram Reels vertical format 9:16"
 )
 
 # Vertical size supported by Sora 2
@@ -204,10 +206,9 @@ def generate_sora_clip(
 # ===========================================================================
 
 BRAND_IMAGE_SUFFIX = (
-    "Dark premium aesthetic, moody lighting, deep plum (#17121D) and violet (#9C8CFF) "
-    "color accents, fitness/wellness mood, clean modern composition, "
-    "cinematic quality, shallow depth of field, "
-    "professional color grading with warm coral (#FF6A4D) highlights, "
+    "Realistic photography, natural lighting, everyday setting, "
+    "fitness or wellness lifestyle scene, warm natural tones, "
+    "no dramatic or neon lighting, clean composition, "
     "vertical 9:16 composition for Instagram Reels"
 )
 

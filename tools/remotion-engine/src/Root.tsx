@@ -2,6 +2,7 @@ import React from "react";
 import { Composition } from "remotion";
 import { ReelComposition } from "./ReelComposition";
 import { ReelProps, BRAND } from "./types";
+import { CTA_DURATION_SECONDS } from "./components/CTASlide";
 
 /**
  * Remotion entry point.
@@ -78,12 +79,16 @@ export const RemotionRoot: React.FC = () => {
         calculateMetadata={async ({ props: rawProps }) => {
           const props = rawProps as unknown as ReelProps;
           const fps = BRAND.fps;
-          const totalFrames = props.scenes.reduce(
+          const sceneFrames = props.scenes.reduce(
             (sum: number, s: { durationSeconds: number }) =>
               sum + Math.round(s.durationSeconds * fps),
             0
           );
-          return { durationInFrames: Math.max(totalFrames, 30) };
+          // Add CTA slide duration unless explicitly disabled
+          const ctaFrames = props.showCTASlide !== false
+            ? Math.round(CTA_DURATION_SECONDS * fps)
+            : 0;
+          return { durationInFrames: Math.max(sceneFrames + ctaFrames, 30) };
         }}
       />
     </>

@@ -49,6 +49,16 @@ export interface ReelProps {
   template: TemplateType;
   /** Watermark handle e.g. "@cals2gains" */
   watermark: string;
+  /**
+   * Optional background music file (relative to public/).
+   * e.g. "background_music.mp3". Plays at 25% volume under voiceover.
+   */
+  backgroundMusicFile?: string;
+  /**
+   * Whether to append the branded CTA slide (3.5s) at the end.
+   * Default: true.
+   */
+  showCTASlide?: boolean;
 }
 
 // Brand constants mirrored here so React components don't import Python brand_config
