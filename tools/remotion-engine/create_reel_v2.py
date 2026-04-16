@@ -87,10 +87,12 @@ VOICE_IDS = {
 }
 
 # --- Brand style suffix for video prompts ---------------------------------
+# IMPORTANT: Use realistic, everyday style — no cinematic/dramatic/neon effects.
+# Sora clips should look like filmed by a real person with a smartphone.
 BRAND_VIDEO_SUFFIX = (
-    "Cinematic quality, dark premium aesthetic, "
-    "moody fitness/nutrition lighting, deep plum and violet color palette, "
-    "professional color grading, shallow depth of field, "
+    "Realistic scene, handheld camera feel, natural lighting, casual everyday setting, "
+    "filmed with a smartphone by a real person, warm natural tones, "
+    "no dramatic lighting, no neon colors, no cinematic color grading, no studio effects, "
     "Instagram Reels vertical format 9:16"
 )
 
@@ -100,25 +102,26 @@ BRAND_VIDEO_SUFFIX = (
 # ===========================================================================
 
 SCRIPT_SYSTEM_PROMPT = """You are a viral Instagram Reels scriptwriter for Cals2Gains,
-a premium fitness and nutrition tracking app.
+a fitness and nutrition tracking app.
 
 Use the 3/8/12 viral framework. Return ONLY valid JSON, no extra text.
 
 FRAMEWORK 3/8/12:
 - scene_0 (HOOK): 3 seconds max. Provocative question or shocking stat that stops the scroll.
-  Example hooks: "¿Sabias que bebes 40% menos agua de la que necesitas?" or "Este error arruina tu dieta."
+  Example hooks: "¿Sabías que bebes 40% menos agua de la que necesitas?" or "Este error arruina tu dieta."
 - scene_1 to scene_N-1 (VALUE): 2-3 scenes, 2.5-3.5 seconds each. One clear tip/fact per scene.
   Short, punchy voiceover — max 1 sentence. No filler words.
 - scene_last (CTA): 3-4 seconds. Strong call-to-action. Direct and specific.
 - Total duration: 12-18 seconds. Cuts every 2-3 seconds.
 
 WRITING RULES:
-- Titles: max 6 words, no emojis, no special punctuation, bold and impactful
-- Voiceover: natural spoken Spanish/English, max 1-2 short sentences per scene
+- Titles: max 6 words, no emojis, SENTENCE CASE ONLY (only first word capitalized, e.g. "Empieza el día con agua" NOT "Empieza El Día Con Agua")
+- ALWAYS include accent marks (tildes): á é í ó ú ü ñ ¿ ¡ — Spanish requires them: "sabías" not "sabias", "día" not "dia"
+- Voiceover: natural spoken Spanish/English, max 1-2 short sentences per scene, include all tildes
 - No filler phrases ("hoy vamos a ver", "en este video", etc.)
 - Hook must create FOMO or curiosity gap
 - CTA must name the app: "Descarga Cals2Gains" or "Trackea con Cals2Gains"
-- Video prompts: cinematic, specific visual description 15-25 words
+- Video prompts: realistic everyday scene filmed with a smartphone, 15-25 words, natural lighting
 
 JSON schema:
 {
@@ -271,6 +274,10 @@ def generate_voiceovers(
                 voice_id=voice_id,
                 lang=lang,
                 output_path=mp3_path,
+                # Alta stability para mantener el acento castellano peninsular
+                # consistente. Similarity 0.75 mantiene la voz fiel al entrenamiento.
+                stability=0.75,
+                similarity_boost=0.75,
             )
             scene["voiceoverFile"] = mp3_path.name
             scene["subtitles"] = result.get("word_timestamps", [])
@@ -294,6 +301,34 @@ def generate_voiceovers(
 # Step 4: Build Remotion inputProps JSON
 # ===========================================================================
 
+def _find_background_music() -> str | None:
+    """
+    Look for a background music file in public/.
+    Accepts any file starting with 'background_music', 'bg_music', or 'ambient'
+    with extension .mp3, .wav, or .ogg.
+
+    Returns the filename (relative to public/) if found, None otherwise.
+    Tip: place a libre-royalty MP3 at tools/remotion-engine/public/background_music.mp3
+    """
+    candidates = [
+        "background_music.mp3",
+        "background_music.wav",
+        "bg_music.mp3",
+        "bg_music.wav",
+        "ambient.mp3",
+        "ambient.wav",
+        "ambient_pad.wav",
+        "music.mp3",
+    ]
+    for name in candidates:
+        if (PUBLIC_DIR / name).exists():
+            log.info(f"[Music] Found background music: {name}")
+            return name
+    log.info("[Music] No background_music.mp3 found in public/. Skipping music.")
+    log.info("[Music] To add music: place a libre-royalty MP3 at tools/remotion-engine/public/background_music.mp3")
+    return None
+
+
 def build_reel_props(
     scenes: list[dict],
     lang: str,
@@ -316,13 +351,21 @@ def build_reel_props(
             ),
         })
 
-    return {
+    props: dict = {
         "scenes": reel_scenes,
         "lang": lang,
         "showProgressBar": True,
+        "showCTASlide": True,
         "template": template,
         "watermark": watermark,
     }
+
+    # Add background music if available
+    music_file = _find_background_music()
+    if music_file:
+        props["backgroundMusicFile"] = music_file
+
+    return props
 
 
 # ===========================================================================
@@ -336,7 +379,7 @@ def render_reel(props: dict, output_path: Path) -> bool:
     """
     TEMP_DIR.mkdir(parents=True, exist_ok=True)
     props_file = TEMP_DIR / "reel_props_latest.json"
-    props_file.write_text(json.dumps(props, indent=2, ensure_ascii=False))
+    props_file.write_text(json.dumps(props, indent=2, ensure_ascii=False), encoding="utf-8")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -496,7 +539,7 @@ def run_pipeline(
     # Save raw script
     TEMP_DIR.mkdir(parents=True, exist_ok=True)
     script_file = TEMP_DIR / f"{timestamp}_script.json"
-    script_file.write_text(json.dumps(scenes, indent=2, ensure_ascii=False))
+    script_file.write_text(json.dumps(scenes, indent=2, ensure_ascii=False), encoding="utf-8")
     log.info(f"[Step 1] Script saved: {script_file}")
 
     # -- Step 2: Backgrounds --
@@ -520,7 +563,7 @@ def run_pipeline(
 
     # Save final props for debugging
     props_debug = TEMP_DIR / f"{timestamp}_props.json"
-    props_debug.write_text(json.dumps(props, indent=2, ensure_ascii=False))
+    props_debug.write_text(json.dumps(props, indent=2, ensure_ascii=False), encoding="utf-8")
 
     output_path = OUTPUT_DIR / f"{timestamp}_{slug}.mp4"
     success = render_reel(props, output_path)

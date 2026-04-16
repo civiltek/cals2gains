@@ -1,16 +1,18 @@
 # Cals2Gains - Estado del Proyecto
-> Última actualización: 2026-04-13 (23:30) — Fix crash Android (reanimated v4 + worklets)
+> Última actualización: 2026-04-16 (12:15) — AAB de producción generado (75 MB)
 
 ## App
 - **Versión actual:** 1.0.0
 - **Bundle ID:** com.civiltek.cals2gains
 - **Expo SDK:** 54
 - **React Native:** 0.81.5
-- **Último build Android (con fix):** en compilación → build `c00a412e-0ac0-4698-9646-bc36af7b10f0`
-  - Logs / descarga: https://expo.dev/accounts/civiltek/projects/cals2gains/builds/c00a412e-0ac0-4698-9646-bc36af7b10f0
-- **Build Android anterior (roto por reanimated v3 + RN 0.81):** https://expo.dev/artifacts/eas/7BhzB8Q9sXS7LQyeTQE62k.apk (build 358414d2) — NO INSTALAR, crashea al abrir
+- **✅ AAB PRODUCCIÓN GENERADO (2026-04-16):** `builds/app-release.aab` (75 MB, firmado)
+  - Build GH Actions: https://github.com/civiltek/cals2gains/actions/runs/24506192985
+  - **Listo para subir a Google Play Console**
+  - minSdkVersion: 26 (fix para react-native-health-connect)
+- **Build Android anterior (roto por reanimated v3 + RN 0.81):** build 358414d2 — NO INSTALAR
 - **Build iOS:** Pendiente (cuenta Apple Developer en verificación)
-- **Estado:** Fix crítico de reanimated aplicado (13/04 23:30), build nuevo en cola para validar en Android físico (Samsung R3CR10E9LSE conectado vía ADB)
+- **Estado:** AAB production firmado y descargado. Pendiente subida a Google Play Console.
 
 ## Stack Tecnológico
 - React Native + Expo Router (typed routes)

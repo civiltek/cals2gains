@@ -18,11 +18,25 @@ interface TitleTextProps {
  *   - Strong glow + text shadow for punch
  *
  * Regular scenes:
- *   - Medium bone text, upper third, pill background
+ *   - Medium bone text, upper third, pill with coral/violet tint (0.75 opacity)
  *   - Spring slide-up entrance
  *
  * Both: fade out last 8 frames.
+ * Titles are converted to sentence case (only first letter uppercase).
  */
+
+/**
+ * Convert any capitalization to sentence case.
+ * "Lleva Tu Botella Siempre" → "Lleva tu botella siempre"
+ * "¿Sabías que...?" → "¿Sabías que...?" (handles ¿/¡ prefix)
+ */
+function toSentenceCase(text: string): string {
+  if (!text) return text;
+  // Lowercase everything, then uppercase the first alphabetic character
+  const lower = text.toLowerCase();
+  return lower.replace(/[a-záéíóúüñ]/i, (c) => c.toUpperCase());
+}
+
 export const TitleText: React.FC<TitleTextProps> = ({
   title,
   frame,
@@ -30,6 +44,8 @@ export const TitleText: React.FC<TitleTextProps> = ({
   isHook,
 }) => {
   const { fps } = useVideoConfig();
+
+  const displayTitle = toSentenceCase(title);
 
   const enterFrames = 12;
   const exitFrames = 8;
@@ -65,7 +81,7 @@ export const TitleText: React.FC<TitleTextProps> = ({
             opacity,
             transform: `translateY(${translateY}px)`,
             textAlign: "center",
-            backgroundColor: "rgba(23,18,29,0.60)",
+            backgroundColor: "rgba(23,18,29,0.65)",
             borderRadius: 24,
             padding: "24px 36px",
           }}
@@ -82,7 +98,7 @@ export const TitleText: React.FC<TitleTextProps> = ({
               display: "block",
             }}
           >
-            {title}
+            {displayTitle}
           </span>
         </div>
       </AbsoluteFill>
@@ -103,24 +119,25 @@ export const TitleText: React.FC<TitleTextProps> = ({
         style={{
           opacity,
           transform: `translateY(${translateY}px)`,
-          backgroundColor: "rgba(23,18,29,0.55)",
+          // Pill con fondo coral translúcido — distintivo, sin ser plano gris
+          backgroundColor: "rgba(255,106,77,0.78)",
           borderRadius: 18,
-          padding: "16px 28px",
+          padding: "14px 26px",
         }}
       >
         <span
           style={{
             fontFamily: BRAND.fontDisplay,
             fontWeight: 700,
-            fontSize: 54,
+            fontSize: 52,
             lineHeight: 1.2,
-            color: BRAND.bone,
-            textShadow: "0 2px 16px rgba(0,0,0,0.9)",
+            color: "#FFFFFF",
+            textShadow: "0 2px 12px rgba(0,0,0,0.5)",
             letterSpacing: "-0.5px",
             display: "block",
           }}
         >
-          {title}
+          {displayTitle}
         </span>
       </div>
     </AbsoluteFill>

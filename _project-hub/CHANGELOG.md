@@ -1,11 +1,32 @@
 # Changelog - Cals2Gains
 
+## 2026-04-16 — Motor Remotion v2: 6 fixes de calidad (tildes, voz, CTA, textos, Sora, música)
+
+- **Fix UTF-8**: `create_reel_v2.py` — todos los `write_text()` ahora usan `encoding="utf-8"` explícito (corrige tildes/acentos en subtítulos karaoke en Windows)
+- **Fix voz España**: ElevenLabs llama con `stability=0.75, similarity_boost=0.75` para maximizar acento castellano peninsular (voice_id `pFZP5JQG7iQjIQuC4Bku` — Lucía, España)
+- **CTASlide nuevo**: componente `CTASlide.tsx` — pantalla final 3.5s con logo C2G-Logo-Light, "@cals2gains", "Descarga la app gratis", gradiente coral→violet; se añade automáticamente a todos los reels
+- **Textos sentence case**: `TitleText.tsx` — función `toSentenceCase()` convierte títulos Title Case de GPT a minúsculas normales (solo primera letra mayúscula). Pill fondo cambiado a coral `rgba(255,106,77,0.78)` sobre fondo blanco
+- **Prompts Sora realistas**: `BRAND_VIDEO_SUFFIX` en ambos scripts Python cambiado de "cinematic/neon/violet palette" a "realistic, handheld camera, natural lighting, casual everyday setting, no dramatic lighting"
+- **Soporte música de fondo**: `ReelComposition.tsx` reproduce `backgroundMusicFile` a 25% volumen con loop; `create_reel_v2.py` busca automáticamente `public/background_music.mp3` (u otros nombres estándar). Para activar: colocar MP3 libre de royalties en `tools/remotion-engine/public/background_music.mp3`
+- **Prompt GPT-4o actualizado**: pide sentence case explícitamente y tildes/acentos correctos en todos los textos
+- **ReelProps actualizado**: nuevos campos `backgroundMusicFile?` y `showCTASlide?` en `types.ts`
+- **calculateMetadata actualizado**: `Root.tsx` suma los frames del CTA slide al total de la composición
+
 ## 2026-04-16 — Fix iOS build: patch expo-dev-menu reloadAppAsync
 
 - **Error**: Build iOS #19 fallaba con `AppContext has no member reloadAppAsync` (Swift compile error)
 - **Causa**: `expo-dev-menu 55.0.23` llama `appContext?.reloadAppAsync()` pero `AppContext` en `expo-modules-core 3.0.29` no tiene ese método nativo
 - **Fix**: `patch-package` → parche en `patches/expo-dev-menu+55.0.23.patch` que sustituye la llamada por `bridge?.reload()`
 - **Archivos**: `patches/expo-dev-menu+55.0.23.patch` (nuevo), `package.json` (añadido `patch-package ^8.0.1` + script `postinstall`)
+
+## 2026-04-16 — Build AAB Android producción (versionCode 14) generado
+
+- **AAB generado**: `builds/app-release.aab` (75 MB, firmado con keystore EAS)
+- **versionCode**: autoincrement desde EAS (~v14 según intentos fallidos previos)
+- **Método**: GitHub Actions ubuntu-latest + `eas build --local` (sin cuota EAS cloud)
+- **Workflow reutilizable**: `.github/workflows/build-android-production.yml`
+- **Fix aplicado**: Config plugin `plugins/withMinSdkVersion.js` → `minSdkVersion=26` vía `withGradleProperties` (requerido por `react-native-health-connect` / `androidx.health.connect:connect-client:1.1.0-alpha11`)
+- **Listo para subir** a Google Play Console (internal testing track)
 
 ## 2026-04-16 — Formato viral + fixes pipeline render (PR #16, PR #18)
 
