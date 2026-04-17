@@ -41,6 +41,13 @@ jobs:
             echo "⚠ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON secret not set — submit step will use EAS-stored credentials"
           fi
 
+      # Expo recommends `prebuild --clean` to guarantee config plugins are
+      # applied from a clean slate. https://docs.expo.dev/config-plugins/introduction/
+      - name: Prebuild Android (clean)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx expo prebuild --platform android --clean --non-interactive
+
       - name: Build Android AAB (local - no cloud quota)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
