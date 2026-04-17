@@ -78,12 +78,17 @@ class HealthService {
         try {
           const status = await HealthConnect.getSdkStatus();
           this.isAvailable = status === SDK_AVAILABLE;
-        } catch {
+          if (!this.isAvailable) {
+            console.warn('[HealthService] Health Connect SDK not available, status=', status);
+          }
+        } catch (err) {
+          console.error('[HealthService] getSdkStatus error:', err);
           this.isAvailable = false;
         }
       }
       return this.isAvailable;
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] checkAvailability error:', err);
       return false;
     }
   }
@@ -239,7 +244,8 @@ class HealthService {
         ]);
         return true;
       }
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] saveWeight error:', err);
       return false;
     }
   }
@@ -268,7 +274,8 @@ class HealthService {
       } else {
         return await this.getAndroid7DayCalorieAverage(startDate, endDate, days);
       }
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] get7DayCalorieAverage error:', err);
       return { avgCalories: 0, daysWithData: 0 };
     }
   }
@@ -331,7 +338,8 @@ class HealthService {
           date: new Date(s.startTime),
         }));
       }
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] getRecentWorkouts error:', err);
       return [];
     }
   }
@@ -499,7 +507,8 @@ class HealthService {
         exerciseMinutes: Math.round(activeCalories / 8),
         lastSynced: new Date(),
       };
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] getAndroidSummary error:', err);
       return {
         steps: 0, activeCalories: 0, restingCalories: 0,
         totalCalories: 0, exerciseMinutes: 0, lastSynced: new Date(),

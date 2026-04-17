@@ -127,34 +127,54 @@ export default function VoiceLogScreen() {
   }, [screenState]);
 
   const handleStartRecording = async () => {
-    const { granted } = await requestRecordingPermissionsAsync();
-    if (!granted) {
-      Alert.alert(t('voiceLog.permissionDenied'), t('voiceLog.permissionMessage'), [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('voiceLog.openSettings'),
-          onPress: () => Linking.openSettings(),
-        },
-      ]);
-      return;
-    }
-    // iOS requires explicit audio session configuration for recording.
-    // Without allowsRecording the session stays in playback mode and
-    // captures silent audio even when the mic permission is granted.
-    if (Platform.OS === 'ios') {
+    try {
+      const { granted } = await requestRecordingPermissionsAsync();
+      if (!granted) {
+        Alert.alert(t('voiceLog.permissionDenied'), t('voiceLog.permissionMessage'), [
+          { text: t('common.cancel'), style: 'cancel' },
+          {
+            text: t('voiceLog.openSettings'),
+            onPress: () => Linking.openSettings(),
+          },
+        ]);
+        return;
+      }
+
+      // Configure audio session for recording. iOS REQUIRES allowsRecording=true
+      // BEFORE .record() or the recorder captures silent audio.
       await setAudioModeAsync({
         allowsRecording: true,
         playsInSilentMode: true,
       });
+
+      // Prepare the recorder explicitly so the native recorder is ready before .record()
+      if (typeof (recorder as any).prepareToRecordAsync === 'function') {
+        await (recorder as any).prepareToRecordAsync();
+      }
+
+      // Start recording and WAIT for it so we only transition state on success
+      await recorder.record();
+      setScreenState('recording');
+    } catch (err: any) {
+      console.error('[VoiceLog] start recording error:', err);
+      setErrorMsg(err?.message || t('voiceLog.errorFailed'));
+      setScreenState('error');
+      if (Platform.OS === 'ios') {
+        await setAudioModeAsync({
+          allowsRecording: false,
+          playsInSilentMode: false,
+        }).catch(() => {});
+      }
     }
-    setScreenState('recording');
-    recorder.record();
   };
 
   const stopAndProcess = async () => {
-    if (!recorderState.isRecording) return;
     setScreenState('processing');
-    await recorder.stop();
+    try {
+      await recorder.stop();
+    } catch (err) {
+      console.warn('[VoiceLog] stop recorder error:', err);
+    }
 
     // Restore audio session to playback mode so the rest of the app works normally
     if (Platform.OS === 'ios') {

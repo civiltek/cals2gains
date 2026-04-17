@@ -67,6 +67,68 @@ export const DEFAULT_MACRO_PRESETS: Record<TrainingDayType, MacroPreset> = {
 };
 
 // ============================================
+// PROPORTIONAL MACRO MULTIPLIERS
+// ============================================
+// Applied to the user's personal goals so training/refeed/rest days scale with
+// their individual TDEE instead of being hardcoded 2800/2500/3100/2600.
+// Protein stays roughly constant; carbs cycle up on training/refeed days
+// and fat compensates on rest days.
+
+export const DAY_TYPE_MULTIPLIERS: Record<
+  TrainingDayType,
+  { calories: number; protein: number; carbs: number; fat: number }
+> = {
+  entreno:     { calories: 1.12, protein: 1.05, carbs: 1.25, fat: 0.90 },
+  descanso:    { calories: 0.95, protein: 1.00, carbs: 0.80, fat: 1.10 },
+  refeed:      { calories: 1.20, protein: 0.95, carbs: 1.45, fat: 0.85 },
+  competicion: { calories: 1.08, protein: 1.00, carbs: 1.20, fat: 0.95 },
+};
+
+/** Build proportional macro presets from the user's base goals. */
+export function buildPresetsFromGoals(goals: {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}): Record<TrainingDayType, MacroPreset> {
+  const out = {} as Record<TrainingDayType, MacroPreset>;
+  (Object.keys(DAY_TYPE_MULTIPLIERS) as TrainingDayType[]).forEach((k) => {
+    const m = DAY_TYPE_MULTIPLIERS[k];
+    out[k] = {
+      calories: Math.round(goals.calories * m.calories),
+      protein: Math.round(goals.protein * m.protein),
+      carbs: Math.round(goals.carbs * m.carbs),
+      fat: Math.round(goals.fat * m.fat),
+    };
+  });
+  return out;
+}
+
+/** Spanish TrainingDayType → English DayType (shared with userStore). */
+export function trainingDayTypeToEnglish(
+  t: TrainingDayType
+): 'training' | 'rest' | 'refeed' | 'competition' {
+  switch (t) {
+    case 'entreno':     return 'training';
+    case 'descanso':    return 'rest';
+    case 'refeed':      return 'refeed';
+    case 'competicion': return 'competition';
+  }
+}
+
+/** English DayType → Spanish TrainingDayType. */
+export function trainingDayTypeFromEnglish(
+  d: 'training' | 'rest' | 'refeed' | 'competition'
+): TrainingDayType {
+  switch (d) {
+    case 'training':    return 'entreno';
+    case 'rest':        return 'descanso';
+    case 'refeed':      return 'refeed';
+    case 'competition': return 'competicion';
+  }
+}
+
+// ============================================
 // BUILT-IN PRESET PLANS
 // ============================================
 
@@ -193,10 +255,32 @@ export const useTrainingPlanStore = create<TrainingPlanState>()(
 
       activatePlan: (planId) => {
         set({ activePlan: { planId, startDate: toDateString(new Date()) } });
+        // Clear any stale manual override so the newly activated plan takes effect today.
+        // Lazy-require userStore to avoid circular import at module-init time.
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const { useUserStore } = require('./userStore');
+          useUserStore.setState({
+            todayDayTypeOverride: null,
+            todayDayTypeOverrideDate: null,
+          });
+        } catch {
+          /* userStore not ready yet — ignored */
+        }
       },
 
       deactivatePlan: () => {
         set({ activePlan: null });
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const { useUserStore } = require('./userStore');
+          useUserStore.setState({
+            todayDayTypeOverride: null,
+            todayDayTypeOverrideDate: null,
+          });
+        } catch {
+          /* ignored */
+        }
       },
 
       getTodayInfo: () => {

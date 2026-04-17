@@ -18,6 +18,12 @@ import { loginRevenueCat, logoutRevenueCat } from '../services/revenuecat';
 import { calculateTDEE, calculateBMR } from '../utils/nutrition';
 import { HealthData } from '../services/healthKit';
 import { differenceInDays } from 'date-fns';
+import {
+  useTrainingPlanStore,
+  buildPresetsFromGoals,
+  trainingDayTypeToEnglish,
+  trainingDayTypeFromEnglish,
+} from './trainingPlanStore';
 
 interface UserState {
   user: User | null;
@@ -26,6 +32,9 @@ interface UserState {
   authInitialized: boolean;
   dayTypeGoals: DayTypeGoals | null;
   todayDayType: DayType;
+  /** Manual override of today's day type (user tapped a button). YYYY-MM-DD of when it was set. Null = follow active plan. */
+  todayDayTypeOverride: DayType | null;
+  todayDayTypeOverrideDate: string | null;
 
   // Health integration
   healthData: HealthData | null;
@@ -76,6 +85,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   authInitialized: false,
   dayTypeGoals: null,
   todayDayType: 'rest',
+  todayDayTypeOverride: null,
+  todayDayTypeOverrideDate: null,
   healthData: null,
 
   // Convenience — derived at read time (not reactive, use user?.uid in components)
@@ -203,20 +214,62 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
 
   setTodayDayType: (type: DayType) => {
-    set({ todayDayType: type });
+    const today = new Date().toISOString().split('T')[0];
+    set({
+      todayDayType: type,
+      todayDayTypeOverride: type,
+      todayDayTypeOverrideDate: today,
+    });
   },
 
   getActiveGoals: () => {
-    const { user, dayTypeGoals, todayDayType } = get();
+    const { user, dayTypeGoals, todayDayType, todayDayTypeOverride, todayDayTypeOverrideDate } = get();
     if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
 
-    // If day type goals are not enabled or not set, return regular goals
-    if (!dayTypeGoals || !dayTypeGoals.enabled) {
-      return user.goals;
+    const today = new Date().toISOString().split('T')[0];
+    const hasValidOverride =
+      todayDayTypeOverride !== null && todayDayTypeOverrideDate === today;
+
+    // Determine today's day type: manual override > active training plan > legacy dayTypeGoals > none
+    let resolvedDayType: DayType | null = null;
+    if (hasValidOverride) {
+      resolvedDayType = todayDayTypeOverride!;
+    } else {
+      // Pull today's day type from active training plan (if any)
+      try {
+        const planInfo = useTrainingPlanStore.getState().getTodayInfo();
+        if (planInfo) {
+          resolvedDayType = trainingDayTypeToEnglish(planInfo.dayType);
+        }
+      } catch (err) {
+        // Training plan store not yet hydrated — fall through
+      }
     }
 
-    // Return training or rest goals based on today's day type
-    return dayTypeGoals[todayDayType];
+    // If we have a resolved day type, compute proportional macros from user's base goals
+    if (resolvedDayType && user.goals && user.goals.calories > 0) {
+      const presets = buildPresetsFromGoals(user.goals);
+      const esKey = trainingDayTypeFromEnglish(resolvedDayType);
+      const preset = presets[esKey];
+      return {
+        calories: preset.calories,
+        protein: preset.protein,
+        carbs: preset.carbs,
+        fat: preset.fat,
+        fiber: user.goals.fiber,
+      };
+    }
+
+    // Legacy fallback: manual training/rest goals
+    if (dayTypeGoals && dayTypeGoals.enabled) {
+      const key = todayDayType as keyof DayTypeGoals;
+      const legacy = (dayTypeGoals as any)[key];
+      if (legacy && typeof legacy === 'object' && 'calories' in legacy) {
+        return legacy as UserGoals;
+      }
+    }
+
+    return user.goals;
   },
 
   // =========================================================================

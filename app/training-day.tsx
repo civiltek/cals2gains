@@ -18,7 +18,11 @@ import { format } from 'date-fns';
 
 // Mock store imports
 import { useUserStore } from '../store/userStore';
-import { useTrainingPlanStore } from '../store/trainingPlanStore';
+import {
+  useTrainingPlanStore,
+  buildPresetsFromGoals,
+  trainingDayTypeToEnglish,
+} from '../store/trainingPlanStore';
 
 const { width } = Dimensions.get('window');
 
@@ -40,37 +44,10 @@ interface WeekDay {
   isToday: boolean;
 }
 
-// DAY_TYPE_PRESETS will be created inside component with access to theme colors
-const BASE_DAY_TYPE_PRESETS = {
-  entreno: {
-    type: 'entreno' as DayType,
-    calories: 2800,
-    protein: 160,
-    carbs: 380,
-    fat: 65,
-  },
-  descanso: {
-    type: 'descanso' as DayType,
-    calories: 2500,
-    protein: 160,
-    carbs: 250,
-    fat: 85,
-  },
-  refeed: {
-    type: 'refeed' as DayType,
-    calories: 3100,
-    protein: 150,
-    carbs: 450,
-    fat: 60,
-  },
-  competicion: {
-    type: 'competicion' as DayType,
-    calories: 2600,
-    protein: 140,
-    carbs: 350,
-    fat: 60,
-  },
-};
+// Fallback presets used when the user has no saved goals yet (first-run).
+// Normally the presets are derived from the user's personal goals
+// via `buildPresetsFromGoals(user.goals)`.
+const FALLBACK_BASE_GOALS = { calories: 2500, protein: 160, carbs: 300, fat: 75 };
 
 // DAY_LABELS will be created inside component with access to t() for translations
 const BASE_DAY_LABELS: Record<DayType, { emoji: string; icon: string }> = {
@@ -94,19 +71,28 @@ export default function TrainingDay() {
     competicion: { label: 'Competición',                        emoji: BASE_DAY_LABELS.competicion.emoji, icon: BASE_DAY_LABELS.competicion.icon },
   }), [t]);
 
-  // Build DAY_TYPE_PRESETS with theme colors
-  const DAY_TYPE_PRESETS: Record<DayType, DayTypeGoals> = useMemo(() => ({
-    entreno:     { ...BASE_DAY_TYPE_PRESETS.entreno,     color: C.primary },
-    descanso:    { ...BASE_DAY_TYPE_PRESETS.descanso,    color: C.info },
-    refeed:      { ...BASE_DAY_TYPE_PRESETS.refeed,      color: C.success },
-    competicion: { ...BASE_DAY_TYPE_PRESETS.competicion, color: '#FF9800' },
-  }), [C.primary, C.info, C.success]);
-
-  // Read active training plan for today
+  // Read user goals and active plan for proportional macros
+  const userGoals = useUserStore((s) => s.user?.goals);
+  const setTodayDayType = useUserStore((s) => s.setTodayDayType);
   const getTodayTrainingInfo = useTrainingPlanStore((s) => s.getTodayInfo);
   const todayTrainingInfo = getTodayTrainingInfo();
   const planDayType = todayTrainingInfo?.dayType as DayType | undefined;
-  const planMacros = todayTrainingInfo?.macros;
+
+  // Build proportional presets from user's personal goals (or fallback base)
+  const DAY_TYPE_PRESETS: Record<DayType, DayTypeGoals> = useMemo(() => {
+    const base = (userGoals && userGoals.calories > 0)
+      ? userGoals
+      : FALLBACK_BASE_GOALS;
+    const presets = buildPresetsFromGoals(base);
+    return {
+      entreno:     { type: 'entreno',     ...presets.entreno,     color: C.primary },
+      descanso:    { type: 'descanso',    ...presets.descanso,    color: C.info },
+      refeed:      { type: 'refeed',      ...presets.refeed,      color: C.success },
+      competicion: { type: 'competicion', ...presets.competicion, color: '#FF9800' },
+    };
+  }, [userGoals?.calories, userGoals?.protein, userGoals?.carbs, userGoals?.fat, C.primary, C.info, C.success]);
+
+  const planMacros = planDayType ? DAY_TYPE_PRESETS[planDayType] : undefined;
 
   const [todayType, setTodayType] = useState<DayType>(planDayType ?? 'entreno');
   const [weekDays, setWeekDays] = useState<WeekDay[]>([]);
@@ -155,6 +141,8 @@ export default function TrainingDay() {
   const handleSelectDayType = (type: DayType) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setTodayType(type);
+    // Propagate to userStore so the home dashboard macros update immediately
+    setTodayDayType(trainingDayTypeToEnglish(type));
   };
 
   const handleToggleAutoDetect = () => {
@@ -164,6 +152,8 @@ export default function TrainingDay() {
 
   const handleApplyToday = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    // Persist today's override so the home dashboard macros update for the rest of the day
+    setTodayDayType(trainingDayTypeToEnglish(todayType));
     const goalData = DAY_TYPE_PRESETS[todayType];
     Alert.alert(
       t('trainingDay.goalsUpdated'),

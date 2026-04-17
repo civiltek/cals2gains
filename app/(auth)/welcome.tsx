@@ -27,6 +27,8 @@ import { useColors } from '../../store/themeStore';
 import { signInWithGoogle, signInWithApple, signInWithEmail, createAccountWithEmail } from '../../services/firebase';
 import { useUserStore } from '../../store/userStore';
 
+const LOGO_MARK = require('../../brand-assets/C2G-Mark-512.png');
+
 // Conditional import — native module not available in Expo Go
 let GoogleSignin: any = null;
 try {
@@ -163,10 +165,12 @@ export default function WelcomeScreen() {
         >
           {/* Logo + Title */}
           <View style={styles.hero}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoEmoji}>🔬</Text>
-            </View>
-            <Text style={styles.appName}>{t('appName')}</Text>
+            <Image source={LOGO_MARK} style={styles.brandLogo} resizeMode="contain" />
+            <Text style={styles.appName}>
+              <Text style={{ color: C.violet }}>Cals</Text>
+              <Text style={{ color: C.coral, fontSize: 26, fontFamily: 'Outfit-Bold' }}>2</Text>
+              <Text style={{ color: C.violet }}>Gains</Text>
+            </Text>
             <Text style={styles.tagline}>{t('auth.welcome')}</Text>
             <Text style={styles.subtitle}>{t('auth.subtitle')}</Text>
           </View>
@@ -344,23 +348,15 @@ function createStyles(C: any) {
       paddingTop: 20,
       marginBottom: 32,
     },
-    logoContainer: {
+    brandLogo: {
       width: 80,
       height: 80,
-      borderRadius: 24,
-      backgroundColor: C.primary + '30',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginBottom: 20,
-      borderWidth: 1,
-      borderColor: C.primary + '40',
-    },
-    logoEmoji: {
-      fontSize: 40,
+      marginBottom: 16,
     },
     appName: {
       fontSize: 32,
       fontWeight: '800',
+      fontFamily: 'Outfit-Bold',
       color: C.text,
       letterSpacing: -0.5,
       marginBottom: 8,

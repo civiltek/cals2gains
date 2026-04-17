@@ -118,7 +118,9 @@
         "android.permission.health.READ_WEIGHT",
         "android.permission.health.WRITE_WEIGHT",
         "android.permission.health.READ_BASAL_METABOLIC_RATE",
-        "android.permission.health.READ_SLEEP"
+        "android.permission.health.READ_SLEEP",
+        "android.permission.health.READ_BODY_FAT",
+        "android.permission.health.READ_LEAN_BODY_MASS"
       ],
       "googleServicesFile": "./google-services.json"
     },
@@ -178,4 +180,21 @@
         {
           "color": "#9C8CFF",
           "defaultChannel": "reminders",
-          "so
+          "sounds": []
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "381120d5-3866-4b97-af00-4c6840768327"
+      }
+    },
+    "owner": "civiltek"
+  }
+}
