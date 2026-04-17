@@ -26,6 +26,7 @@ import {
   useAudioRecorderState,
   requestRecordingPermissionsAsync,
   RecordingPresets,
+  setAudioModeAsync,
 } from 'expo-audio';
 import { useColors } from '../store/themeStore';
 import { useMealStore } from '../store/mealStore';
@@ -137,6 +138,15 @@ export default function VoiceLogScreen() {
       ]);
       return;
     }
+    // iOS requires explicit audio session configuration for recording.
+    // Without allowsRecording the session stays in playback mode and
+    // captures silent audio even when the mic permission is granted.
+    if (Platform.OS === 'ios') {
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
+      });
+    }
     setScreenState('recording');
     recorder.record();
   };
@@ -145,6 +155,14 @@ export default function VoiceLogScreen() {
     if (!recorderState.isRecording) return;
     setScreenState('processing');
     await recorder.stop();
+
+    // Restore audio session to playback mode so the rest of the app works normally
+    if (Platform.OS === 'ios') {
+      await setAudioModeAsync({
+        allowsRecording: false,
+        playsInSilentMode: false,
+      }).catch(() => {});
+    }
 
     const uri = recorder.uri;
     if (!uri) {
