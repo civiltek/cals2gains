@@ -159,6 +159,24 @@ class HealthService {
         };
 
         console.log('[HealthKit] initHealthKit request payload:', JSON.stringify(permissions));
+
+        // Apple: getRequestStatusForAuthorization tells us whether the system
+        // SHOULD show the sheet (1=shouldRequest, 2=unnecessary, 0=unknown/error).
+        // Probe BEFORE init so we know what state the OS thinks we're in.
+        const authStatusProbe = await new Promise<any>((resolve) => {
+          try {
+            AppleHealthKit.getRequestStatusForAuthorization?.(
+              permissions,
+              (err: any, result: any) => {
+                resolve({ err, result });
+              }
+            ) ?? resolve({ err: 'getRequestStatusForAuthorization not available', result: null });
+          } catch (e) {
+            resolve({ err: String(e), result: null });
+          }
+        });
+        console.log('[HealthKit] getRequestStatusForAuthorization:', JSON.stringify(authStatusProbe));
+
         return new Promise((resolve) => {
           AppleHealthKit.initHealthKit(permissions, (err: any) => {
             if (err) {
@@ -169,6 +187,7 @@ class HealthService {
                 userInfo: err?.userInfo,
                 toString: err?.toString?.(),
                 keys: err ? Object.keys(err) : null,
+                authStatusProbe,
               };
               console.error('[HealthKit init error]', JSON.stringify(errInfo, null, 2));
               console.error('[HealthKit init error raw]', err);

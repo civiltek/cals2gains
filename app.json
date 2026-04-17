@@ -163,13 +163,6 @@
       "expo-secure-store",
       "expo-health-connect",
       [
-        "react-native-health",
-        {
-          "healthSharePermission": "Cals2Gains lee tus datos de salud (pasos, calorias, ejercicio, peso) para adaptar tus macros automaticamente.",
-          "healthUpdatePermission": "Cals2Gains sincroniza tu peso con Apple Health."
-        }
-      ],
-      [
         "expo-notifications",
         {
           "color": "#9C8CFF",
