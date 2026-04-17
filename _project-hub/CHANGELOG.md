@@ -1,5 +1,25 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Sistema completo de planes de entrenamiento por ciclos (c108253)
+
+Implementación del sistema de planes de entrenamiento con ajuste nutricional automático por tipo de día:
+- `store/trainingPlanStore.ts`: store Zustand con tipos (entreno/descanso/refeed/competición), presets de macros, 3 planes predefinidos (Fuerza 3x, Fuerza 5x, Preparación 10K 8 semanas), activación con fecha inicio, auto-desactivación al acabar el plan
+- `app/training-plans.tsx`: pantalla de gestión de planes — listado, WeekPreview con cuadrícula 7 días, activar/editar/eliminar
+- `app/create-training-plan.tsx`: crear/editar plan con selector de día por semana (toca para ciclar tipo) y macros editables por tipo de día
+- `app/(tabs)/index.tsx`: banner activo en home cuando hay plan activo — muestra tipo de día, nombre del plan, día X/Y
+- `app/(tabs)/tools.tsx`: acceso directo a Planes de entrenamiento en sección de seguimiento
+- `app/training-day.tsx`: tipo 'competición' añadido (🏁 #FF9800), banner del plan activo en pantalla de día de entrenamiento
+- Commit: `c108253`
+
+## 2026-04-17 — Investigación InBody + Apple Health / Google Health Connect
+
+Resultado de la investigación de integración InBody con plataformas de salud:
+- InBody **SÍ escribe** en Apple Health: `bodyMass`, `bodyFatPercentage`, `leanBodyMass`, `bodyMassIndex`
+- BMR (`basalEnergyBurned`) posiblemente en modelos H30; SMM y grasa visceral NO tienen identificador HealthKit
+- Datos persisten en HealthKit aunque el usuario desinstale InBody
+- Google Health Connect: sin confirmación oficial (solo Google Fit legacy confirmado)
+- **Acción recomendada**: pedir permisos `bodyFatPercentage` + `leanBodyMass` + `bodyMass` + `basalEnergyBurned` en HealthKit; captura manual como fallback en Android
+
 ## 2026-04-17 — Reemplazar integración InBody rota por entrada manual (3895532)
 
 El botón InBody en Ajustes redirigía a la web de la API de InBody (B2B only, sin OAuth público).
