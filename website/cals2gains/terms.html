@@ -314,15 +314,4 @@ function setLang(l) {
     localStorage.setItem('c2g-lang', l);
     document.documentElement.lang = l;
     btn.textContent = l === 'es' ? 'EN' : 'ES';
-    document.querySelectorAll('[data-es][data-en]').forEach(function(el) {
-        var val = el.getAttribute('data-' + l);
-        if (el.tagName === 'INPUT') el.placeholder = val;
-        else if (val.includes('<')) el.innerHTML = val;
-        else el.textContent = val;
-    });
-}
-function toggleLang() { setLang(lang === 'es' ? 'en' : 'es'); }
-setLang(lang);
-</script>
-</body>
-</html>
+    document.querySelectorAll('[data-es][data-en]').forEach(function(e
