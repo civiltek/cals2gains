@@ -33,9 +33,13 @@ export interface WorkoutSummary {
 // HEALTH SERVICE (Platform-agnostic interface)
 // ============================================
 
+// Health Connect SDK status constants (from react-native-health-connect)
+const SDK_AVAILABLE = 3;
+
 class HealthService {
   private isAvailable: boolean = false;
   private isAuthorized: boolean = false;
+  private isInitialized: boolean = false;
 
   /**
    * Check if health data is available on this device
@@ -46,11 +50,47 @@ class HealthService {
         // HealthKit is available on all iPhones
         this.isAvailable = true;
       } else if (Platform.OS === 'android') {
-        // Health Connect requires Android 14+ or the app installed
-        this.isAvailable = true;
+        // Health Connect requires Android 14+ or the Health Connect APK installed.
+        // getSdkStatus returns 3 = SDK_AVAILABLE, 2 = UPDATE_REQUIRED, 1 = UNAVAILABLE
+        const HealthConnect = await getHealthConnect();
+        if (!HealthConnect) {
+          this.isAvailable = false;
+          return false;
+        }
+        try {
+          const status = await HealthConnect.getSdkStatus();
+          this.isAvailable = status === SDK_AVAILABLE;
+        } catch {
+          this.isAvailable = false;
+        }
       }
       return this.isAvailable;
     } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Ensure Health Connect SDK is initialized (Android only). Idempotent.
+   */
+  private async ensureAndroidInitialized(): Promise<boolean> {
+    if (Platform.OS !== 'android') return true;
+    if (this.isInitialized) return true;
+
+    const HealthConnect = await getHealthConnect();
+    if (!HealthConnect) return false;
+
+    try {
+      const status = await HealthConnect.getSdkStatus();
+      if (status !== SDK_AVAILABLE) {
+        console.warn('[HealthService] Health Connect not available, sdkStatus:', status);
+        return false;
+      }
+      const ok = await HealthConnect.initialize();
+      this.isInitialized = !!ok;
+      return this.isInitialized;
+    } catch (error) {
+      console.error('[HealthService] initialize error:', error);
       return false;
     }
   }
@@ -95,7 +135,11 @@ class HealthService {
           });
         });
       } else {
-        // Android Health Connect
+        // Android Health Connect — MUST initialize before requestPermission,
+        // otherwise the call fails silently on testers' devices.
+        const ready = await this.ensureAndroidInitialized();
+        if (!ready) return false;
+
         const HealthConnect = await getHealthConnect();
         if (!HealthConnect) return false;
 
@@ -109,7 +153,7 @@ class HealthService {
           { accessType: 'write', recordType: 'Weight' },
         ]);
 
-        this.isAuthorized = granted.length > 0;
+        this.isAuthorized = Array.isArray(granted) && granted.length > 0;
         return this.isAuthorized;
       }
     } catch (error) {
@@ -156,6 +200,9 @@ class HealthService {
           );
         });
       } else {
+        const ready = await this.ensureAndroidInitialized();
+        if (!ready) return false;
+
         const HealthConnect = await getHealthConnect();
         if (!HealthConnect) return false;
 
@@ -237,6 +284,9 @@ class HealthService {
           );
         });
       } else {
+        const ready = await this.ensureAndroidInitialized();
+        if (!ready) return [];
+
         const HealthConnect = await getHealthConnect();
         if (!HealthConnect) return [];
 
@@ -305,6 +355,9 @@ class HealthService {
     end: Date,
     days: number
   ): Promise<{ avgCalories: number; daysWithData: number }> {
+    const ready = await this.ensureAndroidInitialized();
+    if (!ready) return { avgCalories: 0, daysWithData: 0 };
+
     const HealthConnect = await getHealthConnect();
     if (!HealthConnect) return { avgCalories: 0, daysWithData: 0 };
 
@@ -384,8 +437,9 @@ class HealthService {
   }
 
   private async getAndroidSummary(start: Date, end: Date): Promise<HealthData> {
+    const ready = await this.ensureAndroidInitialized();
     const HealthConnect = await getHealthConnect();
-    if (!HealthConnect) {
+    if (!ready || !HealthConnect) {
       return {
         steps: 0, activeCalories: 0, restingCalories: 0,
         totalCalories: 0, exerciseMinutes: 0, lastSynced: new Date(),

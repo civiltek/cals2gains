@@ -1,5 +1,20 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Fix Android Health Connect (faltaba initialize() + sdkStatus check)
+
+Reportado por Judith tras instalar tanda 3 en Android: "en android tampoco funciona la conexion a la app de salud".
+
+**Root cause**: `react-native-health-connect` v3.2.0 exige llamar a **`initialize()`** antes de cualquier `requestPermission`/`readRecords`/`insertRecords`. Nuestro `healthService.requestAuthorization()` llamaba directamente `HealthConnect.requestPermission([...])` → el cliente nativo no estaba inicializado → la promesa rechazaba silenciosamente → el catch devolvía `false` → el toggle no se activaba y el diálogo de Health Connect nunca aparecía.
+
+**Fix** (`services/healthKit.ts`):
+- Nuevo método privado `ensureAndroidInitialized()` idempotente que llama `getSdkStatus()` + `initialize()`. Cache de `isInitialized` para no re-inicializar.
+- Llamada a `ensureAndroidInitialized()` al inicio de cada entrada Android: `requestAuthorization`, `saveWeight`, `getAndroidSummary`, `getAndroid7DayCalorieAverage`, `getRecentWorkouts`.
+- `checkAvailability()` Android ahora llama `getSdkStatus()` y devuelve `true` solo si status es `SDK_AVAILABLE` (3). Antes devolvía hardcoded `true`.
+
+**Impacto**: sin este fix, el AAB Android que se había subido tras las tandas 1+2 tenía el flujo de Health Connect correcto a nivel de routing pero **roto a nivel de cliente nativo**. Los testers veían el toggle pero al activarlo no pasaba nada visible.
+
+**Requiere nuevo build Android + subir al canal alpha** (el AAB anterior descargado en `Downloads/c2g-aab-tanda3/` queda obsoleto).
+
 ## 2026-04-17 — Fix config iOS HealthKit (faltaba plugin expo + entitlement clinical inválido)
 
 Reportado por Judith tras instalar tanda 3 en TestFlight: "en iOS sigue sin funcionar la conexión a los datos de salud del iphone".
