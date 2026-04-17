@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build iOS IPA (local, no EAS cloud quota)
+    name: Build and Submit iOS IPA (local, no EAS cloud quota)
     # Apple requires iOS 26 SDK (Xcode 26) starting 2026-04-28.
     # macos-latest currently resolves to macos-15 (Xcode 16 / iOS 18.5 SDK)
     # which produces warning 90725. macos-26 ships with Xcode 26.
@@ -51,3 +51,13 @@ jobs:
           path: ./build-output/app-release.ipa
           retention-days: 30
           if-no-files-found: error
+
+      - name: Submit to App Store Connect
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas submit \
+            --platform ios \
+            --path ./build-output/app-release.ipa \
+            --profile production \
+            --non-interactive

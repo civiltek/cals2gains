@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build Android AAB (local, no EAS cloud quota)
+    name: Build and Submit Android AAB (local, no EAS cloud quota)
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -30,6 +30,17 @@ jobs:
       - name: Setup EAS CLI
         run: npm install -g eas-cli
 
+      - name: Write Google Play service account key
+        env:
+          GOOGLE_PLAY_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -n "$GOOGLE_PLAY_KEY" ]; then
+            echo "$GOOGLE_PLAY_KEY" > ./google-play-service-account.json
+            echo "✓ google-play-service-account.json written from secret"
+          else
+            echo "⚠ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON secret not set — submit step will use EAS-stored credentials"
+          fi
+
       - name: Build Android AAB (local - no cloud quota)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -48,3 +59,13 @@ jobs:
           path: ./build-output/app-release.aab
           retention-days: 30
           if-no-files-found: error
+
+      - name: Submit to Google Play (internal track)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas submit \
+            --platform android \
+            --path ./build-output/app-release.aab \
+            --profile production \
+            --non-interactive
