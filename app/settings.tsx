@@ -213,7 +213,17 @@ const SettingsScreen = () => {
             setLoading(false);
             return;
           }
-          await setHealthEnabled(true);
+          try {
+            await setHealthEnabled(true);
+          } catch (persistErr: any) {
+            console.error('[settings] setHealthEnabled(true) failed after auth OK:', persistErr?.message, persistErr);
+            Alert.alert(
+              'Error guardando ajuste',
+              `Permiso concedido pero no se pudo guardar. ${persistErr?.message || String(persistErr)}`.trim()
+            );
+            setLoading(false);
+            return;
+          }
         }
 
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -279,7 +289,8 @@ const SettingsScreen = () => {
           ? t('settings.serviceDisconnected', { service })
           : t('settings.serviceConnected', { service })
       );
-    } catch (error) {
+    } catch (error: any) {
+      console.error('[settings] handleConnectService error:', service, error?.message, error);
       Alert.alert('Error', t('settings.serviceError', { service }));
     } finally {
       setLoading(false);
