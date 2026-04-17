@@ -33,6 +33,15 @@ jobs:
       - name: Setup EAS CLI
         run: npm install -g eas-cli
 
+      # Expo recommends `prebuild --clean` to guarantee config plugins are
+      # applied from a clean slate. Without --clean, rerunning prebuild can
+      # "layer changes on top" and produce inconsistent native projects.
+      # https://docs.expo.dev/config-plugins/introduction/
+      - name: Prebuild iOS (clean)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx expo prebuild --platform ios --clean --non-interactive
+
       - name: Build iOS IPA (local - no cloud quota)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
