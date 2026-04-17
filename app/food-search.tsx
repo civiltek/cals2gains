@@ -18,6 +18,7 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useMealStore } from '../store/mealStore';
@@ -47,6 +48,7 @@ export default function FoodSearchScreen() {
   const C = useColors();
   const { t } = useTranslation();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ mealType?: string }>();
   const { addMeal } = useMealStore();
   const user = useUserStore((s) => s.user);
@@ -438,7 +440,7 @@ export default function FoodSearchScreen() {
 
       {/* Selected Item Footer */}
       {selectedItem && (
-        <View style={[styles.footer, { backgroundColor: C.surface, borderTopColor: C.border }]}>
+        <View style={[styles.footer, { backgroundColor: C.surface, borderTopColor: C.border, paddingBottom: Math.max(16, insets.bottom) }]}>
           {/* Servings stepper */}
           <View style={styles.servingsRow}>
             <Text style={[styles.servingsLabel, { color: C.textSecondary }]}>{t('foodSearch.servingsLabel')}</Text>
@@ -667,8 +669,7 @@ const createStyles = (C: any) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    paddingBottom: 34,
+    paddingTop: 14,
     backgroundColor: C.surface,
     borderTopWidth: 1,
     borderTopColor: C.border,

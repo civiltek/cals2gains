@@ -128,6 +128,7 @@ export default function RootLayout() {
           <Stack.Screen name="progress-photos" options={{ ...featureScreenOptions, headerShown: false, title: i18n.t('progressPhotos.title') }} />
           <Stack.Screen name="protein-dashboard" options={{ ...featureScreenOptions, title: i18n.t('profile.proteinDashboard') }} />
           <Stack.Screen name="training-day" options={{ ...featureScreenOptions, title: i18n.t('trainingDay.title') }} />
+          <Stack.Screen name="training-plan" options={{ ...featureScreenOptions, title: i18n.t('trainingPlan.title') }} />
           <Stack.Screen name="goal-modes" options={{ ...featureScreenOptions, title: i18n.t('goalModes.title') }} />
           <Stack.Screen name="grocery-list" options={{ ...featureScreenOptions, title: i18n.t('profile.shoppingList') }} />
           <Stack.Screen name="shopping-list" options={{ ...featureScreenOptions, title: i18n.t('profile.shoppingList') }} />

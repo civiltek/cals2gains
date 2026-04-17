@@ -1325,6 +1325,8 @@ export default {
     fastingDesc: 'Protocolo intermitente',
     trainingDay: 'Día entreno',
     trainingDayDesc: 'Macros según actividad',
+    trainingPlan: 'Plan de entrenamiento',
+    trainingPlanDesc: 'Plan adaptativo por sesión',
     measurements: 'Medidas',
     measurementsDesc: 'Seguimiento corporal',
     photos: 'Fotos progreso',

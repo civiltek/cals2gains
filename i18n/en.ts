@@ -1280,6 +1280,8 @@ export default {
     fastingDesc: 'Intermittent protocol',
     trainingDay: 'Training day',
     trainingDayDesc: 'Macros by activity',
+    trainingPlan: 'Training plan',
+    trainingPlanDesc: 'Adaptive plan by session',
     measurements: 'Measurements',
     measurementsDesc: 'Body tracking',
     photos: 'Progress photos',
