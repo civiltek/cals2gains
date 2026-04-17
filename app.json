@@ -178,4 +178,21 @@
         {
           "color": "#9C8CFF",
           "defaultChannel": "reminders",
-          "so
+          "sounds": []
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "381120d5-3866-4b97-af00-4c6840768327"
+      }
+    },
+    "owner": "civiltek"
+  }
+}
