@@ -192,18 +192,14 @@ class HealthService {
               console.error('[HealthKit init error]', JSON.stringify(errInfo, null, 2));
               console.error('[HealthKit init error raw]', err);
               const errText = JSON.stringify(errInfo, null, 2);
+              // Copy to clipboard AUTOMATICALLY so the user doesn't have to
+              // press a button in a potentially-queued Alert.
+              Clipboard.setStringAsync(errText).catch(() => {});
               Alert.alert(
-                'HealthKit error (diagnóstico)',
-                errText.length > 900 ? errText.slice(0, 900) + '…' : errText,
-                [
-                  {
-                    text: 'Copiar',
-                    onPress: () => {
-                      Clipboard.setStringAsync(errText).catch(() => {});
-                    },
-                  },
-                  { text: 'Cerrar', style: 'cancel' },
-                ]
+                'HealthKit error — copiado al portapapeles',
+                (errText.length > 800 ? errText.slice(0, 800) + '…' : errText) +
+                  '\n\n(pégalo en el chat)',
+                [{ text: 'OK' }]
               );
               resolve(false);
             } else {

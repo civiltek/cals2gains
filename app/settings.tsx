@@ -204,7 +204,12 @@ const SettingsScreen = () => {
           }
           const granted = await healthService.requestAuthorization();
           if (!granted) {
-            Alert.alert('Error', t('settings.serviceError', { service }));
+            // On iOS, healthService.requestAuthorization already shows a
+            // diagnostic Alert with the NSError details. Don't stack a
+            // second generic Alert on top — it queues and hides the useful one.
+            if (Platform.OS !== 'ios') {
+              Alert.alert('Error', t('settings.serviceError', { service }));
+            }
             setLoading(false);
             return;
           }
