@@ -4,16 +4,12 @@
 // Given the last 7 days of actual intake + dynamic TDEE, compute today's
 // target so that the weekly budget comes out on plan.
 //
-// Clinical guardrails (non-negotiable):
-//   - Protein never rebalanced down (floor by g/kg depending on goal)
-//   - Absolute kcal floor: max(BMR*1.1, 1200♀/1500♂)
-//   - Absolute kcal ceiling: dynamic_TDEE + 700
-//   - Daily band vs base target: ±25% (maintain), -10/+25% (cut), -20/+15% (bulk)
-//   - Kill switch: age < 18, BMI < 18.5, base target < BMR*1.2
-//
-// Design choices (not consensus, tuneable):
-//   - Rolling 7d window (internal), natural week for UI
-//   - Goal kcal adjustment ±500 cut / ±300 bulk
+// Canonical constants are aligned with METODOLOGIA_NUTRICIONAL.md (legal
+// worktree confident-lamarr). Any divergence must be resolved in favour of
+// that document per its §0 ("si el código y este documento divergen, gana
+// este documento"). The static target comes from `utils/macros.ts`
+// (calculateMacroTargets); this file only adds DAILY redistribution based
+// on the rolling 7-day window of actual intake + dynamic TDEE.
 // ============================================
 
 import { FitnessGoal, GoalMode, User, UserGoals, UserProfile } from '../types';
@@ -58,38 +54,41 @@ export function goalTypeFromFitnessGoal(g: FitnessGoal): GoalType {
 }
 
 /**
- * Weekly kcal delta applied on top of summed TDEEs.
- * References (nutrition agent R6 — ranges, not points):
- *   - cut: -500 kcal/day ≈ 0.5 kg/week sustainable deficit (ISSN 2014)
- *   - mini_cut: -700 kcal/day, ≤ 4–8 weeks only (Helms et al. 2014)
- *   - recomp: 0 kcal, emphasis shifts to macros/protein (Barakat et al. 2020)
- *   - bulk: +300 kcal/day for muscle gain (ACSM 2016)
- *   - lean_bulk: +200 kcal/day for minimal fat spillover (ISSN 2019)
+ * TDEE factor applied per goal mode — canonical from METODOLOGIA §3.1 and
+ * mirrored verbatim in utils/macros.ts (legal worktree). The weekly budget
+ * is `Σ(tdeeDynamic * factor)` so the rebalance stays in step with the
+ * static onboarding target when activity is average.
  */
-const GOAL_KCAL_ADJUSTMENT: Record<GoalType, number> = {
-  cut: -500,
-  mini_cut: -700,
-  maintain: 0,
-  recomp: 0,
-  bulk: 300,
-  lean_bulk: 200,
+const GOAL_TDEE_FACTOR: Record<GoalType, number> = {
+  cut: 0.80,       // lose_fat
+  mini_cut: 0.75,
+  maintain: 1.00,
+  recomp: 1.00,
+  bulk: 1.10,      // gain_muscle
+  lean_bulk: 1.05,
 };
 
 /**
- * Protein floor in g/kg body weight. Ranges from ISSN 2017 position stand
- * (1.4–2.2 g/kg for active individuals, up to 2.4 in aggressive cuts).
+ * Protein floor in g/kg body weight — canonical centres from METODOLOGIA
+ * §3.2 (ISSN 2017 Jäger et al., Helms 2014). Mirrors utils/macros.ts
+ * PROTEIN_G_PER_KG so a user on average activity gets the same protein
+ * target whether the static or the rebalanced path runs.
  */
 const PROTEIN_FLOOR_G_PER_KG: Record<GoalType, number> = {
-  cut: 2.2,
+  cut: 2.1,        // lose_fat
   mini_cut: 2.4,
-  maintain: 1.8,
-  recomp: 2.0,
-  bulk: 1.6,
-  lean_bulk: 1.8,
+  maintain: 1.7,
+  recomp: 2.3,
+  bulk: 1.9,       // gain_muscle
+  lean_bulk: 1.9,
 };
 
-/** Fat floor in g/kg body weight (hormonal minimum, ACSM 2016). */
-const FAT_FLOOR_G_PER_KG = 0.6;
+/**
+ * Hormonal fat floor (g/kg) — METODOLOGIA §8.2. Below this the risk of
+ * hypogonadism (♂) and hypothalamic amenorrhea (♀) grows materially
+ * (Fahrenholtz 2018; Loucks 2003).
+ */
+const FAT_FLOOR_G_PER_KG = 0.5;
 
 /** Hard absolute kcal floor by sex (safety net — EFSA minimums). */
 const ABSOLUTE_KCAL_FLOOR_FEMALE = 1200;
@@ -166,20 +165,17 @@ function absoluteFloor(profile: UserProfile): number {
 }
 
 /**
- * Optional medical flags — will be typed strictly when the legal worktree
- * (confident-lamarr) lands in main with the screening onboarding. Until then
- * we read via loose shape so the check is forward-compatible.
- *
- * Nutrition agent R3: block rebalance for vulnerable populations
- * (pregnancy, lactation, minors, active/past ED, clinical conditions).
+ * Canonical taxonomy from legal worktree (confident-lamarr)
+ * `types/index.ts` — array form. Strings are UI-safe (no clinical terms,
+ * §8.4 METODOLOGIA). Typed loosely here so this file doesn't hard-depend
+ * on the legal branch until it lands in main.
  */
-export interface MedicalFlagsShape {
-  pregnant?: boolean;
-  breastfeeding?: boolean;
-  eatingDisorderHistory?: boolean;
-  diabetesType1?: boolean;
-  renalDisease?: boolean;
-  hepaticDisease?: boolean;
+export type MedicalFlagsShape =
+  | Array<'pregnancy_lactation' | 'eating_sensitive' | 'diabetes' | 'kidney_disease' | string>
+  | undefined;
+
+function hasFlag(flags: MedicalFlagsShape, flag: string): boolean {
+  return Array.isArray(flags) && flags.includes(flag);
 }
 
 /**
@@ -195,14 +191,12 @@ export function checkKillSwitch(
   baseGoals: UserGoals,
   medicalFlags?: MedicalFlagsShape
 ): RebalanceFlag | null {
-  // R3 vulnerable populations — must come before anthropometric gates.
-  if (medicalFlags?.pregnant) return 'kill_switch_pregnancy';
-  if (medicalFlags?.breastfeeding) return 'kill_switch_breastfeeding';
-  if (medicalFlags?.eatingDisorderHistory) return 'kill_switch_eating_disorder';
+  // R3 vulnerable populations — canonical strings from legal worktree.
+  if (hasFlag(medicalFlags, 'pregnancy_lactation')) return 'kill_switch_pregnancy';
+  if (hasFlag(medicalFlags, 'eating_sensitive')) return 'kill_switch_eating_disorder';
   if (
-    medicalFlags?.diabetesType1 ||
-    medicalFlags?.renalDisease ||
-    medicalFlags?.hepaticDisease
+    hasFlag(medicalFlags, 'diabetes') ||
+    hasFlag(medicalFlags, 'kidney_disease')
   ) {
     return 'kill_switch_clinical_condition';
   }
@@ -259,17 +253,19 @@ export function computeTodayTarget(
   const pastEntries = entries.slice(0, todayIdx);
   const daysRemaining = entries.length - todayIdx; // includes today
 
-  // Weekly kcal budget = Σ tdeeDynamic per day + goal adjustment * 7
-  const goalAdjust = GOAL_KCAL_ADJUSTMENT[goalType];
-  const weeklyBudget = entries.reduce((sum, e) => sum + e.tdeeDynamic, 0)
-    + goalAdjust * entries.length;
+  // Weekly kcal budget = Σ (tdeeDynamic * goalFactor) per day
+  const goalFactor = GOAL_TDEE_FACTOR[goalType];
+  const weeklyBudget = entries.reduce(
+    (sum, e) => sum + e.tdeeDynamic * goalFactor,
+    0
+  );
 
   const consumedKcal = pastEntries.reduce((sum, e) => sum + e.consumedKcal, 0);
   const remainingKcal = weeklyBudget - consumedKcal;
   const rawDailyKcal = remainingKcal / daysRemaining;
 
   // Base single-day target for comparison + band reference
-  const baseDaily = entries[todayIdx].tdeeDynamic + goalAdjust;
+  const baseDaily = entries[todayIdx].tdeeDynamic * goalFactor;
 
   // Guardrails
   const [bandLo, bandHi] = DAILY_BAND[goalType];
