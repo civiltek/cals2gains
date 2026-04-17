@@ -271,11 +271,13 @@ export interface Recipe {
 // Training / Rest Day Goals
 // ============================================
 
-export type DayType = 'training' | 'rest';
+export type DayType = 'training' | 'rest' | 'refeed' | 'competition';
 
 export interface DayTypeGoals {
   training: UserGoals;
   rest: UserGoals;
+  refeed?: UserGoals;
+  competition?: UserGoals;
   enabled: boolean;
 }
 

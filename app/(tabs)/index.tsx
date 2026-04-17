@@ -29,6 +29,7 @@ import { useAdaptiveEngines } from '../../hooks/useAdaptiveEngines';
 import { useStreakStore } from '../../store/streakStore';
 import StreakBadge from '../../components/ui/StreakBadge';
 import * as Haptics from 'expo-haptics';
+import { DayType } from '../../types';
 
 // ============================================
 // MACRO BAR COLORS
@@ -52,6 +53,8 @@ export default function HomeScreen() {
   const isDark = useThemeStore(s => s.isDark);
   const styles = getStyles(C);
   const { user, getActiveGoals, isSubscriptionActive, isOnTrial, trialDaysRemaining } = useUserStore();
+  const todayDayType = useUserStore((s) => s.todayDayType);
+  const setTodayDayType = useUserStore((s) => s.setTodayDayType);
   const nutritionMode = useUserStore((s) => s.user?.nutritionMode || 'simple');
   const {
     todayMeals,
@@ -518,6 +521,18 @@ export default function HomeScreen() {
           })()}
         </View>
 
+        {/* Day Type Selector */}
+        <DayTypeSelector
+          current={todayDayType}
+          onSelect={(type) => {
+            setTodayDayType(type);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          t={t}
+          C={C}
+          styles={styles}
+        />
+
         {/* Quick Actions */}
         <View style={styles.quickActionsSection}>
           <Text style={styles.sectionTitle}>{t('home.quickActions.title')}</Text>
@@ -580,6 +595,46 @@ export default function HomeScreen() {
 // ============================================
 // SUB-COMPONENTS
 // ============================================
+
+const DAY_TYPES: { type: DayType; emoji: string; key: string }[] = [
+  { type: 'training', emoji: '🏋️', key: 'dayTypeTraining' },
+  { type: 'rest',     emoji: '😴', key: 'dayTypeRest' },
+  { type: 'refeed',  emoji: '🍚', key: 'dayTypeRefeed' },
+  { type: 'competition', emoji: '🏆', key: 'dayTypeCompetition' },
+];
+
+const DayTypeSelector: React.FC<{
+  current: DayType;
+  onSelect: (type: DayType) => void;
+  t: any;
+  C: any;
+  styles: any;
+}> = ({ current, onSelect, t, C, styles }) => (
+  <View style={styles.dayTypeSection}>
+    <Text style={styles.dayTypeSectionLabel}>{t('trainingDay.todayType')}</Text>
+    <View style={styles.dayTypeRow}>
+      {DAY_TYPES.map(({ type, emoji, key }) => {
+        const active = current === type;
+        return (
+          <TouchableOpacity
+            key={type}
+            style={[
+              styles.dayTypeChip,
+              { borderColor: active ? C.primary : C.border, backgroundColor: active ? `${C.primary}18` : C.surface },
+            ]}
+            onPress={() => onSelect(type)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.dayTypeEmoji}>{emoji}</Text>
+            <Text style={[styles.dayTypeLabel, { color: active ? C.primary : C.textSecondary }]}>
+              {t(`trainingDay.${key}`)}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  </View>
+);
 
 const MacroProgressBar: React.FC<{
   label: string;
@@ -919,6 +974,40 @@ const getStyles = (C: ReturnType<typeof useColors>) =>
       fontSize: 11,
       fontWeight: '500',
       textAlign: 'right',
+    },
+
+    // ===== DAY TYPE SELECTOR =====
+    dayTypeSection: {
+      marginHorizontal: 16,
+      marginTop: 16,
+    },
+    dayTypeSectionLabel: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: C.textMuted,
+      textTransform: 'uppercase',
+      letterSpacing: 0.4,
+      marginBottom: 8,
+    },
+    dayTypeRow: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    dayTypeChip: {
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderRadius: 12,
+      borderWidth: 1,
+      gap: 4,
+    },
+    dayTypeEmoji: {
+      fontSize: 18,
+    },
+    dayTypeLabel: {
+      fontSize: 10,
+      fontWeight: '600',
+      textAlign: 'center',
     },
 
     // ===== QUICK ACTIONS =====

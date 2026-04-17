@@ -210,12 +210,26 @@ export const useUserStore = create<UserState>((set, get) => ({
     const { user, dayTypeGoals, todayDayType } = get();
     if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
 
-    // If day type goals are not enabled or not set, return regular goals
     if (!dayTypeGoals || !dayTypeGoals.enabled) {
       return user.goals;
     }
 
-    // Return training or rest goals based on today's day type
+    // Use specific goals if configured
+    if (todayDayType === 'refeed' && dayTypeGoals.refeed) return dayTypeGoals.refeed;
+    if (todayDayType === 'competition' && dayTypeGoals.competition) return dayTypeGoals.competition;
+
+    // Derive refeed/competition from training goals when no specific goals are set
+    if (todayDayType === 'refeed') {
+      const base = dayTypeGoals.training;
+      const extraCarbs = Math.round((base.carbs || 0) * 0.3);
+      return { ...base, carbs: (base.carbs || 0) + extraCarbs, fat: Math.round((base.fat || 0) * 0.8), calories: (base.calories || 0) + extraCarbs * 4 };
+    }
+    if (todayDayType === 'competition') {
+      const base = dayTypeGoals.training;
+      const extraCarbs = Math.round((base.carbs || 0) * 0.5);
+      return { ...base, carbs: (base.carbs || 0) + extraCarbs, fat: Math.round((base.fat || 0) * 0.7), calories: (base.calories || 0) + extraCarbs * 4 };
+    }
+
     return dayTypeGoals[todayDayType];
   },
 

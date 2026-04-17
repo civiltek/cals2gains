@@ -509,6 +509,7 @@ export default {
     dayTypeTraining: 'Training',
     dayTypeRest: 'Rest',
     dayTypeRefeed: 'Refeed',
+    dayTypeCompetition: 'Competition',
     quickActions: 'Quick actions',
     gymPreWorkout: 'Pre-workout meal',
     gymPostWorkout: 'Post-workout snack',
