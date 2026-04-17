@@ -148,11 +148,11 @@ export default function ToolsScreen() {
               onPress={() => router.push('/training-day')}
             />
             <ToolRow
-              icon="trophy-outline"
-              label={t('tools.trainingPlan')}
-              desc={t('tools.trainingPlanDesc')}
-              color="#FF9800"
-              onPress={() => router.push('/training-plan')}
+              icon="calendar-number-outline"
+              label="Planes de entrenamiento"
+              desc="Gestiona y activa tu plan de entrenamiento"
+              color="#FF6A4D"
+              onPress={() => router.push('/training-plans')}
             />
             <ToolRow
               icon="body-outline"

@@ -20,7 +20,7 @@ import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
 import { useUserStore } from '../store/userStore';
-import { useTrainingPlanStore } from '../store/trainingPlanStore';
+import { useTrainingPlanStore } from '../store/trainingPlanSessionStore';
 import {
   TrainingPlanEngine,
   TrainingSession,

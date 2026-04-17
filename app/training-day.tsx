@@ -18,10 +18,11 @@ import { format } from 'date-fns';
 
 // Mock store imports
 import { useUserStore } from '../store/userStore';
+import { useTrainingPlanStore } from '../store/trainingPlanStore';
 
 const { width } = Dimensions.get('window');
 
-type DayType = 'entreno' | 'descanso' | 'refeed';
+type DayType = 'entreno' | 'descanso' | 'refeed' | 'competicion';
 
 interface DayTypeGoals {
   type: DayType;
@@ -62,6 +63,13 @@ const BASE_DAY_TYPE_PRESETS = {
     carbs: 450,
     fat: 60,
   },
+  competicion: {
+    type: 'competicion' as DayType,
+    calories: 2600,
+    protein: 140,
+    carbs: 350,
+    fat: 60,
+  },
 };
 
 // DAY_LABELS will be created inside component with access to t() for translations
@@ -69,6 +77,7 @@ const BASE_DAY_LABELS: Record<DayType, { emoji: string; icon: string }> = {
   entreno: { emoji: '🏋️', icon: 'barbell' },
   descanso: { emoji: '🛋️', icon: 'bed' },
   refeed: { emoji: '🔄', icon: 'refresh' },
+  competicion: { emoji: '🏁', icon: 'flag' },
 };
 
 export default function TrainingDay() {
@@ -79,19 +88,27 @@ export default function TrainingDay() {
 
   // Build DAY_LABELS with translations
   const DAY_LABELS: Record<DayType, { label: string; emoji: string; icon: string }> = useMemo(() => ({
-    entreno: { label: t('trainingDay.dayTypeTraining'), emoji: BASE_DAY_LABELS.entreno.emoji, icon: BASE_DAY_LABELS.entreno.icon },
-    descanso: { label: t('trainingDay.dayTypeRest'), emoji: BASE_DAY_LABELS.descanso.emoji, icon: BASE_DAY_LABELS.descanso.icon },
-    refeed: { label: t('trainingDay.dayTypeRefeed'), emoji: BASE_DAY_LABELS.refeed.emoji, icon: BASE_DAY_LABELS.refeed.icon },
+    entreno:     { label: t('trainingDay.dayTypeTraining'),     emoji: BASE_DAY_LABELS.entreno.emoji,     icon: BASE_DAY_LABELS.entreno.icon },
+    descanso:    { label: t('trainingDay.dayTypeRest'),         emoji: BASE_DAY_LABELS.descanso.emoji,    icon: BASE_DAY_LABELS.descanso.icon },
+    refeed:      { label: t('trainingDay.dayTypeRefeed'),       emoji: BASE_DAY_LABELS.refeed.emoji,      icon: BASE_DAY_LABELS.refeed.icon },
+    competicion: { label: 'Competición',                        emoji: BASE_DAY_LABELS.competicion.emoji, icon: BASE_DAY_LABELS.competicion.icon },
   }), [t]);
 
   // Build DAY_TYPE_PRESETS with theme colors
   const DAY_TYPE_PRESETS: Record<DayType, DayTypeGoals> = useMemo(() => ({
-    entreno: { ...BASE_DAY_TYPE_PRESETS.entreno, color: C.primary },
-    descanso: { ...BASE_DAY_TYPE_PRESETS.descanso, color: C.info },
-    refeed: { ...BASE_DAY_TYPE_PRESETS.refeed, color: C.success },
+    entreno:     { ...BASE_DAY_TYPE_PRESETS.entreno,     color: C.primary },
+    descanso:    { ...BASE_DAY_TYPE_PRESETS.descanso,    color: C.info },
+    refeed:      { ...BASE_DAY_TYPE_PRESETS.refeed,      color: C.success },
+    competicion: { ...BASE_DAY_TYPE_PRESETS.competicion, color: '#FF9800' },
   }), [C.primary, C.info, C.success]);
 
-  const [todayType, setTodayType] = useState<DayType>('entreno');
+  // Read active training plan for today
+  const getTodayTrainingInfo = useTrainingPlanStore((s) => s.getTodayInfo);
+  const todayTrainingInfo = getTodayTrainingInfo();
+  const planDayType = todayTrainingInfo?.dayType as DayType | undefined;
+  const planMacros = todayTrainingInfo?.macros;
+
+  const [todayType, setTodayType] = useState<DayType>(planDayType ?? 'entreno');
   const [weekDays, setWeekDays] = useState<WeekDay[]>([]);
   const [autoDetect, setAutoDetect] = useState(false);
   const [selectedDayForEdit, setSelectedDayForEdit] = useState<string | null>(null);
@@ -125,6 +142,7 @@ export default function TrainingDay() {
         entreno: 'training',
         descanso: 'rest',
         refeed: 'light',
+        competicion: 'training',
       };
       const timeStr = format(new Date(), 'HH:mm');
       const actions = PersonalEngine.getGymFlowSuggestions(dayTypeMap[todayType], timeStr);
@@ -482,6 +500,23 @@ export default function TrainingDay() {
       showsVerticalScrollIndicator={false}
     >
       <Text style={styles.title}>{t('trainingDay.title')}</Text>
+
+      {/* Active plan banner */}
+      {todayTrainingInfo && (
+        <View style={[styles.card, { backgroundColor: '#FF6A4D15', borderColor: '#FF6A4D40', borderWidth: 1, marginBottom: 12 }]}>
+          <Text style={{ fontSize: 12, color: '#FF6A4D', fontWeight: '700', marginBottom: 2 }}>
+            📋 {todayTrainingInfo.plan.name}
+          </Text>
+          <Text style={{ fontSize: 13, color: C.text }}>
+            Día {todayTrainingInfo.dayNumber} de {todayTrainingInfo.totalDays} · {todayTrainingInfo.daysRemaining} días restantes
+          </Text>
+          {planMacros && (
+            <Text style={{ fontSize: 11, color: C.textSecondary, marginTop: 4 }}>
+              Objetivo del plan: {planMacros.calories} kcal · {planMacros.protein}g prot
+            </Text>
+          )}
+        </View>
+      )}
 
       {renderDayTypeSelector()}
 
