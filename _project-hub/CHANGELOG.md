@@ -1,5 +1,15 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Reemplazar integración InBody rota por entrada manual (3895532)
+
+El botón InBody en Ajustes redirigía a la web de la API de InBody (B2B only, sin OAuth público).
+Solución: sustituido por modal de entrada manual de mediciones del informe InBody.
+- `inBodyService`: `hasData()`, `getLastMeasurement()`, `saveManualMeasurement()` (persistencia local)
+- `settings.tsx`: Switch → botón "Registrar" que abre el modal; muestra fecha de última medición
+- Modal con campos: grasa corporal (%), masa muscular (kg), agua % (opt.), grasa visceral (opt.)
+- Al guardar, el servicio queda marcado como "conectado" con datos locales
+- Commit: `3895532`
+
 ## 2026-04-17 — Reparar app.json truncado por commit ddbc981 (c8ab16c)
 
 El commit `ddbc981` ("Fix iOS HealthKit...") eliminó correctamente el entitlement `healthkit.access`
