@@ -168,7 +168,11 @@ export default function WelcomeScreen() {
             <View style={styles.logoContainer}>
               <Image source={LOGO_MARK} style={{ width: 56, height: 56 }} resizeMode="contain" />
             </View>
-            <Text style={styles.appName}>{t('appName')}</Text>
+            <Text style={styles.appName}>
+              <Text style={{ color: C.violet }}>Cals</Text>
+              <Text style={{ color: C.coral }}>2</Text>
+              <Text style={{ color: C.violet }}>Gains</Text>
+            </Text>
             <Text style={styles.tagline}>{t('auth.welcome')}</Text>
             <Text style={styles.subtitle}>{t('auth.subtitle')}</Text>
           </View>

@@ -18,7 +18,7 @@ import { format } from 'date-fns';
 
 // Mock store imports
 import { useUserStore } from '../store/userStore';
-import { useTrainingPlanStore } from '../store/trainingPlanStore';
+import { useTrainingPlanStore, buildPresetsFromGoals } from '../store/trainingPlanStore';
 
 const { width } = Dimensions.get('window');
 
@@ -94,17 +94,33 @@ export default function TrainingDay() {
     competicion: { label: 'Competición',                        emoji: BASE_DAY_LABELS.competicion.emoji, icon: BASE_DAY_LABELS.competicion.icon },
   }), [t]);
 
-  // Build DAY_TYPE_PRESETS with theme colors
-  const DAY_TYPE_PRESETS: Record<DayType, DayTypeGoals> = useMemo(() => ({
-    entreno:     { ...BASE_DAY_TYPE_PRESETS.entreno,     color: C.primary },
-    descanso:    { ...BASE_DAY_TYPE_PRESETS.descanso,    color: C.info },
-    refeed:      { ...BASE_DAY_TYPE_PRESETS.refeed,      color: C.success },
-    competicion: { ...BASE_DAY_TYPE_PRESETS.competicion, color: '#FF9800' },
-  }), [C.primary, C.info, C.success]);
+  // User goals drive proportional macros; fall back to hardcoded defaults.
+  const user = useUserStore((s) => s.user);
+  const userGoals = user?.goals && user.goals.calories > 0 ? user.goals : null;
 
-  // Read active training plan for today
+  // Build DAY_TYPE_PRESETS — proportional to user goals when available.
+  const DAY_TYPE_PRESETS: Record<DayType, DayTypeGoals> = useMemo(() => {
+    const colors = { entreno: C.primary, descanso: C.info, refeed: C.success, competicion: '#FF9800' };
+    if (userGoals) {
+      const p = buildPresetsFromGoals(userGoals);
+      return {
+        entreno:     { type: 'entreno',     ...p.entreno,     color: colors.entreno },
+        descanso:    { type: 'descanso',    ...p.descanso,    color: colors.descanso },
+        refeed:      { type: 'refeed',      ...p.refeed,      color: colors.refeed },
+        competicion: { type: 'competicion', ...p.competicion, color: colors.competicion },
+      };
+    }
+    return {
+      entreno:     { ...BASE_DAY_TYPE_PRESETS.entreno,     color: colors.entreno },
+      descanso:    { ...BASE_DAY_TYPE_PRESETS.descanso,    color: colors.descanso },
+      refeed:      { ...BASE_DAY_TYPE_PRESETS.refeed,      color: colors.refeed },
+      competicion: { ...BASE_DAY_TYPE_PRESETS.competicion, color: colors.competicion },
+    };
+  }, [C.primary, C.info, C.success, userGoals]);
+
+  // Read active training plan for today (pass goals so plan macros scale with user TDEE)
   const getTodayTrainingInfo = useTrainingPlanStore((s) => s.getTodayInfo);
-  const todayTrainingInfo = getTodayTrainingInfo();
+  const todayTrainingInfo = getTodayTrainingInfo(userGoals ?? undefined);
   const planDayType = todayTrainingInfo?.dayType as DayType | undefined;
   const planMacros = todayTrainingInfo?.macros;
 

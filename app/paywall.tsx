@@ -11,7 +11,10 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Image,
 } from 'react-native';
+
+const LOGO_MARK = require('../brand-assets/C2G-Mark-512.png');
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -149,7 +152,12 @@ export default function PaywallScreen() {
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Hero */}
           <View style={styles.hero}>
-            <Text style={styles.heroEmoji}>🔬</Text>
+            <Image source={LOGO_MARK} style={styles.heroLogo} resizeMode="contain" />
+            <Text style={styles.brandWordmark}>
+              <Text style={{ color: C.violet }}>Cals</Text>
+              <Text style={{ color: C.coral, fontSize: 24, fontFamily: 'Outfit-Bold' }}>2</Text>
+              <Text style={{ color: C.violet }}>Gains</Text>
+            </Text>
             <Text style={styles.heroTitle}>{t('paywall.title')}</Text>
             <Text style={styles.heroSubtitle}>{t('paywall.subtitle')}</Text>
           </View>
@@ -331,9 +339,18 @@ function createStyles(C: any) {
       paddingBottom: 24,
       paddingHorizontal: 24,
     },
-    heroEmoji: {
-      fontSize: 56,
-      marginBottom: 16,
+    heroLogo: {
+      width: 72,
+      height: 72,
+      marginBottom: 12,
+    },
+    brandWordmark: {
+      fontSize: 30,
+      fontWeight: '800',
+      fontFamily: 'Outfit-Bold',
+      letterSpacing: -0.5,
+      marginBottom: 14,
+      textAlign: 'center',
     },
     heroTitle: {
       fontSize: 28,

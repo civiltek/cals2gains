@@ -210,6 +210,28 @@ export const useUserStore = create<UserState>((set, get) => ({
     const { user, dayTypeGoals, todayDayType } = get();
     if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
 
+    // If a training plan is active, it overrides everything until the plan ends.
+    // Macros are proportional to the user's personal goals, not the plan's hardcoded defaults.
+    if (user.goals && user.goals.calories > 0) {
+      try {
+        // Lazy-require to avoid circular import at module-init time.
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { useTrainingPlanStore } = require('./trainingPlanStore');
+        const planInfo = useTrainingPlanStore.getState().getTodayInfo(user.goals);
+        if (planInfo) {
+          return {
+            calories: planInfo.macros.calories,
+            protein: planInfo.macros.protein,
+            carbs: planInfo.macros.carbs,
+            fat: planInfo.macros.fat,
+            fiber: user.goals.fiber,
+          };
+        }
+      } catch {
+        /* training plan store not ready — fall through */
+      }
+    }
+
     if (!dayTypeGoals || !dayTypeGoals.enabled) {
       return user.goals;
     }

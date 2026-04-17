@@ -67,6 +67,55 @@ export const DEFAULT_MACRO_PRESETS: Record<TrainingDayType, MacroPreset> = {
 };
 
 // ============================================
+// PROPORTIONAL MACRO MULTIPLIERS
+// ============================================
+// Applied to the user's personal goals so training/refeed/rest days scale
+// with their individual TDEE instead of the hardcoded defaults above.
+// Protein roughly constant; carbs cycle up on training/refeed; fat compensates on rest.
+
+export const DAY_TYPE_MULTIPLIERS: Record<
+  TrainingDayType,
+  { calories: number; protein: number; carbs: number; fat: number }
+> = {
+  entreno:     { calories: 1.12, protein: 1.05, carbs: 1.25, fat: 0.90 },
+  descanso:    { calories: 0.95, protein: 1.00, carbs: 0.80, fat: 1.10 },
+  refeed:      { calories: 1.20, protein: 0.95, carbs: 1.45, fat: 0.85 },
+  competicion: { calories: 1.08, protein: 1.00, carbs: 1.20, fat: 0.95 },
+};
+
+/** Build proportional macro presets from the user's base goals. */
+export function buildPresetsFromGoals(goals: {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}): Record<TrainingDayType, MacroPreset> {
+  const out = {} as Record<TrainingDayType, MacroPreset>;
+  (Object.keys(DAY_TYPE_MULTIPLIERS) as TrainingDayType[]).forEach((k) => {
+    const m = DAY_TYPE_MULTIPLIERS[k];
+    out[k] = {
+      calories: Math.round(goals.calories * m.calories),
+      protein: Math.round(goals.protein * m.protein),
+      carbs: Math.round(goals.carbs * m.carbs),
+      fat: Math.round(goals.fat * m.fat),
+    };
+  });
+  return out;
+}
+
+/** Spanish TrainingDayType → English DayType (shared with userStore). */
+export function trainingDayTypeToEnglish(
+  t: TrainingDayType
+): 'training' | 'rest' | 'refeed' | 'competition' {
+  switch (t) {
+    case 'entreno':     return 'training';
+    case 'descanso':    return 'rest';
+    case 'refeed':      return 'refeed';
+    case 'competicion': return 'competition';
+  }
+}
+
+// ============================================
 // BUILT-IN PRESET PLANS
 // ============================================
 
@@ -156,8 +205,15 @@ interface TrainingPlanState {
   activatePlan: (planId: string) => void;
   deactivatePlan: () => void;
 
-  // Computed info for today (returns null if no active plan or plan ended)
-  getTodayInfo: () => TodayPlanInfo | null;
+  // Computed info for today (returns null if no active plan or plan ended).
+  // If `userGoals` is passed, `macros` is computed proportionally from them via
+  // buildPresetsFromGoals; otherwise falls back to the plan's hardcoded defaults.
+  getTodayInfo: (userGoals?: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  }) => TodayPlanInfo | null;
 }
 
 export const useTrainingPlanStore = create<TrainingPlanState>()(
@@ -199,7 +255,7 @@ export const useTrainingPlanStore = create<TrainingPlanState>()(
         set({ activePlan: null });
       },
 
-      getTodayInfo: () => {
+      getTodayInfo: (userGoals) => {
         const { activePlan, plans } = get();
         if (!activePlan) return null;
 
@@ -211,9 +267,7 @@ export const useTrainingPlanStore = create<TrainingPlanState>()(
 
         if (elapsed < 0) return null;
 
-        // Plan finished — auto-deactivate
         if (elapsed >= totalDays) {
-          // Deactivate asynchronously to avoid updating store during render
           setTimeout(() => get().deactivatePlan(), 0);
           return null;
         }
@@ -222,13 +276,19 @@ export const useTrainingPlanStore = create<TrainingPlanState>()(
         const dayIndex = elapsed % 7;
         const dayType = plan.weeks[weekIndex]?.[dayIndex]?.type ?? 'descanso';
 
+        // Proportional macros (when we have valid user goals) > plan.macroPresets fallback.
+        const macros =
+          userGoals && userGoals.calories > 0
+            ? buildPresetsFromGoals(userGoals)[dayType]
+            : plan.macroPresets[dayType];
+
         return {
           plan,
           dayType,
           dayNumber: elapsed + 1,
           totalDays,
           daysRemaining: totalDays - elapsed - 1,
-          macros: plan.macroPresets[dayType],
+          macros,
         };
       },
     }),

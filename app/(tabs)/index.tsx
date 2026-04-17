@@ -105,7 +105,7 @@ export default function HomeScreen() {
   const dismissRecommendation = useAdaptiveStore((s) => s.dismissRecommendation);
   const updateUserGoals = useUserStore((s) => s.updateUserGoals);
   const getTodayTrainingInfo = useTrainingPlanStore((s) => s.getTodayInfo);
-  const todayTraining = isToday ? getTodayTrainingInfo() : null;
+  const todayTraining = isToday ? getTodayTrainingInfo(user?.goals) : null;
 
   const locale = i18n.language === 'es' ? es : enUS;
   const today = useMemo(
