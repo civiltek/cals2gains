@@ -1,6 +1,6 @@
 # Cals2Gains - Features
 
-> Última actualización: 2026-04-13
+> Última actualización: 2026-04-17
 > Fuente: pantallas en `app/`, componentes en `components/`, servicios en `services/`
 
 ## Estado: ✅ = Implementado | 🔧 = Bug conocido | 🚧 = En progreso | ⏳ = Pendiente
@@ -37,9 +37,18 @@
 | Progress Photos | `app/progress-photos.tsx` | 🔧 Firebase Storage upload |
 | Fasting Tracker | `app/fasting.tsx` | ✅ |
 | Training Day (ajuste macros) | `app/training-day.tsx` | ✅ |
+| **Training Plan adaptativo** | `app/training-plan.tsx` | ✅ nuevo |
 | Adherence | `app/adherence.tsx` | ✅ |
 | Analytics | `app/analytics.tsx` | ✅ |
 | Protein Dashboard | `app/protein-dashboard.tsx` | ✅ |
+
+### UX Educativa
+| Feature | Archivo | Estado |
+|---------|---------|--------|
+| InfoButton (modal educativo) | `components/ui/InfoButton.tsx` | ✅ nuevo |
+| Tooltip ayuno intermitente | `app/fasting.tsx` | ✅ nuevo |
+| Tooltip modo objetivo + macros | `app/goal-modes.tsx` | ✅ nuevo |
+| Tooltip calorías + macros | `app/analysis.tsx` | ✅ nuevo |
 
 ### IA y Coaching
 | Feature | Archivo | Estado |
