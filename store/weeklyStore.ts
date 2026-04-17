@@ -18,11 +18,15 @@ import { addNutrition, calculateBMR, emptyNutrition } from '../utils/nutrition';
 import { calculateDynamicTDEE } from '../utils/nutrition';
 import {
   DailyEntry,
+  MedicalFlagsShape,
   TodayTarget,
+  TrainingDayOverride,
   computeTodayTarget,
   goalTypeFromFitnessGoal,
+  goalTypeFromUser,
   getActivityMultiplier,
 } from '../utils/weeklyRebalance';
+import { User } from '../types';
 
 const WINDOW_DAYS = 7;
 const REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6h
@@ -56,8 +60,19 @@ interface WeeklyState {
   /** Load/refresh the 7-day window. No-op if recently loaded. */
   loadWeek: (userId: string, profile: UserProfile, force?: boolean) => Promise<void>;
 
-  /** Compute today's rebalanced target. Returns null if rebalance not applicable. */
-  getTodayTarget: (profile: UserProfile, baseGoals: UserGoals) => TodayTarget | null;
+  /**
+   * Compute today's rebalanced target. Returns null if rebalance not applicable
+   * (kill switch, vulnerable population, or plan override for today).
+   *
+   * @param user          Full user (to read goalMode + medical flags forward-compat)
+   * @param baseGoals     Static accepted goals
+   * @param trainingDay   Optional — today's training plan day override ('refeed' / 'competicion')
+   */
+  getTodayTarget: (
+    user: User,
+    baseGoals: UserGoals,
+    trainingDay?: TrainingDayOverride | null
+  ) => TodayTarget | null;
 
   /** Clear state (on logout). */
   reset: () => void;
@@ -139,11 +154,22 @@ export const useWeeklyStore = create<WeeklyState>((set, get) => ({
     }
   },
 
-  getTodayTarget: (profile, baseGoals) => {
+  getTodayTarget: (user, baseGoals, trainingDay) => {
     const { entries } = get();
     if (entries.length === 0) return null;
-    const goalType = goalTypeFromFitnessGoal(profile.goal);
-    return computeTodayTarget(profile, baseGoals, goalType, entries);
+    // Prefer advanced goalMode (6 values) over simple FitnessGoal (4 values).
+    const goalType = goalTypeFromUser(user);
+    // Forward-compat: legal worktree adds medicalFlags to the User via screening.
+    // Read loosely so this survives the merge either way.
+    const medicalFlags = (user as any).medicalFlags as MedicalFlagsShape | undefined;
+    return computeTodayTarget(
+      user.profile,
+      baseGoals,
+      goalType,
+      entries,
+      medicalFlags,
+      trainingDay
+    );
   },
 
   reset: () => set({ entries: [], lastLoadedAt: null, isLoading: false }),

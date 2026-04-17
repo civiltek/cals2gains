@@ -188,8 +188,11 @@ export default function HomeScreen() {
   const rebalancedTarget = useMemo(() => {
     if (!user?.dynamicTDEEEnabled || !user?.profile) return null;
     if (!isToday) return null; // only adjust today's view
-    return getTodayTarget(user.profile, baseGoals);
-  }, [user?.dynamicTDEEEnabled, user?.profile, isToday, baseGoals.calories, getTodayTarget]);
+    // TODO: pass trainingDay from training plan store once it's wired here.
+    // For now we pass undefined — rebalance runs normally except when the plan
+    // store explicitly flags refeed/competition days.
+    return getTodayTarget(user, baseGoals, null);
+  }, [user, isToday, baseGoals.calories, getTodayTarget]);
 
   const goals = rebalancedTarget
     ? {
@@ -448,15 +451,23 @@ export default function HomeScreen() {
 
         {/* ===== CALORIE RING + MACRO BARS DASHBOARD ===== */}
         <View style={styles.dashboardCard}>
-          {/* Rebalance banner: only shown when today's target differs from base */}
+          {/* Rebalance banner: only shown when today's target differs from base.
+              Includes the nutrition-agent-mandated medical disclaimer (R2). */}
           {rebalancedTarget && rebalancedTarget.calories !== rebalancedTarget.baseTarget && (
             <View style={[styles.rebalanceBanner, { backgroundColor: C.violet + '22', borderColor: C.violet }]}>
-              <Ionicons name="sync" size={14} color={C.violet} />
-              <Text style={[styles.rebalanceText, { color: C.text }]}>
-                {t('home.rebalance.adjusted', {
-                  today: rebalancedTarget.calories,
-                  base: rebalancedTarget.baseTarget,
-                  defaultValue: 'Hoy {{today}} kcal · base {{base}}',
+              <View style={styles.rebalanceHeader}>
+                <Ionicons name="sync" size={14} color={C.violet} />
+                <Text style={[styles.rebalanceText, { color: C.text }]}>
+                  {t('home.rebalance.adjusted', {
+                    today: rebalancedTarget.calories,
+                    base: rebalancedTarget.baseTarget,
+                    defaultValue: 'Hoy {{today}} kcal · base {{base}}',
+                  })}
+                </Text>
+              </View>
+              <Text style={[styles.rebalanceDisclaimer, { color: C.text + 'aa' }]}>
+                {t('home.rebalance.disclaimer', {
+                  defaultValue: 'Información general basada en tu actividad reciente. No sustituye el consejo de un profesional de la salud.',
                 })}
               </Text>
             </View>
@@ -959,14 +970,25 @@ const getStyles = (C: ReturnType<typeof useColors>) =>
       marginBottom: 20,
     },
     rebalanceBanner: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
+      flexDirection: 'column',
+      gap: 4,
       paddingHorizontal: 12,
-      paddingVertical: 8,
+      paddingVertical: 10,
       borderRadius: 10,
       borderWidth: 1,
       marginBottom: 12,
+    },
+    rebalanceHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    rebalanceDisclaimer: {
+      fontSize: 10,
+      fontFamily: 'InstrumentSans',
+      fontStyle: 'italic',
+      lineHeight: 14,
+      marginTop: 2,
     },
     rebalanceText: {
       fontSize: 12,
