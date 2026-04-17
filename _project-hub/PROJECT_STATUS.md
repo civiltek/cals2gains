@@ -34,8 +34,17 @@
 - i18n `loseFatDesc` / `miniCutDesc` usan "pérdida rápida"/"rapid loss" (prohibidos §9.2 metodología) — reformular.
 - `hooks/useHealthSync.ts` tiene import inocuo `calculateBMR` sin uso directo (puede limpiarse).
 
-## Documentos nuevos del hub en esta sesión
-- `METODOLOGIA_NUTRICIONAL.md` · `INFORME_LEGAL_v1.md` · `DPIA_v1.md` · `RAT_v1.md` · `AUDITORIA_MARKETING_v1.md` · `AGE_RATING_STORES.md` · `PROMPT_UPDATE_APP.md`
+## Documentos nuevos del hub
+- **Manuales del producto (4):**
+  - `METODOLOGIA_NUTRICIONAL.md` — guía técnica/científica (402 líneas, 17 refs primarias).
+  - `MANUAL_LEGAL.md` — cumplimiento y procedimientos (792 líneas).
+  - `MANUAL_DEV.md` — manual técnico (804 líneas, 11 ADRs).
+  - `MANUAL_USUARIO.md` — guía de uso (530 líneas).
+- **Documentos legales firmados:**
+  - `DPIA_v1.md` — Evaluación de Impacto (firmada).
+  - `RAT_v1.md` — Registro de Actividades (10 tratamientos).
+- **Auditorías y orientaciones:**
+  - `INFORME_LEGAL_v1.md` · `AUDITORIA_MARKETING_v1.md` · `AGE_RATING_STORES.md` · `PROMPT_UPDATE_APP.md`.
 
 ## App
 - **Versión actual:** 1.0.0
