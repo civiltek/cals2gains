@@ -188,11 +188,15 @@ export default function HomeScreen() {
   const rebalancedTarget = useMemo(() => {
     if (!user?.dynamicTDEEEnabled || !user?.profile) return null;
     if (!isToday) return null; // only adjust today's view
-    // TODO: pass trainingDay from training plan store once it's wired here.
-    // For now we pass undefined — rebalance runs normally except when the plan
-    // store explicitly flags refeed/competition days.
-    return getTodayTarget(user, baseGoals, null);
-  }, [user, isToday, baseGoals.calories, getTodayTarget]);
+    // If an active training plan marks today as refeed or competition, skip
+    // rebalance so the plan's macros take precedence (nutrition agent R9).
+    const trainingInfo = getTodayTrainingInfo();
+    const trainingDay =
+      trainingInfo?.dayType === 'refeed' || trainingInfo?.dayType === 'competicion'
+        ? trainingInfo.dayType
+        : null;
+    return getTodayTarget(user, baseGoals, trainingDay);
+  }, [user, isToday, baseGoals.calories, getTodayTarget, getTodayTrainingInfo]);
 
   const goals = rebalancedTarget
     ? {
