@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import Svg, { Path } from 'react-native-svg';
 import { mealStore } from '../store/mealStore';
 import { weightStore } from '../store/weightStore';
 import { waterStore } from '../store/waterStore';
@@ -638,14 +639,14 @@ export default function AnalyticsScreen() {
     const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
     return (
-      <svg
+      <Svg
         width={width - 80}
         height={CHART_HEIGHT}
         viewBox={`0 0 ${width - 80} ${CHART_HEIGHT}`}
         style={{ position: 'absolute' }}
       >
-        <path d={pathD} stroke={C.primary} strokeWidth={2} fill="none" />
-      </svg>
+        <Path d={pathD} stroke={C.primary} strokeWidth={2} fill="none" />
+      </Svg>
     );
   };
 

@@ -60,6 +60,9 @@ export default function FoodSearchScreen() {
   const [analyzing, setAnalyzing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
   const [servings, setServings] = useState(1);
+  // Custom weight override (grams). When set, replaces servings × servingSize.
+  // Testers asked for fine-grained portion control (not only 0.5 increments).
+  const [customGrams, setCustomGrams] = useState<string>('');
   const [mealType, setMealType] = useState(params.mealType || 'lunch');
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -126,12 +129,48 @@ export default function FoodSearchScreen() {
     }
   };
 
+  // Resolve effective weight (grams): custom input overrides servings × servingSize
+  const resolveEffectiveGrams = useCallback((): number => {
+    if (!selectedItem) return 0;
+    const servingSize = selectedItem.servingSize || 100;
+    const custom = parseFloat(customGrams);
+    if (Number.isFinite(custom) && custom > 0) return Math.max(1, Math.round(custom));
+    return Math.max(1, Math.round(servingSize * servings));
+  }, [selectedItem, customGrams, servings]);
+
   // Log selected food
   const handleLogFood = async () => {
     if (!selectedItem || !user?.uid) return;
 
-    const nutrition = selectedItem.nutritionPerServing || selectedItem.nutritionPer100g;
-    if (!nutrition) return;
+    // Prefer per-100g nutrition when scaling by custom grams (more accurate);
+    // fall back to nutritionPerServing when only servings are used.
+    const per100g = selectedItem.nutritionPer100g;
+    const nutritionPerServing = selectedItem.nutritionPerServing || per100g;
+    if (!nutritionPerServing && !per100g) return;
+
+    const grams = resolveEffectiveGrams();
+
+    // Scale: if we have per-100g values, use grams/100. Otherwise fall back to servings.
+    let scaledNutrition;
+    if (per100g) {
+      const factor = grams / 100;
+      scaledNutrition = {
+        calories: Math.round((per100g.calories || 0) * factor),
+        protein: Math.round((per100g.protein || 0) * factor * 10) / 10,
+        carbs: Math.round((per100g.carbs || 0) * factor * 10) / 10,
+        fat: Math.round((per100g.fat || 0) * factor * 10) / 10,
+        fiber: Math.round((per100g.fiber || 0) * factor * 10) / 10,
+      };
+    } else {
+      const s = grams / (selectedItem.servingSize || 100);
+      scaledNutrition = {
+        calories: Math.round((nutritionPerServing!.calories || 0) * s),
+        protein: Math.round((nutritionPerServing!.protein || 0) * s * 10) / 10,
+        carbs: Math.round((nutritionPerServing!.carbs || 0) * s * 10) / 10,
+        fat: Math.round((nutritionPerServing!.fat || 0) * s * 10) / 10,
+        fiber: Math.round((nutritionPerServing!.fiber || 0) * s * 10) / 10,
+      };
+    }
 
     try {
       await addMeal({
@@ -143,16 +182,10 @@ export default function FoodSearchScreen() {
         dishNameEn: selectedItem.nameEn || selectedItem.name || 'Food',
         ingredients: [],
         portionDescription: selectedItem.brand
-          ? `${selectedItem.brand} - ${servings} ${t('common.servings', { count: servings })}`
-          : `${servings} ${t('common.servings', { count: servings })}`,
-        estimatedWeight: Math.round((selectedItem.servingSize || 100) * servings),
-        nutrition: {
-          calories: Math.round((nutrition.calories || 0) * servings),
-          protein: Math.round((nutrition.protein || 0) * servings * 10) / 10,
-          carbs: Math.round((nutrition.carbs || 0) * servings * 10) / 10,
-          fat: Math.round((nutrition.fat || 0) * servings * 10) / 10,
-          fiber: Math.round((nutrition.fiber || 0) * servings * 10) / 10,
-        },
+          ? `${selectedItem.brand} · ${grams}g`
+          : `${grams}g`,
+        estimatedWeight: grams,
+        nutrition: scaledNutrition,
         mealType: mealType as any,
         aiConfidence: 1.0,
       } as any);
@@ -406,23 +439,45 @@ export default function FoodSearchScreen() {
       {/* Selected Item Footer */}
       {selectedItem && (
         <View style={[styles.footer, { backgroundColor: C.surface, borderTopColor: C.border }]}>
+          {/* Servings stepper */}
           <View style={styles.servingsRow}>
             <Text style={[styles.servingsLabel, { color: C.textSecondary }]}>{t('foodSearch.servingsLabel')}</Text>
             <TouchableOpacity
-              onPress={() => setServings(Math.max(0.5, servings - 0.5))}
+              onPress={() => { setCustomGrams(''); setServings(Math.max(0.5, servings - 0.5)); }}
               style={styles.servingsBtn}
+              accessibilityRole="button"
+              accessibilityLabel={t('foodSearch.decreaseServings')}
             >
               <Ionicons name="remove" size={20} color={C.text} />
             </TouchableOpacity>
             <Text style={[styles.servingsValue, { color: C.text }]}>{servings}</Text>
             <TouchableOpacity
-              onPress={() => setServings(servings + 0.5)}
+              onPress={() => { setCustomGrams(''); setServings(servings + 0.5); }}
               style={styles.servingsBtn}
+              accessibilityRole="button"
+              accessibilityLabel={t('foodSearch.increaseServings')}
             >
               <Ionicons name="add" size={20} color={C.text} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={[styles.logButton, { backgroundColor: C.primary }]} onPress={handleLogFood}>
+
+          {/* Exact weight input (grams) */}
+          <View style={styles.gramsRow}>
+            <Text style={[styles.servingsLabel, { color: C.textSecondary }]}>{t('foodSearch.weightLabel')}</Text>
+            <TextInput
+              style={[styles.gramsInput, { color: C.text, borderColor: C.border, backgroundColor: C.background }]}
+              placeholder={String(Math.round((selectedItem.servingSize || 100) * servings))}
+              placeholderTextColor={C.textMuted}
+              keyboardType="numeric"
+              value={customGrams}
+              onChangeText={setCustomGrams}
+              maxLength={5}
+              accessibilityLabel={t('foodSearch.weightLabel')}
+            />
+            <Text style={[styles.gramsUnit, { color: C.textSecondary }]}>g</Text>
+          </View>
+
+          <TouchableOpacity style={[styles.logButton, { backgroundColor: C.primary }]} onPress={handleLogFood} accessibilityRole="button" accessibilityLabel={t('foodSearch.logButton')}>
             <Ionicons name="add-circle" size={20} color={C.text} />
             <Text style={[styles.logButtonText, { color: C.text }]}>{t('foodSearch.logButton')}</Text>
           </TouchableOpacity>
@@ -641,6 +696,27 @@ const createStyles = (C: any) => StyleSheet.create({
     color: C.text,
     minWidth: 30,
     textAlign: 'center',
+  },
+  gramsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 10,
+  },
+  gramsInput: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    textAlign: 'right',
+  },
+  gramsUnit: {
+    fontSize: 14,
+    fontWeight: '600',
+    minWidth: 20,
   },
   logButton: {
     flexDirection: 'row',

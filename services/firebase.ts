@@ -220,6 +220,19 @@ export async function getUserData(uid: string): Promise<User | null> {
       profile: data.profile || {},
       onboardingCompleted: data.onboardingCompleted || false,
       language: data.language || 'es',
+      // Optional fields — persisted by updateUserGoalsAndMode / updateUserAllergies / etc.
+      // Missing these on load caused settings toggles and allergy chips to reset
+      // every cold start (tester feedback 2026-04-17).
+      goalMode: data.goalMode,
+      nutritionMode: data.nutritionMode,
+      adaptiveMode: data.adaptiveMode,
+      tdee: data.tdee,
+      bmr: data.bmr,
+      weight: data.weight,
+      healthEnabled: data.healthEnabled,
+      dynamicTDEEEnabled: data.dynamicTDEEEnabled,
+      allergies: data.allergies || [],
+      intolerances: data.intolerances || [],
     } as User;
   } catch (error) {
     console.error('Error fetching user data:', error);

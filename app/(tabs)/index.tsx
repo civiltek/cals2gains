@@ -2,7 +2,7 @@
 // Cals2Gains - Home / Dashboard Screen
 // ============================================
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -58,8 +58,33 @@ export default function HomeScreen() {
     todayNutrition,
     isLoading,
     loadTodayMeals,
+    loadMealsForDate,
     removeMeal,
   } = useMealStore();
+
+  // View date — defaults to today; user can step back/forward with arrows.
+  // We load meals for this date whenever it changes (including on mount).
+  const [viewDate, setViewDate] = useState<Date>(new Date());
+  const isToday = useMemo(() => {
+    const now = new Date();
+    return viewDate.toDateString() === now.toDateString();
+  }, [viewDate]);
+
+  const goPrevDay = useCallback(() => {
+    const d = new Date(viewDate);
+    d.setDate(d.getDate() - 1);
+    setViewDate(d);
+  }, [viewDate]);
+
+  const goNextDay = useCallback(() => {
+    if (isToday) return;
+    const d = new Date(viewDate);
+    d.setDate(d.getDate() + 1);
+    const now = new Date();
+    now.setHours(23, 59, 59, 999);
+    if (d > now) return;
+    setViewDate(d);
+  }, [viewDate, isToday]);
 
   // Adaptive engines — runs weekly check + memory analysis on mount
   const { isAnalyzing } = useAdaptiveEngines();
@@ -77,16 +102,22 @@ export default function HomeScreen() {
   const updateUserGoals = useUserStore((s) => s.updateUserGoals);
 
   const locale = i18n.language === 'es' ? es : enUS;
-  const today = format(new Date(), 'EEEE, d MMMM', { locale });
+  const today = useMemo(
+    () => format(viewDate, 'EEEE, d MMMM', { locale }),
+    [viewDate, locale]
+  );
 
   useEffect(() => {
-    if (user) {
+    if (!user) return;
+    if (isToday) {
       loadTodayMeals(user.uid);
-      if (!isStreakLoaded) {
-        loadGameProgress(user.uid);
-      }
+    } else {
+      loadMealsForDate(user.uid, viewDate);
     }
-  }, [user?.uid]);
+    if (!isStreakLoaded) {
+      loadGameProgress(user.uid);
+    }
+  }, [user?.uid, viewDate.toDateString()]);
 
   // Refresh streak whenever meals are loaded for the day
   useEffect(() => {
@@ -204,13 +235,39 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Greeting + Date + Streak badge */}
+        {/* Greeting + Date (with day nav) + Streak badge */}
         <View style={styles.header}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.greeting}>
               {t('home.greeting')}, {user?.displayName?.split(' ')[0] || '👋'}
             </Text>
-            <Text style={styles.date}>{today}</Text>
+            <View style={styles.dateNavRow}>
+              <TouchableOpacity
+                onPress={goPrevDay}
+                style={styles.dateNavBtn}
+                accessibilityRole="button"
+                accessibilityLabel={t('home.previousDay')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 4 }}
+              >
+                <Ionicons name="chevron-back" size={18} color={C.textSecondary} />
+              </TouchableOpacity>
+              <Text style={styles.date}>{today}</Text>
+              <TouchableOpacity
+                onPress={goNextDay}
+                disabled={isToday}
+                style={styles.dateNavBtn}
+                accessibilityRole="button"
+                accessibilityLabel={t('home.nextDay')}
+                accessibilityState={{ disabled: isToday }}
+                hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}
+              >
+                <Ionicons
+                  name="chevron-forward"
+                  size={18}
+                  color={isToday ? C.textMuted : C.textSecondary}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
           <StreakBadge compact />
         </View>
@@ -633,8 +690,17 @@ const getStyles = (C: ReturnType<typeof useColors>) =>
     date: {
       fontSize: 13,
       color: C.textSecondary,
-      marginTop: 2,
       textTransform: 'capitalize',
+    },
+    dateNavRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 2,
+      gap: 6,
+    },
+    dateNavBtn: {
+      paddingVertical: 2,
+      paddingHorizontal: 2,
     },
     notificationBtn: {
       width: 40,

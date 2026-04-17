@@ -1,5 +1,47 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Tanda 3: fixes feedback TestFlight build 1.0.0 (46)
+
+Correcciones de los errores/comentarios reportados por Judith como tester interno TestFlight, tras instalar el build `6935ba28` (1.0.0, 46) en iPhone 16 Pro Max / iOS 26.3.1.
+
+**🔴 Crashes:**
+- **[app/analytics.tsx]** Pantalla Analíticas crasheaba al abrir porque `renderTrendLine` usaba elementos web `<svg>` y `<path>` en lugar de `Svg`/`Path` de `react-native-svg`. Importado `Svg, Path` y reemplazados los elementos → crash resuelto.
+
+**🔴 Bugs funcionales:**
+- **[services/firebase.ts:208-223]** `getUserData` solo deserializaba un subset de campos del user de Firestore y OMITÍA varios opcionales críticos: `allergies`, `intolerances`, `healthEnabled`, `dynamicTDEEEnabled`, `adaptiveMode`, `goalMode`, `nutritionMode`, `tdee`, `bmr`, `weight`. Esto causaba que:
+  - Las alergias/intolerancias desaparecieran al reiniciar la app ("aparecen desmarcadas al volver a entrar")
+  - El toggle Health/Apple Health se resetease a OFF aunque estuviera conectado
+  - Los ajustes de adaptive / goal mode / TDEE dinámico se perdiesen entre sesiones
+  Fix: deserializar todos los campos opcionales del interface `User`.
+
+**🟡 Mejoras UX solicitadas por tester:**
+- **[app/(tabs)/index.tsx]** Dashboard ahora tiene flechas ◄ ► junto a la fecha para navegar a días anteriores/siguientes. No permite ir al futuro. Cada cambio de día recarga las comidas correspondientes vía `loadMealsForDate`.
+- **[app/food-search.tsx]** Búsqueda manual ahora permite ajustar peso exacto en gramos además del stepper de porciones. Input numérico `customGrams` que sobrescribe el cálculo `servingSize × servings`. Macros se recalculan usando `per100g × (grams/100)` para máxima precisión. Descripción de la comida ahora muestra "Xg" en vez de "1 porción".
+
+**A11y:**
+- Flechas navegación días: `accessibilityRole="button"` + labels i18n (`home.previousDay`, `home.nextDay`) + `accessibilityState.disabled` cuando es hoy.
+- Stepper porciones y botón log: labels i18n (`foodSearch.decreaseServings`, `foodSearch.increaseServings`).
+
+**i18n:** nuevas claves `home.previousDay`, `home.nextDay`, `foodSearch.weightLabel`, `foodSearch.increaseServings`, `foodSearch.decreaseServings` en ES + EN.
+
+**Validación**: `npx tsc --noEmit` 0 errores en código relevante (preexistentes en `tools/remotion-engine`).
+
+**Pendientes reportados que NO se abordan aún:**
+- Fotos de progreso no se ven (bug conocido Firebase Storage, aún pendiente — `_project-hub/PROJECT_STATUS.md` → Bugs Conocidos).
+- "No se conecta a la app de salud" (x2): los fixes de tanda 1 deben resolverlo; build nuevo con tanda 1+2+3 va a TestFlight tras este commit → verificar con build 47+.
+
+## 2026-04-17 — Actualizar precios de suscripción en todo el proyecto
+
+Nuevos precios: €8,90/mes y €59,90/año (antes €9,99/mes y €49,99/año). Ahorro anual: 44% (antes 58%). Equivalente mensual anual: €4,99/mes.
+
+Archivos modificados:
+- **Web**: website/index.html (precios + FAQ), website/terms.html (precios + tildes corregidas en toda la página)
+- **App**: app/paywall.tsx, services/revenuecat.ts (product IDs: monthly_890, annual_5990), i18n/es.ts, i18n/en.ts
+- **Copias web**: public/index.html, public/terms.html, public/cals2gains/terms.html, public/landing.html
+- **Docs/Marketing**: store-listing-metadata, GUIA_COMPLETA, APP-STORE-LISTING, COMMUNITY-PLAYBOOK, INFLUENCER-PLAYBOOK, PROJECT-OVERVIEW (x2), instagram-comment-replies
+- No se tocaron precios de competidores ni iCloud.
+- **Pendiente**: actualizar precios en RevenueCat dashboard, App Store Connect y Google Play Console.
+
 ## 2026-04-17 — Tanda 2: estabilidad (timeouts OpenAI, try/catch, cleanup) + a11y crítico
 
 Continuación de los fixes tras auditoría. Todo listo para ir en el mismo build que la tanda 1.
