@@ -1,5 +1,13 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Integración InBody con Apple Salud / Google Health Connect (b284bc6)
+
+Importación automática de composición corporal desde la app Salud del móvil:
+- `services/healthKit.ts`: permisos `BodyFatPercentage` + `LeanBodyMass` en iOS y Android; `requestBodyCompositionPermission()` independiente del sync completo; `getBodyComposition()` lee % grasa, masa magra, peso y TMB
+- `services/inBodyService.ts`: campo `source` en mediciones ('manual' | 'healthkit'); `syncFromHealthKit()` orquesta permisos → lectura → guardado
+- `app/settings.tsx`: botón "Importar desde Apple Salud / Google Salud" en el modal de InBody; si InBody ha sincronizado con la app Salud, los datos se importan automáticamente; fallback al formulario manual si no hay datos
+- Commit: `b284bc6`
+
 ## 2026-04-17 — Sistema completo de planes de entrenamiento por ciclos (c108253)
 
 Implementación del sistema de planes de entrenamiento con ajuste nutricional automático por tipo de día:
