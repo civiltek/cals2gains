@@ -28,6 +28,8 @@ export default {
     createAccount: 'Crear cuenta',
     signInEmail: 'Entrar con email',
     emailPlaceholder: 'Email',
+    showPassword: 'Mostrar contraseña',
+    hidePassword: 'Ocultar contraseña',
   },
 
   // Onboarding
@@ -185,6 +187,7 @@ export default {
   // Dashboard / Home
   home: {
     title: 'Hoy',
+    analyzeFood: 'Analizar comida con cámara',
     greeting: 'Hola',
     caloriesRemaining: 'Calorías restantes',
     caloriesConsumed: 'consumidas',

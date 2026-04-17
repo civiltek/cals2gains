@@ -90,7 +90,12 @@ export default function EditMealScreen() {
     const newWeight = parseFloat(weight);
     if (!newWeight || !originalWeight || newWeight === originalWeight) return;
 
-    const ratio = newWeight / originalWeight;
+    // Clamp ratio to sane bounds so a fat-finger weight (e.g. 0 or 9999) can't
+    // wipe the macros or inflate them to nonsense.
+    const rawRatio = newWeight / originalWeight;
+    if (!Number.isFinite(rawRatio)) return;
+    const ratio = Math.min(20, Math.max(0.1, rawRatio));
+
     setCalories(String(Math.round((originalNutrition.calories || 0) * ratio)));
     setProtein(String(Math.round(((originalNutrition.protein || 0) * ratio) * 10) / 10));
     setCarbs(String(Math.round(((originalNutrition.carbs || 0) * ratio) * 10) / 10));
@@ -169,17 +174,19 @@ export default function EditMealScreen() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      const nonNegative = (s: string) => Math.max(0, parseFloat(s) || 0);
+
       const updates: any = {
         dishName: dishName,
-        estimatedWeight: parseFloat(weight) || meal.estimatedWeight || 0,
+        estimatedWeight: nonNegative(weight) || meal.estimatedWeight || 0,
         mealType,
         notes: notes.trim(),
         nutrition: {
-          calories: parseFloat(calories) || 0,
-          protein: parseFloat(protein) || 0,
-          carbs: parseFloat(carbs) || 0,
-          fat: parseFloat(fat) || 0,
-          fiber: parseFloat(fiber) || 0,
+          calories: nonNegative(calories),
+          protein: nonNegative(protein),
+          carbs: nonNegative(carbs),
+          fat: nonNegative(fat),
+          fiber: nonNegative(fiber),
         },
       };
 

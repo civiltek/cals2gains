@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useThemeStore, ThemeMode, useColors } from '../store/themeStore';
 import { terraService, TerraProvider, TerraConnection } from '../services/terraService';
 import { inBodyService } from '../services/inBodyService';
+import { healthService } from '../services/healthKit';
 import { changeLanguage, getCurrentLanguageInfo, SUPPORTED_LANGUAGES, LanguageOption } from '../i18n';
 import { useUserStore } from '../store/userStore';
 import { useReminderStore } from '../store/reminderStore';
@@ -59,6 +60,7 @@ const SettingsScreen = () => {
   const { mode: themeMode, setMode: setThemeMode } = useThemeStore();
   const C = useColors();
   const user = useUserStore((s) => s.user);
+  const setHealthEnabled = useUserStore((s) => s.setHealthEnabled);
   const reminderState = useReminderStore();
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState<UserSettings>({
@@ -84,6 +86,19 @@ const SettingsScreen = () => {
       inBody: false,
     },
   });
+
+  // Sync native health toggle with persisted user.healthEnabled
+  useEffect(() => {
+    if (user?.healthEnabled == null) return;
+    setSettings((prev) => {
+      const key = Platform.OS === 'ios' ? 'appleHealth' : 'googleHealth';
+      if (prev.connectedServices[key] === user.healthEnabled) return prev;
+      return {
+        ...prev,
+        connectedServices: { ...prev.connectedServices, [key]: user.healthEnabled },
+      };
+    });
+  }, [user?.healthEnabled]);
 
   const [showMealTimeModal, setShowMealTimeModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
@@ -143,21 +158,55 @@ const SettingsScreen = () => {
     try {
       const isCurrentlyConnected = settings.connectedServices[service as keyof typeof settings.connectedServices];
 
+      // Native health (HealthKit on iOS, Health Connect on Android) — includes Samsung Health on Android
+      // since Samsung Health exposes data to Health Connect natively.
+      const isNativeHealth = service === 'appleHealth'
+        || service === 'googleHealth'
+        || (service === 'samsungHealth' && Platform.OS === 'android');
+
+      if (isNativeHealth) {
+        if (isCurrentlyConnected) {
+          await setHealthEnabled(false);
+        } else {
+          await healthService.checkAvailability();
+          const granted = await healthService.requestAuthorization();
+          if (!granted) {
+            Alert.alert('Error', t('settings.serviceError', { service }));
+            setLoading(false);
+            return;
+          }
+          await setHealthEnabled(true);
+        }
+
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setSettings({
+          ...settings,
+          connectedServices: {
+            ...settings.connectedServices,
+            [service]: !isCurrentlyConnected,
+          },
+        });
+        Alert.alert(
+          t('common.success'),
+          isCurrentlyConnected
+            ? t('settings.serviceDisconnected', { service })
+            : t('settings.serviceConnected', { service })
+        );
+        return;
+      }
+
+      // Terra wearables (Garmin, Fitbit, WearOS, Samsung on iOS)
+      const terraProviderMap: Record<string, TerraProvider> = {
+        garmin: 'GARMIN', fitbit: 'FITBIT', samsungHealth: 'SAMSUNG', wearOS: 'WEAR_OS',
+      };
+
       if (isCurrentlyConnected) {
-        // Disconnect
-        const terraProviderMap: Record<string, TerraProvider> = {
-          garmin: 'GARMIN', fitbit: 'FITBIT', samsungHealth: 'SAMSUNG', wearOS: 'WEAR_OS',
-        };
         if (terraProviderMap[service]) {
           await terraService.disconnect(terraProviderMap[service]);
         } else if (service === 'inBody') {
           await inBodyService.disconnect();
         }
       } else {
-        // Connect via Terra for third-party wearables
-        const terraProviderMap: Record<string, TerraProvider> = {
-          garmin: 'GARMIN', fitbit: 'FITBIT', samsungHealth: 'SAMSUNG', wearOS: 'WEAR_OS',
-        };
         if (terraProviderMap[service]) {
           const authUrl = await terraService.generateAuthUrl(terraProviderMap[service]);
           if (authUrl) {

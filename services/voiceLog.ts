@@ -26,21 +26,31 @@ export async function transcribeAudio(audioUri: string): Promise<string> {
   formData.append('model', 'whisper-1');
   // Omit 'language' to let Whisper auto-detect — works better bilingually
 
-  const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: formData,
-  });
+  // Whisper upload + transcribe — 30s cap. Audio is usually <15s so this is
+  // generous enough to survive slow cell networks without hanging forever.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(`Whisper API error: ${response.status} - ${JSON.stringify(error)}`);
+  try {
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: formData,
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(`Whisper API error: ${response.status} - ${JSON.stringify(error)}`);
+    }
+
+    const data = await response.json();
+    return data.text || '';
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  const data = await response.json();
-  return data.text || '';
 }
 
 /**

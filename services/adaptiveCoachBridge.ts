@@ -59,6 +59,11 @@ async function buildExplanationWithAI(
 
   const prompt = buildExplanationPrompt(adjustment, currentGoals);
 
+  // Abort the call after 15s so a stalled OpenAI request never keeps the
+  // coach UI spinning indefinitely — fall back to the static explanation.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -79,6 +84,7 @@ async function buildExplanationWithAI(
           { role: 'user', content: prompt },
         ],
       }),
+      signal: controller.signal,
     });
 
     if (!response.ok) throw new Error('OpenAI error');
@@ -94,6 +100,8 @@ async function buildExplanationWithAI(
     };
   } catch {
     return buildFallbackExplanation(adjustment, currentGoals);
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 

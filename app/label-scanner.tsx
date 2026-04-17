@@ -84,35 +84,45 @@ export default function LabelScannerScreen() {
         throw new Error('OpenAI API key not configured');
       }
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: 'You are a nutrition label OCR specialist. Extract ALL nutritional information from this nutrition label photo. Return ONLY valid JSON with this structure: { servingSize: number (grams), servingsPerContainer: number, nutrition: { calories, protein, carbs, fat, fiber, sugar, saturatedFat, sodium }, productName: string }',
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:image/jpeg;base64,${base64}`,
+      // 30s cap — vision OCR with a base64 image payload is slower than text.
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+      let response!: Response;
+      try {
+        response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: 'gpt-4o',
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'You are a nutrition label OCR specialist. Extract ALL nutritional information from this nutrition label photo. Return ONLY valid JSON with this structure: { servingSize: number (grams), servingsPerContainer: number, nutrition: { calories, protein, carbs, fat, fiber, sugar, saturatedFat, sodium }, productName: string }',
                   },
-                },
-              ],
-            },
-          ],
-          max_tokens: 500,
-          temperature: 0,
-        }),
-      });
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: `data:image/jpeg;base64,${base64}`,
+                    },
+                  },
+                ],
+              },
+            ],
+            max_tokens: 500,
+            temperature: 0,
+          }),
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       if (!response.ok) {
         throw new Error(`OpenAI API error: ${response.status}`);

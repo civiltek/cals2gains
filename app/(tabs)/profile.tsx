@@ -27,6 +27,7 @@ const LOGO_MARK = require('../../brand-assets/C2G-Mark-512.png');
 import { calculateTDEE, calculateBMR } from '../../utils/nutrition';
 import { HealthDashboardCard } from '../../components/ui/HealthDashboardCard';
 import { useHealthSync } from '../../hooks/useHealthSync';
+import { healthService } from '../../services/healthKit';
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -37,6 +38,7 @@ export default function ProfileScreen() {
     isOnTrial,
     trialDaysRemaining,
   } = useUserStore();
+  const setHealthEnabled = useUserStore((s) => s.setHealthEnabled);
   const C = useColors(); // Reactive theme colors
   const isDark = useThemeStore(s => s.isDark);
 
@@ -73,6 +75,20 @@ export default function ProfileScreen() {
   // Activate periodic health sync for this screen
   useHealthSync();
 
+  const handleConnectHealth = async () => {
+    try {
+      await healthService.checkAvailability();
+      const granted = await healthService.requestAuthorization();
+      if (!granted) {
+        Alert.alert(t('errors.error'), t('errors.generic'));
+        return;
+      }
+      await setHealthEnabled(true);
+    } catch {
+      Alert.alert(t('errors.error'), t('errors.generic'));
+    }
+  };
+
   const subscriptionStatus = () => {
     if (!user) return '';
     if (isOnTrial()) {
@@ -98,7 +114,12 @@ export default function ProfileScreen() {
               </Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.notificationBtn} onPress={() => router.push('/paywall')}>
+          <TouchableOpacity
+            style={styles.notificationBtn}
+            onPress={() => router.push('/paywall')}
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.notifications')}
+          >
             <Ionicons name="notifications-outline" size={22} color={C.textSecondary} />
           </TouchableOpacity>
         </View>
@@ -207,7 +228,7 @@ export default function ProfileScreen() {
         {/* Health & Activity section */}
         <View style={[styles.section, { backgroundColor: C.surface, borderColor: C.border }]}>
           <Text style={[styles.sectionTitle, { color: C.textSecondary }]}>{t('health.title')}</Text>
-          <HealthDashboardCard />
+          <HealthDashboardCard onConnect={handleConnectHealth} />
         </View>
 
         {/* Activity & Achievements section */}

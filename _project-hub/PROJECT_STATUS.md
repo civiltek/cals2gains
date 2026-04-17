@@ -1,17 +1,22 @@
 # Cals2Gains - Estado del Proyecto
-> Última actualización: 2026-04-16 (12:15) — AAB de producción generado (75 MB)
+> Última actualización: 2026-04-17 — Bugs críticos Android v19 corregidos (código). Pendiente SHA-1 Play→Firebase + nuevos builds.
 
 ## App
 - **Versión actual:** 1.0.0
 - **Bundle ID:** com.civiltek.cals2gains
 - **Expo SDK:** 54
 - **React Native:** 0.81.5
-- **✅ AAB PRODUCCIÓN GENERADO (2026-04-16):** `builds/app-release.aab` (75 MB, firmado)
-  - Build GH Actions: https://github.com/civiltek/cals2gains/actions/runs/24506192985
+- **✅ AAB PRODUCCIÓN (2026-04-16 18:03 UTC):** 77 MB, firmado — PRs #21-#26
+  - Build GH Actions: https://github.com/civiltek/cals2gains/actions/runs/24524771335
+  - Artifact ID: `6480223158` (expira 2026-05-16)
   - **Listo para subir a Google Play Console**
   - minSdkVersion: 26 (fix para react-native-health-connect)
 - **Build Android anterior (roto por reanimated v3 + RN 0.81):** build 358414d2 — NO INSTALAR
-- **Build iOS:** Pendiente (cuenta Apple Developer en verificación)
+- **Build iOS (App Store):** 🟡 EN COLA — `b7cd8dc2-f6f0-4eac-9f00-b9dc16660eef` (buildNumber 21, Free tier queue)
+  - URL: https://expo.dev/accounts/civiltek/projects/cals2gains/builds/b7cd8dc2-f6f0-4eac-9f00-b9dc16660eef
+  - Patch expo-dev-menu aplicado (fix reloadAppAsync → bridge.reload)
+  - ⚠️ Créditos EAS al 96% — riesgo de cancelación si se agotan en cola; considerar upgrade
+  - Build anterior cancelado: `254b9c6e` (buildNumber 19); intento disco lleno: buildNumber 20 (descartado)
 - **Estado:** AAB production firmado y descargado. Pendiente subida a Google Play Console.
 
 ## Stack Tecnológico
@@ -54,6 +59,17 @@ Pantallas principales:
 - **expo-notifications:** Removido temporalmente por crash en Android sin FCM configurado
 - **Firebase Water permissions:** "Missing or insufficient permissions" en water tracker
 - **Tema oscuro:** Corregidos ~70 issues en auditoría, pueden quedar edge cases
+- **🔴 Google Sign-In DEVELOPER_ERROR (Android prod):** AAB firmado por Play App Signing key cuyo SHA-1 NO está en Firebase/OAuth. Requiere acción manual Judith (ver CHANGELOG 2026-04-17) ANTES del próximo build.
+
+### Corregidos en tanda 2 (2026-04-17)
+- ✅ `updateDailyLog` envuelto en try/catch
+- ✅ `edit-meal` ratio clamp + clamp no-negativo en save
+- ✅ `food-search` searchTimeout cleanup
+- ✅ AbortController+timeout en las 5 llamadas OpenAI (adaptiveCoach, foodDatabase, macroCoach, voiceLog, label-scanner)
+- ✅ A11y crítico en tab bar cámara + welcome + profile
+
+### A11y pendiente (tanda 3)
+- 🟡 Resto de pantallas (~200 TouchableOpacity sin label). Settings, home dashboard, capture-hub, camera, history, tools, recipes, weight-tracker, etc.
 
 ## Bugs Resueltos recientemente
 - **[13/04 23:30] Crash inmediato al abrir APK en Android** — RESUELTO
@@ -96,15 +112,16 @@ Ver `FINANCES.md` para detalle completo.
 Ver `ACCOUNTS.md` para detalle completo.
 
 ## Próximos Pasos
-1. **[URGENTE]** Esperar build `c00a412e` (~10-15 min) → desinstalar APK roto del móvil → instalar nuevo APK → validar que la app abre correctamente
-2. Completar testing Android con APK corregido
-3. Resolver cuenta Apple Developer → build iOS
+1. **[BLOQUEANTE]** Judith añade SHA-1 App Signing Key (Play Console → Integridad de la app → Firma de apps) a Firebase Console + Google Cloud OAuth Android client. Sin esto Google Sign-In Android roto en prod.
+2. **[SIGUIENTE BUILD]** Build Android + iOS con los 4 fixes del 2026-04-17 (auth Health, card onConnect, tab bar Samsung, búsqueda ES con fallback OpenAI)
+3. **[ACTIVO]** Esperar build iOS `254b9c6e` → validar en TestFlight → submit a App Store Review
 4. Completar posts EN faltantes (6-14) y programar
-5. Preparar submission a Google Play Store
-6. Resolver bug Firebase Storage para progress photos
-7. Vincular @cals2gains a Meta Business Suite para obtener insights
-8. Instalar tag GA4 en cals2gains.com (propiedad ya creada: macrolens-ai-4c482)
-9. Verificar acceso a Google Play Console con la cuenta de desarrollador correcta
+5. Verificar submission Google Play (AAB `builds/app-release.aab`)
+6. ⚠️ Revisar créditos EAS (96% usados) — upgrade recomendado antes del próximo build combinado
+7. **[TANDA 2]** Tras validar los fixes: estabilidad (timeouts OpenAI + listener cleanup + photo validation) y a11y (accessibilityLabel en TouchableOpacity)
+8. Resolver bug Firebase Storage para progress photos
+9. Vincular @cals2gains a Meta Business Suite para obtener insights
+10. Instalar tag GA4 en cals2gains.com (propiedad ya creada: macrolens-ai-4c482)
 
 ## Notas de build
 - **Cals2Gains NO puede correr en Expo Go** desde SDK 53. Usa módulos nativos (RevenueCat, GoogleSignIn, expo-notifications, CameraView con children). Para probar en dispositivo físico siempre generar APK vía EAS (`eas build --profile preview --platform android`).

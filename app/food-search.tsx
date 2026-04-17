@@ -67,6 +67,14 @@ export default function FoodSearchScreen() {
     loadTemplates(user?.uid || '');
   }, []);
 
+  // Clear any pending debounced search if the screen is unmounted mid-query —
+  // avoids setState on an unmounted component when the user navigates away.
+  useEffect(() => {
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    };
+  }, []);
+
   // Debounced search
   const handleSearch = useCallback((text: string) => {
     setQuery(text);

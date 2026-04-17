@@ -195,6 +195,9 @@ export default function WelcomeScreen() {
               onPress={handleGoogleSignIn}
               disabled={loading !== null}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={t('auth.signInGoogle')}
+              accessibilityState={{ disabled: loading !== null, busy: loading === 'google' }}
             >
               {loading === 'google' ? (
                 <ActivityIndicator color={C.text} size="small" />
@@ -213,6 +216,9 @@ export default function WelcomeScreen() {
                 onPress={handleAppleSignIn}
                 disabled={loading !== null}
                 activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={t('auth.signInApple')}
+                accessibilityState={{ disabled: loading !== null, busy: loading === 'apple' }}
               >
                 {loading === 'apple' ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
@@ -260,6 +266,10 @@ export default function WelcomeScreen() {
               <TouchableOpacity
                 style={styles.eyeButton}
                 onPress={() => setShowPassword(!showPassword)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  showPassword ? t('auth.hidePassword') : t('auth.showPassword')
+                }
               >
                 <Ionicons
                   name={showPassword ? 'eye-off-outline' : 'eye-outline'}
@@ -274,6 +284,9 @@ export default function WelcomeScreen() {
               onPress={handleEmailAuth}
               disabled={loading !== null}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={isCreatingAccount ? t('auth.createAccount') : t('auth.signInEmail')}
+              accessibilityState={{ disabled: loading !== null, busy: loading === 'email' }}
             >
               {loading === 'email' ? (
                 <ActivityIndicator color="#FFFFFF" size="small" />

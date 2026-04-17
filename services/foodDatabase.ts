@@ -94,15 +94,27 @@ export async function lookupBarcode(barcode: string): Promise<FoodItem | null> {
 // ============================================
 
 /**
- * Search foods by text query
+ * Search foods by text query.
+ *
+ * Order of resolution:
+ *   1. Local curated database (instant, high quality for ES/LatAm dishes)
+ *   2. Open Food Facts (global product catalog, branded items)
+ *   3. OpenAI estimation fallback if fewer than 3 matches total
+ *      (covers home-cooked dishes like "lentejas estofadas" that OFF misses)
  */
 export async function searchFoods(
   query: string,
   page: number = 1,
   pageSize: number = 20
 ): Promise<{ items: FoodItem[]; total: number }> {
+  const lang = getAppLanguage();
+
+  // Local first — synchronous, no network
+  const localMatches = lang === 'es'
+    ? searchSpanishFoodsAsFoodItems(query)
+    : searchLocalFoods(query);
+
   try {
-    const lang = getAppLanguage();
     const params = new URLSearchParams({
       search_terms: query,
       search_simple: '1',
@@ -115,11 +127,18 @@ export async function searchFoods(
       cc: lang === 'es' ? 'es' : 'us', // Country code: prioritize local products
     });
 
+    // Abort the remote call after 5s so slow networks don't block search UX —
+    // we already have local results to show.
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
     const response = await fetch(`${OFF_SEARCH}?${params}`, {
       headers: { 'User-Agent': 'Cals2Gains/1.0 (info@civiltek.es)' },
-    });
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
 
-    if (!response.ok) return { items: [], total: 0 };
+    if (!response.ok) {
+      return maybeAiFallback(query, localMatches, lang);
+    }
 
     const data = await response.json();
     const products = data.products || [];
@@ -172,22 +191,38 @@ export async function searchFoods(
       });
 
     // Merge with local results (local first for instant recognition)
-    // Use expanded Spanish database (167 foods) for Spanish users
-    const localMatches = lang === 'es'
-      ? searchSpanishFoodsAsFoodItems(query)
-      : searchLocalFoods(query);
     const localIds = new Set(localMatches.map((f) => f.id));
     const merged = [...localMatches, ...items.filter((f) => !localIds.has(f.id))];
+
+    // If the combined list is still poor, ask OpenAI to estimate — covers
+    // home-cooked dishes that Open Food Facts catalog doesn't track
+    if (merged.length < 3) {
+      const aiItem = await analyzeTextFood(query, lang);
+      if (aiItem) merged.push(aiItem);
+    }
+
     return { items: merged, total: (data.count || items.length) + localMatches.length };
   } catch (error) {
     console.error('Food search error:', error);
-    // Fallback to local database when API fails
-    const lang = getAppLanguage();
-    const localMatches = lang === 'es'
-      ? searchSpanishFoodsAsFoodItems(query)
-      : searchLocalFoods(query);
+    return maybeAiFallback(query, localMatches, lang);
+  }
+}
+
+/**
+ * When network search fails or returns too few matches, optionally enrich
+ * the local results with an OpenAI estimation.
+ */
+async function maybeAiFallback(
+  query: string,
+  localMatches: FoodItem[],
+  lang: 'es' | 'en'
+): Promise<{ items: FoodItem[]; total: number }> {
+  if (localMatches.length >= 3) {
     return { items: localMatches, total: localMatches.length };
   }
+  const aiItem = await analyzeTextFood(query, lang);
+  const items = aiItem ? [...localMatches, aiItem] : localMatches;
+  return { items, total: items.length };
 }
 
 // ============================================
@@ -205,6 +240,9 @@ export async function analyzeTextFood(
   const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
   if (!OPENAI_API_KEY) return null;
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -212,6 +250,7 @@ export async function analyzeTextFood(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         max_tokens: 400,
@@ -260,6 +299,8 @@ export async function analyzeTextFood(
   } catch (error) {
     console.error('AI text analysis error:', error);
     return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -296,11 +337,13 @@ const LOCAL_FOODS: FoodItem[] = [
 ];
 
 /**
- * Search expanded Spanish food database (167 items) and convert to FoodItem format
+ * Search expanded Spanish food database and convert to FoodItem format.
+ * Returns up to 40 local matches so common queries ("pollo", "arroz") surface
+ * relevant variants instead of being capped silently.
  */
 function searchSpanishFoodsAsFoodItems(query: string): FoodItem[] {
   const results = searchSpanishFoods(query);
-  return results.slice(0, 15).map((sf) => ({
+  return results.slice(0, 40).map((sf) => ({
     id: sf.id,
     name: sf.nameEs,
     nameEs: sf.nameEs,

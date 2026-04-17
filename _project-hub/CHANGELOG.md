@@ -1,5 +1,87 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Tanda 2: estabilidad (timeouts OpenAI, try/catch, cleanup) + a11y crítico
+
+Continuación de los fixes tras auditoría. Todo listo para ir en el mismo build que la tanda 1.
+
+**Estabilidad:**
+- **[services/firebase.ts:396]** `saveMeal` ahora envuelve `updateDailyLog` en try/catch. Si Firestore falla al actualizar el daily log, la comida (que ya se guardó) NO se marca como error para el usuario — el log se reconstruirá en el siguiente save.
+- **[app/edit-meal.tsx:89-104]** `handleWeightEndEditing` clampa ratio a `[0.1, 20]` y descarta `Infinity/NaN` → evita que una entrada de peso errónea (0, -5, 99999) borre o infle los macros.
+- **[app/edit-meal.tsx:177-192]** `handleSave` ahora pasa todos los campos de `nutrition` por `Math.max(0, parseFloat(s) || 0)` → no se graban negativos.
+- **[app/food-search.tsx]** Añadido useEffect cleanup de `searchTimeout` al desmontar → evita `setState` en componente muerto si el usuario navega durante una búsqueda debounced.
+- **[services/adaptiveCoachBridge.ts:62-101]** AbortController con timeout 15s en la llamada OpenAI que explica los ajustes de macros. Si la API cuelga, cae al fallback estático inmediato en vez de dejar la UI colgada.
+- **[services/foodDatabase.ts:243-305]** `analyzeTextFood` (fallback búsqueda) → 15s timeout.
+- **[services/macroCoach.ts:136-200]** Weekly coaching → 20s timeout (prompt más grande).
+- **[services/voiceLog.ts:29-53]** Whisper transcribe → 30s timeout (upload audio).
+- **[app/label-scanner.tsx:87-132]** OCR etiquetas nutricionales (gpt-4o vision) → 30s timeout.
+
+**A11y (crítico para App Store review):**
+- **[app/(tabs)/_layout.tsx]** Tab central de cámara (icono sin label) ahora tiene `accessibilityRole="button"` + `accessibilityLabel` i18n (`home.analyzeFood`: "Analizar comida con cámara" / "Analyze food with camera"). El resto de tabs ya tenía `title` implícito.
+- **[app/(auth)/welcome.tsx]** Botones Google/Apple/Email + toggle mostrar contraseña: `accessibilityRole`, `accessibilityLabel`, `accessibilityState.busy` para estados de carga → VoiceOver/TalkBack los anuncia correctamente.
+- **[app/(tabs)/profile.tsx]** Botón de notificación (icono sin texto) ahora tiene label.
+- **[i18n/es.ts + en.ts]** Nuevas claves: `auth.showPassword`, `auth.hidePassword`, `home.analyzeFood`.
+
+**Pendiente tanda 3** (más adelante):
+- A11y al resto de pantallas (settings, home dashboard, capture-hub, camera, etc.) — son ~200 TouchableOpacity, tarea larga.
+- Performance: virtualizar `app/(tabs)/index.tsx` (991 líneas) y `app/adherence.tsx` (SectionList en vez de ScrollView+map).
+- Photo caching con expo-image en `progress-photos.tsx`.
+
+**Validación**: `npx tsc --noEmit` 0 errores nuevos (preexistentes en `tools/remotion-engine` por deps no instaladas del subproyecto).
+
+## 2026-04-17 — Fix bugs críticos v19 Android (Google Sign-In, Health Connect, tab bar Samsung, búsqueda ES) + auditoría técnica
+
+Reportado por Judith tras test en Samsung con Android 19. Correcciones aplicadas:
+
+- **[app/settings.tsx]** `handleConnectService` enrutaba `appleHealth`/`googleHealth` al flujo de Terra (wearables terceros), que no tiene mapping para HealthKit/Health Connect → error "No se pudo generar el enlace de autenticación". Ahora rama nativa para `appleHealth` (iOS) / `googleHealth` (Android) / `samsungHealth` (Android via Health Connect) → llama `healthService.requestAuthorization()` + `setHealthEnabled(true)`. Resto de wearables sigue por Terra como antes. Añadido `useEffect` para sincronizar toggle con `user.healthEnabled` persistido.
+- **[app/(tabs)/profile.tsx]** La `HealthDashboardCard` no tenía `onConnect` → botón "Conectar" nunca se renderizaba. Añadido `handleConnectHealth` que llama a `healthService.requestAuthorization()` y activa `healthEnabled`.
+- **[app/(tabs)/_layout.tsx]** `paddingBottom` del tab bar estaba hardcodeado a 8 en Android → botones del sistema de Samsung (3-button nav / gesture bar) se solapaban con las tabs. Ahora usa `useSafeAreaInsets()` y suma `insets.bottom` en Android.
+- **[services/foodDatabase.ts]** Búsqueda con base española capaba resultados a 15 con `slice(0, 15)` aunque la DB tiene 500+ ítems → subido a 40. Flujo reordenado: local primero (instantáneo), OFF con timeout 5s (`AbortController`), y nuevo fallback a `analyzeTextFood` (OpenAI) cuando la unión de matches < 3 — resuelve platos caseros ("lentejas estofadas", "paella con chorizo") que OFF no tiene.
+- **Pendiente Judith**: añadir SHA-1 del **App Signing Key** de Google Play Console (Configuración → Integridad de la app) al proyecto Firebase y al OAuth Android Client en Google Cloud. Esto desbloquea Google Sign-In en prod (`DEVELOPER_ERROR` actual). Sin este paso los builds Android no pueden hacer login con Google aunque se compilen perfectos.
+- **Validación**: `npx tsc --noEmit` 0 errores. Builds nuevos Android+iOS pendientes de lanzar (créditos EAS al 96%).
+
+## 2026-04-17 — Auditoría técnica + informe competitivo Cals2Gains
+
+Informe completo en contexto de Claude (no commiteado). Resumen ejecutivo:
+
+- **Bugs pendientes clasificados**:
+  - 🔴 `services/firebase.ts:510-532` `updateDailyLog` sin try/catch → estado inconsistente si Firestore falla
+  - 🔴 `services/firebase.ts:747-801` `migrateMealPhotosToFirestore` no valida `photoUri` antes de leer con FileSystem
+  - 🟡 `app/edit-meal.tsx:94-98` ratio puede ser 0 → kcal=0
+  - 🟡 `app/_layout.tsx:76` + `store/userStore.ts:188` listener `onAuthStateChange` puede fugar en hot reload
+  - 🟡 `app/food-search.tsx:64,84-100` searchTimeout sin cleanup en desmontaje
+  - 🟡 `services/adaptiveCoachBridge.ts:62-80` llamada OpenAI sin timeout (AbortController)
+- **Huecos vs competencia** (MyFitnessPal/Lifesum/Yazio/Cronometer/MacroFactor): URL recipe importer, Strava sync bidireccional, historial de ajustes macro, escritura Apple Health, búsqueda recetas por macro, notificaciones predictivas, báscula Bluetooth, micronutrientes, dark mode automático
+- **Diferenciadores reales** (dónde ganamos): Coach IA explicativa en lenguaje natural, análisis foto con contexto usuario, Memory Engine (patrones), Adaptive macro engine granular, integración nativa HealthKit+Health Connect, Fasting tracker con analytics, Coach Share (export nutriólogo), Training Day dinámico
+- **UX/a11y**: 0 `accessibilityLabel` en toda la app → crítico para App Store y ~15% usuarios con discapacidad visual. Home `app/(tabs)/index.tsx` 991 líneas sin virtualización (scroll lento <4GB RAM). `app/adherence.tsx:454-514` ScrollView con mapa anidado → usar SectionList. `app/progress-photos.tsx` imágenes sin cache → `expo-image` con `cachePolicy="disk"`.
+- **Próximas tandas sugeridas**: (1) estabilidad — timeouts + listeners + photo validation; (2) a11y — añadir `accessibilityLabel` a todos los TouchableOpacity; (3) feature win — Strava sync + "Por qué cambié tus macros" historial.
+
+## 2026-04-17 — Reel "3 errores en tu desayuno" — prompts DALL-E corregidos, sin bloqueos
+
+- **Fix prompts**: eliminadas todas las referencias a cuerpos humanos en `SCRIPT_SYSTEM_PROMPT` (create_reel_v2.py) y en `BRAND_IMAGE_SUFFIX` / `BRAND_VIDEO_SUFFIX` (generate_sora_clips.py). Ahora los video_prompt usan solo escenas de comida, cocinas, equipamiento fitness y entornos — sin personas ni partes del cuerpo.
+- **Reel generado**: tema "3 errores en tu desayuno que te hacen engordar", 5 escenas (~16s), `--force-image`
+- **Fondos DALL-E 3**: 5/5 generados sin bloqueo de content_policy
+- **Voz ElevenLabs**: Lucía peninsular (pFZP5JQG7iQjIQuC4Bku), tildes correctas en todas las escenas
+- **Output**: `tools/remotion-engine/output/2026-04-17T00-25-02_3_errores_en_tu_desayuno_que_t.mp4`
+
+## 2026-04-16 — Build Android AAB + iOS production con Firebase secrets
+
+- **Android AAB descargado**: GitHub Actions run `24535633430` → `C:\Users\Judit\Downloads\cals2gains-build-new\android-production-aab\app-release.aab` (build con EAS secrets de Firebase configurados)
+- **Samsung**: no instalable directo (AAB requiere bundletool, no instalado); subir a Play Console para testear
+- **Build iOS `b7cd8dc2`**: ya estaba cancelado (no requirió acción)
+- **Nuevo build iOS lanzado**: `652077c3-059e-41ef-9ba5-18cbae29fc66` — production, build number 44, con todos los Firebase secrets cargados (FIREBASE_API_KEY, APP_ID, AUTH_DOMAIN, MEASUREMENT_ID, etc.)
+- **Disco liberado**: borrados ~8.5 GB de temporales EAS CLI (`AppData/Local/Temp/eas-cli-nodejs`); C: pasa de 1.2 GB a 31 GB libres
+- **Alerta**: 96% créditos EAS del mes consumidos — considerar upgrade de plan
+
+## 2026-04-16 — Generar reel de prueba con motor Remotion
+
+- **Motor**: remotion-engine / create_reel_v2.py con `--force-image` (DALL-E 3, sin Sora)
+- **Tema**: "5 alimentos que destruyen tu grasa abdominal"
+- **Script GPT-4o**: 5 escenas, 16s, tildes correctas, CTA a Cals2Gains
+- **Voz**: ElevenLabs Lucía (pFZP5JQG7iQjIQuC4Bku — peninsular femenina)
+- **Fondos**: DALL-E 3 con placeholders donde content_policy bloqueó prompts de cuerpos
+- **Output**: `tools/remotion-engine/output/2026-04-16T23-50-25_5_alimentos_que_destruyen_tu_g.mp4` (9.2 MB)
+- **Nota**: el script JSON de escenas en `tools/remotion-engine/temp/2026-04-16T23-50-25_script.json`
+
 ## 2026-04-16 — Corregir errores críticos web cals2gains.com + validador pre-deploy
 
 - **Tildes en español**: corregidas ~50 palabras sin acento en todo el HTML (nutrición, función, código, calorías, visión, etc.) tanto en contenido visible como en atributos data-es

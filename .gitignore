@@ -61,6 +61,11 @@ Thumbs.db
 *.swp
 *.swo
 
+# Claude Code session state — keep .claude/launch.json tracked
+.claude/worktrees/
+.claude/projects/
+.claude/*.cache
+
 # Secrets detected by GitHub Push Protection
 docs/build-logs/gcloud-token.txt
 docs/build-logs/gcloud-token2.txt

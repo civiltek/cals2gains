@@ -133,6 +133,11 @@ export async function generateWeeklyRecommendation(
   // Build context for AI
   const context = buildCoachingContext(user, weekSummary, bodyComp, healthData, workouts);
 
+  // 20s timeout — weekly coaching prompt is larger; allow a bit more headroom
+  // than single-shot estimations, but never let it stall the UI indefinitely.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -140,6 +145,7 @@ export async function generateWeeklyRecommendation(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         max_tokens: 800,
@@ -191,6 +197,8 @@ export async function generateWeeklyRecommendation(
   } catch (error) {
     console.error('Macro coaching error:', error);
     return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 

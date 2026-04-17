@@ -392,8 +392,14 @@ export async function saveMeal(meal: Omit<Meal, 'id'>): Promise<string> {
     timestamp: Timestamp.fromDate(meal.timestamp),
   });
 
-  // Update daily log
-  await updateDailyLog(meal.userId, meal.timestamp, meal);
+  // Update daily log — best-effort. If this fails the meal is already
+  // persisted; a future saveMeal or the dashboard aggregator will rebuild
+  // the totals, so don't bubble the error up and confuse the user.
+  try {
+    await updateDailyLog(meal.userId, meal.timestamp, meal);
+  } catch (err) {
+    console.warn('[saveMeal] updateDailyLog failed (meal saved OK):', err);
+  }
 
   return docRef.id;
 }

@@ -4,11 +4,12 @@
 
 import { Tabs } from 'expo-router';
 import { View, Platform, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '../../store/themeStore';
 
-function CameraTabButton({ onPress, colors }: { onPress?: () => void; colors: any }) {
+function CameraTabButton({ onPress, colors, label }: { onPress?: () => void; colors: any; label: string }) {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -19,6 +20,8 @@ function CameraTabButton({ onPress, colors }: { onPress?: () => void; colors: an
         flex: 1,
       }}
       activeOpacity={0.85}
+      accessibilityRole="button"
+      accessibilityLabel={label}
     >
       <View
         style={{
@@ -45,6 +48,12 @@ function CameraTabButton({ onPress, colors }: { onPress?: () => void; colors: an
 export default function TabsLayout() {
   const { t } = useTranslation();
   const C = useColors();
+  const insets = useSafeAreaInsets();
+
+  // On Android respect the system nav-bar (3-button or gesture) so the tab bar
+  // doesn't overlap with Samsung's bottom controls.
+  const baseHeight = Platform.OS === 'ios' ? 84 : 68;
+  const basePaddingBottom = Platform.OS === 'ios' ? 24 : 8;
 
   return (
     <Tabs
@@ -54,8 +63,8 @@ export default function TabsLayout() {
           backgroundColor: C.surface,
           borderTopColor: C.border,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 84 : 68,
-          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+          height: baseHeight + (Platform.OS === 'android' ? insets.bottom : 0),
+          paddingBottom: basePaddingBottom + (Platform.OS === 'android' ? insets.bottom : 0),
           paddingTop: 8,
         },
         tabBarActiveTintColor: C.primary,
@@ -97,7 +106,10 @@ export default function TabsLayout() {
         options={{
           title: '',
           tabBarIcon: () => null,
-          tabBarButton: (props: any) => <CameraTabButton {...props} colors={C} />,
+          tabBarAccessibilityLabel: t('home.analyzeFood'),
+          tabBarButton: (props: any) => (
+            <CameraTabButton {...props} colors={C} label={t('home.analyzeFood')} />
+          ),
         }}
       />
 
