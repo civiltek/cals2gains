@@ -5,7 +5,8 @@
 // Uses expo-health-connect for Android (Google Health Connect)
 // Uses react-native-health for iOS (HealthKit)
 
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 
 // ============================================
 // TYPES
@@ -171,6 +172,20 @@ class HealthService {
               };
               console.error('[HealthKit init error]', JSON.stringify(errInfo, null, 2));
               console.error('[HealthKit init error raw]', err);
+              const errText = JSON.stringify(errInfo, null, 2);
+              Alert.alert(
+                'HealthKit error (diagnóstico)',
+                errText.length > 900 ? errText.slice(0, 900) + '…' : errText,
+                [
+                  {
+                    text: 'Copiar',
+                    onPress: () => {
+                      Clipboard.setStringAsync(errText).catch(() => {});
+                    },
+                  },
+                  { text: 'Cerrar', style: 'cancel' },
+                ]
+              );
               resolve(false);
             } else {
               console.log('[HealthKit] init OK — authorization sheet processed');
