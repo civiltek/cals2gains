@@ -49,6 +49,41 @@ class HealthService {
   private isAvailable: boolean = false;
   private isAuthorized: boolean = false;
   private isInitialized: boolean = false;
+  private readonly iosAuthTimeoutMs = 6000;
+
+  private withTimeout<T>(promise: Promise<T>, fallback: T, ms: number = this.iosAuthTimeoutMs): Promise<T> {
+    return new Promise((resolve) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          console.warn(`[HealthService] withTimeout: promise timed out after ${ms}ms, using fallback`);
+          resolve(fallback);
+        }
+      }, ms);
+
+      promise.then((value) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(value);
+      }).catch((err) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        console.warn('[HealthService] withTimeout: promise rejected, using fallback:', err);
+        resolve(fallback);
+      });
+    });
+  }
+
+  private resolveIOSPermission(appleHealthKit: any, ...candidates: string[]): string {
+    const perms = appleHealthKit?.Constants?.Permissions ?? {};
+    for (const key of candidates) {
+      if (perms[key]) return perms[key];
+    }
+    return candidates[0];
+  }
 
   /**
    * Check if health data is available on this device.
@@ -65,16 +100,26 @@ class HealthService {
         }
         // react-native-health exposes isAvailable() which calls
         // HKHealthStore.isHealthDataAvailable() under the hood.
-        const available: boolean = await new Promise((resolve) => {
+        const available: boolean = await this.withTimeout(new Promise<boolean>((resolve) => {
           if (typeof AppleHealthKit.isAvailable === 'function') {
-            AppleHealthKit.isAvailable((err: any, result: boolean) => {
-              resolve(err ? false : !!result);
-            });
+            let callbackCalled = false;
+            try {
+              const maybeResult = AppleHealthKit.isAvailable((err: any, result: boolean) => {
+                callbackCalled = true;
+                resolve(err ? false : !!result);
+              });
+              // Some versions return a boolean synchronously.
+              if (!callbackCalled && typeof maybeResult === 'boolean') {
+                resolve(maybeResult);
+              }
+            } catch {
+              resolve(false);
+            }
           } else {
             // Fallback: HealthKit is available on all iPhones running iOS 8+
             resolve(true);
           }
-        });
+        }), false, 2500);
         this.isAvailable = available;
       } else if (Platform.OS === 'android') {
         // Health Connect requires Android 14+ or the Health Connect APK installed.
@@ -142,19 +187,24 @@ class HealthService {
           return false;
         }
 
+        // Resolve permission strings via Constants.Permissions when available
+        // (some versions of react-native-health require HKQuantityTypeIdentifier*
+        // constants rather than raw string keys).
         const permissions = {
           permissions: {
             read: [
-              'StepCount',
-              'ActiveEnergyBurned',
-              'BasalEnergyBurned',
-              'Workout',
-              'Weight',
-              'HeartRate',
-              'BodyFatPercentage',
-              'LeanBodyMass',
+              this.resolveIOSPermission(AppleHealthKit, 'StepCount', 'Steps'),
+              this.resolveIOSPermission(AppleHealthKit, 'ActiveEnergyBurned'),
+              this.resolveIOSPermission(AppleHealthKit, 'BasalEnergyBurned'),
+              this.resolveIOSPermission(AppleHealthKit, 'Workout', 'Workouts'),
+              this.resolveIOSPermission(AppleHealthKit, 'Weight', 'BodyMass'),
+              this.resolveIOSPermission(AppleHealthKit, 'HeartRate'),
+              this.resolveIOSPermission(AppleHealthKit, 'BodyFatPercentage'),
+              this.resolveIOSPermission(AppleHealthKit, 'LeanBodyMass'),
             ],
-            write: ['Weight'],
+            write: [
+              this.resolveIOSPermission(AppleHealthKit, 'Weight', 'BodyMass'),
+            ],
           },
         };
 
@@ -163,7 +213,7 @@ class HealthService {
         // Apple: getRequestStatusForAuthorization tells us whether the system
         // SHOULD show the sheet (1=shouldRequest, 2=unnecessary, 0=unknown/error).
         // Probe BEFORE init so we know what state the OS thinks we're in.
-        const authStatusProbe = await new Promise<any>((resolve) => {
+        const authStatusProbe = await this.withTimeout(new Promise<any>((resolve) => {
           try {
             AppleHealthKit.getRequestStatusForAuthorization?.(
               permissions,
@@ -174,10 +224,10 @@ class HealthService {
           } catch (e) {
             resolve({ err: String(e), result: null });
           }
-        });
+        }), { err: 'getRequestStatusForAuthorization timed out', result: null }, 3000);
         console.log('[HealthKit] getRequestStatusForAuthorization:', JSON.stringify(authStatusProbe));
 
-        return new Promise((resolve) => {
+        const initGranted = await this.withTimeout(new Promise<boolean>((resolve) => {
           AppleHealthKit.initHealthKit(permissions, (err: any) => {
             if (err) {
               const errInfo = {
@@ -204,11 +254,19 @@ class HealthService {
               resolve(false);
             } else {
               console.log('[HealthKit] init OK — authorization sheet processed');
-              this.isAuthorized = true;
               resolve(true);
             }
           });
-        });
+        }), false);
+
+        if (!initGranted) return false;
+
+        // Post-init verification: iOS hides READ permission status by design
+        // (getAuthStatus returns 0=notDetermined even after user authorized reads).
+        // So we ONLY block on explicit sharingDenied (1). Anything else passes.
+        const authStatusOk = await this.withTimeout(this.checkIOSAuthStatus(), true, 2500);
+        this.isAuthorized = authStatusOk;
+        return authStatusOk;
       } else {
         // Android Health Connect — MUST initialize before requestPermission,
         // otherwise the call fails silently on testers' devices.
@@ -237,6 +295,54 @@ class HealthService {
       console.error('Health authorization error:', error);
       return false;
     }
+  }
+
+  /**
+   * Verify iOS auth status post-init. IMPORTANT: Apple deliberately hides
+   * READ permission state (returns 0 = notDetermined even after user authorized)
+   * so we cannot require "authorized" (2) — we only BLOCK on explicit
+   * "sharingDenied" (1). This avoids false negatives while catching explicit
+   * denials.
+   */
+  private async checkIOSAuthStatus(): Promise<boolean> {
+    if (Platform.OS !== 'ios') return true;
+    const AppleHealthKit = await getAppleHealthKit();
+    if (!AppleHealthKit || typeof AppleHealthKit.getAuthStatus !== 'function') return true;
+
+    const perms = {
+      permissions: {
+        read: [
+          this.resolveIOSPermission(AppleHealthKit, 'StepCount', 'Steps'),
+          this.resolveIOSPermission(AppleHealthKit, 'ActiveEnergyBurned'),
+          this.resolveIOSPermission(AppleHealthKit, 'BasalEnergyBurned'),
+        ],
+        write: [this.resolveIOSPermission(AppleHealthKit, 'Weight', 'BodyMass')],
+      },
+    };
+
+    return new Promise((resolve) => {
+      try {
+        AppleHealthKit.getAuthStatus(perms, (err: any, results: any) => {
+          if (err || !results) {
+            console.warn('[HealthKit] getAuthStatus err/empty, passing:', err);
+            return resolve(true);
+          }
+          const allValues: any[] = [];
+          for (const group of Object.values(results)) {
+            if (Array.isArray(group)) allValues.push(...group);
+            else allValues.push(group);
+          }
+          console.log('[HealthKit] getAuthStatus values:', JSON.stringify(allValues));
+          // Only explicit sharingDenied (1) blocks. notDetermined (0) is the
+          // default iOS response for READ perms and does NOT mean denied.
+          const hasExplicitDenial = allValues.some((v) => v === 1);
+          resolve(!hasExplicitDenial);
+        });
+      } catch (e) {
+        console.warn('[HealthKit] getAuthStatus threw, passing:', e);
+        resolve(true);
+      }
+    });
   }
 
   // Deprecated no-op. Antes hacía un initHealthKit(StepCount) en boot para
