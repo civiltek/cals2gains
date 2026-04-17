@@ -1,5 +1,18 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Fix iOS HealthKit: isHealthDataAvailable + entitlement + archivo truncado
+
+Build 52 iOS fallaba al conectar a Salud. Tres problemas encontrados y corregidos:
+
+1. **Archivo truncado** (`services/healthKit.ts`): faltaban ~70 líneas finales (getAndroidSummary, getAppleHealthKit, getHealthConnect, singleton export). Restaurado completo.
+2. **Falta `isHealthDataAvailable()` en iOS** (requerido por Apple docs): `checkAvailability()` simplemente ponía `this.isAvailable = true` sin llamar al nativo. Ahora llama `AppleHealthKit.isAvailable()` (que envuelve `HKHealthStore.isHealthDataAvailable()`). También se llama en `requestAuthorization()` antes de `initHealthKit`.
+3. **Entitlement `com.apple.developer.healthkit.access: []`** en app.json: array vacío para clinical records que puede causar problemas de signing. Eliminado (no usamos clinical health records).
+4. **settings.tsx**: ahora comprueba el resultado de `checkAvailability()` y muestra alerta si HealthKit no está disponible, en vez de continuar ciegamente.
+
+## 2026-04-17 — Ronda de comentarios IG mañana (11 comentarios, 3 cuentas)
+
+Tarea programada ejecutada. 11 comentarios publicados: 5 en @cals2gains_es (@realfooding ×2, @lanutrimorell, @hsnstore_es, @sabervivir_tve), 3 en @calstogains (@biolayne, @steficohen, @simeonpanda), 3 en @cals2gains (@mindpumpmedia, @athleanx, @megsquats). Daily log actualizado en skills/instagram-commenter/references/daily-log.md.
+
 ## 2026-04-17 — Fix Android Health Connect (faltaba initialize() + sdkStatus check)
 
 Reportado por Judith tras instalar tanda 3 en Android: "en android tampoco funciona la conexion a la app de salud".
@@ -559,64 +572,4 @@ Ruta: `tools/visual-engine/`
 - Añadido GA4 tag `G-WMHZQ52NS2` a `website/index.html` y `public/index.html` (dual config con existente `G-97MNMCDEG2`)
 
 ### Store listing
-- Creado `store-listing/STORE_METADATA.md` con metadata completa para Google Play y App Store (nombres, descripciones EN/ES, keywords, data safety, checklist)
-
-### Auth
-- Verificado: Google Sign-In, Apple Sign-In y Email/Password están completos y funcionales
-
----
-
-## 2026-04-14 — Implementar pantalla de voice logging y refactorizar capture-hub con datos reales
-
-### Voice Log Screen (app/voice-log.tsx)
-- **Nueva pantalla completa** para registro de comidas por voz
-- **Funcionalidades:**
-  - Botón de micrófono con animación pulsante durante grabación
-  - Uso de `expo-audio` para grabar en formato M4A
-  - Transcripción automática mediante OpenAI Whisper (via voiceLog.ts)
-  - Análisis de nutrición con IA mediante `voiceToNutrition()`
-  - Interfaz de resultados mostrando transcripción + estimación nutricional
-  - Botón "Guardar" para añadir comida al store
-  - Botón "Intentar de nuevo" para reintentar grabación
-- **Manejo de errores robusto:**
-  - Permisos de micrófono (solicitud y validación)
-  - Errores de API (key no configurada, inválida, red)
-  - Errores de transcripción
-- **Estilo:** Coherente con tema actual (useColors, AnimatedView para pulso)
-- **i18n:** Traducciones en inglés y español añadidas (voiceLog namespace)
-
-### Actualización de capture-hub.tsx
-- **Ruta de voice:** 'voice' → 'voice-log' (línea 60)
-- **Removido:** Handler especial inline para voice (setTimeout fake de 1500ms)
-- **Mock data → Datos reales:**
-  - Importado `useMealStore` y `useUserStore`
-  - Reemplazado `createMockRecentMeals()` con `storeRecentMeals` del store
-  - Reemplazado `createMockFavorites()` con extracción automática basada en frecuencia
-  - Añadido `useEffect` para cargar datos cuando user está disponible
-  - Filtrado de "yesterday's meals" usando lógica de fechas real
-- **Removidas funciones mock:** `createMockRecentMeals()` y `createMockFavorites()`
-- **Estilos:** Removido `voiceLoadingContainer` y `voiceLoadingText` (ya no necesarios)
-
-### Traducciones añadidas (i18n/)
-- **en.ts:** voiceLog namespace con 20 strings
-- **es.ts:** voiceLog namespace con 20 strings (mismo contenido en español)
-
-### Dependencias
-- `expo-audio` ya estaba en app.json (línea 74) — sin cambios
-- Microphone permissions ya configuradas en app.json
-
-## 2026-04-14 — Re-agregar expo-notifications al proyecto
-- **Paquete re-añadido:** `expo-notifications` ~0.31.0 en dependencies
-- **Configuración del plugin en app.json:**
-  - Icono: `./assets/images/notification-icon.png`
-  - Color: `#9C8CFF` (violet)
-  - Canal por defecto: `reminders`
-- **Android config actualizado:**
-  - `useNextNotificationsApi: true` habilitado
-  - Permiso `android.permission.POST_NOTIFICATIONS` añadido a lista de permisos
-- **Verificación:** reminderService.ts ya soporta importación dinámica con fallback seguro
-- **FCM:** google-services.json ya configurado en app.json (android.googleServicesFile)
-- **Nota:** Las notificaciones funcionarán correctamente ahora que FCM está configurado en google-services.json
-
-## 2026-04-13 (23:30) — Fix crítico: crash al abrir APK en Android
-- **Diagnóstico vía ADB logcat sobre Samsung R3CR10E9LSE conectado por USB** — la app se instalaba pero crasheaba al inici
+- Creado `store

@@ -168,7 +168,12 @@ const SettingsScreen = () => {
         if (isCurrentlyConnected) {
           await setHealthEnabled(false);
         } else {
-          await healthService.checkAvailability();
+          const available = await healthService.checkAvailability();
+          if (!available) {
+            Alert.alert('Error', t('settings.healthNotAvailable', { defaultValue: 'Health data is not available on this device.' }));
+            setLoading(false);
+            return;
+          }
           const granted = await healthService.requestAuthorization();
           if (!granted) {
             Alert.alert('Error', t('settings.serviceError', { service }));

@@ -31,7 +31,6 @@
       "usesAppleSignIn": true,
       "entitlements": {
         "com.apple.developer.healthkit": true,
-        "com.apple.developer.healthkit.access": [],
         "com.apple.developer.healthkit.background-delivery": true
       },
       "privacyManifests": {
@@ -179,21 +178,4 @@
         {
           "color": "#9C8CFF",
           "defaultChannel": "reminders",
-          "sounds": []
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "381120d5-3866-4b97-af00-4c6840768327"
-      }
-    },
-    "owner": "civiltek"
-  }
-}
+          "so

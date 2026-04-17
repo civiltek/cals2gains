@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // Cals2Gains - Apple Health / Google Fit Integration
 // ============================================
 // Provides wearable sync: steps, active energy, workouts, weight
@@ -42,13 +42,31 @@ class HealthService {
   private isInitialized: boolean = false;
 
   /**
-   * Check if health data is available on this device
+   * Check if health data is available on this device.
+   * On iOS calls AppleHealthKit.isAvailable() (wraps HKHealthStore.isHealthDataAvailable()).
+   * On Android checks Health Connect SDK status.
    */
   async checkAvailability(): Promise<boolean> {
     try {
       if (Platform.OS === 'ios') {
-        // HealthKit is available on all iPhones
-        this.isAvailable = true;
+        const AppleHealthKit = await getAppleHealthKit();
+        if (!AppleHealthKit) {
+          this.isAvailable = false;
+          return false;
+        }
+        // react-native-health exposes isAvailable() which calls
+        // HKHealthStore.isHealthDataAvailable() under the hood.
+        const available: boolean = await new Promise((resolve) => {
+          if (typeof AppleHealthKit.isAvailable === 'function') {
+            AppleHealthKit.isAvailable((err: any, result: boolean) => {
+              resolve(err ? false : !!result);
+            });
+          } else {
+            // Fallback: HealthKit is available on all iPhones running iOS 8+
+            resolve(true);
+          }
+        });
+        this.isAvailable = available;
       } else if (Platform.OS === 'android') {
         // Health Connect requires Android 14+ or the Health Connect APK installed.
         // getSdkStatus returns 3 = SDK_AVAILABLE, 2 = UPDATE_REQUIRED, 1 = UNAVAILABLE
@@ -96,18 +114,24 @@ class HealthService {
   }
 
   /**
-   * Request authorization to read health data
-   * Returns true if user granted permissions
+   * Request authorization to read health data.
+   * On iOS: checks isHealthDataAvailable() first (Apple requirement),
+   * then calls initHealthKit which triggers the system permission dialog.
+   * Returns true if user granted permissions.
    */
   async requestAuthorization(): Promise<boolean> {
     try {
       if (Platform.OS === 'ios') {
-        // Request HealthKit permissions
-        // Types: steps, active energy, resting energy, workouts, weight, heart rate
-        // Note: actual HealthKit integration requires react-native-health package
-        // This is the interface - native module will be linked at build time
         const AppleHealthKit = await getAppleHealthKit();
         if (!AppleHealthKit) return false;
+
+        // Apple docs: you MUST call isHealthDataAvailable() before requesting
+        // authorization. If HealthKit is not available, do not attempt to use it.
+        const available = await this.checkAvailability();
+        if (!available) {
+          console.warn('[HealthService] HealthKit not available on this device');
+          return false;
+        }
 
         const permissions = {
           permissions: {
