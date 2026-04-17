@@ -12,6 +12,8 @@ import {
   Linking,
   Platform,
   Image,
+  TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -106,6 +108,24 @@ const SettingsScreen = () => {
   const [showWeightTimeModal, setShowWeightTimeModal] = useState(false);
   const [tempTime, setTempTime] = useState(settings.reminders.mealsTime);
 
+  // InBody manual entry
+  const [showInBodyModal, setShowInBodyModal] = useState(false);
+  const [inBodyFat, setInBodyFat] = useState('');
+  const [inBodyMuscle, setInBodyMuscle] = useState('');
+  const [inBodyWater, setInBodyWater] = useState('');
+  const [inBodyVisceral, setInBodyVisceral] = useState('');
+  const [lastInBodyDate, setLastInBodyDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    inBodyService.initialize().then(() => {
+      const last = inBodyService.getLastMeasurement();
+      if (last) setLastInBodyDate(last.date);
+      if (inBodyService.hasData()) {
+        setSettings(prev => ({ ...prev, connectedServices: { ...prev.connectedServices, inBody: true } }));
+      }
+    });
+  }, []);
+
   // Real user data from store
   const userProfile = {
     name: user?.displayName || t('settings.user'),
@@ -170,7 +190,13 @@ const SettingsScreen = () => {
         } else {
           const available = await healthService.checkAvailability();
           if (!available) {
-            Alert.alert('Error', t('settings.healthNotAvailable', { defaultValue: 'Health data is not available on this device.' }));
+            const isIOS = Platform.OS === 'ios';
+            Alert.alert(
+              isIOS ? 'Apple Health' : 'Health Connect',
+              isIOS
+                ? t('settings.healthNotAvailableIOS', { defaultValue: 'Apple Health no está disponible en este dispositivo. Asegúrate de tener la app Salud instalada y de usar la versión más reciente de Cals2Gains.' })
+                : t('settings.healthNotAvailableAndroid', { defaultValue: 'Health Connect no está disponible. Instala la app "Health Connect" de Google Play y asegúrate de usar la versión más reciente de Cals2Gains.' })
+            );
             setLoading(false);
             return;
           }
@@ -210,6 +236,7 @@ const SettingsScreen = () => {
           await terraService.disconnect(terraProviderMap[service]);
         } else if (service === 'inBody') {
           await inBodyService.disconnect();
+          setLastInBodyDate(null);
         }
       } else {
         if (terraProviderMap[service]) {
@@ -222,8 +249,10 @@ const SettingsScreen = () => {
             return;
           }
         } else if (service === 'inBody') {
-          const authUrl = await inBodyService.generateAuthUrl();
-          await Linking.openURL(authUrl);
+          // InBody API is B2B only — open manual entry modal instead.
+          setLoading(false);
+          setShowInBodyModal(true);
+          return;
         }
       }
 
@@ -294,6 +323,36 @@ const SettingsScreen = () => {
       Alert.alert('Error', t('settingsScreen.backupFailed'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveInBody = async () => {
+    const fat = parseFloat(inBodyFat);
+    const muscle = parseFloat(inBodyMuscle);
+    if (isNaN(fat) || fat < 1 || fat > 70) {
+      Alert.alert('Error', 'Introduce un porcentaje de grasa válido (1–70%)');
+      return;
+    }
+    if (isNaN(muscle) || muscle < 5 || muscle > 100) {
+      Alert.alert('Error', 'Introduce una masa muscular válida (5–100 kg)');
+      return;
+    }
+    try {
+      await inBodyService.saveManualMeasurement({
+        bodyFatPercent: fat,
+        skeletalMuscleMass: muscle,
+        waterPercent: inBodyWater ? parseFloat(inBodyWater) : undefined,
+        visceralFatLevel: inBodyVisceral ? parseFloat(inBodyVisceral) : undefined,
+      });
+      const last = inBodyService.getLastMeasurement();
+      if (last) setLastInBodyDate(last.date);
+      setSettings(prev => ({ ...prev, connectedServices: { ...prev.connectedServices, inBody: true } }));
+      setInBodyFat(''); setInBodyMuscle(''); setInBodyWater(''); setInBodyVisceral('');
+      setShowInBodyModal(false);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(t('common.success'), `Grasa: ${fat}% · Músculo: ${muscle} kg`);
+    } catch {
+      Alert.alert('Error', t('settings.serviceError', { service: 'InBody' }));
     }
   };
 
@@ -851,23 +910,38 @@ const SettingsScreen = () => {
               </View>
             )}
 
-            {/* InBody */}
-            <View style={styles.serviceItem}>
+            {/* InBody — manual entry, no OAuth */}
+            <View style={[styles.serviceItem, { borderBottomWidth: 0 }]}>
               <View style={styles.serviceInfo}>
                 <Ionicons name="body-outline" size={24} color="#E8383D" />
                 <View style={styles.serviceText}>
                   <Text style={[styles.serviceName, { color: C.text }]}>InBody</Text>
                   <Text style={[styles.serviceStatus, { color: C.textSecondary }]}>
-                    {settings.connectedServices.inBody ? t('settingsScreen.connected') : t('settingsScreen.notConnected')}
+                    {settings.connectedServices.inBody && lastInBodyDate
+                      ? `Última: ${lastInBodyDate.toLocaleDateString()}`
+                      : settings.connectedServices.inBody
+                      ? t('settingsScreen.connected')
+                      : t('settingsScreen.notConnected')}
                   </Text>
                 </View>
               </View>
-              <Switch
-                value={settings.connectedServices.inBody}
-                onValueChange={() => handleConnectService('inBody')}
-                trackColor={{ false: C.border, true: '#E8383D40' }}
-                thumbColor={settings.connectedServices.inBody ? '#E8383D' : C.textSecondary}
-              />
+              {settings.connectedServices.inBody ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <TouchableOpacity onPress={() => setShowInBodyModal(true)}>
+                    <Ionicons name="add-circle-outline" size={24} color="#E8383D" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleConnectService('inBody')}>
+                    <Ionicons name="close-circle-outline" size={24} color={C.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={[styles.inBodyRegisterBtn, { backgroundColor: '#E8383D15', borderColor: '#E8383D50' }]}
+                  onPress={() => setShowInBodyModal(true)}
+                >
+                  <Text style={{ color: '#E8383D', fontSize: 13, fontWeight: '600' }}>Registrar</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -951,6 +1025,90 @@ const SettingsScreen = () => {
 
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      {/* InBody Manual Entry Modal */}
+      <Modal
+        visible={showInBodyModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowInBodyModal(false)}
+      >
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <View style={styles.modalOverlay}>
+            <View style={[styles.inBodyModal, { backgroundColor: C.cardElevated || C.surface }]}>
+              <View style={styles.languageModalHeader}>
+                <Text style={[styles.languageModalTitle, { color: C.text }]}>Medición InBody</Text>
+                <TouchableOpacity onPress={() => setShowInBodyModal(false)}>
+                  <Ionicons name="close" size={24} color={C.textSecondary} />
+                </TouchableOpacity>
+              </View>
+              <Text style={[styles.inBodySubtitle, { color: C.textSecondary }]}>
+                Introduce los datos del informe InBody
+              </Text>
+
+              <View style={styles.inBodyField}>
+                <Text style={[styles.inBodyLabel, { color: C.text }]}>Grasa corporal (%) *</Text>
+                <TextInput
+                  style={[styles.inBodyInput, { color: C.text, borderColor: C.border, backgroundColor: C.background }]}
+                  value={inBodyFat}
+                  onChangeText={setInBodyFat}
+                  keyboardType="decimal-pad"
+                  placeholder="ej. 18.5"
+                  placeholderTextColor={C.textSecondary}
+                />
+              </View>
+
+              <View style={styles.inBodyField}>
+                <Text style={[styles.inBodyLabel, { color: C.text }]}>Masa muscular esquelética (kg) *</Text>
+                <TextInput
+                  style={[styles.inBodyInput, { color: C.text, borderColor: C.border, backgroundColor: C.background }]}
+                  value={inBodyMuscle}
+                  onChangeText={setInBodyMuscle}
+                  keyboardType="decimal-pad"
+                  placeholder="ej. 32.4"
+                  placeholderTextColor={C.textSecondary}
+                />
+              </View>
+
+              <View style={styles.inBodyField}>
+                <Text style={[styles.inBodyLabel, { color: C.text }]}>
+                  Agua corporal (%){'  '}<Text style={{ color: C.textSecondary, fontWeight: '400' }}>opcional</Text>
+                </Text>
+                <TextInput
+                  style={[styles.inBodyInput, { color: C.text, borderColor: C.border, backgroundColor: C.background }]}
+                  value={inBodyWater}
+                  onChangeText={setInBodyWater}
+                  keyboardType="decimal-pad"
+                  placeholder="ej. 60.1"
+                  placeholderTextColor={C.textSecondary}
+                />
+              </View>
+
+              <View style={styles.inBodyField}>
+                <Text style={[styles.inBodyLabel, { color: C.text }]}>
+                  Grasa visceral (1-20){'  '}<Text style={{ color: C.textSecondary, fontWeight: '400' }}>opcional</Text>
+                </Text>
+                <TextInput
+                  style={[styles.inBodyInput, { color: C.text, borderColor: C.border, backgroundColor: C.background }]}
+                  value={inBodyVisceral}
+                  onChangeText={setInBodyVisceral}
+                  keyboardType="number-pad"
+                  placeholder="ej. 5"
+                  placeholderTextColor={C.textSecondary}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.inBodySaveBtn, { backgroundColor: '#E8383D' }]}
+                onPress={handleSaveInBody}
+              >
+                <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                <Text style={styles.inBodySaveBtnText}>Guardar medición</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
 
       {/* Language Modal — OUTSIDE ScrollView so it renders as true overlay */}
       <Modal
@@ -1271,6 +1429,55 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
+  },
+
+  // InBody manual entry
+  inBodyModal: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  inBodySubtitle: {
+    fontSize: 14,
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  inBodyField: {
+    marginBottom: 16,
+  },
+  inBodyLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  inBodyInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    fontSize: 16,
+  },
+  inBodySaveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
+    gap: 8,
+    marginTop: 8,
+  },
+  inBodySaveBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  inBodyRegisterBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
   },
 });
 

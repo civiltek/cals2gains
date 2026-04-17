@@ -170,6 +170,47 @@ class InBodyService {
     }
   }
 
+  /** Returns true if there is at least one stored measurement (manual or synced). */
+  hasData(): boolean {
+    return this.cachedMeasurements.length > 0;
+  }
+
+  /** Most recent measurement, or null. */
+  getLastMeasurement(): InBodyMeasurement | null {
+    return this.cachedMeasurements.length > 0 ? this.cachedMeasurements[0] : null;
+  }
+
+  /**
+   * Save a manually entered InBody measurement.
+   * Only bodyFatPercent and skeletalMuscleMass are required;
+   * the rest default to 0 and can be filled in later.
+   */
+  async saveManualMeasurement(data: {
+    bodyFatPercent: number;
+    skeletalMuscleMass: number;
+    waterPercent?: number;
+    visceralFatLevel?: number;
+    weight?: number;
+  }): Promise<void> {
+    const measurement: InBodyMeasurement = {
+      date: new Date(),
+      weight: data.weight ?? 0,
+      bodyFatPercent: data.bodyFatPercent,
+      bodyFatMass: 0,
+      skeletalMuscleMass: data.skeletalMuscleMass,
+      totalBodyWater: 0,
+      waterPercent: data.waterPercent ?? 0,
+      bmi: 0,
+      visceralFatLevel: data.visceralFatLevel ?? 0,
+      basalMetabolicRate: 0,
+    };
+    this.cachedMeasurements = [measurement, ...this.cachedMeasurements];
+    await AsyncStorage.setItem(
+      STORAGE_KEYS.INBODY_MEASUREMENTS,
+      JSON.stringify(this.cachedMeasurements)
+    );
+  }
+
   /**
    * Disconnect from InBody
    */
