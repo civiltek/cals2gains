@@ -1,5 +1,20 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Reparar app.json truncado por commit ddbc981 (c8ab16c)
+
+El commit `ddbc981` ("Fix iOS HealthKit...") eliminó correctamente el entitlement `healthkit.access`
+pero cortó el archivo `app.json` a mitad del plugin `expo-notifications`. Restaurado:
+`"sounds": []`, `experiments.typedRoutes`, `extra.eas.projectId`, `owner`. JSON validado y pusheado.
+
+## 2026-04-17 — Build iOS producción fallido: créditos EAS agotados (100%)
+
+Intento de `eas build --profile production --platform ios` cancelado por límite de plan Free.
+- buildNumber autoincremento en servidor: 51 → 52 (ya registrado en EAS)
+- Credenciales iOS en orden (cert caduca 14/04/2027, perfil activo T72VULK36U)
+- Reset de créditos: **1 de mayo 2026** (13 días)
+- Acción requerida: upgrade plan EAS en https://expo.dev/accounts/civiltek/settings/billing
+  O esperar al 1 de mayo y relanzar: `eas build --profile production --platform ios --non-interactive`
+
 ## 2026-04-17 — Fix iOS HealthKit: isHealthDataAvailable + entitlement + archivo truncado
 
 Build 52 iOS fallaba al conectar a Salud. Tres problemas encontrados y corregidos:

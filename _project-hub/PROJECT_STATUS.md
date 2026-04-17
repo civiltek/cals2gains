@@ -1,5 +1,5 @@
 # Cals2Gains - Estado del Proyecto
-> Última actualización: 2026-04-17 — Bugs críticos Android v19 corregidos (código). Pendiente SHA-1 Play→Firebase + nuevos builds.
+> Última actualización: 2026-04-17 — Build iOS bloqueado: créditos EAS al 100% (reset 1 mayo). app.json reparado (c8ab16c). buildNumber iOS en remoto: 52.
 
 ## App
 - **Versión actual:** 1.0.0
@@ -12,11 +12,13 @@
   - **Listo para subir a Google Play Console**
   - minSdkVersion: 26 (fix para react-native-health-connect)
 - **Build Android anterior (roto por reanimated v3 + RN 0.81):** build 358414d2 — NO INSTALAR
-- **Build iOS (App Store):** 🟡 EN COLA — `b7cd8dc2-f6f0-4eac-9f00-b9dc16660eef` (buildNumber 21, Free tier queue)
-  - URL: https://expo.dev/accounts/civiltek/projects/cals2gains/builds/b7cd8dc2-f6f0-4eac-9f00-b9dc16660eef
-  - Patch expo-dev-menu aplicado (fix reloadAppAsync → bridge.reload)
-  - ⚠️ Créditos EAS al 96% — riesgo de cancelación si se agotan en cola; considerar upgrade
-  - Build anterior cancelado: `254b9c6e` (buildNumber 19); intento disco lleno: buildNumber 20 (descartado)
+- **Build iOS (App Store):** 🔴 BLOQUEADO — créditos EAS agotados (100%), reset 1 mayo 2026
+  - buildNumber remoto actual: **52** (autoincremento en intento fallido 2026-04-17)
+  - app.json reparado y pusheado: commit `c8ab16c` — credenciales iOS válidas hasta 14/04/2027
+  - ⚠️ Upgrade EAS o esperar reset 1 mayo: https://expo.dev/accounts/civiltek/settings/billing
+  - Comando listo: `eas build --profile production --platform ios --non-interactive`
+  - Build obsoleto en cola (sin fix HealthKit): `b7cd8dc2-f6f0-4eac-9f00-b9dc16660eef`
+  - Build anterior cancelado: `254b9c6e` (buildNumber 19); intento disco lleno: buildNumber 20
 - **Estado:** AAB production firmado y descargado. Pendiente subida a Google Play Console.
 
 ## Stack Tecnológico
