@@ -120,7 +120,9 @@
         "android.permission.health.READ_WEIGHT",
         "android.permission.health.WRITE_WEIGHT",
         "android.permission.health.READ_BASAL_METABOLIC_RATE",
-        "android.permission.health.READ_SLEEP"
+        "android.permission.health.READ_SLEEP",
+        "android.permission.health.READ_BODY_FAT",
+        "android.permission.health.READ_LEAN_BODY_MASS"
       ],
       "googleServicesFile": "./google-services.json"
     },
