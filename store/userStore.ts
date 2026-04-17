@@ -12,8 +12,10 @@ import {
   updateUserGoalsAndMode,
   updateUserAllergies,
   onAuthStateChange,
+  redeemPromoCodeInFirestore,
   signOut as firebaseSignOut,
 } from '../services/firebase';
+import { findPromoCode } from '../constants/promoCodes';
 import { loginRevenueCat, logoutRevenueCat } from '../services/revenuecat';
 import { calculateTDEE, calculateBMR } from '../utils/nutrition';
 import { HealthData } from '../services/healthKit';
@@ -62,6 +64,13 @@ interface UserState {
     targetFat: number;
   }) => Promise<void>;
   toggleAdaptiveMode: (enabled: boolean) => Promise<void>;
+
+  // Promotional code redemption
+  redeemPromoCode: (code: string) => Promise<{
+    ok: boolean;
+    reason?: 'INVALID' | 'ALREADY_REDEEMED' | 'NO_USER' | 'ERROR';
+    expiresAt?: Date;
+  }>;
 
   // Computed getters
   isSubscriptionActive: () => boolean;
@@ -409,5 +418,39 @@ export const useUserStore = create<UserState>((set, get) => ({
   isOnTrial: () => {
     const { user } = get();
     return user?.subscriptionType === 'trial' && get().isSubscriptionActive();
+  },
+
+  redeemPromoCode: async (code) => {
+    const { user } = get();
+    if (!user) return { ok: false, reason: 'NO_USER' };
+
+    const promo = findPromoCode(code);
+    if (!promo) return { ok: false, reason: 'INVALID' };
+
+    try {
+      const expiresAt = await redeemPromoCodeInFirestore({
+        uid: user.uid,
+        code: promo.code,
+        type: promo.type,
+        durationDays: promo.durationDays,
+      });
+
+      // Optimistic local update — reload from Firebase afterwards to be safe
+      set({
+        user: {
+          ...user,
+          isSubscribed: true,
+          subscriptionType: promo.type === 'master' ? 'lifetime' : 'promo',
+          subscriptionExpiresAt: expiresAt,
+        },
+      });
+      return { ok: true, expiresAt };
+    } catch (err: any) {
+      if (err?.message === 'CODE_ALREADY_REDEEMED') {
+        return { ok: false, reason: 'ALREADY_REDEEMED' };
+      }
+      console.error('redeemPromoCode failed:', err);
+      return { ok: false, reason: 'ERROR' };
+    }
   },
 }));

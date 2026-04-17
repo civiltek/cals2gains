@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { useMealPlanStore } from '../store/mealPlanStore';
 import { useMealStore } from '../store/mealStore';
 import { useUserStore } from '../store/userStore';
@@ -38,6 +39,9 @@ interface AddMealModalState {
 }
 
 export default function MealPlanScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();

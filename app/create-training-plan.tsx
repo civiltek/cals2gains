@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useColors } from '../store/themeStore';
@@ -212,6 +213,9 @@ function DayTypePresets({
 // ============================================
 
 export default function CreateTrainingPlanScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const { planId } = useLocalSearchParams<{ planId?: string }>();
 

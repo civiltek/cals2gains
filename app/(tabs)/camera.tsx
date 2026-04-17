@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useColors } from '../../store/themeStore';
 import { useUserStore } from '../../store/userStore';
 import { useAnalysisStore } from '../../store/analysisStore';
+import { useQuotaStore, QUOTA_LIMITS } from '../../store/quotaStore';
 
 export default function CameraScreen() {
   const { t, i18n } = useTranslation();
@@ -41,8 +42,29 @@ export default function CameraScreen() {
 
   const cameraRef = useRef<CameraView>(null);
 
-  // Check subscription
-  const canUseCamera = isSubscriptionActive();
+  // Free users get 1 photo/week; subscribers unlimited.
+  const photoQuotaRemaining = useQuotaStore((s) => s.remaining('photo'));
+  const canUseCamera = isSubscriptionActive() || photoQuotaRemaining > 0;
+
+  const ensurePhotoQuota = (): boolean => {
+    if (isSubscriptionActive()) return true;
+    const ok = useQuotaStore.getState().consume('photo');
+    if (!ok) {
+      Alert.alert(
+        t('quota.photoExhaustedTitle', 'L\u00edmite alcanzado'),
+        t(
+          'quota.photoExhaustedMsg',
+          'Tu prueba gratuita incluye 1 an\u00e1lisis por foto a la semana. Suscr\u00edbete para an\u00e1lisis ilimitados.'
+        ),
+        [
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('paywall.subscribe'), onPress: () => router.push('/paywall') },
+        ]
+      );
+      return false;
+    }
+    return true;
+  };
 
   const compressAndConvertToBase64 = async (uri: string): Promise<string> => {
     // Resize to max 1024px and compress for API efficiency
@@ -120,6 +142,7 @@ export default function CameraScreen() {
 
   const handleAnalyze = async () => {
     if (!previewUri) return;
+    if (!ensurePhotoQuota()) return;
     setIsAnalyzing(true);
 
     try {

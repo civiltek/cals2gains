@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
 import { useMealStore } from '../store/mealStore';
 import { useUserStore } from '../store/userStore';
+import { useQuotaStore } from '../store/quotaStore';
 import { lookupBarcode } from '../services/foodDatabase';
 import { FoodItem } from '../types';
 
@@ -79,6 +80,25 @@ export default function BarcodeScannerScreen() {
 
   const onBarcode = useCallback(async (r: BarcodeScanningResult) => {
     if (scanLock.current) return;
+    // Free tier: 3 escaneos/día
+    const isSub = useUserStore.getState().isSubscriptionActive();
+    if (!isSub) {
+      const ok = useQuotaStore.getState().consume('barcode');
+      if (!ok) {
+        Alert.alert(
+          t('quota.barcodeExhaustedTitle', 'L\u00edmite alcanzado'),
+          t(
+            'quota.barcodeExhaustedMsg',
+            'La prueba gratuita incluye 3 escaneos de c\u00f3digo de barras al d\u00eda. Suscr\u00edbete para usos ilimitados.'
+          ),
+          [
+            { text: t('common.cancel'), onPress: () => router.back() },
+            { text: t('paywall.subscribe'), onPress: () => router.replace('/paywall') },
+          ]
+        );
+        return;
+      }
+    }
     scanLock.current = true;
     setScanned(true); setLoading(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

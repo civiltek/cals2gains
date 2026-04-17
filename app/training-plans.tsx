@@ -18,6 +18,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useColors } from '../store/themeStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { useTrainingPlanStore, TrainingPlan, TrainingDayType } from '../store/trainingPlanStore';
 
 // ============================================
@@ -143,6 +144,9 @@ function PlanCard({
 // ============================================
 
 export default function TrainingPlansScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const s = useMemo(() => createStyles(C), [C]);
 

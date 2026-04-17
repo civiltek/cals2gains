@@ -16,6 +16,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { mealStore } from '../store/mealStore';
 import { weightStore } from '../store/weightStore';
 import { waterStore } from '../store/waterStore';
@@ -229,6 +230,9 @@ const styles = StyleSheet.create({
 
 
 export default function ExportDataScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const { t } = useTranslation();
   const [format, setFormat] = useState<FormatType>('csv');

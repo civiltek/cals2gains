@@ -18,6 +18,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { BRAND_COLORS, BRAND_FONTS } from '../theme';
 import { useColors } from '../store/themeStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import InfoButton from '../components/ui/InfoButton';
 import { useUserStore } from '../store/userStore';
 import { AdaptiveMacroEngine, GoalMode } from '../services/adaptiveMacroEngine';
@@ -102,6 +103,8 @@ interface GoalModesScreenProps {
 export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
   onGoalsUpdated,
 }) => {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
   const { t } = useTranslation();
   const C = useColors();
   const {

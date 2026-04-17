@@ -18,6 +18,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { useColors } from '../store/themeStore';
 import { useUserStore } from '../store/userStore';
 import { useTrainingPlanStore } from '../store/trainingPlanSessionStore';
@@ -137,6 +138,9 @@ function DayCard({ dayIndex, session, isToday, macroAdjustment, onPress, C, lang
 // ============================================================================
 
 export default function TrainingPlanScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;

@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
 import { useMealStore } from '../store/mealStore';
 import { useUserStore } from '../store/userStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { Meal } from '../types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -140,6 +141,9 @@ function parseAnalysisFromParams(params: RouteParams): AnalysisResult {
 }
 
 export default function AIReviewScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const { t } = useTranslation();
   const route = useRoute<any>();

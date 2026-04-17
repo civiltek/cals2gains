@@ -18,6 +18,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useColors } from '../store/themeStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { useUserStore } from '../store/userStore';
 import { useMealStore } from '../store/mealStore';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +46,9 @@ const QUICK_PROTEIN_FOODS: ProteinFood[] = [
 ];
 
 export default function ProteinDashboard() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const styles = useMemo(() => createStyles(C), [C]);
   const macroStyles = useMemo(() => createMacroStyles(C), [C]);

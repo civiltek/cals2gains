@@ -16,6 +16,7 @@ import { mealStore } from '../store/mealStore';
 import { weightStore } from '../store/weightStore';
 import { waterStore } from '../store/waterStore';
 import { useColors } from '../store/themeStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 
 const { width } = Dimensions.get('window');
 const CARD_PADDING = 16;
@@ -352,6 +353,9 @@ interface WaterStats {
 }
 
 export default function AnalyticsScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const { t } = useTranslation();
   const styles = createStyles(C);

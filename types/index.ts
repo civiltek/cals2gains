@@ -11,7 +11,7 @@ export interface User {
   createdAt: Date;
   trialStartDate: Date;
   isSubscribed: boolean;
-  subscriptionType: 'trial' | 'monthly' | 'annual' | 'none';
+  subscriptionType: 'trial' | 'monthly' | 'annual' | 'none' | 'lifetime' | 'promo';
   subscriptionExpiresAt: Date | null;
   goals: UserGoals;
   profile: UserProfile;

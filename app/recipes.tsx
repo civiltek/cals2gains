@@ -18,6 +18,7 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { useColors } from '../store/themeStore';
 import { useShoppingListStore } from '../store/shoppingListStore';
 import { useRecipeStore } from '../store/recipeStore';
@@ -34,6 +35,9 @@ interface FilterChip {
 }
 
 export default function RecipesScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const { t } = useTranslation();
   const C = useColors();
   const router = useRouter();

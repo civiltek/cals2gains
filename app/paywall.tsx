@@ -12,6 +12,10 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
 const LOGO_MARK = require('../brand-assets/C2G-Mark-512.png');
@@ -33,7 +37,7 @@ type PurchasesPackage = any;
 
 export default function PaywallScreen() {
   const { t } = useTranslation();
-  const { user, loadUserData } = useUserStore();
+  const { user, loadUserData, redeemPromoCode } = useUserStore();
   const C = useColors();
   const styles = useMemo(() => createStyles(C), [C]);
 
@@ -42,6 +46,9 @@ export default function PaywallScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [promoModalVisible, setPromoModalVisible] = useState(false);
+  const [promoInput, setPromoInput] = useState('');
+  const [isRedeeming, setIsRedeeming] = useState(false);
 
   useEffect(() => {
     loadPackages();
@@ -110,6 +117,34 @@ export default function PaywallScreen() {
       Alert.alert(t('errors.generic'));
     } finally {
       setIsRestoring(false);
+    }
+  };
+
+  const handleRedeemPromo = async () => {
+    if (!promoInput.trim() || isRedeeming) return;
+    setIsRedeeming(true);
+    try {
+      const result = await redeemPromoCode(promoInput);
+      if (result.ok) {
+        if (user) await loadUserData(user.uid);
+        setPromoModalVisible(false);
+        setPromoInput('');
+        Alert.alert(
+          '🎉',
+          t('paywall.promoSuccess', '¡Código activado! Ya tienes acceso premium.'),
+          [{ text: t('common.ok'), onPress: () => router.back() }]
+        );
+      } else {
+        const msg =
+          result.reason === 'ALREADY_REDEEMED'
+            ? t('paywall.promoAlreadyUsed', 'Este código ya se ha usado.')
+            : result.reason === 'INVALID'
+            ? t('paywall.promoInvalid', 'Código no válido.')
+            : t('errors.generic');
+        Alert.alert(msg);
+      }
+    } finally {
+      setIsRedeeming(false);
     }
   };
 
@@ -307,10 +342,76 @@ export default function PaywallScreen() {
               )}
             </TouchableOpacity>
 
+            <TouchableOpacity
+              style={styles.restoreButton}
+              onPress={() => setPromoModalVisible(true)}
+            >
+              <Text style={styles.restoreText}>
+                {t('paywall.havePromoCode', '¿Tienes un código?')}
+              </Text>
+            </TouchableOpacity>
+
             <Text style={styles.termsText}>{t('paywall.terms')}</Text>
           </View>
         </ScrollView>
       </SafeAreaView>
+
+      {/* Promo code modal */}
+      <Modal
+        visible={promoModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPromoModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>
+              {t('paywall.promoTitle', 'Código promocional')}
+            </Text>
+            <Text style={styles.modalSubtitle}>
+              {t('paywall.promoSubtitle', 'Introduce tu código para desbloquear el acceso premium.')}
+            </Text>
+            <TextInput
+              style={styles.promoInput}
+              value={promoInput}
+              onChangeText={setPromoInput}
+              placeholder="C2G-XXXXXX"
+              placeholderTextColor={C.textMuted}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              editable={!isRedeeming}
+            />
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonSecondary]}
+                onPress={() => {
+                  setPromoModalVisible(false);
+                  setPromoInput('');
+                }}
+                disabled={isRedeeming}
+              >
+                <Text style={styles.modalButtonSecondaryText}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonPrimary]}
+                onPress={handleRedeemPromo}
+                disabled={isRedeeming || !promoInput.trim()}
+              >
+                {isRedeeming ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text style={styles.modalButtonPrimaryText}>
+                    {t('paywall.promoActivate', 'Activar')}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
@@ -548,6 +649,79 @@ function createStyles(C: any) {
       textAlign: 'center',
       lineHeight: 16,
       paddingHorizontal: 8,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+    },
+    modalCard: {
+      width: '100%',
+      maxWidth: 400,
+      backgroundColor: C.surface,
+      borderRadius: 20,
+      padding: 24,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: C.text,
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+    modalSubtitle: {
+      fontSize: 14,
+      color: C.textSecondary,
+      textAlign: 'center',
+      marginBottom: 20,
+      lineHeight: 20,
+    },
+    promoInput: {
+      backgroundColor: C.background,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      fontSize: 16,
+      color: C.text,
+      borderWidth: 1,
+      borderColor: C.border,
+      marginBottom: 16,
+      letterSpacing: 1,
+      textAlign: 'center',
+      fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    },
+    modalActions: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    modalButton: {
+      flex: 1,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    modalButtonPrimary: {
+      backgroundColor: C.primary,
+    },
+    modalButtonSecondary: {
+      backgroundColor: C.background,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    modalButtonPrimaryText: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: '#FFFFFF',
+    },
+    modalButtonSecondaryText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: C.textSecondary,
     },
   });
 }

@@ -35,6 +35,7 @@ import {
   getDocs,
   addDoc,
   deleteDoc,
+  runTransaction,
   Timestamp,
   limit,
 } from 'firebase/firestore';
@@ -373,6 +374,56 @@ export async function updateSubscriptionStatus(
     subscriptionType,
     subscriptionExpiresAt: expiresAt ? Timestamp.fromDate(expiresAt) : null,
   });
+}
+
+/**
+ * Redeem a promotional code.
+ * Master codes: unlimited reuse.
+ * Friend codes: single-use — enforced via a Firestore transaction on
+ * `promoCodesRedeemed/{code}`. Returns the expiry date that was applied.
+ */
+export async function redeemPromoCodeInFirestore(params: {
+  uid: string;
+  code: string;
+  type: 'master' | 'friend';
+  durationDays: number;
+}): Promise<Date> {
+  const { uid, code, type, durationDays } = params;
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + durationDays);
+
+  const userRef = doc(db, 'users', uid);
+  const subscriptionType = type === 'master' ? 'lifetime' : 'promo';
+
+  if (type === 'friend') {
+    // Atomically check-and-claim the code
+    const codeRef = doc(db, 'promoCodesRedeemed', code);
+    await runTransaction(db, async (tx) => {
+      const existing = await tx.get(codeRef);
+      if (existing.exists()) {
+        throw new Error('CODE_ALREADY_REDEEMED');
+      }
+      tx.set(codeRef, {
+        redeemedBy: uid,
+        redeemedAt: Timestamp.fromDate(new Date()),
+        type,
+      });
+      tx.update(userRef, {
+        isSubscribed: true,
+        subscriptionType,
+        subscriptionExpiresAt: Timestamp.fromDate(expiresAt),
+      });
+    });
+  } else {
+    // Master code — just update the subscription
+    await updateDoc(userRef, {
+      isSubscribed: true,
+      subscriptionType,
+      subscriptionExpiresAt: Timestamp.fromDate(expiresAt),
+    });
+  }
+
+  return expiresAt;
 }
 
 /**

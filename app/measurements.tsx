@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 import { useMeasurementStore } from '../store/measurementStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { useWeightStore } from '../store/weightStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '../store/themeStore';
@@ -134,6 +135,9 @@ const BodySilhouette: React.FC<{ width: number; colors: ReturnType<typeof useCol
 };
 
 export default function MeasurementsScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const { t } = useTranslation();
   const C = useColors();
   const router = useRouter();

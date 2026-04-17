@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
 import { useUserStore } from '../store/userStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { Meal, Nutrition, UserGoals } from '../types';
 import { getRecentMeals } from '../services/firebase';
 import { format, subDays, startOfDay, differenceInCalendarDays } from 'date-fns';
@@ -104,6 +105,9 @@ function generateTips(
 // ── Component ────────────────────────────────────────────
 
 export default function AdherenceScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const { t } = useTranslation();
   const styles = useMemo(() => createStyles(C), [C]);

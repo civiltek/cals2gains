@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
 import { useShoppingListStore, ShoppingListItem } from '../store/shoppingListStore';
 import { useUserStore } from '../store/userStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +27,9 @@ interface GroupedItems {
 }
 
 export default function ShoppingListScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const { t } = useTranslation();
   const styles = createStyles(C);

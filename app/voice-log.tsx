@@ -31,6 +31,7 @@ import {
 import { useColors } from '../store/themeStore';
 import { useMealStore } from '../store/mealStore';
 import { useUserStore } from '../store/userStore';
+import { useQuotaStore } from '../store/quotaStore';
 import { voiceToNutrition } from '../services/voiceLog';
 import { FoodItem, MealType } from '../types';
 import { formatMacro } from '../utils/nutrition';
@@ -127,6 +128,25 @@ export default function VoiceLogScreen() {
   }, [screenState]);
 
   const handleStartRecording = async () => {
+    // Free users: 1 voice log/day. Consume quota before starting to avoid wasted recordings.
+    const isSub = useUserStore.getState().isSubscriptionActive();
+    if (!isSub) {
+      const ok = useQuotaStore.getState().consume('voice');
+      if (!ok) {
+        Alert.alert(
+          t('quota.voiceExhaustedTitle', 'L\u00edmite alcanzado'),
+          t(
+            'quota.voiceExhaustedMsg',
+            'Tu prueba gratuita incluye 1 an\u00e1lisis por voz al d\u00eda. Suscr\u00edbete para usos ilimitados.'
+          ),
+          [
+            { text: t('common.cancel'), style: 'cancel' },
+            { text: t('paywall.subscribe'), onPress: () => router.push('/paywall') },
+          ]
+        );
+        return;
+      }
+    }
     try {
       const { granted } = await requestRecordingPermissionsAsync();
       if (!granted) {

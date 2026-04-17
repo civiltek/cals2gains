@@ -17,6 +17,7 @@ import * as Haptics from 'expo-haptics';
 import * as Sharing from 'expo-sharing';
 import { useTranslation } from 'react-i18next';
 import { useMealPlanStore } from '../store/mealPlanStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { GroceryItem } from '../types';
 import { useColors } from '../store/themeStore';
 
@@ -47,6 +48,9 @@ interface GrocerySection {
 }
 
 export default function GroceryListScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const C = useColors();

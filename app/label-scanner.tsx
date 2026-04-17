@@ -13,6 +13,8 @@ import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 import { useMealStore } from '../store/mealStore';
 import { useColors } from '../store/themeStore';
+import { useUserStore } from '../store/userStore';
+import { useQuotaStore } from '../store/quotaStore';
 import { MealType } from '../types';
 
 const { width: SW } = Dimensions.get('window');
@@ -63,6 +65,25 @@ export default function LabelScannerScreen() {
 
   const takePhoto = useCallback(async () => {
     if (!cameraRef.current || loading) return;
+    // Free tier: 1 escaneo de etiqueta/mes
+    const isSub = useUserStore.getState().isSubscriptionActive();
+    if (!isSub) {
+      const ok = useQuotaStore.getState().consume('label');
+      if (!ok) {
+        Alert.alert(
+          t('quota.labelExhaustedTitle', 'L\u00edmite alcanzado'),
+          t(
+            'quota.labelExhaustedMsg',
+            'La prueba gratuita incluye 1 escaneo de etiqueta al mes. Suscr\u00edbete para usos ilimitados.'
+          ),
+          [
+            { text: t('common.cancel'), style: 'cancel' },
+            { text: t('paywall.subscribe'), onPress: () => router.replace('/paywall') },
+          ]
+        );
+        return;
+      }
+    }
     setLoading(true);
     try {
       const photo = await cameraRef.current.takePictureAsync({ base64: true });

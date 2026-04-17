@@ -14,6 +14,7 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { useMealStore } from '../store/mealStore';
 import { useUserStore } from '../store/userStore';
 import { useWeightStore } from '../store/weightStore';
@@ -137,6 +138,9 @@ function generateImprovements(
 // ── Component ────────────────────────────────────────────
 
 export default function WeeklyCoachScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const router = useRouter();
   const { t } = useTranslation();

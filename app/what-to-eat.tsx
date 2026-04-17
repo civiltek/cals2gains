@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
 import { useMealStore } from '../store/mealStore';
 import { useUserStore } from '../store/userStore';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { useRecipeStore } from '../store/recipeStore';
 import { MemoryEngine, Suggestion as MemorySuggestion } from '../services/memoryEngine';
 import { PersonalEngine, Suggestion as PersonalSuggestion } from '../services/personalEngine';
@@ -73,6 +74,9 @@ function getMealTypeLabel(
 // ============================================================================
 
 export default function WhatToEatScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const router = useRouter();
   const { t } = useTranslation();
   const C = useColors();

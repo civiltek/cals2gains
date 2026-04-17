@@ -18,6 +18,7 @@ import {
   Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { usePremiumGate } from '../hooks/usePremiumGate';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as Clipboard from 'expo-clipboard';
@@ -154,6 +155,9 @@ function computeWeeklyReport(
 // ============================================================================
 
 export default function CoachShareScreen() {
+  const isPremium = usePremiumGate();
+  if (!isPremium) return null;
+
   const C = useColors();
   const { t } = useTranslation();
   const router = useRouter();
