@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#17121D">
+<meta name="description" content="Manual completo de Cals2Gains: como usar la app, la ciencia que la sustenta y tus derechos. Redactado con referencias académicas y compromisos claros.">
+<meta name="keywords" content="manual cals2gains, guia usuario nutricion, macros evidencia, RGPD, derechos privacidad">
+<meta property="og:title" content="Manual de usuario - Cals2Gains">
+<meta property="og:description" content="Todo lo que necesitas saber para usar Cals2Gains: funcionalidades, evidencia científica, salvaguardas de salud y tus derechos.">
+<meta property="og:image" content="https://cals2gains.com/c2g-icon.png">
+<meta property="og:url" content="https://cals2gains.com/guides/manual.html">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://cals2gains.com/guides/manual.html">
+<link rel="icon" type="image/png" href="/c2g-icon.png">
+<link rel="apple-touch-icon" href="/c2g-icon.png">
+<title data-es="Manual de usuario - Cals2Gains" data-en="User Manual - Cals2Gains">Manual de usuario - Cals2Gains</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+    --violet:#9C8CFF;--violet-bright:#B4A3FF;--violet-dim:#7B6DDE;
+    --coral:#FF6A4D;--coral-bright:#FF8A70;
+    --orange:#FF9800;--gold:#FFD700;
+    --plum:#17121D;--plum-light:#1E1829;--plum-deep:#0F0B14;
+    --bone:#F7F2EA;--bone-80:rgba(247,242,234,0.8);--bone-60:rgba(247,242,234,0.6);--bone-40:rgba(247,242,234,0.4);--bone-20:rgba(247,242,234,0.2);--bone-10:rgba(247,242,234,0.1);
+    --violet-15:rgba(156,140,255,0.15);--violet-25:rgba(156,140,255,0.25);--violet-08:rgba(156,140,255,0.08);
+    --coral-15:rgba(255,106,77,0.15);--coral-25:rgba(255,106,77,0.25);--coral-08:rgba(255,106,77,0.08);
+    --orange-15:rgba(255,152,0,0.15);--gold-15:rgba(255,215,0,0.15);
+    --gradient:linear-gradient(135deg,#9C8CFF,#FF6A4D);
+    --gradient-soft:linear-gradient(135deg,rgba(156,140,255,0.12),rgba(255,106,77,0.12));
+}
+html{scroll-behavior:smooth}
+body{font-family:'Instrument Sans',-apple-system,sans-serif;background:var(--plum);color:var(--bone);line-height:1.7;padding:0;-webkit-font-smoothing:antialiased}
+a{color:var(--violet);text-decoration:none;transition:color .2s}
+a:hover{color:var(--violet-bright);text-decoration:underline}
+button{border:none;cursor:pointer;font-family:inherit}
+
+/* NAV */
+nav.topnav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0.75rem 2rem;backdrop-filter:blur(20px);background:rgba(23,18,29,0.92);border-bottom:1px solid var(--violet-15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:0.6rem;text-decoration:none;color:inherit}
+.nav-logo img{width:36px;height:36px;border-radius:10px}
+.nav-wordmark{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:800;letter-spacing:-0.5px}
+.nav-wordmark .c{color:var(--violet)}.nav-wordmark .t{color:var(--coral)}.nav-wordmark .g{color:var(--violet)}
+.nav-right{display:flex;gap:0.75rem;align-items:center}
+.lang-toggle{background:transparent;border:1px solid var(--violet-15);padding:0.3rem 0.7rem;border-radius:999px;font-size:0.8rem;color:var(--bone-60);transition:all .3s}
+.lang-toggle:hover{color:var(--violet);border-color:var(--violet-25)}
+.nav-cta{background:var(--violet);color:var(--plum);padding:0.5rem 1.1rem;border-radius:10px;font-weight:700;font-family:'Outfit',sans-serif;font-size:0.82rem;transition:all .3s;text-decoration:none}
+.nav-cta:hover{background:var(--violet-bright);transform:translateY(-1px);box-shadow:0 8px 24px rgba(156,140,255,.3);text-decoration:none}
+
+/* HERO */
+.hero{padding:7rem 1.5rem 3rem;max-width:1100px;margin:0 auto;text-align:center;position:relative}
+.hero::before{content:'';position:absolute;top:6rem;left:50%;transform:translateX(-50%);width:60%;height:200px;background:radial-gradient(circle,rgba(156,140,255,0.25),transparent 70%);filter:blur(80px);z-index:-1}
+.eyebrow{display:inline-block;font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--coral);background:var(--coral-15);border:1px solid var(--coral-25);padding:0.45rem 1rem;border-radius:999px;margin-bottom:1.5rem}
+.hero h1{font-family:'Outfit',sans-serif;font-size:clamp(2rem,5vw,3.4rem);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:1rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero .lead{font-size:1.15rem;color:var(--bone-80);max-width:720px;margin:0 auto 2rem;line-height:1.6}
+.hero-meta{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;font-size:0.85rem;color:var(--bone-60);margin-bottom:2.5rem}
+.hero-meta span{display:inline-flex;align-items:center;gap:0.4rem}
+
+/* TOC */
+.toc{max-width:900px;margin:0 auto 4rem;padding:0 1.5rem}
+.toc-box{background:var(--plum-light);border:1px solid var(--violet-15);border-radius:16px;padding:1.75rem 2rem}
+.toc-title{font-family:'Outfit',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--violet);margin-bottom:1.25rem}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.6rem}
+.toc-item{display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0.75rem;border-radius:8px;color:var(--bone-80);font-size:0.92rem;text-decoration:none;transition:all .2s;border:1px solid transparent}
+.toc-item:hover{background:var(--violet-08);border-color:var(--violet-15);color:var(--bone);text-decoration:none}
+.toc-num{font-family:'Outfit',sans-serif;font-weight:700;color:var(--coral);font-size:0.85rem;min-width:1.75rem}
+
+/* CONTENT */
+.page{max-width:900px;margin:0 auto;padding:0 1.5rem 4rem}
+section{margin-bottom:4rem;scroll-margin-top:5rem}
+h2{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:700;color:var(--bone);margin-bottom:0.75rem;letter-spacing:-0.5px;display:flex;align-items:baseline;gap:0.75rem;flex-wrap:wrap}
+h2 .num{color:var(--coral);font-size:1.1rem;font-weight:800;letter-spacing:2px}
+h3{font-family:'Outfit',sans-serif;color:var(--violet);font-size:1.15rem;font-weight:600;margin:2rem 0 0.75rem;letter-spacing:-0.3px}
+h4{font-family:'Outfit',sans-serif;color:var(--bone);font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem}
+p{margin-bottom:1rem;color:var(--bone-80)}
+ul,ol{margin:0.75rem 0 1.25rem 1.5rem;color:var(--bone-80)}
+li{margin-bottom:0.5rem}
+strong{color:var(--bone);font-weight:600}
+em{color:var(--bone);font-style:italic}
+.section-lead{font-size:1.05rem;color:var(--bone-80);margin-bottom:1.5rem;padding-left:1rem;border-left:3px solid var(--violet);line-height:1.7}
+
+/* Steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:0.75rem;margin:1.25rem 0 1.75rem}
+.step{background:var(--plum-light);border:1px solid var(--violet-15);border-radius:12px;padding:1rem 1.25rem 1rem 3.5rem;position:relative}
+.step::before{counter-increment:step;content:counter(step);position:absolute;left:1rem;top:1rem;font-family:'Outfit',sans-serif;font-weight:800;color:var(--coral);background:var(--coral-15);width:1.75rem;height:1.75rem;display:flex;align-items:center;justify-content:center;border-radius:999px;font-size:0.85rem}
+.step h4{margin:0 0 0.25rem;color:var(--bone);font-size:0.98rem}
+.step p{margin:0;font-size:0.9rem;color:var(--bone-60);line-height:1.55}
+
+/* Cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:1.5rem 0}
+.card{background:var(--plum-light);border:1px solid var(--violet-15);border-radius:14px;padding:1.25rem 1.4rem;transition:all .3s}
+.card:hover{border-color:var(--violet-25);transform:translateY(-2px);box-shadow:0 12px 32px rgba(156,140,255,0.08)}
+.card .emoji{font-size:1.5rem;margin-bottom:0.6rem}
+.card h4{color:var(--coral);font-size:0.95rem;margin:0 0 0.4rem;font-weight:700}
+.card p{font-size:0.88rem;color:var(--bone-60);margin:0;line-height:1.5}
+
+/* Tables */
+.table-wrap{overflow-x:auto;margin:1.25rem 0 1.75rem;border-radius:12px;border:1px solid var(--violet-15)}
+table{width:100%;border-collapse:collapse;font-size:0.9rem}
+thead tr{background:var(--plum-light)}
+th{text-align:left;padding:0.8rem 1rem;color:var(--violet);font-family:'Outfit',sans-serif;font-weight:700;font-size:0.82rem;letter-spacing:0.5px;border-bottom:2px solid var(--violet-15);white-space:nowrap}
+td{padding:0.75rem 1rem;border-bottom:1px solid var(--violet-15);color:var(--bone-80);font-size:0.9rem}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--violet-08)}
+td strong{color:var(--bone)}
+td .pill{display:inline-block;padding:0.15rem 0.55rem;border-radius:999px;font-size:0.75rem;font-weight:600;font-family:'Outfit',sans-serif}
+.pill.violet{background:var(--violet-15);color:var(--violet-bright)}
+.pill.coral{background:var(--coral-15);color:var(--coral-bright)}
+.pill.gold{background:var(--gold-15);color:var(--gold)}
+.pill.orange{background:var(--orange-15);color:var(--orange)}
+
+/* Callouts */
+.callout{background:var(--gradient-soft);border:1px solid var(--violet-25);border-radius:14px;padding:1.25rem 1.5rem;margin:1.25rem 0;display:flex;gap:1rem;align-items:flex-start}
+.callout .icon{font-size:1.5rem;line-height:1;flex-shrink:0;margin-top:0.15rem}
+.callout .body{flex:1}
+.callout h4{margin:0 0 0.35rem;color:var(--bone);font-size:1rem}
+.callout p{margin:0;color:var(--bone-80);font-size:0.93rem}
+.callout.safety{background:linear-gradient(135deg,rgba(255,106,77,0.08),rgba(255,152,0,0.08));border-color:var(--coral-25)}
+.callout.safety h4{color:var(--coral-bright)}
+.callout.info{background:linear-gradient(135deg,rgba(156,140,255,0.06),rgba(156,140,255,0.12));border-color:var(--violet-15)}
+.callout.info h4{color:var(--violet)}
+.callout.success{background:linear-gradient(135deg,rgba(72,187,120,0.08),rgba(72,187,120,0.04));border-color:rgba(72,187,120,0.35)}
+.callout.success h4{color:#48bb78}
+
+/* Pillars / principles */
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:1.5rem 0}
+.pillar{background:var(--plum-light);border:1px solid var(--violet-15);border-radius:16px;padding:1.5rem;position:relative;overflow:hidden}
+.pillar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient)}
+.pillar .n{font-family:'Outfit',sans-serif;font-size:2.2rem;font-weight:800;line-height:1;color:var(--coral);margin-bottom:0.5rem}
+.pillar h4{color:var(--bone);font-size:1.05rem;margin-bottom:0.5rem}
+.pillar p{color:var(--bone-60);font-size:0.9rem;margin:0;line-height:1.55}
+
+/* FAQ */
+.faq{margin:1.5rem 0}
+.faq details{background:var(--plum-light);border:1px solid var(--violet-15);border-radius:12px;padding:0;margin-bottom:0.6rem;overflow:hidden;transition:border-color .2s}
+.faq details[open]{border-color:var(--violet-25)}
+.faq summary{padding:1rem 1.25rem;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;color:var(--bone);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;font-size:0.98rem}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';color:var(--coral);font-size:1.2rem;font-weight:700;transition:transform .2s;flex-shrink:0}
+.faq details[open] summary::after{content:'−'}
+.faq details[open] summary{border-bottom:1px solid var(--violet-15)}
+.faq .body{padding:1rem 1.25rem;color:var(--bone-80);font-size:0.93rem;line-height:1.65}
+.faq .body p{margin-bottom:0.75rem}
+.faq .body p:last-child{margin-bottom:0}
+
+/* References */
+.refs{background:var(--plum-light);border:1px solid var(--violet-15);border-radius:14px;padding:1.5rem 1.75rem;margin:1.5rem 0}
+.refs ol{margin:0;padding-left:1.25rem;color:var(--bone-60);font-size:0.88rem;line-height:1.6}
+.refs li{margin-bottom:0.6rem;padding-left:0.25rem}
+.refs li::marker{color:var(--violet);font-weight:700}
+.refs a{font-size:0.88rem;word-break:break-word}
+
+/* CTA box */
+.cta-box{background:var(--gradient-soft);border:1px solid var(--violet-25);border-radius:20px;padding:2.5rem 2rem;text-align:center;margin:3rem 0 1.5rem}
+.cta-box h3{color:var(--bone);font-size:1.4rem;margin-bottom:0.5rem}
+.cta-box p{color:var(--bone-80);margin-bottom:1.5rem;max-width:560px;margin-left:auto;margin-right:auto}
+.cta-btn{display:inline-block;background:var(--violet);color:var(--plum);padding:0.85rem 1.75rem;border-radius:12px;font-family:'Outfit',sans-serif;font-weight:700;font-size:0.95rem;transition:all .3s;text-decoration:none}
+.cta-btn:hover{background:var(--violet-bright);transform:translateY(-2px);box-shadow:0 12px 32px rgba(156,140,255,.3);text-decoration:none}
+
+/* Footer */
+.site-footer{margin-top:3rem;padding:2rem 1.5rem;border-top:1px solid var(--violet-15);text-align:center;color:var(--bone-40);font-size:0.82rem}
+.site-footer a{color:var(--violet)}
+.site-footer .links{display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap;margin-bottom:1rem}
+
+/* Disclaimer pinned */
+.pinned-disclaimer{background:linear-gradient(135deg,rgba(255,106,77,0.12),rgba(255,152,0,0.08));border:1px solid var(--coral-25);border-radius:14px;padding:1.1rem 1.4rem;margin:0 auto 2.5rem;max-width:900px;color:var(--bone-80);font-size:0.92rem;line-height:1.6;display:flex;gap:1rem;align-items:flex-start}
+.pinned-disclaimer strong{color:var(--bone)}
+.pinned-disclaimer .icon{font-size:1.4rem;flex-shrink:0;margin-top:0.1rem}
+
+@media(max-width:640px){
+    nav.topnav{padding:0.6rem 1rem}
+    .hero{padding:6rem 1rem 2rem}
+    .hero h1{font-size:1.8rem}
+    .hero .lead{font-size:1rem}
+    .toc-box{padding:1.25rem}
+    h2{font-size:1.4rem}
+    h3{font-size:1rem}
+    .card{padding:1rem}
+    .step{padding:0.85rem 1rem 0.85rem 3rem}
+    .step::before{left:0.75rem;top:0.85rem;width:1.5rem;height:1.5rem;font-size:0.78rem}
+    th,td{padding:0.5rem 0.6rem;font-size:0.8rem}
+    .callout{flex-direction:column;gap:0.5rem}
+    .cta-box{padding:2rem 1.25rem}
+    .pinned-disclaimer{flex-direction:column;gap:0.5rem;padding:1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+<div class="nav-inner">
+    <a href="/" class="nav-logo">
+        <img src="/c2g-icon.png" alt="Cals2Gains" width="36" height="36">
+        <span class="nav-wordmark"><span class="c">Cals</span><span class="t">2</span><span class="g">Gains</span></span>
+    </a>
+    <div class="nav-right">
+        <button class="lang-toggle" onclick="toggleLang()" id="langBtn">EN</button>
+        <a href="/" class="nav-cta" data-es="Descargar app" data-en="Get the app">Descargar app</a>
+    </div>
+</div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+    <span class="eyebrow" data-es="Manual de usuario - v1.0" data-en="User Manual - v1.0">Manual de usuario - v1.0</span>
+    <h1 data-es="Todo lo que necesitas para usar Cals2Gains con confianza." data-en="Everything you need to use Cals2Gains with confidence.">Todo lo que necesitas para usar Cals2Gains con confianza.</h1>
+    <p class="lead" data-es="Cómo usar la app, por qué los números que ves tienen respaldo científico, y que compromisos adquirimos contigo sobre tu salud y tus datos." data-en="How to use the app, why the numbers you see are backed by science, and the commitments we make to you about your health and your data.">Cómo usar la app, por qué los números que ves tienen respaldo científico, y que compromisos adquirimos contigo sobre tu salud y tus datos.</p>
+    <div class="hero-meta">
+        <span data-es="&#128197; Actualizado 18 abril 2026" data-en="&#128197; Updated April 18, 2026">&#128197; Actualizado 18 abril 2026</span>
+        <span data-es="&#128218; 17 referencias académicas" data-en="&#128218; 17 academic references">&#128218; 17 referencias académicas</span>
+        <span data-es="&#9201; 12 min de lectura" data-en="&#9201; 12 min read">&#9201; 12 min de lectura</span>
+    </div>
+</header>
+
+<!-- Pinned disclaimer -->
+<div class="pinned-disclaimer">
+    <span class="icon">&#9881;&#65039;</span>
+    <span data-es="<strong>Cals2Gains es una app de estilo de vida y bienestar nutricional.</strong> Las recomendaciones son orientativas y no sustituyen el consejo de un profesional sanitario. Si tienes una condición médica, estás embarazada o en lactancia, o tienes antecedentes de trastornos de la conducta alimentaria, consulta con tu médico o dietista-nutricionista antes de aplicar estas recomendaciones." data-en="<strong>Cals2Gains is a lifestyle and nutritional wellness app.</strong> Recommendations are guidance and do not replace the advice of a healthcare professional. If you have a medical condition, are pregnant or breastfeeding, or have a history of eating disorders, please consult your doctor or registered dietitian before applying these recommendations."><strong>Cals2Gains es una app de estilo de vida y bienestar nutricional.</strong> Las recomendaciones son orientativas y no sustituyen el consejo de un profesional sanitario. Si tienes una condición médica, estás embarazada o en lactancia, o tienes antecedentes de trastornos de la conducta alimentaria, consulta con tu médico o dietista-nutricionista antes de aplicar estas recomendaciones.</span>
+</div>
+
+<!-- TOC -->
+<nav class="toc" aria-label="Indice">
+<div class="toc-box">
+    <div class="toc-title" data-es="Contenidos" data-en="Contents">Contenidos</div>
+    <div class="toc-grid">
+        <a class="toc-item" href="#para-quien"><span class="toc-num">01</span><span data-es="Para quién es la app" data-en="Who is it for">Para quién es la app</span></a>
+        <a class="toc-item" href="#empezar"><span class="toc-num">02</span><span data-es="Empezar en 6 pasos" data-en="Get started in 6 steps">Empezar en 6 pasos</span></a>
+        <a class="toc-item" href="#día-a-día"><span class="toc-num">03</span><span data-es="Tu día a día" data-en="Your day to day">Tu día a día</span></a>
+        <a class="toc-item" href="#progreso"><span class="toc-num">04</span><span data-es="Seguir tu progreso" data-en="Tracking progress">Seguir tu progreso</span></a>
+        <a class="toc-item" href="#coach"><span class="toc-num">05</span><span data-es="Coaching y sugerencias" data-en="Coaching & suggestions">Coaching y sugerencias</span></a>
+        <a class="toc-item" href="#ciencia"><span class="toc-num">06</span><span data-es="La ciencia detrás" data-en="The science">La ciencia detrás</span></a>
+        <a class="toc-item" href="#salud"><span class="toc-num">07</span><span data-es="Salvaguardas de salud" data-en="Health safeguards">Salvaguardas de salud</span></a>
+        <a class="toc-item" href="#especiales"><span class="toc-num">08</span><span data-es="Situaciones especiales" data-en="Special situations">Situaciones especiales</span></a>
+        <a class="toc-item" href="#datos"><span class="toc-num">09</span><span data-es="Privacidad y tus datos" data-en="Privacy & your data">Privacidad y tus datos</span></a>
+        <a class="toc-item" href="#no-es"><span class="toc-num">10</span><span data-es="Qué es y que no es" data-en="What it is & isn't">Qué es y que no es</span></a>
+        <a class="toc-item" href="#faq"><span class="toc-num">11</span><span data-es="Preguntas frecuentes" data-en="FAQ">Preguntas frecuentes</span></a>
+        <a class="toc-item" href="#contacto"><span class="toc-num">12</span><span data-es="Contacto y derechos" data-en="Contact & rights">Contacto y derechos</span></a>
+        <a class="toc-item" href="#referencias"><span class="toc-num">13</span><span data-es="Referencias" data-en="References">Referencias</span></a>
+    </div>
+</div>
+</nav>
+
+<main class="page">
+
+<!-- 1. PARA QUIEN -->
+<section id="para-quien">
+<h2><span class="num">01</span><span data-es="Para quién está pensada la app" data-en="Who this app is designed for">Para quién está pensada la app</span></h2>
+<p class="section-lead" data-es="Cals2Gains es una herramienta de estilo de vida y bienestar nutricional. Está hecha para personas adultas sanas que quieren mantenerse, perder grasa con cabeza, ganar músculo o rendir mejor en su deporte." data-en="Cals2Gains is a lifestyle and nutritional wellness tool. It is designed for healthy adults who want to maintain, lose fat sensibly, build muscle, or improve sports performance.">Cals2Gains es una herramienta de estilo de vida y bienestar nutricional. Está hecha para personas adultas sanas que quieren mantenerse, perder grasa con cabeza, ganar músculo o rendir mejor en su deporte.</p>
+
+<div class="pillars">
+    <div class="pillar">
+        <div class="n">&#9989;</div>
+        <h4 data-es="Funciona bien si..." data-en="Works well if...">Funciona bien si...</h4>
+        <p data-es="Tienes 16 años o más y quieres mantenerte, ganar músculo o rendir mejor. Desde los 18 también si tu objetivo es perder grasa con un plan serio." data-en="You are 16+ and you want to maintain, build muscle, or improve performance. From 18+ also if your goal is to lose fat with a serious plan.">Tienes 16 años o más y quieres mantenerte, ganar músculo o rendir mejor. Desde los 18 también si tu objetivo es perder grasa con un plan serio.</p>
+    </div>
+    <div class="pillar">
+        <div class="n">&#128170;</div>
+        <h4 data-es="Apoya tu entrenamiento" data-en="Supports your training">Apoya tu entrenamiento</h4>
+        <p data-es="Si entrenas (gym, running, CrossFit, competición), la app ajusta tus macros al tipo de sesión. Si no entrenas, te da una referencia honesta para tu situación." data-en="If you train (gym, running, CrossFit, competition), the app adjusts macros by session type. If you don't, it gives you an honest reference for your situation.">Sí entrenas (gym, running, CrossFit, competición), la app ajusta tus macros al tipo de sesión. Si no entrenas, te da una referencia honesta para tu situación.</p>
+    </div>
+    <div class="pillar">
+        <div class="n">&#129658;</div>
+        <h4 data-es="No es tu herramienta principal si..." data-en="Not your main tool if...">No es tu herramienta principal si...</h4>
+        <p data-es="Estás embarazada o en lactancia, tu relación con la comida es un tema sensible, tienes diabetes o patología renal, o eres menor de 16. La app se adapta a estas situaciones, pero tu equipo sanitario es quien pauta." data-en="You are pregnant or breastfeeding, your relationship with food is a sensitive topic, you have diabetes or kidney disease, or you are under 16. The app adapts to these situations, but your healthcare team leads.">Estás embarazada o en lactancia, tu relación con la comida es un tema sensible, tienes diabetes o patología renal, o eres menor de 16. La app se adapta a estas situaciones, pero tu equipo sanitario es quien pauta.</p>
+    </div>
+</div>
+
+<p data-es="En la sección 08 te explicamos cómo la app se ajusta en cada una de estas situaciones especiales." data-en="In section 08 we explain how the app adapts in each of these special situations.">En la sección 08 te explicamos cómo la app se ajusta en cada una de estas situaciones especiales.</p>
+</section>
+
+<!-- 2. EMPEZAR -->
+<section id="empezar">
+<h2><span class="num">02</span><span data-es="Empezar en 6 pasos" data-en="Get started in 6 steps">Empezar en 6 pasos</span></h2>
+<p class="section-lead" data-es="El onboarding no dura más de tres minutos. Lo importante es responder con honestidad, sobre todo con el nivel de actividad." data-en="Onboarding takes under three minutes. Be honest, especially about activity level.">El onboarding no dura más de tres minutos. Lo importante es responder con honestidad, sobre todo con el nivel de actividad.</p>
+
+<div class="steps">
+    <div class="step">
+        <h4 data-es="Crear cuenta" data-en="Create account">Crear cuenta</h4>
+        <p data-es="Con Apple, Google o email. Tu email solo sirve para identificarte y, si hace falta, contactarte. No hacemos spam." data-en="Sign in with Apple, Google, or email. We only use your email to identify you and contact you if needed. No spam.">Con Apple, Google o email. Tu email solo sirve para identificarte y, si hace falta, contactarte. No hacemos spam.</p>
+    </div>
+    <div class="step">
+        <h4 data-es="Tu fecha de nacimiento" data-en="Your date of birth">Tu fecha de nacimiento</h4>
+        <p data-es="La edad forma parte del cálculo metabólico y nos permite verificar la edad mínima de uso (16 años)." data-en="Age is part of the metabolic calculation and lets us verify the minimum usage age (16).">La edad forma parte del cálculo metabólico y nos permite verificar la edad mínima de uso (16 años).</p>
+    </div>
+    <div class="step">
+        <h4 data-es="Condiciones declaradas (opcional)" data-en="Declared conditions (optional)">Condiciones declaradas (opcional)</h4>
+        <p data-es="Puedes marcar embarazo/lactancia, relación sensible con la comida, diabetes o enfermedad renal. Es privado, opcional y revocable en Ajustes. Al marcarlo pedimos un consentimiento explícito porque son datos de salud." data-en="You can mark pregnancy/lactation, sensitive relationship with food, diabetes, or kidney disease. Private, optional, revocable in Settings. When you mark something we request explicit consent because these are health data.">Puedes marcar embarazo/lactancia, relación sensible con la comida, diabetes o enfermedad renal. Es privado, opcional y revocable en Ajustes. Al marcarlo pedimos un consentimiento explícito porque son datos de salud.</p>
+    </div>
+    <div class="step">
+        <h4 data-es="Tus datos básicos" data-en="Your basic data">Tus datos básicos</h4>
+        <p data-es="Sexo biológico, altura, peso y nivel de actividad. Consejo honesto: la mayoria de las personas sobreestima su actividad. Si dudas, elige un nivel por debajo. Después el coach ajusta." data-en="Biological sex, height, weight, and activity level. Honest tip: most people overestimate their activity. If in doubt, pick one level below. The coach adjusts later.">Sexo biológico, altura, peso y nivel de actividad. Consejo honesto: la mayoria de las personas sobreestima su actividad. Si dudas, elige un nivel por debajo. Después el coach ajusta.</p>
+    </div>
+    <div class="step">
+        <h4 data-es="Tu objetivo" data-en="Your goal">Tu objetivo</h4>
+        <p data-es="Seis modos: perder grasa, mini-cut, recomposicion, mantener, lean bulk, ganar músculo. Los modos de déficit (perder grasa, mini-cut) solo están disponibles a partir de 18. Puedes cambiar de modo cuando quieras." data-en="Six modes: lose fat, mini-cut, recomp, maintain, lean bulk, gain muscle. Déficit modes (lose fat, mini-cut) are only available from 18. You can switch modes anytime.">Seis modos: perder grasa, mini-cut, recomposicion, mantener, lean bulk, ganar músculo. Los modos de déficit (perder grasa, mini-cut) solo están disponibles a partir de 18. Puedes cambiar de modo cuando quieras.</p>
+    </div>
+    <div class="step">
+        <h4 data-es="Tus macros del primer día" data-en="Your first day macros">Tus macros del primer día</h4>
+        <p data-es="Al acabar te mostramos tu objetivo diario de calorías, proteína, carbohidratos, grasa y fibra. Son una estimacion con margen de error real de +-10 a 15%. El coach los afina cada semana con tus datos reales." data-en="At the end we show your daily target for calories, protein, carbs, fat, and fiber. This is an estimate with a real margin of +-10 to 15%. The coach refines it weekly from your actual data.">Al acabar te mostramos tu objetivo diario de calorías, proteína, carbohidratos, grasa y fibra. Son una estimacion con margen de error real de +-10 a 15%. El coach los afina cada semana con tus datos reales.</p>
+    </div>
+</div>
+</section>
+
+<!-- 3. DIA A DIA -->
+<section id="día-a-día">
+<h2><span class="num">03</span><span data-es="Tu día a día en la app" data-en="Your day to day in the app">Tu día a día en la app</span></h2>
+<p class="section-lead" data-es="El centro es la pantalla de inicio. Ahí ves tus macros del día, registras comidas y navegas al resto de funciones." data-en="The hub is the home screen. There you see today's macros, log meals, and jump into the rest of the features.">El centro es la pantalla de inicio. Ahí ves tus macros del día, registras comidas y navegas al resto de funciones.</p>
+
+<h3 data-es="Seis formas de registrar una comida" data-en="Six ways to log a meal">Seis formas de registrar una comida</h3>
+<div class="cards">
+    <div class="card"><div class="emoji">&#128247;</div><h4 data-es="Cámara" data-en="Camera">Cámara</h4><p data-es="Haz foto al plato. La app identifica los alimentos y estima cantidades y macros. Te puede hacer hasta 3 preguntas rápidas para afinar. Siempre puedes ajustar antes de guardar." data-en="Take a photo of your plate. The app identifies items and estimates amounts and macros. It may ask up to 3 quick questions to refine. You can always adjust before saving.">Haz foto al plato. La app identifica los alimentos y estima cantidades y macros. Te puede hacer hasta 3 preguntas rápidas para afinar. Siempre puedes ajustar antes de guardar.</p></div>
+    <div class="card"><div class="emoji">&#129521;</div><h4 data-es="Codigo de barras" data-en="Barcode">Codigo de barras</h4><p data-es="Para productos envasados. Alta fiabilidad, con datos de una base abierta con millones de productos verificados." data-en="For packaged products. High reliability, based on an open database with millions of verified items.">Para productos envasados. Alta fiabilidad, con datos de una base abierta con millones de productos verificados.</p></div>
+    <div class="card"><div class="emoji">&#128196;</div><h4 data-es="Etiqueta" data-en="Label">Etiqueta</h4><p data-es="Si el producto no está en la base, haz foto a la tabla nutricional. Leemos los valores y tu ajustas los gramos que vas a comer." data-en="If the product isn't in the database, photograph the nutrition panel. We read the values and you set the grams you'll eat.">Sí el producto no está en la base, haz foto a la tabla nutricional. Leemos los valores y tu ajustas los gramos que vas a comer.</p></div>
+    <div class="card"><div class="emoji">&#128269;</div><h4 data-es="Busqueda" data-en="Search">Busqueda</h4><p data-es="Escribe el nombre del alimento. Consultamos primero una base local curada, después bases abiertas globales." data-en="Type the food name. We query our curated local database first, then open global databases.">Escribe el nombre del alimento. Consultamos primero una base local curada, después bases abiertas globales.</p></div>
+    <div class="card"><div class="emoji">&#9889;</div><h4 data-es="Quick Add" data-en="Quick Add">Quick Add</h4><p data-es="Cuando ya sabes las cifras (pauta profesional, producto conocido), introduces calorías y macros directamente." data-en="When you already know the numbers (professional plan, known product), enter calories and macros directly.">Cuando ya sabes las cifras (pauta profesional, producto conocido), introduces calorías y macros directamente.</p></div>
+    <div class="card"><div class="emoji">&#127908;</div><h4 data-es="Voz" data-en="Voice">Voz</h4><p data-es="Pulsa el microfono y describe lo que has comido. La transcripción es privada y se convierte en registro editable." data-en="Tap the mic and describe what you ate. Transcription is private and becomes an editable log entry.">Pulsa el microfono y describe lo que has comido. La transcripción es privada y se convierte en registro editable.</p></div>
+</div>
+
+<div class="callout info">
+    <div class="icon">&#128161;</div>
+    <div class="body">
+        <h4 data-es="Cualquier estimacion es editable" data-en="Any estimate is editable">Cualquier estimacion es editable</h4>
+        <p data-es="Si crees que la cantidad estimada no se ajusta, cambiala antes de guardar. La ciencia del tracking reconoce un margen de error típico del 10-15%. No pasa nada por corregir." data-en="If an estimate doesn't match, edit it before saving. Tracking science acknowledges a typical error margin of 10-15%. It's fine to correct.">Sí crees que la cantidad estimada no se ajusta, cambiala antes de guardar. La ciencia del tracking reconoce un margen de error típico del 10-15%. No pasa nada por corregir.</p>
+    </div>
+</div>
+
+<h3 data-es="Tus días de entrenamiento" data-en="Your training days">Tus días de entrenamiento</h3>
+<p data-es="No comes igual un día de descanso que un día de series largas. Dos formas de gestionarlo:" data-en="You don't eat the same on a rest day vs a long interval day. Two ways to manage it:">No comes igual un día de descanso que un día de series largas. Dos formas de gestionarlo:</p>
+<ul>
+    <li><strong data-es="Training Day (boton unico):" data-en="Training Day (single button):">Training Day (boton unico):</strong> <span data-es="pulsa &laquo;Entreno hoy&raquo; y la app aumenta tus objetivos del día segun el tipo de sesión." data-en="tap &laquo;Today's workout&raquo; and the app raises your day targets based on the session type.">pulsa &laquo;Entreno hoy&raquo; y la app aumenta tus objetivos del día segun el tipo de sesión.</span></li>
+    <li><strong data-es="Plan de entrenamiento:" data-en="Training plan:">Plan de entrenamiento:</strong> <span data-es="si sigues un plan estructurado (maraton 12 semanas, CrossFit 8 semanas, 10K 6 semanas, o uno propio), la app aplica los ajustes automáticamente cada día." data-en="if you follow a structured plan (12-week marathon, 8-week CrossFit, 6-week 10K, or your own), the app applies the adjustments each day automatically.">si sigues un plan estructurado (maraton 12 semanas, CrossFit 8 semanas, 10K 6 semanas, o uno propio), la app aplica los ajustes automáticamente cada día.</span></li>
+</ul>
+<p data-es="En ambos casos la proteína se mantiene estable todos los días; lo que cambia son los carbohidratos, que suben cuando entrenas fuerte porque tu cuerpo los necesita como combustible preferente." data-en="In both cases protein stays stable every day; carbohydrates scale with training intensity because your body uses them as primary fuel.">En ambos casos la proteína se mantiene estable todos los días; lo que cambia son los carbohidratos, que suben cuando entrenas fuerte porque tu cuerpo los necesita como combustible preferente.</p>
+</section>
+
+<!-- 4. PROGRESO -->
+<section id="progreso">
+<h2><span class="num">04</span><span data-es="Seguir tu progreso" data-en="Tracking your progress">Seguir tu progreso</span></h2>
+<p class="section-lead" data-es="La bascula es ruidosa: el peso fluctua con el agua, la sal y la hora del día. Por eso trabajamos con tendencias, no con pesajes sueltos." data-en="The scale is noisy: weight fluctuates with water, salt, and time of day. That's why we work with trends, not isolated weigh-ins.">La bascula es ruidosa: el peso fluctua con el agua, la sal y la hora del día. Por eso trabajamos con tendencias, no con pesajes sueltos.</p>
+
+<div class="cards">
+    <div class="card"><div class="emoji">&#9878;&#65039;</div><h4 data-es="Peso" data-en="Weight">Peso</h4><p data-es="Registra tu peso en condiciones equivalentes (misma hora, en ayunas, después del baño). La app calcula una media móvil de 7 días: esa es la cifra real de tendencia." data-en="Log your weight under equivalent conditions (same time, fasted, after bathroom). The app computes a 7-day moving average — that's the real trend number.">Registra tu peso en condiciones equivalentes (misma hora, en ayunas, después del baño). La app calcula una media móvil de 7 días: esa es la cifra real de tendencia.</p></div>
+    <div class="card"><div class="emoji">&#128207;</div><h4 data-es="Medidas" data-en="Measurements">Medidas</h4><p data-es="Cintura, cadera, brazo, pecho, muslo, cuello. Cada 1-2 semanas. Muy útil en recomposicion: el peso no cambia pero si la cintura." data-en="Waist, hip, arm, chest, thigh, neck. Every 1-2 weeks. Especially useful during recomp: weight may not change but waist does.">Cintura, cadera, brazo, pecho, muslo, cuello. Cada 1-2 semanas. Muy útil en recomposicion: el peso no cambia pero si la cintura.</p></div>
+    <div class="card"><div class="emoji">&#128247;</div><h4 data-es="Fotos de progreso" data-en="Progress photos">Fotos de progreso</h4><p data-es="Mismo sitio, misma luz, misma postura. Cada 2-4 semanas. Las fotos muestran lo que la bascula no ve. Son privadas y solo tu las ves." data-en="Same spot, same light, same pose. Every 2-4 weeks. Photos show what the scale can't. They're private and only you see them.">Mismo sitio, misma luz, misma postura. Cada 2-4 semanas. Las fotos muestran lo que la bascula no ve. Son privadas y solo tu las ves.</p></div>
+    <div class="card"><div class="emoji">&#128290;</div><h4 data-es="Composicion corporal" data-en="Body composition">Composicion corporal</h4><p data-es="Si te haces InBody o tienes bascula de bioimpedancia conectada a Apple Salud o Google Salud, los datos se sincronizan (si autorizas) y el cálculo es más preciso." data-en="If you do InBody or have a bioimpedance scale linked to Apple Health or Google Health, the data syncs (with your permission) and the calculation becomes more accurate.">Sí te haces InBody o tienes bascula de bioimpedancia conectada a Apple Salud o Google Salud, los datos se sincronizan (si autorizas) y el cálculo es más preciso.</p></div>
+    <div class="card"><div class="emoji">&#128200;</div><h4 data-es="Adherencia" data-en="Adherence">Adherencia</h4><p data-es="Un porcentaje que resume cuánto te ajustas a tus objetivos de calorías y proteína y con qué consistencia registras. La adherencia alta es la que permite al coach ajustar con sentido." data-en="A percentage summarizing how well you hit calories and protein, plus logging consistency. High adherence is what enables the coach to adjust meaningfully.">Un porcentaje que resume cuánto te ajustas a tus objetivos de calorías y proteína y con qué consistencia registras. La adherencia alta es la que permite al coach ajustar con sentido.</p></div>
+    <div class="card"><div class="emoji">&#128202;</div><h4 data-es="Analytics" data-en="Analytics">Analytics</h4><p data-es="Graficas con tu historial: peso, calorías, proteína, entrenamientos. Para ver la película completa, no un fotograma aislado." data-en="Charts of your history: weight, calories, protein, training. To see the full movie, not an isolated frame.">Graficas con tu historial: peso, calorías, proteína, entrenamientos. Para ver la película completa, no un fotograma aislado.</p></div>
+</div>
+</section>
+
+<!-- 5. COACH -->
+<section id="coach">
+<h2><span class="num">05</span><span data-es="Coaching y sugerencias" data-en="Coaching & suggestions">Coaching y sugerencias</span></h2>
+<p class="section-lead" data-es="No tienes que tomar todas las decisiones tu. La app te acompaña con recomendaciones semanales y sugerencias para el momento." data-en="You don't have to make every decisión. The app supports you with weekly recommendations and in-the-moment suggestions.">No tienes que tomar todas las decisiones tu. La app te acompaña con recomendaciones semanales y sugerencias para el momento.</p>
+
+<h3 data-es="Recap semanal" data-en="Weekly recap">Recap semanal</h3>
+<p data-es="Una vez por semana el coach revisa lo que has hecho y te da una lectura corta: como vas, que ha ido bien y si conviene ajustar. Si propone un cambio en tus objetivos, te lo explica y siempre puedes aceptarlo o rechazarlo desde Ajustes." data-en="Once a week the coach reviews your data and gives you a short reading: how it's going, what's working, whether to adjust. If it suggests a change in your targets, it explains why and you can always accept or reject from Settings.">Una vez por semana el coach revisa lo que has hecho y te da una lectura corta: como vas, que ha ido bien y si conviene ajustar. Si propone un cambio en tus objetivos, te lo explica y siempre puedes aceptarlo o rechazarlo desde Ajustes.</p>
+
+<h3 data-es="Qué comer ahora" data-en="What to eat now">Qué comer ahora</h3>
+<p data-es="Cuando no sabes qué preparar, la app te propone cinco opciones adaptadas a los macros que te quedan, a tus alimentos frecuentes, a la hora del día y, muy importante, a tus alergias e intolerancias declaradas: nunca te sugerimos algo que las contenga." data-en="When you don't know what to cook, the app suggests five options matching your remaining macros, your frequent foods, time of day, and — critically — your declared allergies and intolerances: we never suggest anything that contains them.">Cuando no sabes qué preparar, la app te propone cinco opciones adaptadas a los macros que te quedan, a tus alimentos frecuentes, a la hora del día y, muy importante, a tus alergias e intolerancias declaradas: nunca te sugerimos algo que las contenga.</p>
+
+<h3 data-es="Recetas y plan semanal" data-en="Recipes & weekly plan">Recetas y plan semanal</h3>
+<p data-es="Puedes guardar recetas propias, importar desde URLs (la app extrae ingredientes y macros) y organizar una semana completa de comidas. Desde el plan semanal se genera automáticamente la lista de la compra." data-en="You can save your own recipes, import from URLs (the app extracts ingredients and macros), and organize a full week of meals. The weekly plan auto-generates your shopping list.">Puedes guardar recetas propias, importar desde URLs (la app extrae ingredientes y macros) y organizar una semana completa de comidas. Desde el plan semanal se genera automáticamente la lista de la compra.</p>
+
+<h3 data-es="Compartir con un profesional" data-en="Share with a professional">Compartir con un profesional</h3>
+<p data-es="Si trabajas con nutricionista o entrenador/a, puedes generar un resumen semanal (PDF o enlace) con comidas, peso, adherencia y progreso. El profesional lo recibe sin tener que instalar nada." data-en="If you work with a dietitian or coach, you can generate a weekly summary (PDF or link) with meals, weight, adherence, and progress. Your professional receives it without installing anything.">Sí trabajas con nutricionista o entrenador/a, puedes generar un resumen semanal (PDF o enlace) con comidas, peso, adherencia y progreso. El profesional lo recibe sin tener que instalar nada.</p>
+
+<div class="callout info">
+    <div class="icon">&#129302;</div>
+    <div class="body">
+        <h4 data-es="Asistente con inteligencia artificial" data-en="AI-powered assistant">Asistente con inteligencia artificial</h4>
+        <p data-es="El análisis de fotos, la transcripción de voz, las sugerencias y el coach semanal estan generados por un sistema de inteligencia artificial (Reglamento UE 2024/1689 Artículo 50). Son orientativos y editables. Puedes desactivar la adaptación automática de objetivos cuando quieras desde Ajustes." data-en="Photo analysis, voice transcription, suggestions, and the weekly coach are generated by an AI system (EU Regulation 2024/1689 Article 50). They are guidance and editable. You can turn off automatic target adaptation anytime in Settings.">El análisis de fotos, la transcripción de voz, las sugerencias y el coach semanal estan generados por un sistema de inteligencia artificial (Reglamento UE 2024/1689 Artículo 50). Son orientativos y editables. Puedes desactivar la adaptación automática de objetivos cuando quieras desde Ajustes.</p>
+    </div>
+</div>
+</section>
+
+<!-- 6. CIENCIA -->
+<section id="ciencia">
+<h2><span class="num">06</span><span data-es="La ciencia que respalda los números" data-en="The science behind the numbers">La ciencia que respalda los números</span></h2>
+<p class="section-lead" data-es="Los cálculos de Cals2Gains no salen de una caja negra. Se apoyan en ecuaciones validadas por la comunidad científica y en referencias revisadas por pares. Esto es lo esencial." data-en="Cals2Gains' calculations don't come from a black box. They rest on validated equations and peer-reviewed references. Here's the essentials.">Los cálculos de Cals2Gains no salen de una caja negra. Se apoyan en ecuaciones validadas por la comunidad científica y en referencias revisadas por pares. Esto es lo esencial.</p>
+
+<h3 data-es="Tu metabolismo basal" data-en="Your basal metabolism">Tu metabolismo basal</h3>
+<p data-es="Calculamos tu tasa metabólica basal (lo que tu cuerpo quema en reposo absoluto) con la ecuacion <strong>Mifflin-St Jeor</strong>, considerada por la Academia de Nutricion y Dietética la más precisa en adultos sanos no obesos: menos del 10% de error en el 82% de casos (Frankenfield et al. 2005)." data-en="We calculate your basal metabolic rate (what your body burns at complete rest) with the <strong>Mifflin-St Jeor</strong> equation, considered by the Academy of Nutrition and Dietetics the most accurate in healthy non-obese adults: less than 10% error in 82% of cases (Frankenfield et al. 2005).">Calculamos tu tasa metabólica basal (lo que tu cuerpo quema en reposo absoluto) con la ecuacion <strong>Mifflin-St Jeor</strong>, considerada por la Academia de Nutricion y Dietética la más precisa en adultos sanos no obesos: menos del 10% de error en el 82% de casos (Frankenfield et al. 2005).</p>
+<p data-es="Si dispones de medicion fiable de tu composición corporal (InBody, DEXA), usamos la ecuacion <strong>Katch-McArdle</strong>, que es aun más precisa porque no asume una composición corporal media." data-en="If you have a reliable body-composition measurement (InBody, DEXA), we use the <strong>Katch-McArdle</strong> equation, which is more accurate because it doesn't assume average body composition.">Sí dispones de medicion fiable de tu composición corporal (InBody, DEXA), usamos la ecuacion <strong>Katch-McArdle</strong>, que es aun más precisa porque no asume una composición corporal media.</p>
+
+<h3 data-es="Tu gasto energético total" data-en="Your total energy expenditure">Tu gasto energético total</h3>
+<p data-es="Al metabolismo basal se añade lo que quemas moviendote, entrenando y haciendo la digestión. Lo estimamos con los factores de actividad del Institute of Medicine, calibrados a la evidencia actual." data-en="On top of basal, we add what you burn moving, training, and digesting. We estimate it with the Institute of Medicine activity factors, calibrated to current evidence.">Al metabolismo basal se añade lo que quemas moviendote, entrenando y haciendo la digestión. Lo estimamos con los factores de actividad del Institute of Medicine, calibrados a la evidencia actual.</p>
+
+<div class="table-wrap"><table>
+<thead><tr>
+    <th data-es="Nivel de actividad" data-en="Activity level">Nivel de actividad</th>
+    <th data-es="Definicion" data-en="Definition">Definicion</th>
+</tr></thead>
+<tbody>
+    <tr><td><strong data-es="Sedentario" data-en="Sedentary">Sedentario</strong></td><td data-es="Trabajo de escritorio, menos de 30 min andando/día, 0 entrenos" data-en="Desk job, <30 min walk/day, 0 workouts">Trabajo de escritorio, menos de 30 min andando/día, 0 entrenos</td></tr>
+    <tr><td><strong data-es="Ligero" data-en="Light">Ligero</strong></td><td data-es="1-3 entrenos/sem ligeros (yoga, caminar, gym principiante)" data-en="1-3 light workouts/wk (yoga, walking, beginner gym)">1-3 entrenos/sem ligeros (yoga, caminar, gym principiante)</td></tr>
+    <tr><td><strong data-es="Moderado" data-en="Moderate">Moderado</strong></td><td data-es="3-5 entrenos/sem de intensidad media (gym regular, running 3x/sem)" data-en="3-5 medium-intensity workouts/wk (regular gym, running 3x/wk)">3-5 entrenos/sem de intensidad media (gym regular, running 3x/sem)</td></tr>
+    <tr><td><strong data-es="Muy activo" data-en="Very active">Muy activo</strong></td><td data-es="6-7 entrenos/sem intensos o trabajo físico" data-en="6-7 intense workouts/wk or physical job">6-7 entrenos/sem intensos o trabajo físico</td></tr>
+    <tr><td><strong data-es="Extremo" data-en="Extreme">Extremo</strong></td><td data-es="Dos sesiones/día, atletas en competición, trabajos físicos pesados" data-en="Two sessions/day, competing athletes, heavy physical jobs">Dos sesiones/día, atletas en competición, trabajos físicos pesados</td></tr>
+</tbody>
+</table></div>
+
+<div class="callout info">
+    <div class="icon">&#128161;</div>
+    <div class="body">
+        <h4 data-es="Elige un nivel por debajo del que crees" data-en="Pick one level below what you think">Elige un nivel por debajo del que crees</h4>
+        <p data-es="Los estudios con agua doblemente marcada (el método de referencia en gasto energético) muestran que la mayoria de las personas sobreestima su actividad en torno a un 20%. Ser honesto contigo da mejores resultados." data-en="Doubly-labeled water studies (the gold standard) show most people overestimate activity by ~20%. Being honest with yourself yields better results.">Los estudios con agua doblemente marcada (el método de referencia en gasto energético) muestran que la mayoria de las personas sobreestima su actividad en torno a un 20%. Ser honesto contigo da mejores resultados.</p>
+    </div>
+</div>
+
+<h3 data-es="Distribucion por objetivo" data-en="Distribution by goal">Distribucion por objetivo</h3>
+<p data-es="Cada modo objetivo aplica un factor sobre tu gasto total y un rango de proteína por kilo de peso. Los carbohidratos y la grasa se ajustan después respetando un mínimo hormonal seguro." data-en="Each goal mode applies a factor to your total expenditure and a protein range per kilogram of body weight. Carbs and fat are tuned afterwards respecting a safe hormonal minimum.">Cada modo objetivo aplica un factor sobre tu gasto total y un rango de proteína por kilo de peso. Los carbohidratos y la grasa se ajustan después respetando un mínimo hormonal seguro.</p>
+
+<div class="table-wrap"><table>
+<thead><tr>
+    <th data-es="Modo" data-en="Mode">Modo</th>
+    <th data-es="Calorias" data-en="Calories">Calorias</th>
+    <th data-es="Proteina" data-en="Protein">Proteina</th>
+    <th data-es="Duracion" data-en="Duration">Duracion</th>
+</tr></thead>
+<tbody>
+    <tr><td>&#128293; <strong data-es="Perder grasa" data-en="Lose fat">Perder grasa</strong></td><td>-20%</td><td>2,0-2,2 g/kg</td><td data-es="12-16 sem" data-en="12-16 wk">12-16 sem</td></tr>
+    <tr><td>&#9889; <strong data-es="Mini-cut" data-en="Mini-cut">Mini-cut</strong></td><td>-25%</td><td>2,3-2,5 g/kg</td><td><strong style="color:var(--coral-bright)" data-es="max 6 sem" data-en="max 6 wk">max 6 sem</strong></td></tr>
+    <tr><td>&#9851;&#65039; <strong data-es="Recomposicion" data-en="Recomp">Recomposicion</strong></td><td data-es="Mantenim." data-en="Maint.">Mantenim.</td><td>2,2-2,4 g/kg</td><td data-es="10-14 sem" data-en="10-14 wk">10-14 sem</td></tr>
+    <tr><td>&#127919; <strong data-es="Mantener" data-en="Maintain">Mantener</strong></td><td>100%</td><td>1,6-1,8 g/kg</td><td data-es="Indefinido" data-en="Open-ended">Indefinido</td></tr>
+    <tr><td>&#128640; <strong data-es="Lean bulk" data-en="Lean bulk">Lean bulk</strong></td><td>+5%</td><td>1,8-2,0 g/kg</td><td data-es="10-12 sem" data-en="10-12 wk">10-12 sem</td></tr>
+    <tr><td>&#128170; <strong data-es="Ganar músculo" data-en="Gain muscle">Ganar músculo</strong></td><td>+10%</td><td>1,8-2,0 g/kg</td><td data-es="8-12 sem" data-en="8-12 wk">8-12 sem</td></tr>
+</tbody>
+</table></div>
+
+<h3 data-es="Por qué la proteína va en gramos por kilo" data-en="Why protein is set in grams per kilo">Por qué la proteína va en gramos por kilo</h3>
+<p data-es="Si la proteína se calculara como porcentaje de las calorías, bajaria cuando estas en déficit, justo cuando más la necesitas para preservar masa muscular. Por eso la fijamos en gramos por kilo de peso corporal, siguiendo la posicion oficial de la International Society of Sports Nutrition (Jager et al. 2017)." data-en="If protein were a percent of calories, it would drop during a déficit — exactly when you need it most to preserve muscle. We fix it in grams per kilogram of body weight, per the International Society of Sports Nutrition official position (Jager et al. 2017).">Sí la proteína se calculara como porcentaje de las calorías, bajaria cuando estas en déficit, justo cuando más la necesitas para preservar masa muscular. Por eso la fijamos en gramos por kilo de peso corporal, siguiendo la posicion oficial de la International Society of Sports Nutrition (Jager et al. 2017).</p>
+
+<h3 data-es="Ajuste por tipo de sesión" data-en="Session-type adjustment">Ajuste por tipo de sesión</h3>
+<p data-es="La filosofia se llama &laquo;fuel for the work required&raquo; (Impey et al. 2018): come en función de lo que vas a pedirle a tu cuerpo. La proteína se mantiene estable; los carbohidratos oscilan segun la demanda glucolitica." data-en="The philosophy is called &laquo;fuel for the work required&raquo; (Impey et al. 2018): eat for what you're about to demand of your body. Protein stays stable; carbs oscillate with glycolytic demand.">La filosofia se llama &laquo;fuel for the work required&raquo; (Impey et al. 2018): come en función de lo que vas a pedirle a tu cuerpo. La proteína se mantiene estable; los carbohidratos oscilan segun la demanda glucolitica.</p>
+<div class="cards">
+    <div class="card"><div class="emoji">&#128564;</div><h4 data-es="Descanso" data-en="Rest">Descanso</h4><p data-es="Menos calorías y menos carbos, proteína estable para reparación muscular." data-en="Fewer calories and carbs, protein stable for muscle repair.">Menos calorías y menos carbos, proteína estable para reparación muscular.</p></div>
+    <div class="card"><div class="emoji">&#127939;</div><h4 data-es="Cardio suave" data-en="Easy cardio">Cardio suave</h4><p data-es="Calorias neutras, ligera ventaja de adaptación a grasas si vas en zona 2." data-en="Neutral calories, slight fat-adaptation benefit in zone 2.">Calorias neutras, ligera ventaja de adaptación a grasas si vas en zona 2.</p></div>
+    <div class="card"><div class="emoji">&#9889;</div><h4 data-es="Tempo / umbral" data-en="Tempo / threshold">Tempo / umbral</h4><p data-es="Más carbos para sostener la intensidad y reponer glucógeno." data-en="More carbs to sustain intensity and replenish glycogen.">Más carbos para sostener la intensidad y reponer glucógeno.</p></div>
+    <div class="card"><div class="emoji">&#128293;</div><h4 data-es="Series / HIIT" data-en="Intervals / HIIT">Series / HIIT</h4><p data-es="Carbos altos y proteína extra por el dano muscular del esfuerzo repetido." data-en="High carbs and extra protein for muscle damage from repeated effort.">Carbos altos y proteína extra por el dano muscular del esfuerzo repetido.</p></div>
+    <div class="card"><div class="emoji">&#127947;</div><h4 data-es="Tirada larga" data-en="Long run">Tirada larga</h4><p data-es="Carbos notablemente más altos: el glucógeno es clave en sesiones de más de 75 minutos." data-en="Notably higher carbs: glycogen is critical in sessions over 75 min.">Carbos notablemente más altos: el glucógeno es clave en sesiones de más de 75 minutos.</p></div>
+    <div class="card"><div class="emoji">&#128170;</div><h4 data-es="Fuerza" data-en="Strength">Fuerza</h4><p data-es="Proteina alta para síntesis muscular, carbos moderados como combustible." data-en="High protein for muscle protein synthesis, moderate carbs as fuel.">Proteina alta para síntesis muscular, carbos moderados como combustible.</p></div>
+    <div class="card"><div class="emoji">&#127947;&#65039;</div><h4 data-es="CrossFit" data-en="CrossFit">CrossFit</h4><p data-es="Combina fuerza y acondicionamiento: carbos y proteína altos para rendimiento y recuperación." data-en="Combines strength and conditioning: high carbs and protein for performance and recovery.">Combina fuerza y acondicionamiento: carbos y proteína altos para rendimiento y recuperación.</p></div>
+    <div class="card"><div class="emoji">&#127942;</div><h4 data-es="Competicion" data-en="Competition">Competicion</h4><p data-es="Carga de carbohidratos adaptada al evento, grasa reducida para vaciado gastrico rápido." data-en="Carb-loading tailored to the event, reduced fat for faster gastric emptying.">Carga de carbohidratos adaptada al evento, grasa reducida para vaciado gastrico rápido.</p></div>
+    <div class="card"><div class="emoji">&#129504;</div><h4 data-es="Recuperacion activa" data-en="Active recovery">Recuperacion activa</h4><p data-es="Ligera reduccion calórica y proteína extra para reparación continúa." data-en="Slight calorie reduction and extra protein for ongoing repair.">Ligera reduccion calórica y proteína extra para reparación continúa.</p></div>
+</div>
+
+<h3 data-es="Timing de nutrientes (guia, no dogma)" data-en="Nutrient timing (guidance, not dogma)">Timing de nutrientes (guia, no dogma)</h3>
+<ul>
+    <li><strong data-es="Pre-entreno (1-3 h antes):" data-en="Pre-workout (1-3 h before):">Pre-entreno (1-3 h antes):</strong> <span data-es="1-3 g/kg de carbos de índice glucémico moderado; proteína opcional (Kerksick et al. 2017)." data-en="1-3 g/kg of moderate-GI carbs; protein optional (Kerksick et al. 2017).">1-3 g/kg de carbos de índice glucémico moderado; proteína opcional (Kerksick et al. 2017).</span></li>
+    <li><strong data-es="Intra-entreno:" data-en="Intra-workout:">Intra-entreno:</strong> <span data-es="solo necesario si la sesión dura más de 75 min; 30-60 g/h de carbos." data-en="only needed for sessions >75 min; 30-60 g/h of carbs.">solo necesario si la sesión dura más de 75 min; 30-60 g/h de carbos.</span></li>
+    <li><strong data-es="Post-entreno:" data-en="Post-workout:">Post-entreno:</strong> <span data-es="20-40 g de proteína dentro de 2 h optimiza la síntesis proteica. La &laquo;ventana anabolica&raquo; no es tan estrecha como se decia (Schoenfeld 2013)." data-en="20-40 g of protein within 2 h optimizes muscle protein synthesis. The &laquo;anabolic window&raquo; isn't as narrow as once thought (Schoenfeld 2013).">20-40 g de proteína dentro de 2 h optimiza la síntesis proteica. La &laquo;ventana anabolica&raquo; no es tan estrecha como se decia (Schoenfeld 2013).</span></li>
+    <li><strong data-es="Distribucion diaria:" data-en="Daily distribution:">Distribucion diaria:</strong> <span data-es="4-5 tomas de 0,4 g/kg (unos 25-40 g) maximizan la síntesis proteica frente a 2 tomas grandes (Areta et al. 2013)." data-en="4-5 doses of 0.4 g/kg (~25-40 g) maximize protein synthesis vs 2 large doses (Areta et al. 2013).">4-5 tomas de 0,4 g/kg (unos 25-40 g) maximizan la síntesis proteica frente a 2 tomas grandes (Areta et al. 2013).</span></li>
+</ul>
+
+<h3 data-es="Hidratacion" data-en="Hydration">Hidratacion</h3>
+<p data-es="El objetivo parte de 30 ml por kilo de peso, se ajusta al alza en días de entreno, ambiente caluroso o altitud. Mínimo absoluto 1.500 ml/día en reposo. Referencias: EFSA 2010, Institute of Medicine 2005." data-en="The target starts at 30 ml per kg of body weight, scales up on training days, heat, or altitude. Absolute minimum 1,500 ml/day at rest. References: EFSA 2010, IOM 2005.">El objetivo parte de 30 ml por kilo de peso, se ajusta al alza en días de entreno, ambiente caluroso o altitud. Mínimo absoluto 1.500 ml/día en reposo. Referencias: EFSA 2010, Institute of Medicine 2005.</p>
+
+<h3 data-es="Adaptacion semanal" data-en="Weekly adaptation">Adaptacion semanal</h3>
+<p data-es="Cada semana el coach revisa la tendencia de tu peso sobre media móvil de 7 días y tu adherencia. Los ajustes se mantienen dentro de +-200 kcal como máximo, siguiendo las recomendaciones para evitar adaptación metabólica (Helms et al. 2014)." data-en="Each week the coach reviews your 7-day moving-average weight trend and adherence. Adjustments stay within +-200 kcal max, following recommendations to avoid metabolic adaptation (Helms et al. 2014).">Cada semana el coach revisa la tendencia de tu peso sobre media móvil de 7 días y tu adherencia. Los ajustes se mantienen dentro de +-200 kcal como máximo, siguiendo las recomendaciones para evitar adaptación metabólica (Helms et al. 2014).</p>
+</section>
+
+<!-- 7. SALVAGUARDAS -->
+<section id="salud">
+<h2><span class="num">07</span><span data-es="Salvaguardas para tu salud" data-en="Health safeguards">Salvaguardas para tu salud</span></h2>
+<p class="section-lead" data-es="Esta sección es la más importante. Es lo que diferencia una app responsable de una app peligrosa." data-en="This is the most important section. It's what separates a responsible app from a harmful one.">Esta sección es la más importante. Es lo que diferencia una app responsable de una app peligrosa.</p>
+
+<div class="callout safety">
+    <div class="icon">&#128680;</div>
+    <div class="body">
+        <h4 data-es="Calorias minimas absolutas" data-en="Absolute minimum calories">Calorias minimas absolutas</h4>
+        <p data-es="Nunca recomendamos por debajo de 1.200 kcal/día en mujeres ni 1.500 kcal/día en hombres (referencia WHO y ACSM). Si el cálculo del déficit saliera por debajo, subimos automáticamente al mínimo y te avisamos." data-en="We never recommend below 1,200 kcal/day for women or 1,500 kcal/day for men (WHO and ACSM reference). If the déficit calc would fall below, we automatically raise to the minimum and notify you.">Nunca recomendamos por debajo de 1.200 kcal/día en mujeres ni 1.500 kcal/día en hombres (referencia WHO y ACSM). Si el cálculo del déficit saliera por debajo, subimos automáticamente al mínimo y te avisamos.</p>
+    </div>
+</div>
+
+<div class="callout safety">
+    <div class="icon">&#129516;</div>
+    <div class="body">
+        <h4 data-es="Suelo hormonal de grasa" data-en="Hormonal fat floor">Suelo hormonal de grasa</h4>
+        <p data-es="Por debajo de 0,5 g/kg de grasa diaria crece el riesgo de alteraciones hormonales relevantes (Fahrenholtz et al. 2018, Loucks 2003). La app no baja de ese piso: si el reparto saliera más bajo, lo subimos y recortamos de carbos." data-en="Below 0.5 g/kg of daily fat, the risk of meaningful hormonal disruption grows (Fahrenholtz et al. 2018, Loucks 2003). The app won't go below that floor: if the split would be lower, we raise it and cut from carbs.">Por debajo de 0,5 g/kg de grasa diaria crece el riesgo de alteraciones hormonales relevantes (Fahrenholtz et al. 2018, Loucks 2003). La app no baja de ese piso: si el reparto saliera más bajo, lo subimos y recortamos de carbos.</p>
+    </div>
+</div>
+
+<div class="callout safety">
+    <div class="icon">&#9888;&#65039;</div>
+    <div class="body">
+        <h4 data-es="Ritmo saludable de cambio de peso" data-en="Healthy weight-change pace">Ritmo saludable de cambio de peso</h4>
+        <p data-es="Pérdida saludable: 0,5-1% de tu peso por semana. Si pierdes más del 1% por semana durante dos semanas seguidas, saltamos un aviso y sugerimos subir 150 kcal. Por encima de ese ritmo se pierde más masa muscular que grasa (Trexler et al. 2014). Siempre puedes aceptar o rechazar el ajuste desde Ajustes." data-en="Healthy loss: 0.5-1% body weight/week. If you lose more than 1%/week for two weeks in a row, we show an alert and suggest raising +150 kcal. Above that pace, more muscle is lost than fat (Trexler et al. 2014). You can accept or reject the adjustment from Settings.">Pérdida saludable: 0,5-1% de tu peso por semana. Si pierdes más del 1% por semana durante dos semanas seguidas, saltamos un aviso y sugerimos subir 150 kcal. Por encima de ese ritmo se pierde más masa muscular que grasa (Trexler et al. 2014). Siempre puedes aceptar o rechazar el ajuste desde Ajustes.</p>
+    </div>
+</div>
+
+<div class="callout safety">
+    <div class="icon">&#129658;</div>
+    <div class="body">
+        <h4 data-es="Situaciones que requieren acompañamiento profesional" data-en="Situations requiring professional support">Situaciones que requieren acompañamiento profesional</h4>
+        <p data-es="Embarazo o lactancia; historial o episodio activo de trastorno de conducta alimentaria; diabetes tipo 1 o 2; enfermedad renal crónica; menor de 18 años. En estos casos la app desactiva modos agresivos, ajusta los mensajes y sugiere consulta con profesional. La app NO sustituye a tu médico, endocrinóloga, nutricionista, matrona o psicóloga." data-en="Pregnancy or breastfeeding; history or active episode of eating disorder; type 1 or 2 diabetes; chronic kidney disease; under 18. In those cases the app disables aggressive modes, adjusts messaging, and refers to a professional. The app does NOT replace your doctor, endocrinologist, dietitian, midwife, or psychologist.">Embarazo o lactancia; historial o episodio activo de trastorno de conducta alimentaria; diabetes tipo 1 o 2; enfermedad renal crónica; menor de 18 años. En estos casos la app desactiva modos agresivos, ajusta los mensajes y sugiere consulta con profesional. La app NO sustituye a tu médico, endocrinóloga, nutricionista, matrona o psicóloga.</p>
+    </div>
+</div>
+
+<h3 data-es="Lenguaje que no vas a ver en Cals2Gains" data-en="Language you will not see in Cals2Gains">Lenguaje que no vas a ver en Cals2Gains</h3>
+<ul>
+    <li data-es="&laquo;Quema grasa&raquo;: ningún alimento quema grasa." data-en="&laquo;Fat-burning&raquo;: no food burns fat.">&laquo;Quema grasa&raquo;: ningún alimento quema grasa.</li>
+    <li data-es="&laquo;Detox&raquo; o &laquo;limpieza&raquo;: no son terminos fisiologicos validos." data-en="&laquo;Detox&raquo; or &laquo;cleanse&raquo;: not valid physiological terms.">&laquo;Detox&raquo; o &laquo;limpieza&raquo;: no son terminos fisiologicos validos.</li>
+    <li data-es="&laquo;Acelera el metabolismo&raquo; o &laquo;adelgaza comiendo&raquo; sin base." data-en="&laquo;Boost your metabolism&raquo; or &laquo;lose weight eating more&raquo; without basis.">&laquo;Acelera el metabolismo&raquo; o &laquo;adelgaza comiendo&raquo; sin base.</li>
+    <li data-es="Dietas milagro de nombre propio sin estudios revisados por pares detrás." data-en="&laquo;Miracle&raquo; brand-name diets with no peer-reviewed studies.">Dietas milagro de nombre propio sin estudios revisados por pares detrás.</li>
+    <li data-es="Promesas numéricas absolutas de pérdida/ganancia (&laquo;pierde X kg en Y semanas&raquo;)." data-en="Absolute numeric promises of loss/gain (&laquo;lose X kg in Y weeks&raquo;).">Promesas numéricas absolutas de pérdida/ganancia (&laquo;pierde X kg en Y semanas&raquo;).</li>
+</ul>
+</section>
+
+<!-- 8. ESPECIALES -->
+<section id="especiales">
+<h2><span class="num">08</span><span data-es="Situaciones especiales" data-en="Special situations">Situaciones especiales</span></h2>
+<p class="section-lead" data-es="Si algúna de estas situaciones es la tuya, la app se adapta y recomienda acompañamiento profesional." data-en="If any of these apply to you, the app adapts and recommends professional support.">Sí algúna de estas situaciones es la tuya, la app se adapta y recomienda acompañamiento profesional.</p>
+
+<h3 data-es="Embarazo o lactancia" data-en="Pregnancy or breastfeeding">Embarazo o lactancia</h3>
+<p data-es="Bloqueamos los modos con déficit calórico (perder grasa, mini-cut). Te permitimos usar la app en modo seguimiento, sin restricción calórica. Tu matrona, ginecóloga o médica es quien fija cualquier objetivo nutricional en esta etapa." data-en="We block déficit modes (lose fat, mini-cut). You can use the app in tracking mode without caloric restriction. Your midwife, gynecologist, or doctor sets any nutritional target at this stage.">Bloqueamos los modos con déficit calórico (perder grasa, mini-cut). Te permitimos usar la app en modo seguimiento, sin restricción calórica. Tu matrona, ginecóloga o médica es quien fija cualquier objetivo nutricional en esta etapa.</p>
+
+<h3 data-es="Relacion sensible con la comida" data-en="Sensitive relationship with food">Relacion sensible con la comida</h3>
+<p data-es="Al marcar esta condición, la app oculta las cifras de calorías en toda la interfaz. Registras lo mismo, pero no ves números: ves etiquetas como &laquo;registrado&raquo; o indicadores de alto/medio/bajo en proteína. Si estás en tratamiento psicológico por trastorno de conducta alimentaria, Cals2Gains puede acompañar, pero tu profesional es la herramienta principal." data-en="When you mark this condition, calorie numbers are hidden across the UI. You log the same, but you don't see numbers: you see labels like &laquo;logged&raquo; or high/medium/low indicators for protein. If you're in psychological treatment for an eating disorder, Cals2Gains can accompany, but your professional is the primary tool.">Al marcar esta condición, la app oculta las cifras de calorías en toda la interfaz. Registras lo mismo, pero no ves números: ves etiquetas como &laquo;registrado&raquo; o indicadores de alto/medio/bajo en proteína. Si estás en tratamiento psicológico por trastorno de conducta alimentaria, Cals2Gains puede acompañar, pero tu profesional es la herramienta principal.</p>
+
+<h3 data-es="Diabetes" data-en="Diabetes">Diabetes</h3>
+<p data-es="Permitimos todos los modos, pero al elegir uno con déficit mostramos un aviso: el control glucémico lo fija tu médica o endocrinóloga. Si llevas conteo de carbohidratos por indicación médica, puedes tener una vista dedicada. No interpretamos analiticas ni ajustamos insulina." data-en="All modes are available, but when choosing a déficit mode we show a notice: glycemic control is set by your doctor or endocrinologist. If you follow carb counting per medical indication, you get a dedicated view. We don't interpret labs or adjust insulin.">Permitimos todos los modos, pero al elegir uno con déficit mostramos un aviso: el control glucémico lo fija tu médica o endocrinóloga. Si llevas conteo de carbohidratos por indicación médica, puedes tener una vista dedicada. No interpretamos analiticas ni ajustamos insulina.</p>
+
+<h3 data-es="Enfermedad renal" data-en="Kidney disease">Enfermedad renal</h3>
+<p data-es="Limitamos la sugerencia proteica a 0,8 g/kg como máximo, la recomendacion conservadora en enfermedad renal no dialitica. Tu objetivo proteico real lo pone tu nefróloga. Usanos como registro, no como prescriptor." data-en="We cap the protein suggestion at 0.8 g/kg, the conservative recommendation in non-dialysis kidney disease. Your real protein target is set by your nephrologist. Use us for tracking, not prescribing.">Limitamos la sugerencia proteica a 0,8 g/kg como máximo, la recomendacion conservadora en enfermedad renal no dialitica. Tu objetivo proteico real lo pone tu nefróloga. Usanos como registro, no como prescriptor.</p>
+
+<h3 data-es="Menores de 18 (16-17 años)" data-en="Under 18 (16-17 years)">Menores de 18 (16-17 años)</h3>
+<p data-es="Tienes disponibles los modos mantener, ganar músculo, lean bulk y recomposicion. Los modos de pérdida (perder grasa, mini-cut) están restringidos a mayores de 18. Si necesitas perder peso por salud, habla primero con tu médica o pediatra. Te recomendamos acompañamiento familiar o profesional para cualquier objetivo físico en esta etapa." data-en="You have maintain, gain muscle, lean bulk, and recomp modes available. Loss modes (lose fat, mini-cut) are restricted to 18+. If you need to lose weight for health reasons, talk first to your doctor or pediatrician. We recommend family or professional support for any physical goal at this stage.">Tienes disponibles los modos mantener, ganar músculo, lean bulk y recomposicion. Los modos de pérdida (perder grasa, mini-cut) están restringidos a mayores de 18. Si necesitas perder peso por salud, habla primero con tu médica o pediatra. Te recomendamos acompañamiento familiar o profesional para cualquier objetivo físico en esta etapa.</p>
+
+<h3 data-es="Atletas en competición" data-en="Competing athletes">Atletas en competición</h3>
+<p data-es="Activa el plan de entrenamiento correspondiente para el ajuste diario automático. Si trabajas con un profesional que te pauta macros, puedes fijarlos manualmente en modo avanzado y desactivar la adaptación automática. En días de competición larga aplicamos carga de carbohidratos; en competición corta (<60 min) no hace falta." data-en="Activate the matching training plan for automatic daily adjustments. If you work with a pro setting your macros, you can lock them manually in advanced mode and turn off automatic adaptation. For long competitions we apply carb-loading; for short competitions (<60 min) it's not needed.">Activa el plan de entrenamiento correspondiente para el ajuste diario automático. Si trabajas con un profesional que te pauta macros, puedes fijarlos manualmente en modo avanzado y desactivar la adaptación automática. En días de competición larga aplicamos carga de carbohidratos; en competición corta (<60 min) no hace falta.</p>
+</section>
+
+<!-- 9. DATOS -->
+<section id="datos">
+<h2><span class="num">09</span><span data-es="Privacidad y control de tus datos" data-en="Privacy & control of your data">Privacidad y control de tus datos</span></h2>
+<p class="section-lead" data-es="Tus datos son tuyos. Cumplimos el Reglamento General de Proteccion de Datos (RGPD) y la normativa española aplicable. Esto es lo que eso significa en la práctica." data-en="Your data is yours. We comply with the General Data Protection Regulation (GDPR) and applicable Spanish law. Here's what that means in practice.">Tus datos son tuyos. Cumplimos el Reglamento General de Proteccion de Datos (RGPD) y la normativa española aplicable. Esto es lo que eso significa en la práctica.</p>
+
+<div class="pillars">
+    <div class="pillar">
+        <div class="n">&#128274;</div>
+        <h4 data-es="Qué hacemos con tus datos" data-en="What we do with your data">Qué hacemos con tus datos</h4>
+        <p data-es="Los usamos exclusivamente para el servicio que te prestamos: calcular tus objetivos, guardar tu historial, mostrarte tu progreso. Nada más." data-en="We use them solely to deliver the service: calculate your targets, store your history, show your progress. Nothing else.">Los usamos exclusivamente para el servicio que te prestamos: calcular tus objetivos, guardar tu historial, mostrarte tu progreso. Nada más.</p>
+    </div>
+    <div class="pillar">
+        <div class="n">&#10060;</div>
+        <h4 data-es="Qué NO hacemos" data-en="What we do NOT do">Qué NO hacemos</h4>
+        <p data-es="No vendemos tus datos. No los cedemos a anunciantes. No los usamos para entrenar modelos de inteligencia artificial. No los cruzamos con otras bases con fines comerciales." data-en="We don't sell your data. We don't share with advertisers. We don't use it to train AI models. We don't cross-reference for commercial purposes.">No vendemos tus datos. No los cedemos a anunciantes. No los usamos para entrenar modelos de inteligencia artificial. No los cruzamos con otras bases con fines comerciales.</p>
+    </div>
+    <div class="pillar">
+        <div class="n">&#128273;</div>
+        <h4 data-es="Tus derechos" data-en="Your rights">Tus derechos</h4>
+        <p data-es="Acceso, rectificación, supresión, portabilidad, oposición, limitación y retirada de consentimiento. Todo ejercitable desde Ajustes o escribiendo a info@cals2gains.com. Respondemos en menos de un mes." data-en="Access, rectification, erasure, portability, opposition, limitation, and consent withdrawal. All exercisable from Settings or by writing to info@cals2gains.com. We respond in under one month.">Acceso, rectificación, supresión, portabilidad, oposición, limitación y retirada de consentimiento. Todo ejercitable desde Ajustes o escribiendo a info@cals2gains.com. Respondemos en menos de un mes.</p>
+    </div>
+</div>
+
+<h3 data-es="Datos de salud declarados" data-en="Declared health data">Datos de salud declarados</h3>
+<p data-es="Las condiciones que marcas (embarazo/lactancia, relación sensible con la comida, diabetes, enfermedad renal) son datos de salud conforme al Artículo 9 del RGPD. Por eso te pedimos un consentimiento explícito y separado antes de tratarlos. Puedes retirar el consentimiento en cualquier momento en Ajustes; al retirarlo, vaciamos esa información inmediatamente." data-en="The conditions you mark (pregnancy/lactation, sensitive food relationship, diabetes, kidney disease) are health data under GDPR Article 9. That's why we ask for explicit, separate consent before processing them. You can withdraw consent anytime in Settings; on withdrawal, we immediately clear that information.">Las condiciones que marcas (embarazo/lactancia, relación sensible con la comida, diabetes, enfermedad renal) son datos de salud conforme al Artículo 9 del RGPD. Por eso te pedimos un consentimiento explícito y separado antes de tratarlos. Puedes retirar el consentimiento en cualquier momento en Ajustes; al retirarlo, vaciamos esa información inmediatamente.</p>
+
+<h3 data-es="Adaptacion automática (Artículo 22 RGPD)" data-en="Automatic adaptation (GDPR Article 22)">Adaptacion automática (Artículo 22 RGPD)</h3>
+<p data-es="El coach ajusta tus objetivos cada semana en función de tu progreso. Lo hacemos de forma orientativa y reversible: puedes desactivar la adaptación automática cuando quieras desde Ajustes. Con el toggle desactivado, verás sugerencias pero no se aplicaran solas." data-en="The coach adjusts your targets weekly based on your progress. It's guidance and reversible: you can disable automatic adaptation anytime in Settings. With the toggle off, you'll see suggestions but they won't apply on their own.">El coach ajusta tus objetivos cada semana en función de tu progreso. Lo hacemos de forma orientativa y reversible: puedes desactivar la adaptación automática cuando quieras desde Ajustes. Con el toggle desactivado, verás sugerencias pero no se aplicaran solas.</p>
+
+<h3 data-es="Fotos y voz" data-en="Photos and voice">Fotos y voz</h3>
+<p data-es="Tus fotos de comida y de progreso se procesan para análisis pero no se usan para entrenar modelos de IA ni se comparten con terceros con fines comerciales. Tus notas de voz se transcriben y se descartan. Puedes exportar o borrar todas tus fotos desde Ajustes." data-en="Your food and progress photos are processed for analysis but not used to train AI models nor shared for commercial purposes. Your voice notes are transcribed and discarded. You can export or delete all your photos from Settings.">Tus fotos de comida y de progreso se procesan para análisis pero no se usan para entrenar modelos de IA ni se comparten con terceros con fines comerciales. Tus notas de voz se transcriben y se descartan. Puedes exportar o borrar todas tus fotos desde Ajustes.</p>
+
+<h3 data-es="Eliminar tu cuenta" data-en="Delete your account">Eliminar tu cuenta</h3>
+<p data-es="Ajustes &gt; Privacidad &gt; Eliminar mi cuenta. Se borra todo en 30 días. Antes de eliminar, puedes exportar tus datos en formato JSON con un click. Sin preguntas, sin retenciones." data-en="Settings &gt; Privacy &gt; Delete my account. Everything is deleted within 30 days. Before deleting, you can export your data in JSON with one tap. No questions, no retention.">Ajustes &gt; Privacidad &gt; Eliminar mi cuenta. Se borra todo en 30 días. Antes de eliminar, puedes exportar tus datos en formato JSON con un click. Sin preguntas, sin retenciones.</p>
+
+<p data-es="Para el detalle legal completo puedes consultar nuestra <a href=\"/privacy.html\">Política de Privacidad</a> y nuestros <a href=\"/terms.html\">Términos de Uso</a>." data-en="For the full legal detail, see our <a href=\"/privacy.html\">Privacy Policy</a> and <a href=\"/terms.html\">Terms of Use</a>.">Para el detalle legal completo puedes consultar nuestra <a href="/privacy.html">Política de Privacidad</a> y nuestros <a href="/terms.html">Términos de Uso</a>.</p>
+</section>
+
+<!-- 10. QUE ES / QUE NO -->
+<section id="no-es">
+<h2><span class="num">10</span><span data-es="Qué es Cals2Gains y que no es" data-en="What Cals2Gains is and isn't">Qué es Cals2Gains y que no es</span></h2>
+<p class="section-lead" data-es="Para cerrar, sin rodeos: lo que puedes esperar y lo que no." data-en="To close, no-nonsense: what to expect and what not to.">Para cerrar, sin rodeos: lo que puedes esperar y lo que no.</p>
+
+<div class="pillars">
+    <div class="pillar">
+        <div class="n">&#9989;</div>
+        <h4 data-es="Lo que SI hacemos" data-en="What we DO">Lo que SI hacemos</h4>
+        <p data-es="Estimaciones fundadas, con margen de error declarado (+-10-15%). Seis formas de registrar comidas. Ajuste semanal segun tu progreso real. Respeto a tus decisiones. Proteccion de tus datos. Avisos de alarma ante señales de riesgo. Respaldo científico en cada cálculo." data-en="Sound estimates with declared error margin (+-10-15%). Six logging methods. Weekly adjustment based on real progress. Respect for your decisions. Data protection. Alerts on risk signals. Scientific backing for every calc.">Estimaciones fundadas, con margen de error declarado (+-10-15%). Seis formas de registrar comidas. Ajuste semanal segun tu progreso real. Respeto a tus decisiones. Proteccion de tus datos. Avisos de alarma ante señales de riesgo. Respaldo científico en cada cálculo.</p>
+    </div>
+    <div class="pillar">
+        <div class="n">&#10060;</div>
+        <h4 data-es="Lo que NO hacemos" data-en="What we DON'T do">Lo que NO hacemos</h4>
+        <p data-es="No diagnosticamos, no prescribimos, no curamos enfermedades. No sustituimos a tu médica, endocrinóloga, nutricionista, dietista o matrona. No prometemos pérdidas concretas en X semanas. No usamos palabras como &laquo;quema grasa&raquo;, &laquo;detox&raquo; o &laquo;milagro&raquo;. No te juzgamos si un día no loggeas." data-en="We don't diagnose, prescribe, or cure. We don't replace your doctor, endocrinologist, dietitian, or midwife. We don't promise specific losses in X weeks. We don't use words like &laquo;fat-burn&raquo;, &laquo;detox&raquo;, or &laquo;miracle&raquo;. We don't judge you on a missed day.">No diagnosticamos, no prescribimos, no curamos enfermedades. No sustituimos a tu médica, endocrinóloga, nutricionista, dietista o matrona. No prometemos pérdidas concretas en X semanas. No usamos palabras como &laquo;quema grasa&raquo;, &laquo;detox&raquo; o &laquo;milagro&raquo;. No te juzgamos si un día no loggeas.</p>
+    </div>
+</div>
+
+<div class="callout success">
+    <div class="icon">&#127807;</div>
+    <div class="body">
+        <h4 data-es="Declaración formal" data-en="Formal declaration">Declaración formal</h4>
+        <p data-es="Cals2Gains es una app de estilo de vida y bienestar nutricional destinada a personas adultas sanas. No es un producto sanitario en el sentido del Reglamento UE 2017/745. No diagnostica, no trata ni previene enfermedades." data-en="Cals2Gains is a lifestyle and nutritional wellness app designed for healthy adults. It is not a medical device under EU Regulation 2017/745. It does not diagnose, treat, or prevent diseases.">Cals2Gains es una app de estilo de vida y bienestar nutricional destinada a personas adultas sanas. No es un producto sanitario en el sentido del Reglamento UE 2017/745. No diagnostica, no trata ni previene enfermedades.</p>
+    </div>
+</div>
+</section>
+
+<!-- 11. FAQ -->
+<section id="faq">
+<h2><span class="num">11</span><span data-es="Preguntas frecuentes" data-en="Frequently asked questions">Preguntas frecuentes</span></h2>
+<div class="faq">
+    <details>
+        <summary data-es="&iquest;Necesito pagar para usar la app?" data-en="Do I need to pay to use the app?">&iquest;Necesito pagar para usar la app?</summary>
+        <div class="body"><p data-es="Hay una versión gratuita con funcionalidades básicas y una versión Premium con análisis visual avanzado, coach adaptativo completo, planes de entrenamiento, importacion de recetas y más. Puedes probar Premium y cancelar desde tu App Store o Google Play sin problema." data-en="There's a free versión with core features and a Premium versión with advanced visual analysis, full adaptive coach, training plans, recipe import, and more. You can try Premium and cancel from your App Store or Google Play anytime.">Hay una versión gratuita con funcionalidades básicas y una versión Premium con análisis visual avanzado, coach adaptativo completo, planes de entrenamiento, importacion de recetas y más. Puedes probar Premium y cancelar desde tu App Store o Google Play sin problema.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Cómo cancelo la suscripcion?" data-en="How do I cancel the subscription?">&iquest;Cómo cancelo la suscripcion?</summary>
+        <div class="body"><p data-es="Desde los ajustes de suscripciones de tu dispositivo (App Store o Google Play). No cancelamos nosotros; Apple y Google son quienes gestionan el cobro." data-en="From your device's subscription settings (App Store or Google Play). We don't cancel; Apple and Google manage billing.">Desde los ajustes de suscripciones de tu dispositivo (App Store o Google Play). No cancelamos nosotros; Apple y Google son quienes gestionan el cobro.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Funciona sin conexion a internet?" data-en="Does it work offline?">&iquest;Funciona sin conexion a internet?</summary>
+        <div class="body"><p data-es="Parcialmente. Registrar comidas con la base local y con quick add si. El análisis de fotos, de voz y el coach necesitan conexion. Los codigos de barras funcionan con una pequeña cache local para productos recientes." data-en="Partially. Logging with the local database and quick add works offline. Photo analysis, voice, and the coach need connectivity. Barcodes work with a small local cache for recent items.">Parcialmente. Registrar comidas con la base local y con quick add si. El análisis de fotos, de voz y el coach necesitan conexion. Los codigos de barras funcionan con una pequeña cache local para productos recientes.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Puedo usar la app sin conectar Apple Salud o Google Salud?" data-en="Can I use the app without connecting Apple Health or Google Health?">&iquest;Puedo usar la app sin conectar Apple Salud o Google Salud?</summary>
+        <div class="body"><p data-es="Sí. La sincronización es opcional. Sin ella usamos el nivel de actividad que declaras. Con ella el cálculo es más preciso porque usamos tus calorías activas reales." data-en="Yes. Sync is optional. Without it we use the activity level you declared. With it the calculation is more accurate because we use your real active calories.">Sí. La sincronización es opcional. Sin ella usamos el nivel de actividad que declaras. Con ella el cálculo es más preciso porque usamos tus calorías activas reales.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Qué hago si la app se equivoca con los macros de una foto?" data-en="What if the app gets photo macros wrong?">&iquest;Qué hago si la app se equivoca con los macros de una foto?</summary>
+        <div class="body"><p data-es="Editalo a mano (ingredientes, gramos, macros). El margen de error típico del análisis visual esta en torno al 15%. Por eso te damos puntuacion de confianza y edicion libre. Con el uso, aprenderas a interpretar mejor tus propios platos." data-en="Edit by hand (ingredients, grams, macros). Typical visual-analysis error is around 15%. That's why we give a confidence score and free editing. Over time you'll learn to interpret your own plates better.">Editalo a mano (ingredientes, gramos, macros). El margen de error típico del análisis visual esta en torno al 15%. Por eso te damos puntuacion de confianza y edicion libre. Con el uso, aprenderas a interpretar mejor tus propios platos.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Cómo sé si mi objetivo calórico es el correcto?" data-en="How do I know if my calorie target is right?">&iquest;Cómo sé si mi objetivo calórico es el correcto?</summary>
+        <div class="body"><p data-es="El mejor termometro es tu evolución real a 2-4 semanas. Si pierdes 0,5-1% de tu peso por semana en pierda, ganas 0,25-0,5% en lean bulk o estas estable en mantener, vas bien. Si no, el coach ajusta automáticamente o puedes hacerlo tu a mano." data-en="The best thermometer is your real 2-4 week trend. If you lose 0.5-1%/week in lose, gain 0.25-0.5%/week in lean bulk, or stay stable in maintain, you're on track. Otherwise the coach adjusts automatically or you can do it manually.">El mejor termometro es tu evolución real a 2-4 semanas. Si pierdes 0,5-1% de tu peso por semana en pierda, ganas 0,25-0,5% en lean bulk o estas estable en mantener, vas bien. Si no, el coach ajusta automáticamente o puedes hacerlo tu a mano.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Qué pasa si llevo muchos días sin loggear?" data-en="What happens if I skip many days?">&iquest;Qué pasa si llevo muchos días sin loggear?</summary>
+        <div class="body"><p data-es="No pasa nada. No hay castigo. La racha se reinicia pero tus objetivos y tu historico siguen ahí. Vuelve cuando puedas. La adherencia es un promedio, no una carrera." data-en="Nothing happens. No punishment. The streak resets but your targets and history stay. Come back when you can. Adherence is an average, not a race.">No pasa nada. No hay castigo. La racha se reinicia pero tus objetivos y tu historico siguen ahí. Vuelve cuando puedas. La adherencia es un promedio, no una carrera.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Por qué la app no me da un plan más agresivo para perder peso rápido?" data-en="Why doesn't the app give me a more aggressive plan to lose weight fast?">&iquest;Por qué la app no me da un plan más agresivo para perder peso rápido?</summary>
+        <div class="body"><p data-es="Porque los planes agresivos suelen fallar: pierdes mucha masa muscular, recuperas el peso (o más) y empeoras tu metabolismo (Trexler et al. 2014). El modo mini-cut está limitado a 4-6 semanas por esa razon. El método que funciona a largo plazo es el déficit moderado y sostenido." data-en="Because aggressive plans tend to fail: you lose lots of muscle, rebound to or past your starting weight, and worsen metabolism (Trexler et al. 2014). Mini-cut is capped at 4-6 weeks for that reason. Moderate, sustained déficit is what works long-term.">Porque los planes agresivos suelen fallar: pierdes mucha masa muscular, recuperas el peso (o más) y empeoras tu metabolismo (Trexler et al. 2014). El modo mini-cut está limitado a 4-6 semanas por esa razon. El método que funciona a largo plazo es el déficit moderado y sostenido.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Puedo compartir mi cuenta con mi pareja o familia?" data-en="Can I share my account with a partner or family?">&iquest;Puedo compartir mi cuenta con mi pareja o familia?</summary>
+        <div class="body"><p data-es="No. Los cálculos son personales (dependen de peso, edad, sexo biológico y actividad). Cada persona necesita su propia cuenta. Si sois varias personas, tenemos previsto un plan familiar más adelante." data-en="No. Calculations are personal (depend on weight, age, biological sex, and activity). Each person needs their own account. A family plan is on our roadmap.">No. Los cálculos son personales (dependen de peso, edad, sexo biológico y actividad). Cada persona necesita su propia cuenta. Si sois varias personas, tenemos previsto un plan familiar más adelante.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Funciona para vegetarianos, veganos, keto o sin gluten?" data-en="Does it work for vegetarians, vegans, keto, or gluten-free?">&iquest;Funciona para vegetarianos, veganos, keto o sin gluten?</summary>
+        <div class="body"><p data-es="Sí. En Ajustes &gt; Preferencias dieteticas puedes marcar la que te aplique. Las sugerencias del asistente y las recetas se adaptan a tu preferencia." data-en="Yes. In Settings &gt; Dietary preferences mark what applies. The assistant's suggestions and recipes adapt accordingly.">Sí. En Ajustes &gt; Preferencias dieteticas puedes marcar la que te aplique. Las sugerencias del asistente y las recetas se adaptan a tu preferencia.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Mis fotos de progreso se usan para publicidad o marketing?" data-en="Are my progress photos used for advertising or marketing?">&iquest;Mis fotos de progreso se usan para publicidad o marketing?</summary>
+        <div class="body"><p data-es="Nunca. Tus fotos estan en tu cuenta, cifradas, solo tu las ves. No las usamos para marketing ni las compartimos. Si algúna vez quisieramos usar una foto tuya para promocion (con consentimiento expreso), te contactariamos directamente; jamás por defecto." data-en="Never. Your photos are in your account, encrypted, visible only to you. We don't use them for marketing or share them. If we ever wanted to use a photo of yours for promotion (with express consent), we'd reach out directly — never by default.">Nunca. Tus fotos estan en tu cuenta, cifradas, solo tu las ves. No las usamos para marketing ni las compartimos. Si algúna vez quisieramos usar una foto tuya para promocion (con consentimiento expreso), te contactariamos directamente; jamás por defecto.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Por qué hay un disclaimer en tantas pantallas?" data-en="Why is there a disclaimer on so many screens?">&iquest;Por qué hay un disclaimer en tantas pantallas?</summary>
+        <div class="body"><p data-es="Porque somos una app de bienestar y nutricion, no una app médica. Las recomendaciones son orientativas. Los recordatorios de &laquo;esto no sustituye a un profesional&raquo; están ahí para cuidarte: si tienes una condición médica, tu equipo sanitario está por encima de nosotros." data-en="Because we're a wellness and nutrition app, not a medical one. Recommendations are guidance. The &laquo;this doesn't replace a professional&raquo; reminders exist to protect you: if you have a medical condition, your healthcare team outranks us.">Porque somos una app de bienestar y nutricion, no una app médica. Las recomendaciones son orientativas. Los recordatorios de &laquo;esto no sustituye a un profesional&raquo; están ahí para cuidarte: si tienes una condición médica, tu equipo sanitario está por encima de nosotros.</p></div>
+    </details>
+    <details>
+        <summary data-es="&iquest;Qué hago si encuentro un error o un bug?" data-en="What do I do if I find an error or bug?">&iquest;Qué hago si encuentro un error o un bug?</summary>
+        <div class="body"><p data-es="Escribenos a info@cals2gains.com con una breve descripción y, si puedes, una captura. Lo miramos rápido." data-en="Write to info@cals2gains.com with a short description and a screenshot if possible. We'll look into it promptly.">Escribenos a info@cals2gains.com con una breve descripción y, si puedes, una captura. Lo miramos rápido.</p></div>
+    </details>
+</div>
+</section>
+
+<!-- 12. CONTACTO -->
+<section id="contacto">
+<h2><span class="num">12</span><span data-es="Contacto y derechos" data-en="Contact & rights">Contacto y derechos</span></h2>
+<p class="section-lead" data-es="Para cualquier duda, sugerencia, ejercicio de derechos o reclamación." data-en="For any question, suggestion, rights exercise, or complaint.">Para cualquier duda, sugerencia, ejercicio de derechos o reclamación.</p>
+<ul>
+    <li><strong data-es="Email:" data-en="Email:">Email:</strong> <a href="mailto:info@cals2gains.com">info@cals2gains.com</a></li>
+    <li><strong data-es="Política de Privacidad:" data-en="Privacy Policy:">Política de Privacidad:</strong> <a href="/privacy.html">cals2gains.com/privacy.html</a></li>
+    <li><strong data-es="Términos de Uso:" data-en="Terms of Use:">Términos de Uso:</strong> <a href="/terms.html">cals2gains.com/terms.html</a></li>
+    <li><strong data-es="Ejercicio de derechos RGPD" data-en="GDPR rights exercise">Ejercicio de derechos RGPD</strong> <span data-es="(acceso, rectificación, supresión, portabilidad, oposición, limitación, retirada de consentimiento):" data-en="(access, rectification, erasure, portability, opposition, limitation, consent withdrawal):">(acceso, rectificación, supresión, portabilidad, oposición, limitación, retirada de consentimiento):</span> info@cals2gains.com. <span data-es="Respondemos en plazo máximo de 1 mes." data-en="We respond within 1 month max.">Respondemos en plazo máximo de 1 mes.</span></li>
+    <li><strong data-es="Reclamacion ante autoridad:" data-en="Authority complaint:">Reclamacion ante autoridad:</strong> <span data-es="Agencia Española de Proteccion de Datos," data-en="Spanish Data Protection Agency,">Agencia Española de Proteccion de Datos,</span> <a href="https://www.aepd.es" target="_blank" rel="noopener">www.aepd.es</a>.</li>
+    <li><strong data-es="Resolucion de disputas en linea (UE):" data-en="EU online dispute resolution:">Resolucion de disputas en linea (UE):</strong> <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</li>
+</ul>
+</section>
+
+<!-- 13. REFERENCIAS -->
+<section id="referencias">
+<h2><span class="num">13</span><span data-es="Referencias bibliograficas" data-en="Bibliographic references">Referencias bibliograficas</span></h2>
+<p class="section-lead" data-es="Las 17 fuentes primarias que sustentan la metodología. Todas revisadas por pares o emitidas por organismos oficiales." data-en="The 17 primary sources that support the methodology. All peer-reviewed or from official bodies.">Las 17 fuentes primarias que sustentan la metodología. Todas revisadas por pares o emitidas por organismos oficiales.</p>
+<div class="refs">
+<ol>
+    <li>Mifflin MD, St Jeor ST, Hill LA et al. <em>A new predictive equation for resting energy expenditure in healthy individuals.</em> Am J Clin Nutr. 1990;51(2):241-7. <a href="https://pubmed.ncbi.nlm.nih.gov/2305711/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Frankenfield D, Roth-Yousey L, Compher C. <em>Comparison of predictive equations for resting metabolic rate in healthy nonobese and obese adults: a systematic review.</em> J Am Diet Assoc. 2005;105(5):775-89. <a href="https://pubmed.ncbi.nlm.nih.gov/15883556/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Jager R, Kerksick CM, Campbell BI et al. <em>ISSN Position Stand: Protein and exercise.</em> J Int Soc Sports Nutr. 2017;14:20. <a href="https://pubmed.ncbi.nlm.nih.gov/28642676/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Helms ER, Aragon AA, Fitschen PJ. <em>Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation.</em> J Int Soc Sports Nutr. 2014;11:20. <a href="https://pubmed.ncbi.nlm.nih.gov/24864135/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Iraki J, Fitschen P, Espinar S, Helms E. <em>Nutrition recommendations for bodybuilders in the off-season: a narrative review.</em> Sports. 2019;7(7):154. <a href="https://pubmed.ncbi.nlm.nih.gov/31247944/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Barakat C, Pearson J, Escalante G, Campbell B, De Souza EO. <em>Body recomposition: Can trained individuals build muscle and lose fat at the same time?</em> Strength Cond J. 2020;42(5):7-21.</li>
+    <li>Schoenfeld BJ, Aragon AA. <em>How much protein can the body use in a single meal for muscle-building?</em> J Int Soc Sports Nutr. 2018;15:10.</li>
+    <li>Areta JL, Burke LM, Ross ML et al. <em>Timing and distribution of protein ingestion during prolonged recovery from resistance exercise alters myofibrillar protein synthesis.</em> J Physiol. 2013;591(9):2319-31. <a href="https://pubmed.ncbi.nlm.nih.gov/23459753/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Impey SG, Hearris MA, Hammond KM et al. <em>Fuel for the work required: a theoretical framework for carbohydrate periodization and the glycogen threshold hypothesis.</em> Sports Med. 2018;48(5):1031-48. <a href="https://pubmed.ncbi.nlm.nih.gov/29675798/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Burke LM, Hawley JA, Wong SH, Jeukendrup AE. <em>Carbohydrates for training and competition.</em> J Sports Sci. 2011;29 Suppl 1:S17-27. <a href="https://pubmed.ncbi.nlm.nih.gov/21660838/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Kerksick CM, Arent S, Schoenfeld BJ et al. <em>ISSN Position Stand: Nutrient timing.</em> J Int Soc Sports Nutr. 2017;14:33. <a href="https://pubmed.ncbi.nlm.nih.gov/28919842/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Shcherbina A, Mattsson CM, Waggott D et al. <em>Accuracy in wrist-worn, sensor-based measurements of heart rate and energy expenditure in a diverse cohort.</em> J Pers Med. 2017;7(2):3. <a href="https://pubmed.ncbi.nlm.nih.gov/28538707/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Fuller D, Colwell E, Low J et al. <em>Reliability and validity of commercially available wearable devices for measuring steps, energy expenditure, and heart rate: systematic review.</em> JMIR Mhealth Uhealth. 2020;8(9):e18694. <a href="https://pubmed.ncbi.nlm.nih.gov/32897239/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Trexler ET, Smith-Ryan AE, Norton LE. <em>Metabolic adaptation to weight loss: implications for the athlete.</em> J Int Soc Sports Nutr. 2014;11(1):7. <a href="https://pubmed.ncbi.nlm.nih.gov/24571926/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>Fahrenholtz IL, Sjodin A, Benardot D et al. <em>Within-day energy deficiency and reproductive function in female endurance athletes.</em> Scand J Med Sci Sports. 2018;28(3):1139-46. <a href="https://pubmed.ncbi.nlm.nih.gov/29607694/" target="_blank" rel="noopener">PubMed</a></li>
+    <li>EFSA Panel on Dietetic Products, Nutrition, and Allergies. <em>Scientific Opinion on Dietary Reference Values for water.</em> EFSA J. 2010;8(3):1459. <a href="https://www.efsa.europa.eu/en/efsajournal/pub/1459" target="_blank" rel="noopener">EFSA</a></li>
+    <li>Trepanowski JF, Kroeger CM, Barnosky A et al. <em>Effect of alternate-day fasting on weight loss, weight maintenance, and cardioprotection among metabolically healthy obese adults.</em> JAMA Intern Med. 2017;177(7):930-8. <a href="https://pubmed.ncbi.nlm.nih.gov/28459931/" target="_blank" rel="noopener">PubMed</a></li>
+</ol>
+</div>
+</section>
+
+<!-- CTA -->
+<div class="cta-box">
+    <h3 data-es="Ya lo sabes todo" data-en="Now you know everything">Ya lo sabes todo</h3>
+    <p data-es="Empieza a usar Cals2Gains sabiendo que cada número tiene ciencia detrás y cada decisión esta en tus manos." data-en="Start using Cals2Gains knowing every number is backed by science and every decisión is in your hands.">Empieza a usar Cals2Gains sabiendo que cada número tiene ciencia detrás y cada decisión esta en tus manos.</p>
+    <a href="/" class="cta-btn" data-es="Descargar la app" data-en="Get the app">Descargar la app</a>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+    <div class="links">
+        <a href="/" data-es="Inicio" data-en="Home">Inicio</a>
+        <a href="/privacy.html" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+        <a href="/terms.html" data-es="Términos" data-en="Terms">Términos</a>
+        <a href="/guides/metodología.html" data-es="Métodología científica" data-en="Scientific methodology">Métodología científica</a>
+        <a href="mailto:info@cals2gains.com">info@cals2gains.com</a>
+    </div>
+    <p data-es="&copy; 2026 CivilTek Ingenieria SLU. Cals2Gains es una herramienta educativa y de seguimiento. No sustituye consejo médico, nutricional ni deportivo profesional." data-en="&copy; 2026 CivilTek Ingenieria SLU. Cals2Gains is an educational and tracking tool. It does not replace professional medical, nutritional, or sports advice.">&copy; 2026 CivilTek Ingenieria SLU. Cals2Gains es una herramienta educativa y de seguimiento. No sustituye consejo médico, nutricional ni deportivo profesional.</p>
+</footer>
+
+<script>
+function toggleLang(){
+    var btn=document.getElementById('langBtn');
+    var cur=document.documentElement.lang;
+    var next=cur==='es'?'en':'es';
+    document.documentElement.lang=next;
+    btn.textContent=next==='es'?'EN':'ES';
+    var nodes=document.querySelectorAll('[data-es][data-en]');
+    nodes.forEach(function(n){
+        var v=n.getAttribute(next==='es'?'data-es':'data-en');
+        if(v!=null) n.innerHTML=v;
+    });
+    try{localStorage.setItem('c2g_lang',next);}catch(e){}
+}
+(function(){
+    var saved;try{saved=localStorage.getItem('c2g_lang');}catch(e){}
+    if(saved==='en'){toggleLang();}
+})();
+</script>
+
+</body>
+</html>

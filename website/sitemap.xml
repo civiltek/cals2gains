@@ -41,4 +41,12 @@
         <xhtml:link rel="alternate" hreflang="es" href="https://cals2gains.com/guides/metodologia.html" />
         <xhtml:link rel="alternate" hreflang="en" href="https://cals2gains.com/guides/metodologia.html" />
     </url>
+    <url>
+        <loc>https://cals2gains.com/guides/manual.html</loc>
+        <lastmod>2026-04-18</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+        <xhtml:link rel="alternate" hreflang="es" href="https://cals2gains.com/guides/manual.html" />
+        <xhtml:link rel="alternate" hreflang="en" href="https://cals2gains.com/guides/manual.html" />
+    </url>
 </urlset>

@@ -11,9 +11,9 @@
     {
       "name": "Static preview (website)",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["http-server", "website", "-p", "$PORT", "-c-1", "--silent"],
+      "runtimeArgs": ["http-server", "website", "-p", "5050", "-c-1", "--silent"],
       "port": 5050,
-      "autoPort": true
+      "autoPort": false
     },
     {
       "name": "Firebase Hosting (landing cals2gains.com)",
