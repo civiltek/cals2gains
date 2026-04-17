@@ -163,12 +163,7 @@
         }
       ],
       "expo-secure-store",
-      [
-        "react-native-health-connect",
-        {
-          "requestPermissionsOnFirstLaunch": false
-        }
-      ],
+      "expo-health-connect",
       [
         "react-native-health",
         {

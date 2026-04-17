@@ -1,5 +1,31 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Fix Health Connect crash nativo: migrar a plugin expo-health-connect
+
+Nuevo crash detectado en device tras instalar Health Connect en Samsung S20 Ultra (Android 13): `kotlin.UninitializedPropertyAccessException: lateinit property requestPermission has not been initialized` en `HealthConnectPermissionDelegate.launchPermissionsDialog` (HealthConnectPermissionDelegate.kt:45).
+
+**Causa raíz**: el plugin `react-native-health-connect` (matinzd) en Expo-managed **solo inyecta intent-filter en AndroidManifest**; NO cablea el `setPermissionDelegate(activity)` en MainActivity.onCreate. El `requestPermission: ActivityResultLauncher` es `lateinit` → sin init crasha al primer `requestPermission()`.
+
+**Fix**: reemplazar el plugin Expo por `expo-health-connect@0.1.1` (mismo autor, diseñado para Expo). Incluye un `ReactActivityLifecycleListener` que registra `HealthConnectPermissionDelegate.setPermissionDelegate(reactActivity)` automáticamente en onCreate, y además añade el `activity-alias ViewPermissionUsageActivity` requerido por Android 14+.
+
+Cambios:
+- `package.json`: `+ expo-health-connect@0.1.1` (JS code sigue usando `react-native-health-connect`)
+- `app.json`: quitado plugin `["react-native-health-connect", {...}]`; añadido `"expo-health-connect"`
+
+Código JS en `services/healthKit.ts` no cambia — sigue importando desde `react-native-health-connect`.
+
+## 2026-04-17 — Fix Health Connect validado en device (BodyFat + LeanBodyMass)
+
+Validado manualmente en Samsung R3CR10E9LSE con APK universal extraído del AAB del run [24581293389](https://github.com/civiltek/cals2gains/actions/runs/24581293389). Flujo: bundletool 1.15.6 `build-apks --mode=universal` → `apksigner` con debug keystore (`~/.android/debug.keystore`, SHA1 `C4:BE:5E:57...`) → `adb install`. El botón "Conectar" de Health Connect ya no crashea y solicita permisos correctamente.
+
+**Bloqueos aún abiertos**:
+- **Play Store submit** sigue fallando por Health Connect declaration form pendiente en Play Console (administrativo, no código). Necesario antes de que el AAB llegue a Internal testing.
+- **Google Sign-In no funciona en este APK** porque el debug keystore no está registrado en Firebase. No bloqueante (email/password funciona). Al firmar con keystore EAS de producción (futuros builds oficiales) el login vuelve.
+
+## 2026-04-17 — Mockups Play Store EN: 8 variantes en inglés
+
+Nuevo script `tools/create_playstore_mockups_en.py` (clon del ES con headlines/subtítulos traducidos). Salida: `store-screenshots/mockups-playstore-en/mockup_01.png`–`mockup_08.png`. **Nota**: los screenshots de fondo siguen siendo las capturas en español (la UI del device sigue en ES). Para screenshots 100% EN habría que recapturar con la app en inglés.
+
 ## 2026-04-17 — iOS HealthKit build #62 diagnóstico: limpieza config + RNH 1.19
 
 Build 61 (`healthkit.access=["health-records"]`) siguió fallando → hipótesis del mismatch binario↔profile **falsada** como causa raíz. Apostamos por la línea de ChatGPT: ruido de config + posibles issues de RNH con New Architecture (habilitada por defecto en Expo SDK 54).
