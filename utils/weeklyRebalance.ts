@@ -137,7 +137,29 @@ export type RebalanceFlag =
   | 'capped_low_carryover_forward'
   | 'protein_floor_enforced'
   | 'low_carb_forced'
-  | 'insufficient_data';
+  | 'insufficient_data'
+  /** Rebalanced target diverges >25% vs static onboarding target — UI should
+   *  surface this prominently (METODOLOGIA §5 "no cambiar objetivo silenciosamente"). */
+  | 'delta_vs_static_exceeded'
+  /** User has been on mini_cut >6 weeks — METODOLOGIA §3.1 upper bound 4-8w,
+   *  §8.1 recommends maintenance break. UI should prompt switching mode. */
+  | 'mini_cut_duration_exceeded';
+
+/** Maximum consecutive mini_cut duration before forcing a maintenance break.
+ *  Mid-point of the 4-8 week window recommended by Helms 2014 (METODOLOGIA §3.1). */
+const MINI_CUT_MAX_DAYS = 42;
+
+/** Delta threshold (relative) between rebalanced and static target above which
+ *  we warn the user. METODOLOGIA §5 states coach must not move the goal silently. */
+const DELTA_VS_STATIC_THRESHOLD = 0.25;
+
+/** Days elapsed since an ISO date, or null if the date is missing/invalid. */
+function daysSince(iso?: string | null): number | null {
+  if (!iso) return null;
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return null;
+  return Math.floor((Date.now() - t) / (24 * 60 * 60 * 1000));
+}
 
 export interface TodayTarget {
   calories: number;
@@ -223,13 +245,15 @@ export type TrainingDayOverride = 'refeed' | 'competicion';
 /**
  * Compute today's rebalanced target given the week's dailyEntries.
  *
- * @param profile         User anthropometrics
- * @param baseGoals       Static user goals (calories + macros) the user accepted
- * @param goalType        Internal rebalance goal type (prefer goalTypeFromUser)
- * @param entries         Rolling 7-day entries (ordered oldest→newest, includes today)
- * @param medicalFlags    Optional — vulnerable-population flags from onboarding screening
- * @param trainingDay     Optional — if today is a plan day that overrides rebalance, skip
- * @returns               Today's target or null if rebalance must be skipped
+ * @param profile              User anthropometrics
+ * @param baseGoals            Static user goals (calories + macros) the user accepted
+ * @param goalType             Internal rebalance goal type (prefer goalTypeFromUser)
+ * @param entries              Rolling 7-day entries (ordered oldest→newest, includes today)
+ * @param medicalFlags         Optional — vulnerable-population flags from onboarding screening
+ * @param trainingDay          Optional — if today is a plan day that overrides rebalance, skip
+ * @param goalModeStartedAt    Optional — ISO date when the current goalMode was chosen.
+ *                             Used to enforce mini_cut ≤ 6 weeks (§3.1 Helms 2014).
+ * @returns                    Today's target or null if rebalance must be skipped
  */
 export function computeTodayTarget(
   profile: UserProfile,
@@ -237,7 +261,8 @@ export function computeTodayTarget(
   goalType: GoalType,
   entries: DailyEntry[],
   medicalFlags?: MedicalFlagsShape,
-  trainingDay?: TrainingDayOverride | null
+  trainingDay?: TrainingDayOverride | null,
+  goalModeStartedAt?: string | null
 ): TodayTarget | null {
   // R9: Training plan refeed/competicion days dictate their own macros.
   if (trainingDay === 'refeed' || trainingDay === 'competicion') return null;
@@ -286,6 +311,19 @@ export function computeTodayTarget(
     flags.push('capped_low_carryover_forward');
     dailyKcal = floor;
     if (floor === floorAbs) flags.push('at_absolute_floor');
+  }
+
+  // §5 — surface a visible warning when the rebalanced daily deviates >25%
+  // from the static onboarding target. "No cambiar objetivo silenciosamente".
+  if (baseGoals.calories > 0) {
+    const relDelta = Math.abs(dailyKcal - baseGoals.calories) / baseGoals.calories;
+    if (relDelta > DELTA_VS_STATIC_THRESHOLD) flags.push('delta_vs_static_exceeded');
+  }
+
+  // §3.1 / §8.1 — mini_cut capped at 6 weeks consecutive.
+  if (goalType === 'mini_cut') {
+    const days = daysSince(goalModeStartedAt);
+    if (days !== null && days > MINI_CUT_MAX_DAYS) flags.push('mini_cut_duration_exceeded');
   }
 
   // Macros — protein & fat have floors; carbs are the residual buffer

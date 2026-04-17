@@ -159,16 +159,23 @@ export const useWeeklyStore = create<WeeklyState>((set, get) => ({
     if (entries.length === 0) return null;
     // Prefer advanced goalMode (6 values) over simple FitnessGoal (4 values).
     const goalType = goalTypeFromUser(user);
-    // Forward-compat: legal worktree adds medicalFlags to the User via screening.
-    // Read loosely so this survives the merge either way.
-    const medicalFlags = (user as any).medicalFlags as MedicalFlagsShape | undefined;
+    // Forward-compat: legal worktree adds medicalFlags + goalModeStartedAt to
+    // the User via screening/onboarding. Read loosely so this survives the
+    // merge either way.
+    const u = user as any;
+    const medicalFlags = u.medicalFlags as MedicalFlagsShape | undefined;
+    const goalModeStartedAt =
+      (u.goalModeStartedAt as string | undefined) ??
+      (u.goalModeStartDate as string | undefined) ??
+      null;
     return computeTodayTarget(
       user.profile,
       baseGoals,
       goalType,
       entries,
       medicalFlags,
-      trainingDay
+      trainingDay,
+      goalModeStartedAt
     );
   },
 

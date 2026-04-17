@@ -469,6 +469,20 @@ export default function HomeScreen() {
                   })}
                 </Text>
               </View>
+              {rebalancedTarget.flags.includes('delta_vs_static_exceeded') && (
+                <Text style={[styles.rebalanceWarning, { color: C.warning }]}>
+                  {t('home.rebalance.deltaExceeded', {
+                    defaultValue: 'El ajuste supera el 25 % de tu objetivo inicial. Considera revisar tu baseline o consultar con un profesional.',
+                  })}
+                </Text>
+              )}
+              {rebalancedTarget.flags.includes('mini_cut_duration_exceeded') && (
+                <Text style={[styles.rebalanceWarning, { color: C.warning }]}>
+                  {t('home.rebalance.miniCutTooLong', {
+                    defaultValue: 'Llevas más de 6 semanas en mini_cut. Es recomendable hacer un descanso en mantenimiento antes de continuar.',
+                  })}
+                </Text>
+              )}
               <Text style={[styles.rebalanceDisclaimer, { color: C.text + 'aa' }]}>
                 {t('home.rebalance.disclaimer', {
                   defaultValue: 'Información general basada en tu actividad reciente. No sustituye el consejo de un profesional de la salud.',
@@ -993,6 +1007,12 @@ const getStyles = (C: ReturnType<typeof useColors>) =>
       fontStyle: 'italic',
       lineHeight: 14,
       marginTop: 2,
+    },
+    rebalanceWarning: {
+      fontSize: 11,
+      fontFamily: 'InstrumentSans-Medium',
+      lineHeight: 15,
+      marginTop: 4,
     },
     rebalanceText: {
       fontSize: 12,
