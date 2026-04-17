@@ -89,11 +89,9 @@ export const useMealStore = create<MealState>((set, get) => ({
       const meals = await getMealsForDate(userId, date);
       const nutrition = calculateTotalNutrition(meals);
 
-      if (isToday(date)) {
-        set({ todayMeals: meals, todayNutrition: nutrition });
-      } else {
-        set({ recentMeals: meals });
-      }
+      // Always update todayMeals/todayNutrition — home dashboard reads these
+      // for whichever date is being viewed, not just calendar today.
+      set({ todayMeals: meals, todayNutrition: nutrition });
     } catch (error) {
       console.error('Failed to load meals for date:', error);
     } finally {
