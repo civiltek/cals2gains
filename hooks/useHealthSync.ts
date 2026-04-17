@@ -38,7 +38,9 @@ export function useHealthSync() {
       if (user.dynamicTDEEEnabled && user.profile) {
         const { avgCalories, daysWithData } = await healthService.get7DayCalorieAverage(7);
         const bmr = calculateBMR(user.profile);
-        const dynamicTDEE = calculateDynamicTDEE(bmr, avgCalories, daysWithData);
+        const { getActivityMultiplier } = await import('../utils/nutrition');
+        const pal = getActivityMultiplier(user.profile.activityLevel);
+        const dynamicTDEE = calculateDynamicTDEE(bmr, pal, avgCalories, daysWithData);
 
         if (dynamicTDEE !== null) {
           // Persist updated TDEE — imported lazily to avoid circular deps

@@ -214,6 +214,30 @@ class HealthService {
   }
 
   /**
+   * Get health summary for an arbitrary calendar day (00:00 → 23:59:59 local).
+   * Used by the weekly rebalance engine to reconstruct the last 7 days.
+   */
+  async getDaySummary(day: Date): Promise<HealthData | null> {
+    if (!this.isAuthorized) return null;
+
+    try {
+      const start = new Date(day);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(day);
+      end.setHours(23, 59, 59, 999);
+
+      if (Platform.OS === 'ios') {
+        return await this.getIOSSummary(start, end);
+      } else {
+        return await this.getAndroidSummary(start, end);
+      }
+    } catch (error) {
+      console.error('Health day fetch error:', error);
+      return null;
+    }
+  }
+
+  /**
    * Write weight to health platform
    */
   async saveWeight(weightKg: number): Promise<boolean> {

@@ -61,6 +61,7 @@ const SettingsScreen = () => {
   const C = useColors();
   const user = useUserStore((s) => s.user);
   const setHealthEnabled = useUserStore((s) => s.setHealthEnabled);
+  const setDynamicTDEEEnabled = useUserStore((s) => s.setDynamicTDEEEnabled);
   const reminderState = useReminderStore();
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState<UserSettings>({
@@ -867,6 +868,42 @@ const SettingsScreen = () => {
                 onValueChange={() => handleConnectService('inBody')}
                 trackColor={{ false: C.border, true: '#E8383D40' }}
                 thumbColor={settings.connectedServices.inBody ? '#E8383D' : C.textSecondary}
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* Smart targets (dynamic TDEE + weekly rebalance) */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>
+            {t('settings.smartTargets.title', { defaultValue: 'Objetivos inteligentes' })}
+          </Text>
+          <View style={[styles.sectionContent, { backgroundColor: C.background }]}>
+            <View style={[styles.serviceItem, { borderBottomColor: C.border }]}>
+              <View style={styles.serviceInfo}>
+                <Ionicons name="sync-circle-outline" size={24} color={C.violet ?? C.primary} />
+                <View style={styles.serviceText}>
+                  <Text style={[styles.serviceName, { color: C.text }]}>
+                    {t('settings.smartTargets.dynamic', { defaultValue: 'Ajuste dinámico semanal' })}
+                  </Text>
+                  <Text style={[styles.serviceStatus, { color: C.textSecondary }]}>
+                    {t('settings.smartTargets.dynamicDesc', {
+                      defaultValue: 'Reparte kcal/macros de la semana según tu actividad real y lo que ya has comido',
+                    })}
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={!!user?.dynamicTDEEEnabled}
+                onValueChange={async (v) => {
+                  try {
+                    await setDynamicTDEEEnabled(v);
+                  } catch {
+                    Alert.alert(t('errors.generic', { defaultValue: 'Error' }));
+                  }
+                }}
+                trackColor={{ false: C.border, true: `${C.primary}40` }}
+                thumbColor={user?.dynamicTDEEEnabled ? C.primary : C.textSecondary}
               />
             </View>
           </View>

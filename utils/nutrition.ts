@@ -25,27 +25,49 @@ export function calculateTDEE(profile: UserProfile): number {
   return Math.round(calculateBMR(profile) * ACTIVITY_MULTIPLIERS[profile.activityLevel]);
 }
 
+// Wearable active-kcal correction factor. Consumer wearables overestimate
+// active energy by ~15-35% (Stanford 2017, Shcherbina). 0.75 is conservative
+// across Apple Watch / Fitbit / Health Connect generic sources.
+export const WEARABLE_CORRECTION = 0.75;
+
+// Dampening applied to the activity delta: half of the extra/missing activity
+// flows into the target. Prevents a 20k-step day from moving the target +1000 kcal.
+// Pure design choice, not clinical consensus — tuneable if telemetry requires.
+export const ACTIVITY_DAMPENING = 0.5;
+
 /**
  * Calculate TDEE using real activity data from HealthKit / Health Connect.
- * Uses a 7-day moving average of active calories to smooth daily variance.
  *
- * @param bmr         Basal metabolic rate (kcal/day) from Mifflin-St Jeor
- * @param avgActiveCalories7d  Average active kcal/day over last 7 days (0 = no data)
- * @param daysWithData         How many of the 7 days actually had data
- * @returns Dynamic TDEE, or null when there's insufficient data (falls back to static)
+ * Anti double-count formula:
+ *   TDEE_base       = BMR * PAL               (activity already assumed by profile)
+ *   delta_activity  = active_real * CORRECTION − BMR * (PAL − 1)
+ *   TDEE_dynamic    = TDEE_base + delta * DAMPENING
+ *
+ * Bounded to [BMR*1.15, BMR*2.5] for sanity.
+ *
+ * @returns Dynamic TDEE, or null when there's insufficient data (fall back to static).
  */
 export function calculateDynamicTDEE(
   bmr: number,
+  pal: number,
   avgActiveCalories7d: number,
   daysWithData: number
 ): number | null {
   if (daysWithData < MIN_HEALTH_DAYS || avgActiveCalories7d <= 0) return null;
 
-  // Apply a small discount (0.9) to account for wearable over-estimation
-  const adjustedActive = Math.round(avgActiveCalories7d * 0.9);
+  const tdeeBase = bmr * pal;
+  const activityExpected = bmr * (pal - 1);
+  const activityReal = avgActiveCalories7d * WEARABLE_CORRECTION;
+  const delta = activityReal - activityExpected;
 
-  // Dynamic TDEE = BMR + real active calories
-  return Math.round(bmr + adjustedActive);
+  const dynamic = tdeeBase + delta * ACTIVITY_DAMPENING;
+  const clamped = Math.max(bmr * 1.15, Math.min(bmr * 2.5, dynamic));
+  return Math.round(clamped);
+}
+
+/** Returns the PAL multiplier for a given ActivityLevel. */
+export function getActivityMultiplier(level: ActivityLevel): number {
+  return ACTIVITY_MULTIPLIERS[level];
 }
 
 export function calculateRecommendedGoals(profile: UserProfile): UserGoals {

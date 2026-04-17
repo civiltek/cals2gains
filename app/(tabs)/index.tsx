@@ -24,6 +24,7 @@ import MacroRing from '../../components/ui/MacroRing';
 import MealCard from '../../components/ui/MealCard';
 import { useUserStore } from '../../store/userStore';
 import { useMealStore } from '../../store/mealStore';
+import { useWeeklyStore } from '../../store/weeklyStore';
 import { useAdaptiveStore } from '../../store/adaptiveStore';
 import { useAdaptiveEngines } from '../../hooks/useAdaptiveEngines';
 import { useStreakStore } from '../../store/streakStore';
@@ -122,6 +123,15 @@ export default function HomeScreen() {
     }
   }, [user?.uid, viewDate.toDateString()]);
 
+  // Load the rolling 7-day window when dynamic TDEE + rebalance is enabled.
+  // Refreshes itself every 6h internally — see weeklyStore.loadWeek.
+  const loadWeek = useWeeklyStore((s) => s.loadWeek);
+  const getTodayTarget = useWeeklyStore((s) => s.getTodayTarget);
+  useEffect(() => {
+    if (!user?.uid || !user?.profile || !user.dynamicTDEEEnabled) return;
+    loadWeek(user.uid, user.profile);
+  }, [user?.uid, user?.dynamicTDEEEnabled, todayNutrition.calories]);
+
   // Refresh streak whenever meals are loaded for the day
   useEffect(() => {
     if (user && todayMeals.length >= 2) {
@@ -168,9 +178,28 @@ export default function HomeScreen() {
 
   // Use getActiveGoals() for reactivity — it respects goalMode, dayType, etc.
   const activeGoals = getActiveGoals();
-  const goals = activeGoals.calories > 0
+  const baseGoals = activeGoals.calories > 0
     ? activeGoals
     : { calories: 2000, protein: 150, carbs: 200, fat: 65, fiber: 30 };
+
+  // Weekly rebalance: if dynamicTDEEEnabled is on AND we have the profile,
+  // compute today's target from the 7-day rolling budget instead of the
+  // flat daily goal. Falls back to baseGoals on kill switch / no data.
+  const rebalancedTarget = useMemo(() => {
+    if (!user?.dynamicTDEEEnabled || !user?.profile) return null;
+    if (!isToday) return null; // only adjust today's view
+    return getTodayTarget(user.profile, baseGoals);
+  }, [user?.dynamicTDEEEnabled, user?.profile, isToday, baseGoals.calories, getTodayTarget]);
+
+  const goals = rebalancedTarget
+    ? {
+        calories: rebalancedTarget.calories,
+        protein: rebalancedTarget.protein,
+        carbs: rebalancedTarget.carbs,
+        fat: rebalancedTarget.fat,
+        fiber: rebalancedTarget.fiber,
+      }
+    : baseGoals;
 
   // Consumed macros
   const consumed = {
@@ -419,6 +448,20 @@ export default function HomeScreen() {
 
         {/* ===== CALORIE RING + MACRO BARS DASHBOARD ===== */}
         <View style={styles.dashboardCard}>
+          {/* Rebalance banner: only shown when today's target differs from base */}
+          {rebalancedTarget && rebalancedTarget.calories !== rebalancedTarget.baseTarget && (
+            <View style={[styles.rebalanceBanner, { backgroundColor: C.violet + '22', borderColor: C.violet }]}>
+              <Ionicons name="sync" size={14} color={C.violet} />
+              <Text style={[styles.rebalanceText, { color: C.text }]}>
+                {t('home.rebalance.adjusted', {
+                  today: rebalancedTarget.calories,
+                  base: rebalancedTarget.baseTarget,
+                  defaultValue: 'Hoy {{today}} kcal · base {{base}}',
+                })}
+              </Text>
+            </View>
+          )}
+
           {/* Calorie ring centered */}
           <View style={styles.ringRow}>
             <MacroRing
@@ -914,6 +957,21 @@ const getStyles = (C: ReturnType<typeof useColors>) =>
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 20,
+    },
+    rebalanceBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 10,
+      borderWidth: 1,
+      marginBottom: 12,
+    },
+    rebalanceText: {
+      fontSize: 12,
+      fontFamily: 'InstrumentSans-Medium',
+      flex: 1,
     },
     calorieStats: {
       flex: 1,
