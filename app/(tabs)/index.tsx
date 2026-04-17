@@ -29,6 +29,7 @@ import { useAdaptiveEngines } from '../../hooks/useAdaptiveEngines';
 import { useStreakStore } from '../../store/streakStore';
 import StreakBadge from '../../components/ui/StreakBadge';
 import * as Haptics from 'expo-haptics';
+import { useTrainingPlanStore } from '../../store/trainingPlanStore';
 
 // ============================================
 // MACRO BAR COLORS
@@ -100,6 +101,8 @@ export default function HomeScreen() {
   const acceptRecommendation = useAdaptiveStore((s) => s.acceptRecommendation);
   const dismissRecommendation = useAdaptiveStore((s) => s.dismissRecommendation);
   const updateUserGoals = useUserStore((s) => s.updateUserGoals);
+  const getTodayTrainingInfo = useTrainingPlanStore((s) => s.getTodayInfo);
+  const todayTraining = isToday ? getTodayTrainingInfo() : null;
 
   const locale = i18n.language === 'es' ? es : enUS;
   const today = useMemo(
@@ -322,6 +325,36 @@ export default function HomeScreen() {
           >
             <Ionicons name="lock-closed" size={16} color={C.white} />
             <Text style={styles.subscriptionBannerText}>{t('home.subscribeToContinue')}</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Training Plan Banner */}
+        {todayTraining && (
+          <TouchableOpacity
+            style={styles.trainingBanner}
+            onPress={() => router.push('/training-day')}
+            activeOpacity={0.85}
+          >
+            <View style={styles.trainingBannerLeft}>
+              <Text style={{ fontSize: 22 }}>
+                {todayTraining.dayType === 'entreno' ? '🏋️'
+                  : todayTraining.dayType === 'refeed' ? '🔄'
+                  : todayTraining.dayType === 'competicion' ? '🏁'
+                  : '🛋️'}
+              </Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.trainingBannerTitle}>
+                  {todayTraining.dayType === 'entreno' ? 'Día de entreno'
+                    : todayTraining.dayType === 'refeed' ? 'Día de refeed'
+                    : todayTraining.dayType === 'competicion' ? '¡Día de competición!'
+                    : 'Día de descanso'}
+                </Text>
+                <Text style={styles.trainingBannerSub}>
+                  {todayTraining.plan.name} · Día {todayTraining.dayNumber}/{todayTraining.totalDays}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color="#FF6A4D" />
           </TouchableOpacity>
         )}
 
@@ -728,6 +761,35 @@ const getStyles = (C: ReturnType<typeof useColors>) =>
       fontSize: 13,
       color: C.warning,
       fontWeight: '500',
+    },
+    trainingBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginHorizontal: 20,
+      marginVertical: 6,
+      backgroundColor: '#FF6A4D15',
+      borderRadius: 14,
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      borderWidth: 1,
+      borderColor: '#FF6A4D40',
+      gap: 10,
+    },
+    trainingBannerLeft: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    trainingBannerTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: '#FF6A4D',
+    },
+    trainingBannerSub: {
+      fontSize: 12,
+      color: C.textSecondary,
+      marginTop: 1,
     },
     subscriptionBanner: {
       flexDirection: 'row',
