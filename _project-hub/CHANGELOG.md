@@ -1,5 +1,59 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — iOS HealthKit build #62 diagnóstico: limpieza config + RNH 1.19
+
+Build 61 (`healthkit.access=["health-records"]`) siguió fallando → hipótesis del mismatch binario↔profile **falsada** como causa raíz. Apostamos por la línea de ChatGPT: ruido de config + posibles issues de RNH con New Architecture (habilitada por defecto en Expo SDK 54).
+
+Cambios en este build:
+- `package.json`: bump `react-native-health ^1.17.0` → `^1.19.0` (resuelve al mismo instalado en realidad — el range `^1.17` ya daba 1.19.0, así que este cambio es cosmético/diagnóstico)
+- `app.json`: quitado `com.apple.developer.healthkit.background-delivery` (no usamos `HKObserverQuery`)
+- `app/_layout.tsx`: eliminada llamada a `primeHealthKitRegistration()` en boot (antipatrón según Apple docs; contamina estado de permisos)
+- `services/healthKit.ts`: `primeHealthKitRegistration()` convertido en no-op (stub para no romper callers)
+
+**Qué NO tocamos aún**: `healthkit.access=["health-records"]` y `NSHealthClinicalHealthRecordsShareUsageDescription` se mantienen porque quitar uno sin el otro crearía mismatch con el profile de Apple (que auto-incluye `health-records`). Si este build sigue fallando, siguiente paso es parchear el plugin de RNH para suprimir el `healthkit.access=[]` que mete incondicionalmente y quitar clinical del todo.
+
+## 2026-04-17 — Mockups Play Store: 8 screenshots brandeados generados
+
+Script Python PIL (`tools/create_playstore_mockups.py`) que genera 8 mockups 1284×2778 px a partir de screenshots reales de la app. Cada mockup lleva fondo dark con glow coral/violet, pill "Cals2Gains" arriba, headline (Outfit-Bold 128px) + subtítulo (Outfit-Regular 44px), phone frame con esquinas redondeadas y borde de acento alternado. Ocho slots: Hoy, Historial fotos, 6 modos objetivo, Cálculo científico TDEE, Seguimiento completo, IA que te guía, Planes entreno, Perfil.
+
+Salida: `store-screenshots/mockups-playstore/mockup_01.png`–`mockup_08.png`.
+
+**Screenshots descartados por bugs detectados** — a arreglar en app antes de publicar:
+- `WhatsApp Image 2026-04-17 at 19.49.20.jpeg` — "Qué como ahora" muestra placeholder sin interpolar: `Te faltan {{protein}}g de proteína`
+- `WhatsApp Image 2026-04-17 at 19.49.21 (4).jpeg` — Historial muestra clave i18n sin traducir: `proteinDashboard....`
+- `WhatsApp Image 2026-04-17 at 19.49.20 (3).jpeg` — Lista de la compra con ingredientes en inglés (Coconut milk, Chicken breast, Crushed tomato...) cuando la UI está en español
+
+## 2026-04-17 — Fix Android Health Connect crash: permisos BodyFat + LeanBodyMass (845208f)
+
+App crasheaba al pulsar "Conectar" en Android. Causa: el código llamaba `HealthConnect.requestPermission()` con `recordType: 'BodyFat'` y `'LeanBodyMass'`, pero los permisos `android.permission.health.READ_BODY_FAT` y `READ_LEAN_BODY_MASS` **no estaban declarados en AndroidManifest** (app.json > android.permissions). Health Connect lanza SecurityException nativa al pedir permisos no declarados, y el try/catch JS no la captura.
+
+**Solución**: añadidos ambos permisos a `app.json`. Build Android triggered: [run 24581293389](https://github.com/civiltek/cals2gains/actions/runs/24581293389)
+
+## 2026-04-17 — Fix iOS HealthKit REAL: healthkit.access mismatch binario↔profile (3624a53)
+
+**Causa raíz definitiva** (descubierta inspeccionando el binario firmado extraído del IPA build 60):
+- **Binario**: `com.apple.developer.healthkit.access` = `<array vacío/>`
+- **Provisioning profile**: `com.apple.developer.healthkit.access` = `["health-records"]`
+- iOS rechazaba `initHealthKit()` con error genérico por ese mismatch → usuaria veía "Error: no se pudo conectar a applehealth"
+
+**Origen del mismatch**: el plugin Expo `react-native-health/app.plugin.js` añade `healthkit.access=[]` incondicionalmente si no está declarado. Apple añade automáticamente `health-records` al profile al marcar HealthKit en el Developer Portal y no se puede desactivar (la capability no tiene botón Configure, verificado vía Chrome MCP).
+
+**Solución**: declarar explícitamente `["health-records"]` en `app.json > ios.entitlements`. El plugin respeta arrays pre-declarados (`if (!Array.isArray(...))`), así no lo sobrescribe. Binario == profile → iOS autoriza HealthKit.
+
+Commit `3624a53`, build iOS triggered: [run 24580473404](https://github.com/civiltek/cals2gains/actions/runs/24580473404)
+
+## 2026-04-17 — Fix iOS HealthKit (INCOMPLETO): NSHealthClinicalHealthRecordsShareUsageDescription (19daa6a)
+
+Fix parcial: añadida usage description en Info.plist. Necesario pero no suficiente — no resolvió el error porque el problema real estaba en el entitlement del binario, no en Info.plist. Ver entrada siguiente para la fix completa.
+
+Tras investigación profunda (extracción binaria del IPA + inspección de provisioning profile + Apple Developer Portal), identificada causa raíz del fallo de Apple Health:
+- Provisioning profile incluye `com.apple.developer.healthkit.access: ["health-records"]` — Apple lo auto-añade al marcar HealthKit en el portal y **no se puede desactivar** (la capability no tiene botón Configure)
+- Info.plist carecía de `NSHealthClinicalHealthRecordsShareUsageDescription` → mismatch entre entitlement y usage descriptions → iOS desactiva HealthKit silenciosamente
+- Síntomas: no sale diálogo de permisos, app no aparece en Ajustes > Salud > Apps
+- **Fix**: añadida `NSHealthClinicalHealthRecordsShareUsageDescription` en `app.json` aclarando que no se accede a historiales clínicos
+- Commit `19daa6a`, build iOS production triggered: [run 24579407991](https://github.com/civiltek/cals2gains/actions/runs/24579407991)
+- Usuario debe **desinstalar** versión actual del iPhone antes de instalar nuevo IPA (limpiar data HealthKit huérfana — bug Apple FB15201360)
+
 ## 2026-04-17 — Gating premium, cuotas freemium y códigos promocionales
 
 Sistema completo de monetización tras auditoría del bug "trial acabado pero app sigue desbloqueada":

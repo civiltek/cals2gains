@@ -80,11 +80,6 @@ export default function RootLayout() {
     const t = i18n.t.bind(i18n);
     useReminderStore.getState().rehydrateReminders(t).catch(() => {});
 
-    // Prime HealthKit: iOS solo lista la app en Ajustes > Salud tras una
-    // primera llamada a HKHealthStore.requestAuthorization. Fire-and-forget,
-    // permiso mínimo (StepCount). No-op en Android.
-    healthService.primeHealthKitRegistration().catch(() => {});
-
     return unsubscribe;
   }, []);
 
