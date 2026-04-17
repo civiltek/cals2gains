@@ -121,7 +121,21 @@ WRITING RULES:
 - No filler phrases ("hoy vamos a ver", "en este video", etc.)
 - Hook must create FOMO or curiosity gap
 - CTA must name the app: "Descarga Cals2Gains" or "Trackea con Cals2Gains"
-- Video prompts: realistic everyday scene filmed with a smartphone, 15-25 words, natural lighting
+
+VIDEO PROMPT RULES (CRITICAL — read carefully):
+- NEVER mention people, persons, humans, bodies, skin, muscles, abs, torsos, silhouettes, or body parts.
+- NEVER describe someone looking at themselves, someone exercising, or any human figure.
+- INSTEAD, describe OBJECTS and ENVIRONMENTS: food, plates, drinks, ingredients, gym equipment, kitchen surfaces.
+- Use vivid, appetizing, premium-looking scene descriptions.
+- Good examples:
+    "Close-up of a colorful protein bowl with quinoa, avocado and cherry tomatoes on a marble countertop, natural morning light"
+    "Protein shake in a sleek glass next to fresh fruits on a white kitchen counter, bright natural light"
+    "Scrambled eggs with spinach and whole-grain toast on a ceramic plate, sunlit kitchen table"
+    "Modern gym interior with empty squat rack and dumbbells, warm afternoon light, no people"
+    "Assorted breakfast foods arranged flat-lay on a wooden table: oats, banana, Greek yogurt, berries"
+    "Nutrition label close-up on a food product, blurred healthy foods in background"
+    "Glass of orange juice and a bowl of fruit on a bright terrace table, summer morning light"
+- Length: 15-25 words, realistic, smartphone-filmed feel, natural lighting.
 
 JSON schema:
 {
@@ -130,7 +144,7 @@ JSON schema:
       "id": "scene_0",
       "title": "Short punchy title",
       "voiceover": "Spoken text for this scene.",
-      "video_prompt": "Visual description for Sora 2 video generation.",
+      "video_prompt": "Visual description — objects/environments only, NO people.",
       "duration_seconds": 3
     }
   ]

@@ -158,16 +158,16 @@ Necesitas crear cuenta (todas gratuitas para empezar) en:
 3. Crea suscripción "Auto-Renovable"
 4. Grupo: `Cals2Gains Premium`
 5. Producto 1:
-   - ID de referencia: `cals2gains_monthly_999`
-   - Precio: 9,99€/mes
+   - ID de referencia: `cals2gains_monthly_890`
+   - Precio: 8,90€/mes
 6. Producto 2:
-   - ID de referencia: `cals2gains_annual_4999`
-   - Precio: 49,99€/año
+   - ID de referencia: `cals2gains_annual_5990`
+   - Precio: 59,90€/año
 
 **En Google Play Console (para Android):**
 1. Tu app → Monetización → Suscripciones
-2. Crea suscripción con ID: `cals2gains_monthly_999` (precio 9,99€)
-3. Crea suscripción con ID: `cals2gains_annual_4999` (precio 49,99€)
+2. Crea suscripción con ID: `cals2gains_monthly_999` (precio 8,90€)
+3. Crea suscripción con ID: `cals2gains_annual_4999` (precio 59,90€)
 
 ### 5.4 Configurar entitlement en RevenueCat
 1. En RevenueCat → Entitlements → + New

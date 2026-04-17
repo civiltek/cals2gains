@@ -231,7 +231,7 @@ Firma Creador: ________________ Fecha: _________
 - **App:** Cals2Gains — AI-powered nutrition tracking
 - **Lanzamiento:** Abril 2026
 - **Plataformas:** iOS + Android
-- **Precio:** Gratis (basico) / 9.99 EUR/mes o 49.99 EUR/ano (Premium)
+- **Precio:** Gratis (basico) / 8,90 EUR/mes o 59,90 EUR/ano (Premium)
 - **Trial:** 7 dias gratis sin tarjeta
 - **Web:** cals2gains.com
 - **Instagram:** @cals2gains (EN), @cals2gains_es (ES)

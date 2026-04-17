@@ -57,7 +57,7 @@ BUILT FOR REAL LIFE
 We know you won't track perfectly every day. And that's fine. Cals2Gains is designed for consistency, not perfection. Skip a meal? Log a rough estimate. Bad day? Just keep going. Your weekly trends tell the real story.
 
 Free for 7 days. No credit card required.
-Monthly: €9.99 | Annual: €49.99 (save 58%)
+Monthly: €8.90 | Annual: €59.90 (save 44%)
 
 Questions? hello@cals2gains.com
 Privacy: https://cals2gains.com/privacy.html
@@ -103,7 +103,7 @@ HECHO PARA LA VIDA REAL
 Sabemos que no vas a trackear perfecto cada dia. Y no pasa nada. Cals2Gains esta disenado para la constancia, no la perfeccion. Te saltas una comida? Registra una estimacion. Dia malo? Sigue adelante. Tus tendencias semanales cuentan la historia real.
 
 Gratis 7 dias. Sin tarjeta de credito.
-Mensual: 9,99 EUR | Anual: 49,99 EUR (ahorra 58%)
+Mensual: 8,90 EUR | Anual: 59,90 EUR (ahorra 44%)
 
 Preguntas? hello@cals2gains.com
 Privacidad: https://cals2gains.com/privacy.html
@@ -204,5 +204,5 @@ Bienvenido a Cals2Gains! Primera version con:
 
 | Product ID | Type | Price | Display Name EN | Display Name ES |
 |-----------|------|-------|-----------------|-----------------|
-| cals2gains_monthly_999 | Auto-renewable | €9.99/mo | Cals2Gains Monthly | Cals2Gains Mensual |
-| cals2gains_annual_4999 | Auto-renewable | €49.99/yr | Cals2Gains Annual (Save 58%) | Cals2Gains Anual (Ahorra 58%) |
+| cals2gains_monthly_999 | Auto-renewable | €8.90/mo | Cals2Gains Monthly | Cals2Gains Mensual |
+| cals2gains_annual_4999 | Auto-renewable | €59.90/yr | Cals2Gains Annual (Save 44%) | Cals2Gains Anual (Ahorra 44%) |

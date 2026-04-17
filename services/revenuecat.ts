@@ -29,8 +29,8 @@ type CustomerInfoType = any;
 
 // Product identifiers (must match App Store Connect and Google Play)
 export const PRODUCT_IDS = {
-  MONTHLY: 'cals2gains_monthly_999',    // €9.99/month
-  ANNUAL: 'cals2gains_annual_4999',      // €49.99/year
+  MONTHLY: 'cals2gains_monthly_999',    // €8.90/month (price updated, ID kept for store compatibility)
+  ANNUAL: 'cals2gains_annual_4999',      // €59.90/year (price updated, ID kept for store compatibility)
 };
 
 export const ENTITLEMENT_ID = 'premium'; // Configured in RevenueCat dashboard

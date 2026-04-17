@@ -64,9 +64,10 @@ log = logging.getLogger(__name__)
 # Videos must look like filmed by a real person with a smartphone.
 BRAND_VIDEO_SUFFIX = (
     "Realistic scene, handheld camera movement, natural light, everyday casual setting, "
-    "filmed with a smartphone by a real person, warm neutral tones, "
+    "filmed with a smartphone, warm neutral tones, "
     "no dramatic lighting, no neon or colored lights, no studio effects, "
-    "fitness or wellness everyday moment, Instagram Reels vertical format 9:16"
+    "NO people, NO human figures, NO body parts, "
+    "food or fitness environment scene, Instagram Reels vertical format 9:16"
 )
 
 # Vertical size supported by Sora 2
@@ -206,9 +207,9 @@ def generate_sora_clip(
 # ===========================================================================
 
 BRAND_IMAGE_SUFFIX = (
-    "Realistic photography, natural lighting, everyday setting, "
-    "fitness or wellness lifestyle scene, warm natural tones, "
-    "no dramatic or neon lighting, clean composition, "
+    "Realistic food photography or fitness environment, natural lighting, everyday setting, "
+    "warm natural tones, no dramatic or neon lighting, clean composition, "
+    "NO people, NO human figures, NO body parts, NO skin, "
     "vertical 9:16 composition for Instagram Reels"
 )
 
@@ -359,7 +360,7 @@ def cmd_test():
     log.info("[Test] Running single-scene test...")
     result = generate_scene_background(
         scene_id="test_scene",
-        prompt="Person drinking a glass of water in a modern minimalist kitchen, morning light",
+        prompt="Glass of water on a modern minimalist kitchen counter, morning light, no people",
         output_dir=ENGINE_DIR / "public",
         seconds=4,
         force_image=False,

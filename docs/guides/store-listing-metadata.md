@@ -28,7 +28,7 @@ EN: Scan your food with AI and track calories & macros instantly.
 • Cualquiera que quiera comer mejor sin complicaciones
 
 💎 SUSCRIPCIÓN PREMIUM:
-Prueba gratis durante 7 días. Después: 9,99 €/mes o 49,99 €/año.
+Prueba gratis durante 7 días. Después: 8,90 €/mes o 59,90 €/año.
 La suscripción se renueva automáticamente a menos que se cancele al menos 24 horas antes del final del período actual.
 
 📧 Contacto: info@civiltek.es
@@ -57,7 +57,7 @@ Tired of manually searching for every food item? With Cals2Gains, just take a ph
 • Anyone who wants to eat better without the hassle
 
 💎 PREMIUM SUBSCRIPTION:
-Free 7-day trial. Then: $9.99/month or $49.99/year.
+Free 7-day trial. Then: €8.90/month or €59.90/year.
 Subscription auto-renews unless canceled at least 24 hours before the end of the current period.
 
 📧 Contact: info@civiltek.es
@@ -85,4 +85,4 @@ Privacy Policy: https://www.cals2gains.com/privacy
 
 ## PRICING
 Free (with in-app purchases)
-Subscription: 7-day free trial, then €9.99/month or €49.99/year
+Subscription: 7-day free trial, then €8.90/month or €59.90/year

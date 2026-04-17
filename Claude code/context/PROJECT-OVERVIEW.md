@@ -7,7 +7,7 @@ App móvil de nutrición con IA que entiende tu comida con una foto, planifica t
 Judith — CivilTek (info@civiltek.es).
 
 ## Modelo de negocio
-- **Precio**: $9.99 / mes (modelo freemium).
+- **Precio**: €8.90 / mes o €59.90 / año (modelo freemium).
 - **Suscripciones**: RevenueCat.
 - **Plataformas**: iOS + Android.
 - **Idiomas**: Español + English.

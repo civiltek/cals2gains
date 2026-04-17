@@ -79,4 +79,4 @@ Estructura el reporte por cuenta (las 5), indicando:
 - Cualquier incidente (fallos de login, comentarios bloqueados, comportamiento sospechoso)
 
 ### Contexto de la app:
-Cals2Gains es una app de nutrición con IA que hace tracking de calorías y macros con fotos, tiene coach personalizado, y cuesta $9.99/mes. Está disponible para iOS y Android. Web: cals2gains.com
+Cals2Gains es una app de nutrición con IA que hace tracking de calorías y macros con fotos, tiene coach personalizado, y cuesta €8,90/mes (o €59,90/año). Está disponible para iOS y Android. Web: cals2gains.com

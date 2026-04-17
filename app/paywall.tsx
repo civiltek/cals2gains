@@ -238,14 +238,14 @@ export default function PaywallScreen() {
                       <View>
                         <Text style={styles.planTitleSelected}>{t('paywall.annual')}</Text>
                         <Text style={styles.planPrice}>
-                          €49,99<Text style={styles.planPeriod}>{t('paywall.perYear')}</Text>
+                          €59,90<Text style={styles.planPeriod}>{t('paywall.perYear')}</Text>
                         </Text>
                       </View>
                       <View style={styles.planRadioSelected}>
                         <Ionicons name="checkmark" size={16} color="#FFFFFF" />
                       </View>
                     </View>
-                    <Text style={styles.annualSavings}>{t('paywall.savePercent', { percent: '58' })}</Text>
+                    <Text style={styles.annualSavings}>{t('paywall.savePercent', { percent: '44' })}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity style={styles.planCard} activeOpacity={0.8}>
@@ -253,7 +253,7 @@ export default function PaywallScreen() {
                       <View>
                         <Text style={styles.planTitle}>{t('paywall.monthly')}</Text>
                         <Text style={styles.planPrice}>
-                          €9,99<Text style={styles.planPeriod}>{t('paywall.perMonth')}</Text>
+                          €8,90<Text style={styles.planPeriod}>{t('paywall.perMonth')}</Text>
                         </Text>
                       </View>
                       <View style={styles.planRadio} />

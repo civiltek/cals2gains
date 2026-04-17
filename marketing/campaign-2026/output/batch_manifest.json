@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-04-17T07:40:33",
+  "total_scripts": 2,
+  "success": 0,
+  "failed": 2,
+  "total_seconds": 2.0,
+  "results": [
+    {
+      "script": "reel_02_scan_3_seconds_en.json",
+      "type": "reel",
+      "status": "FAIL",
+      "duration": 1.3460583686828613,
+      "output": "C:\\Users\\Judit\\Documents\\Cals2Gains\\marketing\\campaign-2026\\output\\reel_02_scan_3_seconds_en",
+      "returncode": 1
+    },
+    {
+      "script": "reel_02_scan_3_seconds_es.json",
+      "type": "reel",
+      "status": "FAIL",
+      "duration": 0.6978123188018799,
+      "output": "C:\\Users\\Judit\\Documents\\Cals2Gains\\marketing\\campaign-2026\\output\\reel_02_scan_3_seconds_es",
+      "returncode": 1
+    }
+  ]
+}

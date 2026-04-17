@@ -37,7 +37,7 @@ Nunca: 😂🤣 (demasiado informal) | 💀☠️ (negativo) | ❤️‍🔥 (co
 ### 2. Preguntas frecuentes
 
 **"Es gratis?"**
-> "7 días totalmente gratis, sin tarjeta. Después 9.99€/mes o 49.99€/año si te convence. Pero los 7 días son tuyos sin compromiso 👊"
+> "7 días totalmente gratis, sin tarjeta. Después 8,90€/mes o 59,90€/año si te convence. Pero los 7 días son tuyos sin compromiso 👊"
 
 **"Funciona con comida de mi país?"**
 > "La IA reconoce comida de todo el mundo — solo hazle una foto y deja que trabaje. Si algo no lo pilla bien, se lo puedes enseñar y mejora. 📸"
