@@ -1,5 +1,18 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — iOS HealthKit build #63: limpiar config clínica + logging crudo
+
+Build 62 (sin prime, sin background-delivery) siguió fallando en device. Diagnóstico de ChatGPT convincente: la hipótesis del "mismatch binary↔profile" es **errónea** (Apple docs: provisioning profile funciona como allowlist, el binario puede pedir subconjunto). Los sospechosos reales:
+
+1. Config clínica sobrante (`health-records` + `NSHealthClinicalHealthRecordsShareUsageDescription`) metiendo ruido sin necesidad — no pedimos `HKClinicalTypeIdentifier`.
+2. El `err` del callback de `initHealthKit()` se está logueando mal y perdemos la señal diagnóstica (NSError wrapped → `[object Object]` en consola RN).
+
+Cambios en este build:
+- `app.json`: quitado `"com.apple.developer.healthkit.access": ["health-records"]` y `NSHealthClinicalHealthRecordsShareUsageDescription`. Queda solo `healthkit: true` + las dos usage strings estándar (share + update).
+- `services/healthKit.ts`: logging exhaustivo del callback de error en iOS — extrae `message`, `code`, `domain`, `userInfo`, `toString()`, keys — además del `err` crudo. Permite leer el NSError real en Xcode Console / `npx react-native log-ios` la próxima vez que se reproduzca.
+
+Si build 63 sigue fallando, con el logging sabremos exactamente qué error nativo sale y podremos apuntar al #1/#3 de ChatGPT (entitlement base malsigned, usage string ausente, o HealthKit no disponible).
+
 ## 2026-04-17 — Fix Health Connect crash nativo: migrar a plugin expo-health-connect
 
 Nuevo crash detectado en device tras instalar Health Connect en Samsung S20 Ultra (Android 13): `kotlin.UninitializedPropertyAccessException: lateinit property requestPermission has not been initialized` en `HealthConnectPermissionDelegate.launchPermissionsDialog` (HealthConnectPermissionDelegate.kt:45).

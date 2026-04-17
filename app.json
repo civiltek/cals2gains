@@ -22,7 +22,6 @@
         "NSMicrophoneUsageDescription": "Cals2Gains usa el microfono para registrar comidas por voz.",
         "NSHealthShareUsageDescription": "Cals2Gains lee tus datos de salud (pasos, calorias, ejercicio, peso) para adaptar tus macros automaticamente.",
         "NSHealthUpdateUsageDescription": "Cals2Gains sincroniza tu peso con Apple Health.",
-        "NSHealthClinicalHealthRecordsShareUsageDescription": "Cals2Gains no accede a tus historiales clinicos medicos. Esta descripcion es requerida por Apple porque el entitlement de HealthKit la incluye por defecto.",
         "CFBundleLocalizations": [
           "en",
           "es"
@@ -31,8 +30,7 @@
       },
       "usesAppleSignIn": true,
       "entitlements": {
-        "com.apple.developer.healthkit": true,
-        "com.apple.developer.healthkit.access": ["health-records"]
+        "com.apple.developer.healthkit": true
       },
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [

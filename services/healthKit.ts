@@ -157,12 +157,23 @@ class HealthService {
           },
         };
 
+        console.log('[HealthKit] initHealthKit request payload:', JSON.stringify(permissions));
         return new Promise((resolve) => {
           AppleHealthKit.initHealthKit(permissions, (err: any) => {
             if (err) {
-              console.error('HealthKit auth error:', err);
+              const errInfo = {
+                message: err?.message ?? String(err),
+                code: err?.code,
+                domain: err?.domain,
+                userInfo: err?.userInfo,
+                toString: err?.toString?.(),
+                keys: err ? Object.keys(err) : null,
+              };
+              console.error('[HealthKit init error]', JSON.stringify(errInfo, null, 2));
+              console.error('[HealthKit init error raw]', err);
               resolve(false);
             } else {
+              console.log('[HealthKit] init OK — authorization sheet processed');
               this.isAuthorized = true;
               resolve(true);
             }
