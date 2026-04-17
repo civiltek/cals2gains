@@ -23,6 +23,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
 import ClarificationModal from '../components/modals/ClarificationModal';
+import InfoButton from '../components/ui/InfoButton';
 import { analyzeFoodPhoto, refineAnalysis } from '../services/openai';
 import { useUserStore } from '../store/userStore';
 import { useMealStore } from '../store/mealStore';
@@ -359,11 +360,27 @@ export default function AnalysisScreen() {
             {/* Nutrition info */}
             {adjustedNutrition && (
               <View style={styles.nutritionSection}>
-                <Text style={styles.sectionTitle}>{t('analysis.nutritionInfo')}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Text style={styles.sectionTitle}>{t('analysis.nutritionInfo')}</Text>
+                  <InfoButton
+                    emoji="🔢"
+                    title={t('infoTooltips.calories_title')}
+                    body={t('infoTooltips.calories_body')}
+                  />
+                </View>
 
                 <View style={styles.calorieHighlight}>
                   <Text style={styles.calorieValue}>{adjustedNutrition.calories}</Text>
                   <Text style={styles.calorieLabel}>kcal</Text>
+                </View>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <InfoButton
+                    emoji="🍽️"
+                    title={t('infoTooltips.macros_title')}
+                    body={t('infoTooltips.macros_body')}
+                    size={15}
+                  />
                 </View>
 
                 <View style={styles.macroGrid}>
