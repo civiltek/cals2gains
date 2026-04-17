@@ -4,7 +4,7 @@
  * Phase 2 - Goal Selection & Adaptive Macros
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,9 @@ import InfoButton from '../components/ui/InfoButton';
 import { useUserStore } from '../store/userStore';
 import { AdaptiveMacroEngine, GoalMode } from '../services/adaptiveMacroEngine';
 import type { GoalModeConfig } from '../services/adaptiveMacroEngine';
+import { calculateMacroTargets } from '../utils/macros';
+import { Ionicons } from '@expo/vector-icons';
+import { isMinor } from '../types';
 
 // ============================================================================
 // Types
@@ -110,9 +113,29 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
     toggleAdaptiveMode,
   } = useUserStore();
 
-  const [selectedMode, setSelectedMode] = useState<GoalMode>(
-    (user?.goalMode as GoalMode) || 'maintain'
+  // --- Fase B: flags de salud y edad ---
+  const minor = useMemo(() => isMinor(user?.dateOfBirth), [user?.dateOfBirth]);
+  const flags = user?.medicalFlags || [];
+  const hasPregnancy = flags.includes('pregnancy_lactation');
+  const hasDiabetes = flags.includes('diabetes');
+  const hasKidney = flags.includes('kidney_disease');
+
+  // lose_fat y mini_cut bloqueados si hay embarazo/lactancia o si es menor de edad
+  const DEFICIT_MODES: GoalMode[] = ['lose_fat', 'mini_cut'];
+  const deficitBlocked = hasPregnancy || minor;
+
+  const isModeLocked = useCallback(
+    (m: GoalMode) => deficitBlocked && DEFICIT_MODES.includes(m),
+    [deficitBlocked],
   );
+
+  // Valor inicial — si el modo guardado está bloqueado, caemos a 'maintain'.
+  const initialMode: GoalMode = (() => {
+    const saved = (user?.goalMode as GoalMode) || 'maintain';
+    return deficitBlocked && DEFICIT_MODES.includes(saved) ? 'maintain' : saved;
+  })();
+
+  const [selectedMode, setSelectedMode] = useState<GoalMode>(initialMode);
   const [adaptiveEnabled, setAdaptiveEnabled] = useState(
     user?.adaptiveMode || false
   );
@@ -125,7 +148,7 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
   // Calculate goals when mode changes
   useEffect(() => {
     calculateGoals(selectedMode);
-  }, [selectedMode, user?.tdee, user?.bmr]);
+  }, [selectedMode, user?.profile]);
 
   // Fetch mode config
   useEffect(() => {
@@ -135,37 +158,20 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
 
   const calculateGoals = useCallback(
     (mode: GoalMode) => {
-      if (!user?.tdee || !user?.bmr) {
+      // Canonical calculation — requires a full profile. If the user hasn't
+      // completed onboarding yet, we skip the preview (parent UI handles it).
+      if (!user?.profile) {
         return;
       }
-
-      const config = AdaptiveMacroEngine.getGoalModeConfig(mode);
-      const targetCalories = Math.round(user.tdee * config.calorieFactor);
-
-      // Protein: multiplier × weight in kg
-      const userWeightKg = user?.weight || 75;
-      const targetProtein = Math.round(
-        userWeightKg * config.proteinMultiplier
-      );
-
-      // Calculate carbs and fat from remaining calories
-      const proteinCalories = targetProtein * 4;
-      const remainingCalories = targetCalories - proteinCalories;
-
-      const carbCalories = Math.round(remainingCalories * config.carbsPct);
-      const fatCalories = Math.round(remainingCalories * config.fatPct);
-
-      const targetCarbs = Math.round(carbCalories / 4);
-      const targetFat = Math.round(fatCalories / 9);
-
+      const targets = calculateMacroTargets(user.profile, mode);
       setCalculatedGoals({
-        calories: targetCalories,
-        protein: targetProtein,
-        carbs: targetCarbs,
-        fat: targetFat,
+        calories: targets.calories,
+        protein: targets.protein,
+        carbs: targets.carbs,
+        fat: targets.fat,
       });
     },
-    [user?.tdee, user?.bmr, user?.weight]
+    [user?.profile]
   );
 
   const handleApplyGoals = useCallback(async () => {
@@ -211,8 +217,22 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
   };
 
   const handleModeSelect = (mode: GoalMode) => {
+    if (isModeLocked(mode)) {
+      // No permitir selección — chip "Consulta con profesional"
+      return;
+    }
     setSelectedMode(mode);
   };
+
+  // Callout visible cuando el modo seleccionado implica déficit y el usuario
+  // declaró diabetes o enf. renal: recomendamos seguimiento profesional.
+  // Solo aplica a déficit (lose_fat, mini_cut) porque es donde el riesgo clínico
+  // crece. recomp y maintain no activan callout.
+  const shouldShowProCallout =
+    DEFICIT_MODES.includes(selectedMode) && (hasDiabetes || hasKidney);
+  const proCalloutKey = hasDiabetes
+    ? 'screening.calloutDiabetes'
+    : 'screening.calloutKidney';
 
   // =========================================================================
   // Render Methods
@@ -220,8 +240,13 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
 
   const renderGoalModeCard = ({ item }: { item: GoalModeOption }) => {
     const isSelected = selectedMode === item.mode;
-    const borderColor = isSelected ? C.primary : C.border;
-    const borderWidth = isSelected ? 3 : 1;
+    const locked = isModeLocked(item.mode);
+    const borderColor = locked
+      ? C.border
+      : isSelected
+      ? C.primary
+      : C.border;
+    const borderWidth = isSelected && !locked ? 3 : 1;
 
     return (
       <TouchableOpacity
@@ -230,16 +255,27 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
           {
             borderColor,
             borderWidth,
-            backgroundColor: isSelected ? C.cardElevated : C.card,
+            backgroundColor: isSelected && !locked ? C.cardElevated : C.card,
+            opacity: locked ? 0.55 : 1,
           },
         ]}
         onPress={() => handleModeSelect(item.mode)}
-        activeOpacity={0.7}
+        activeOpacity={locked ? 1 : 0.7}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: locked, selected: isSelected }}
       >
         <Text style={styles.emoji}>{item.emoji}</Text>
         <Text style={[styles.modeName, { color: C.text }]}>{t(item.nameKey)}</Text>
         <Text style={[styles.modeDescription, { color: C.textMuted }]}>{t(item.descriptionKey)}</Text>
         <Text style={[styles.macroSummary, { color: C.primary }]}>{t(item.macroSummaryKey)}</Text>
+        {locked && (
+          <View style={[styles.lockChip, { backgroundColor: `${C.warning}20` }]}>
+            <Ionicons name="information-circle" size={12} color={C.warning} />
+            <Text style={[styles.lockChipText, { color: C.warning }]}>
+              {t('screening.blockLoseFatTitle')}
+            </Text>
+          </View>
+        )}
       </TouchableOpacity>
     );
   };
@@ -274,6 +310,18 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
         </Text>
       </View>
 
+      {/* Bloque informativo si hay modos bloqueados por edad/embarazo */}
+      {deficitBlocked && (
+        <View style={[styles.blockBanner, { backgroundColor: `${C.warning}15`, borderColor: `${C.warning}40` }]}>
+          <Ionicons name="information-circle-outline" size={20} color={C.warning} />
+          <Text style={[styles.blockBannerText, { color: C.text }]}>
+            {minor
+              ? t('onboarding.ageGate.minorDeficitBlock')
+              : t('screening.blockLoseFatBody')}
+          </Text>
+        </View>
+      )}
+
       {/* Goal Mode Cards Grid */}
       <View style={styles.gridContainer}>
         <FlatList
@@ -286,6 +334,16 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
           contentContainerStyle={styles.gridContent}
         />
       </View>
+
+      {/* Callout profesional para diabetes/renal con modo déficit */}
+      {shouldShowProCallout && (
+        <View style={[styles.callout, { backgroundColor: `${BRAND_COLORS.violet}12`, borderColor: `${BRAND_COLORS.violet}40` }]}>
+          <Ionicons name="medkit-outline" size={18} color={BRAND_COLORS.violet} />
+          <Text style={[styles.calloutText, { color: C.text }]}>
+            {t(proCalloutKey)}
+          </Text>
+        </View>
+      )}
 
       {/* Mode Details & Macro Preview */}
       {modeConfig && calculatedGoals && (
@@ -611,6 +669,37 @@ const styles = StyleSheet.create({
   applyButtonText: {
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: BRAND_FONTS.body.family,
+  },
+  // Fase B — bloqueos / callouts
+  blockBanner: {
+    flexDirection: 'row', alignItems: 'flex-start',
+    gap: 10,
+    paddingVertical: 12, paddingHorizontal: 14,
+    marginHorizontal: 20, marginBottom: 16,
+    borderRadius: 12, borderWidth: 1,
+  },
+  blockBannerText: {
+    flex: 1, fontSize: 13, lineHeight: 19,
+    fontFamily: BRAND_FONTS.body.family,
+  },
+  callout: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: 10,
+    paddingVertical: 12, paddingHorizontal: 14,
+    marginHorizontal: 20, marginBottom: 16,
+    borderRadius: 12, borderWidth: 1,
+  },
+  calloutText: {
+    flex: 1, fontSize: 13, lineHeight: 19,
+    fontFamily: BRAND_FONTS.body.family,
+  },
+  lockChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    marginTop: 6, paddingHorizontal: 8, paddingVertical: 3,
+    borderRadius: 8,
+  },
+  lockChipText: {
+    fontSize: 10, fontWeight: '600',
     fontFamily: BRAND_FONTS.body.family,
   },
 });

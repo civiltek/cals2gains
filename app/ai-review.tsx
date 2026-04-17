@@ -22,6 +22,7 @@ import { Meal } from '../types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { canDisplayUri } from '../utils/imageUtils';
+import AITransparencyBanner from '../components/ui/AITransparencyBanner';
 
 const { width } = Dimensions.get('window');
 
@@ -546,6 +547,12 @@ export default function AIReviewScreen() {
           </Text>
         </View>
       </View>
+
+      {/* AI Act Art. 50 transparency banner (Fase B) — once per screen */}
+      <AITransparencyBanner
+        screenKey="ai-review"
+        style={{ marginHorizontal: 16, marginTop: 8 }}
+      />
 
       {/* AI Explanation Banner */}
       <View style={[styles.aiBanner, { backgroundColor: `${C.primary}12`, borderColor: `${C.primary}25` }]}>

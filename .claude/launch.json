@@ -5,13 +5,22 @@
       "name": "Expo (app móvil)",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["expo", "start"],
-      "port": 8081
+      "port": 8081,
+      "autoPort": false
+    },
+    {
+      "name": "Static preview (website)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "website", "-p", "$PORT", "-c-1", "--silent"],
+      "port": 5050,
+      "autoPort": true
     },
     {
       "name": "Firebase Hosting (landing cals2gains.com)",
       "runtimeExecutable": "firebase",
       "runtimeArgs": ["serve", "--only", "hosting"],
-      "port": 5000
+      "port": 5000,
+      "autoPort": true
     }
   ]
 }

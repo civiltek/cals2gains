@@ -28,6 +28,7 @@ import { useAdaptiveStore } from '../../store/adaptiveStore';
 import { useAdaptiveEngines } from '../../hooks/useAdaptiveEngines';
 import { useStreakStore } from '../../store/streakStore';
 import StreakBadge from '../../components/ui/StreakBadge';
+import SafetyDisclaimer from '../../components/ui/SafetyDisclaimer';
 import * as Haptics from 'expo-haptics';
 import { DayType } from '../../types';
 import { useTrainingPlanStore } from '../../store/trainingPlanStore';
@@ -620,6 +621,9 @@ export default function HomeScreen() {
             })
           )}
         </View>
+
+        {/* Safety disclaimer (Fase B — Informe legal §7 Acción 6) */}
+        <SafetyDisclaimer variant="short" style={{ marginHorizontal: 16, marginTop: 16 }} />
 
         <View style={{ height: 32 }} />
       </ScrollView>

@@ -67,6 +67,21 @@ export interface ActivityAdjustment {
   magnitude: 'low' | 'medium' | 'high';
 }
 
+/** Resultado de `detectExcessiveWeightLoss` — §8.3 Metodología */
+export interface ExcessiveLossResult {
+  trigger: boolean;
+  messageEs: string;
+  messageEn: string;
+  /**
+   * Cambio calórico sugerido (siempre +150 kcal cuando trigger=true).
+   * No se aplica automáticamente desde este helper — lo orquesta el caller,
+   * que debe consultar `user.autoAdaptEnabled` antes de mutar objetivos.
+   */
+  suggestedCalorieChange: number;
+  /** Porcentaje estimado de pérdida semanal (informativo). */
+  weeklyLossPct?: number;
+}
+
 export interface GoalModeConfig {
   calorieFactor: number;
   proteinMultiplier: number;
@@ -354,6 +369,91 @@ export class AdaptiveMacroEngine {
     };
 
     return configs[mode];
+  }
+
+  /**
+   * Detecta ritmo de pérdida de peso excesivo — §8.3 METODOLOGIA_NUTRICIONAL.md
+   *
+   * Criterio: media móvil de 7 días descendiendo >1 % del peso corporal
+   * durante 2 semanas consecutivas.
+   *
+   * Implementación: comparamos la media móvil 7d del final (hoy) contra la
+   * media móvil 7d de hace 7 días (=primera semana) y la media de hace 14
+   * días (=semana anterior). Si ambos descensos (semana N vs N-1 y N-1 vs
+   * N-2) superan 1 % del peso corporal medio, `trigger = true`.
+   *
+   * Reg UE 2024/1689 Art. 50 + MDR Regla 11: copy orientativo NUNCA
+   * prescriptivo. Copy canónico: INFORME_LEGAL_v1.md §7 Acción 9.
+   *
+   * @param weights  Historial de pesajes (cualquier orden).
+   * @param currentWeight  Peso actual (kg) — usado como fallback para calcular
+   *                       el umbral porcentual si no hay suficiente historia.
+   */
+  public static detectExcessiveWeightLoss(
+    weights: WeightEntry[],
+    currentWeight: number,
+  ): ExcessiveLossResult {
+    const negResult: ExcessiveLossResult = {
+      trigger: false,
+      messageEs: '',
+      messageEn: '',
+      suggestedCalorieChange: 0,
+    };
+
+    if (!weights || weights.length < 5) return negResult;
+
+    // Normalizar a kg y ordenar por fecha ascendente
+    const normalized = weights
+      .map((w) => ({
+        date: new Date(w.date).getTime(),
+        kg: w.unit === 'lbs' ? w.weight * 0.45359237 : w.weight,
+      }))
+      .filter((w) => !isNaN(w.date) && !isNaN(w.kg) && w.kg > 0)
+      .sort((a, b) => a.date - b.date);
+
+    if (normalized.length < 5) return negResult;
+
+    const now = Date.now();
+    const DAY = 24 * 3600 * 1000;
+
+    const avgInWindow = (centerMs: number, windowDays = 7) => {
+      const lo = centerMs - windowDays * DAY;
+      const hi = centerMs + windowDays * DAY;
+      const inWin = normalized.filter((w) => w.date >= lo && w.date <= hi);
+      if (inWin.length === 0) return null;
+      const sum = inWin.reduce((s, w) => s + w.kg, 0);
+      return sum / inWin.length;
+    };
+
+    const avgNow = avgInWindow(now);
+    const avg7dAgo = avgInWindow(now - 7 * DAY);
+    const avg14dAgo = avgInWindow(now - 14 * DAY);
+
+    if (avgNow == null || avg7dAgo == null || avg14dAgo == null) {
+      return negResult;
+    }
+
+    const baselineWeight = currentWeight || avgNow;
+    const threshold = 0.01 * baselineWeight; // 1 %
+
+    const drop1 = avg7dAgo - avgNow;     // pérdida última semana
+    const drop2 = avg14dAgo - avg7dAgo;  // pérdida semana anterior
+
+    if (drop1 > threshold && drop2 > threshold) {
+      const weeklyLossPct = (drop1 / baselineWeight) * 100;
+      return {
+        trigger: true,
+        // Copy canónico — INFORME_LEGAL_v1.md §7 Acción 9
+        messageEs:
+          'Hemos detectado que tu ritmo de pérdida está siendo superior al rango habitualmente recomendado. Suele ser señal de que el déficit es demasiado agresivo. Vamos a ajustar tu objetivo calórico al alza (+150 kcal/día). Puedes revertirlo en Ajustes. Si esta pérdida rápida es deliberada y la estás haciendo con supervisión profesional, dinos para no volver a ajustar.',
+        messageEn:
+          'We detected that your rate of loss is higher than the commonly recommended range. This usually means the deficit is too aggressive. We are going to adjust your calorie goal upwards (+150 kcal/day). You can revert it in Settings. If this rapid loss is intentional and under professional supervision, let us know so we do not adjust again.',
+        suggestedCalorieChange: 150,
+        weeklyLossPct,
+      };
+    }
+
+    return negResult;
   }
 
   // =========================================================================

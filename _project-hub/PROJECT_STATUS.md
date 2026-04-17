@@ -1,5 +1,41 @@
 # Cals2Gains - Estado del Proyecto
-> Última actualización: 2026-04-17 — Build iOS bloqueado: créditos EAS al 100% (reset 1 mayo). app.json reparado (c8ab16c). buildNumber iOS en remoto: 52.
+> Última actualización: 2026-04-17 — Fases A + B completadas · DPIA firmada · RAT adoptado · privacy+terms v2 · auditoría marketing aplicada en repo. 🟢 9 de 10 bloqueantes resueltos. Queda ejecución manual por Judith (age rating stores + edición de posts ya programados en MBS/Meta/Brevo).
+
+## 🟢 Estado bloqueantes lanzamiento público (2026-04-17, cierre)
+
+| # | Bloqueante | Estado |
+|---|-------------|---------|
+| 1 | Screening médico en onboarding | ✅ Fase B |
+| 2 | Hard-cap kcal 1.200 ♀ / 1.500 ♂ | ✅ Fase A (`utils/macros.ts`) |
+| 3 | DPIA firmada | ✅ `_project-hub/DPIA_v1.md` firmado |
+| 4 | `privacy.html` + `terms.html` v2 | ✅ sincronizados website/ + public/ |
+| 5 | RAT con `medicalFlags` | ✅ `_project-hub/RAT_v1.md` adoptado |
+| 6 | Disclaimer ubicuo in-app | ✅ 4 ubicaciones (onboarding, home, what-to-eat, weekly-coach) |
+| 7 | Edad 16+/18+ + Age Rating stores | 🟡 Código ✅ Fase B; manual Judith pendiente → `_project-hub/AGE_RATING_STORES.md` |
+| 8 | Defensa no-MDR | ✅ en DPIA + privacy + terms + declaración pública |
+| 9 | Copy screening TCA | ✅ Fase B (sin términos clínicos) |
+| 10 | Auditoría copy publicado | 🟡 Repo ✅; posts MBS/Meta/Email pendientes Judith → `_project-hub/AUDITORIA_MARKETING_v1.md` §3 |
+
+**Acciones manuales de Judith antes del submission público:**
+1. 🚨 **URGENTE antes 20 abr 13:00** — editar en MBS posts 17 EN/ES ("burns fat / quema grasa"), 15 EN (claim absoluto proteína), 25 EN ("high body fat %").
+2. **Age Rating** — App Store Connect a 17+ + Google Play Console a Teen/Mature + Target 18+ (pasos exactos en `AGE_RATING_STORES.md`).
+3. **Anuncio Meta** — eliminar testimonio "perdí 2.3 kg" en `META-ADS-PLAN.md`.
+4. **Email 4 Brevo** — retirar "78% usuarios / perdí 4 kg" (dato inventado).
+5. **Posts ya publicados en IG/FB** — revisar y retirar piezas con claims de peso cuantificados o "quema grasa".
+
+## Estado build
+- **AAB Android:** 77 MB, firmado, listo para Google Play Console (2026-04-16).
+- **iOS:** bloqueado por créditos EAS al 100 % (reset 1 mayo). buildNumber remoto 52. app.json reparado (c8ab16c).
+- **Siguiente build combinado:** tras Fase B debe regenerarse para validar screening + age gate + disclaimer en dispositivo Samsung R3CR10E9LSE via ADB.
+
+## Deuda técnica menor anotada
+- `app/(auth)/onboarding.tsx` (onboarding legacy) tiene BMR inline duplicado — migrar a `calculateMacroTargets` o deprecar un flujo.
+- 17 errores TS preexistentes en `app/training-plan.tsx` + 1 en `InfoButton.tsx` (bugs BRAND_FONTS/BRAND_COLORS del commit 17/04).
+- i18n `loseFatDesc` / `miniCutDesc` usan "pérdida rápida"/"rapid loss" (prohibidos §9.2 metodología) — reformular.
+- `hooks/useHealthSync.ts` tiene import inocuo `calculateBMR` sin uso directo (puede limpiarse).
+
+## Documentos nuevos del hub en esta sesión
+- `METODOLOGIA_NUTRICIONAL.md` · `INFORME_LEGAL_v1.md` · `DPIA_v1.md` · `RAT_v1.md` · `AUDITORIA_MARKETING_v1.md` · `AGE_RATING_STORES.md` · `PROMPT_UPDATE_APP.md`
 
 ## App
 - **Versión actual:** 1.0.0

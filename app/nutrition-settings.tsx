@@ -25,7 +25,7 @@ import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
 import { useUserStore } from '../store/userStore';
-import { calculateBMR, calculateTDEE } from '../utils/nutrition';
+import { calculateBMR } from '../utils/nutrition';
 import { calculateGoalsFromPreset, getPresetById, MACRO_PRESETS } from '../constants/macroPresets';
 import type { ActivityLevel, GoalMode } from '../types';
 
@@ -108,10 +108,19 @@ export default function NutritionSettingsScreen() {
   const numHeight = parseFloat(height) || 170;
   const numAge = parseInt(age) || 25;
 
-  const bmr = useMemo(() => {
-    if (gender === 'female') return 10 * numWeight + 6.25 * numHeight - 5 * numAge - 161;
-    return 10 * numWeight + 6.25 * numHeight - 5 * numAge + 5;
-  }, [numWeight, numHeight, numAge, gender]);
+  // Unified BMR/TDEE calculation — see utils/nutrition.ts (Mifflin-St Jeor).
+  const bmr = useMemo(
+    () =>
+      calculateBMR({
+        age: numAge,
+        weight: numWeight,
+        height: numHeight,
+        gender: gender as 'male' | 'female' | 'other',
+        activityLevel: activity,
+        goal: 'maintain_weight',
+      }),
+    [numWeight, numHeight, numAge, gender, activity]
+  );
 
   const actMult = ACTIVITIES.find(a => a.id === activity)?.mult || 1.55;
   const tdee = Math.round(bmr * actMult);
