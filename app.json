@@ -125,6 +125,7 @@
     },
     "plugins": [
       ["./plugins/withMinSdkVersion", { "minSdkVersion": 26 }],
+      "./plugins/withRemoveUnusedAudioPermissions",
       "expo-router",
       "expo-apple-authentication",
       [
