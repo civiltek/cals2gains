@@ -11,7 +11,10 @@ on:
 jobs:
   build:
     name: Build iOS IPA (local, no EAS cloud quota)
-    runs-on: macos-latest
+    # Apple requires iOS 26 SDK (Xcode 26) starting 2026-04-28.
+    # macos-latest currently resolves to macos-15 (Xcode 16 / iOS 18.5 SDK)
+    # which produces warning 90725. macos-26 ships with Xcode 26.
+    runs-on: macos-26
     timeout-minutes: 90
 
     steps:
