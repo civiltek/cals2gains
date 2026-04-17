@@ -31,7 +31,7 @@
       "usesAppleSignIn": true,
       "entitlements": {
         "com.apple.developer.healthkit": true,
-        "com.apple.developer.healthkit.access": ["health-records"],
+        "com.apple.developer.healthkit.access": [],
         "com.apple.developer.healthkit.background-delivery": true
       },
       "privacyManifests": {
@@ -165,6 +165,13 @@
         "react-native-health-connect",
         {
           "requestPermissionsOnFirstLaunch": false
+        }
+      ],
+      [
+        "react-native-health",
+        {
+          "healthSharePermission": "Cals2Gains lee tus datos de salud (pasos, calorias, ejercicio, peso) para adaptar tus macros automaticamente.",
+          "healthUpdatePermission": "Cals2Gains sincroniza tu peso con Apple Health."
         }
       ],
       [

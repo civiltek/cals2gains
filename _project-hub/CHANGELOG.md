@@ -1,5 +1,57 @@
 # Changelog - Cals2Gains
 
+## 2026-04-17 — Fix config iOS HealthKit (faltaba plugin expo + entitlement clinical inválido)
+
+Reportado por Judith tras instalar tanda 3 en TestFlight: "en iOS sigue sin funcionar la conexión a los datos de salud del iphone".
+
+**Root cause**: Aunque `react-native-health` estaba en `package.json` y las `NSHealthShareUsageDescription` + entitlements estaban en `app.json`, **el plugin de expo NO estaba en el array `plugins`** → expo prebuild no enlazaba el framework `HealthKit.framework` ni aplicaba las modificaciones necesarias al Podfile/target Xcode. Resultado: `require('react-native-health')` fallaba silenciosamente en runtime → `healthService.requestAuthorization()` retornaba `false` sin mostrar prompt de permisos al usuario. Los fixes de routing de tandas 1+2 (apple/googleHealth → servicio nativo en vez de Terra) eran correctos pero inútiles sin el módulo nativo cargado.
+
+**Bug secundario**: `"com.apple.developer.healthkit.access": ["health-records"]` pedía autorización de Clinical Health Records que Apple requiere aprobar específicamente por app y NO está concedida para Cals2Gains → puede provocar rechazo en runtime o build. Cambiado a array vacío (solo datos normales de fitness/pasos/calorías).
+
+**Fix**:
+- **[app.json]** Añadido `react-native-health` al array `plugins` con las mismas strings de permisos que ya estaban en `infoPlist` manual.
+- **[app.json]** `healthkit.access` → `[]` (quitado `health-records`).
+- **Nuevo build iOS requerido** para que prebuild regenere con el plugin y linkee HealthKit framework. Android no se ve afectado (su plugin `react-native-health-connect` ya estaba bien configurado).
+
+## 2026-04-17 — Token optimization audit (OpenAI + Claude) · tarea programada
+
+Auditoría automática de uso de tokens en todos los servicios IA del proyecto.
+
+**Cambio realizado:**
+- Creado `CLAUDE-COMPACT.md` en la raíz del proyecto — versión comprimida de CLAUDE.md (~55 líneas vs ~174 líneas). Las tareas programadas deben leer este archivo en vez de CLAUDE.md para reducir tokens de contexto en cada ejecución. Ahorro estimado: ~120 líneas de contexto × coste por token en cada run de tarea.
+
+**Hallazgos OpenAI (app · services/):**
+- ✅ `gpt-4o-mini` correctamente usado en: macroCoach, adaptiveCoachBridge, foodDatabase (analyzeTextFood), recipeService, openai.ts (generateAIMealSuggestions)
+- ✅ `detail:low` correctamente aplicado en análisis de fotos
+- ✅ TTS: `tts-1` en voice_generator.py (NO tts-1-hd)
+- ✅ visual-engine/script_generator.py → `gpt-4o-mini`
+- ⚠️ **RECOMENDACIÓN PENDIENTE aprobación Judith:** `analyzeFoodPhoto` y `refineAnalysis` (services/openai.ts líneas 192 y 302) usan `gpt-4o` en vez de `gpt-4o-mini`. La función central de análisis de fotos de comida es el servicio de mayor volumen de llamadas. Cambiar a `gpt-4o-mini` + `detail:low` ya activo supondría ahorro estimado ~16× en coste por token (gpt-4o: $2.50/1M input vs gpt-4o-mini: $0.15/1M input). Riesgo: posible degradación en precisión nutricional — requiere test A/B antes de aplicar en producción.
+- ℹ️ No existe `tools/carousel-engine/` — el motor de vídeo es `tools/remotion-engine/` (no usa OpenAI directamente para scripts de carrusel).
+
+**Hallazgos Claude/Anthropic (tareas programadas · agentes):**
+- ✅ `instagram-comment-replies.md` → modelo `sonnet` correcto para tarea compleja de escritura
+- ✅ Agentes en `Claude code/agents/`: todos entre 34-91 líneas, compresión no urgente
+- ❌ **CORREGIDO:** `CLAUDE-COMPACT.md` no existía; creado en esta ejecución
+- ⚠️ `instagram-comments-morning.md` y `instagram-comments-afternoon.md` están marcados como DEPRECADOS (reemplazados por `instagram-comments-outbound.md`) pero contienen rutas hardcodeadas a `/sessions/brave-festive-feynman/` (sesión antigua inexistente). El archivo `instagram-comments-outbound.md` al que señalan tampoco existe en `orchestration/scheduled-tasks-prompts/`. Pendiente: o crear el archivo consolidado o actualizar las rutas.
+- ⚠️ `scheduled-tasks-map.md` está desactualizado (fecha: 14 abr). No incluye `token-optimization` ni `instagram-comments-outbound`.
+- ℹ️ `trend-scout-biweekly` documentada pero aún no activada — modelo `sonnet` correcto cuando se active.
+- ℹ️ No se puede auditar los archivos `.md` de tareas programadas en `C:\Users\Judit\OneDrive\Documentos\Claude\Scheduled\` desde esta sesión (ruta Windows fuera del workspace montado).
+
+**Recomendaciones pendientes para Judith:**
+1. Probar `gpt-4o-mini` para `analyzeFoodPhoto` en entorno de test (mayor impacto en coste OpenAI).
+2. Crear `orchestration/scheduled-tasks-prompts/instagram-comments-outbound.md` y eliminar los dos archivos deprecated.
+3. Actualizar `orchestration/scheduled-tasks-map.md`.
+4. Verificar que las tareas programadas en Cowork usan `CLAUDE-COMPACT.md` y no `CLAUDE.md` completo.
+
+---
+
+## 2026-04-17 — Deploy web GitHub Pages: precios 8,90€/mes y 59,90€/año + tildes terms.html
+
+- Actualizar precios en `website/index.html`, `website/terms.html`, `public/index.html`, `public/terms.html` y sus variantes `/cals2gains/`
+- Corregir tildes en `terms.html` (español)
+- Merge `fix/android-v19-bugs-and-stability` → `main` (fast-forward, 42 archivos)
+- Push a `origin/main` → GitHub Pages desplegará automáticamente
+
 ## 2026-04-17 — Tanda 3: fixes feedback TestFlight build 1.0.0 (46)
 
 Correcciones de los errores/comentarios reportados por Judith como tester interno TestFlight, tras instalar el build `6935ba28` (1.0.0, 46) en iPhone 16 Pro Max / iOS 26.3.1.
@@ -552,58 +604,4 @@ Ruta: `tools/visual-engine/`
 - **Nota:** Las notificaciones funcionarán correctamente ahora que FCM está configurado en google-services.json
 
 ## 2026-04-13 (23:30) — Fix crítico: crash al abrir APK en Android
-- **Diagnóstico vía ADB logcat sobre Samsung R3CR10E9LSE conectado por USB** — la app se instalaba pero crasheaba al inicializar Reanimated
-- **Error real:** `NoSuchFieldException: No field mIsFinished in MessageQueueThreadImpl` → `react-native-reanimated` 3.19.5 incompatible con RN 0.81
-- **Fix aplicado:**
-  - `react-native-reanimated`: 3.19.5 → ~4.1.1 (v4.1.7 instalada)
-  - `react-native-worklets`: nuevo paquete añadido (0.5.1)
-  - `babel.config.js`: plugin cambiado de `react-native-reanimated/plugin` → `react-native-worklets/plugin`
-- **Nuevo build EAS lanzado:** `c00a412e-0ac0-4698-9646-bc36af7b10f0` (preview, Android, APK)
-- Build anterior (358414d2) queda inválido — no instalar
-- Confirmado que el proyecto no puede correr en Expo Go (usa módulos nativos RevenueCat, GoogleSignIn, expo-notifications, CameraView con children)
-
-## 2026-04-13 (SEO Fixes aplicados — ejecución automática)
-- **public/index.html actualizado** con 4 fixes SEO urgentes:
-  - ✅ Twitter Card meta tags añadidos (summary_large_image, title, description, image)
-  - ✅ Favicon link añadido (rel="icon" → /c2g-icon.png + apple-touch-icon)
-  - ✅ FAQPage schema añadido (5 preguntas → rich snippets Google)
-  - ✅ Schema MobileApplication description corregida a español
-- **deploy-seo-fixes.bat** creado para facilitar el deploy
-- **PENDIENTE:** Ejecutar `deploy-seo-fixes.bat` para publicar los cambios (credenciales Firebase expiradas)
-
-## 2026-04-13 (19:00) — Revisión financiera automática
-- Búsqueda automática de nuevos recibos en info@civiltek.es (Gmail MCP)
-- **Sin nuevos gastos detectados** desde la última actualización (14:40)
-- Dashboard regenerado con timestamp actualizado → ambas ubicaciones sincronizadas
-- FINANCES.md actualizado: total acumulado clarificado (413,76 € desde inicio / 390,76 € desde 6 abril)
-- Nota: cals2gains@gmail.com y judith.cordobes@gmail.com no accesibles vía MCP (revisar manualmente)
-
-## 2026-04-13
-- Auditoría completa Android: 21 fixes i18n, ~70 fixes tema oscuro, 4 fixes Android-específicos
-- Build Android exitoso (bf859936) con todas las correcciones aplicadas
-- Eliminado expo-notifications (causa crash en Android sin FCM configurado)
-- Automatizada respuesta a comentarios en todas las cuentas IG/FB (3x/día)
-- **Reorganización completa del proyecto** → estructura profesional con _project-hub
-- Sistema financiero creado: Excel, recibos Anthropic (8 PDFs), dashboard, FINANCES.md
-
-## 2026-04-12
-- 28 posts ES programados en MBS (calendario 12-25 abril)
-- Posts EN generados y parcialmente programados (1-5, 15-28)
-- Comentarios automáticos en influencers configurados (2x/día)
-- Reels assets creados: demos cámara IA en EN y ES
-- Guiones de reels documentados
-
-## Semanas anteriores (resumen)
-- Desarrollo completo de la app: 35+ pantallas funcionales
-- Integración Firebase (Auth, Firestore, Storage)
-- Integración RevenueCat para suscripciones
-- Sistema i18n completo (EN + ES)
-- Tema claro/oscuro con detección automática
-- Landing page creada y desplegada en Firebase Hosting
-- Cuentas de RRSS creadas y configuradas
-- Estrategia de marketing Fase 1 diseñada
-- SEO audit completado para landing page
-
----
-*Para actualizar: añade las entradas más recientes arriba con fecha.*
-
+- **Diagnóstico vía ADB logcat sobre Samsung R3CR10E9LSE conectado por USB** — la app se instalaba pero crasheaba al inici
