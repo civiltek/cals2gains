@@ -115,6 +115,8 @@ const SettingsScreen = () => {
   const [inBodyWater, setInBodyWater] = useState('');
   const [inBodyVisceral, setInBodyVisceral] = useState('');
   const [lastInBodyDate, setLastInBodyDate] = useState<Date | null>(null);
+  const [inBodyImporting, setInBodyImporting] = useState(false);
+  const [inBodySourceLabel, setInBodySourceLabel] = useState<string | null>(null);
 
   useEffect(() => {
     inBodyService.initialize().then(() => {
@@ -251,6 +253,7 @@ const SettingsScreen = () => {
         } else if (service === 'inBody') {
           // InBody API is B2B only — open manual entry modal instead.
           setLoading(false);
+          setInBodySourceLabel(null);
           setShowInBodyModal(true);
           return;
         }
@@ -323,6 +326,35 @@ const SettingsScreen = () => {
       Alert.alert('Error', t('settingsScreen.backupFailed'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImportFromHealth = async () => {
+    setInBodyImporting(true);
+    try {
+      const result = await inBodyService.syncFromHealthKit();
+      if (!result) {
+        Alert.alert(
+          'Sin datos disponibles',
+          'No se encontraron datos de composición corporal en Apple Salud.\n\nAsegúrate de que la app InBody tiene permiso para escribir en Salud: InBody > Ver más > General > HealthKit Sync.',
+          [{ text: 'Entendido' }]
+        );
+      } else {
+        const last = inBodyService.getLastMeasurement();
+        if (last) setLastInBodyDate(last.date);
+        setSettings(prev => ({ ...prev, connectedServices: { ...prev.connectedServices, inBody: true } }));
+        setInBodyFat(String(result.bodyFatPercent));
+        setInBodyMuscle(String(result.leanBodyMass));
+        setInBodySourceLabel('Importado desde Apple Salud ✓');
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Alert.alert(
+          'Datos importados',
+          `Grasa: ${result.bodyFatPercent}%\nMasa muscular: ${result.leanBodyMass} kg${result.weight ? `\nPeso: ${result.weight} kg` : ''}${result.bmr ? `\nTMB: ${result.bmr} kcal` : ''}`,
+          [{ text: 'OK', onPress: () => setShowInBodyModal(false) }]
+        );
+      }
+    } finally {
+      setInBodyImporting(false);
     }
   };
 
@@ -1046,6 +1078,36 @@ const SettingsScreen = () => {
                 Introduce los datos del informe InBody
               </Text>
 
+              {/* Import from Health button */}
+              <TouchableOpacity
+                style={[styles.inBodyImportBtn, { borderColor: Platform.OS === 'ios' ? '#FF2D55' : '#4CAF50', opacity: inBodyImporting ? 0.6 : 1 }]}
+                onPress={handleImportFromHealth}
+                disabled={inBodyImporting}
+              >
+                <Ionicons
+                  name={Platform.OS === 'ios' ? 'heart' : 'fitness'}
+                  size={18}
+                  color={Platform.OS === 'ios' ? '#FF2D55' : '#4CAF50'}
+                />
+                <Text style={[styles.inBodyImportBtnText, { color: Platform.OS === 'ios' ? '#FF2D55' : '#4CAF50' }]}>
+                  {inBodyImporting
+                    ? 'Importando...'
+                    : Platform.OS === 'ios'
+                      ? 'Importar desde Apple Salud'
+                      : 'Importar desde Google Salud'}
+                </Text>
+              </TouchableOpacity>
+
+              {inBodySourceLabel && (
+                <Text style={{ fontSize: 11, color: '#4ADE80', marginBottom: 12, textAlign: 'center' }}>
+                  {inBodySourceLabel}
+                </Text>
+              )}
+
+              <View style={[styles.inBodyDivider, { backgroundColor: C.border }]}>
+                <Text style={[styles.inBodyDividerText, { color: C.textSecondary }]}>o introduce manualmente</Text>
+              </View>
+
               <View style={styles.inBodyField}>
                 <Text style={[styles.inBodyLabel, { color: C.text }]}>Grasa corporal (%) *</Text>
                 <TextInput
@@ -1472,6 +1534,35 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+  },
+  inBodyImportBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  inBodyImportBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  inBodyDivider: {
+    height: 1,
+    marginBottom: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  inBodyDividerText: {
+    fontSize: 11,
+    fontWeight: '500',
+    backgroundColor: 'transparent',
+    paddingHorizontal: 8,
+    position: 'absolute',
   },
   inBodyRegisterBtn: {
     paddingVertical: 8,

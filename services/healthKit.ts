@@ -29,6 +29,14 @@ export interface WorkoutSummary {
   date: Date;
 }
 
+export interface BodyCompositionData {
+  bodyFatPercent: number | null;
+  leanBodyMass: number | null; // kg
+  weight: number | null; // kg
+  bmr: number | null; // kcal/day
+  measuredAt: Date;
+}
+
 // ============================================
 // HEALTH SERVICE (Platform-agnostic interface)
 // ============================================
@@ -142,6 +150,8 @@ class HealthService {
               'Workout',
               'Weight',
               'HeartRate',
+              'BodyFatPercentage',
+              'LeanBodyMass',
             ],
             write: ['Weight'],
           },
@@ -174,6 +184,8 @@ class HealthService {
           { accessType: 'read', recordType: 'ExerciseSession' },
           { accessType: 'read', recordType: 'Weight' },
           { accessType: 'read', recordType: 'HeartRate' },
+          { accessType: 'read', recordType: 'BodyFat' },
+          { accessType: 'read', recordType: 'LeanBodyMass' },
           { accessType: 'write', recordType: 'Weight' },
         ]);
 
@@ -247,6 +259,167 @@ class HealthService {
   /** Whether the user has granted health permissions in this session */
   getIsAuthorized(): boolean {
     return this.isAuthorized;
+  }
+
+  /**
+   * Request body composition permissions specifically (can be called without full health setup).
+   * Useful for the InBody import flow when the user hasn't enabled full health sync.
+   */
+  async requestBodyCompositionPermission(): Promise<boolean> {
+    try {
+      if (Platform.OS === 'ios') {
+        const AppleHealthKit = await getAppleHealthKit();
+        if (!AppleHealthKit) return false;
+        const available = await this.checkAvailability();
+        if (!available) return false;
+        return new Promise((resolve) => {
+          AppleHealthKit.initHealthKit(
+            {
+              permissions: {
+                read: ['BodyFatPercentage', 'LeanBodyMass', 'Weight', 'BasalEnergyBurned'],
+                write: [],
+              },
+            },
+            (err: any) => {
+              if (!err) this.isAuthorized = true;
+              resolve(!err);
+            }
+          );
+        });
+      } else {
+        const ready = await this.ensureAndroidInitialized();
+        if (!ready) return false;
+        const HealthConnect = await getHealthConnect();
+        if (!HealthConnect) return false;
+        const granted = await HealthConnect.requestPermission([
+          { accessType: 'read', recordType: 'BodyFat' },
+          { accessType: 'read', recordType: 'LeanBodyMass' },
+          { accessType: 'read', recordType: 'Weight' },
+          { accessType: 'read', recordType: 'BasalMetabolicRate' },
+        ]);
+        const ok = Array.isArray(granted) && granted.length > 0;
+        if (ok) this.isAuthorized = true;
+        return ok;
+      }
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Read the most recent body composition measurement from HealthKit / Health Connect.
+   * Returns null if no data is available or permissions not granted.
+   * Reads: body fat %, lean body mass, weight, BMR.
+   * InBody writes these when the user syncs via the InBody app.
+   */
+  async getBodyComposition(): Promise<BodyCompositionData | null> {
+    try {
+      if (Platform.OS === 'ios') {
+        return await this.getIOSBodyComposition();
+      } else {
+        return await this.getAndroidBodyComposition();
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  private async getIOSBodyComposition(): Promise<BodyCompositionData | null> {
+    const AppleHealthKit = await getAppleHealthKit();
+    if (!AppleHealthKit) return null;
+
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const opts = { startDate: oneYearAgo.toISOString(), limit: 1, ascending: false };
+
+    const readSample = (method: string): Promise<number | null> =>
+      new Promise((resolve) => {
+        if (typeof AppleHealthKit[method] !== 'function') return resolve(null);
+        AppleHealthKit[method](opts, (err: any, results: any[]) => {
+          if (err || !results || results.length === 0) return resolve(null);
+          resolve(results[0]?.value ?? null);
+        });
+      });
+
+    const [bodyFatRaw, leanBodyMassKg, weightLbs, bmrKcal] = await Promise.all([
+      readSample('getBodyFatPercentageSamples'),
+      readSample('getLeanBodyMassSamples'),
+      readSample('getWeightSamples'),
+      readSample('getBasalEnergyBurned'),
+    ]);
+
+    // HealthKit returns body fat as 0–1 (fraction) or 0–100 depending on SDK version
+    const bodyFatPercent = bodyFatRaw !== null
+      ? (bodyFatRaw <= 1 ? bodyFatRaw * 100 : bodyFatRaw)
+      : null;
+
+    // HealthKit weight is in lbs by default (from saveWeight we convert kg→lbs)
+    const weightKg = weightLbs !== null ? weightLbs / 2.20462 : null;
+
+    if (bodyFatPercent === null && leanBodyMassKg === null) return null;
+
+    return {
+      bodyFatPercent: bodyFatPercent !== null ? Math.round(bodyFatPercent * 10) / 10 : null,
+      leanBodyMass: leanBodyMassKg !== null ? Math.round(leanBodyMassKg * 10) / 10 : null,
+      weight: weightKg !== null ? Math.round(weightKg * 10) / 10 : null,
+      bmr: bmrKcal !== null ? Math.round(bmrKcal) : null,
+      measuredAt: new Date(),
+    };
+  }
+
+  private async getAndroidBodyComposition(): Promise<BodyCompositionData | null> {
+    const ready = await this.ensureAndroidInitialized();
+    if (!ready) return null;
+    const HealthConnect = await getHealthConnect();
+    if (!HealthConnect) return null;
+
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const timeFilter = {
+      timeRangeFilter: {
+        operator: 'between' as const,
+        startTime: oneYearAgo.toISOString(),
+        endTime: new Date().toISOString(),
+      },
+    };
+
+    const readLatest = async (recordType: string): Promise<any | null> => {
+      try {
+        const res = await HealthConnect.readRecords(recordType, timeFilter);
+        const records = res?.records ?? [];
+        if (records.length === 0) return null;
+        // Sort desc by time and take the last one
+        return records.sort((a: any, b: any) =>
+          new Date(b.time ?? b.startTime).getTime() - new Date(a.time ?? a.startTime).getTime()
+        )[0];
+      } catch {
+        return null;
+      }
+    };
+
+    const [fatRecord, leanRecord, weightRecord, bmrRecord] = await Promise.all([
+      readLatest('BodyFat'),
+      readLatest('LeanBodyMass'),
+      readLatest('Weight'),
+      readLatest('BasalMetabolicRate'),
+    ]);
+
+    const bodyFatPercent = fatRecord?.percentage ?? null;
+    const leanBodyMass = leanRecord?.mass?.inKilograms ?? null;
+
+    if (bodyFatPercent === null && leanBodyMass === null) return null;
+
+    return {
+      bodyFatPercent: bodyFatPercent !== null ? Math.round(bodyFatPercent * 10) / 10 : null,
+      leanBodyMass: leanBodyMass !== null ? Math.round(leanBodyMass * 10) / 10 : null,
+      weight: weightRecord?.weight?.inKilograms
+        ? Math.round(weightRecord.weight.inKilograms * 10) / 10
+        : null,
+      bmr: bmrRecord?.basalMetabolicRate?.inKilocaloriesPerDay
+        ? Math.round(bmrRecord.basalMetabolicRate.inKilocaloriesPerDay)
+        : null,
+      measuredAt: new Date(),
+    };
   }
 
   /**

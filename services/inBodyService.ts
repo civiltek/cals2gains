@@ -6,6 +6,7 @@
 // Uses InBody API v2 for data retrieval
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { healthService } from './healthKit';
 
 // ============================================
 // TYPES
@@ -22,6 +23,7 @@ export interface InBodyMeasurement {
   bmi: number;
   visceralFatLevel: number; // 1-20
   basalMetabolicRate: number; // kcal/day
+  source?: 'manual' | 'healthkit'; // how the measurement was recorded
   segmentalLeanMass?: {
     rightArm: number;
     leftArm: number;
@@ -191,6 +193,8 @@ class InBodyService {
     waterPercent?: number;
     visceralFatLevel?: number;
     weight?: number;
+    basalMetabolicRate?: number;
+    source?: 'manual' | 'healthkit';
   }): Promise<void> {
     const measurement: InBodyMeasurement = {
       date: new Date(),
@@ -202,13 +206,49 @@ class InBodyService {
       waterPercent: data.waterPercent ?? 0,
       bmi: 0,
       visceralFatLevel: data.visceralFatLevel ?? 0,
-      basalMetabolicRate: 0,
+      basalMetabolicRate: data.basalMetabolicRate ?? 0,
+      source: data.source ?? 'manual',
     };
     this.cachedMeasurements = [measurement, ...this.cachedMeasurements];
     await AsyncStorage.setItem(
       STORAGE_KEYS.INBODY_MEASUREMENTS,
       JSON.stringify(this.cachedMeasurements)
     );
+  }
+
+  /**
+   * Read body composition from Apple Health / Google Health Connect and save as a measurement.
+   * Returns the imported data on success, null if no data found or permissions denied.
+   */
+  async syncFromHealthKit(): Promise<{ bodyFatPercent: number; leanBodyMass: number; weight: number | null; bmr: number | null } | null> {
+    try {
+      const granted = await healthService.requestBodyCompositionPermission();
+      if (!granted) return null;
+
+      const data = await healthService.getBodyComposition();
+      if (!data || (data.bodyFatPercent === null && data.leanBodyMass === null)) return null;
+
+      // Need at least body fat % and lean mass to be useful
+      if (data.bodyFatPercent === null || data.leanBodyMass === null) return null;
+
+      await this.saveManualMeasurement({
+        bodyFatPercent: data.bodyFatPercent,
+        skeletalMuscleMass: data.leanBodyMass,
+        weight: data.weight ?? undefined,
+        basalMetabolicRate: data.bmr ?? undefined,
+        source: 'healthkit',
+      });
+
+      return {
+        bodyFatPercent: data.bodyFatPercent,
+        leanBodyMass: data.leanBodyMass,
+        weight: data.weight,
+        bmr: data.bmr,
+      };
+    } catch (error) {
+      console.error('[InBodyService] syncFromHealthKit error:', error);
+      return null;
+    }
   }
 
   /**
