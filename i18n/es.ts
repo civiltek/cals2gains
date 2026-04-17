@@ -1355,6 +1355,58 @@ export default {
     exportDataDesc: 'Compartir con tu coach',
   },
 
+  // Training Plan
+  trainingPlan: {
+    title: 'Plan de Entrenamiento',
+    noPlan: 'Sin plan activo',
+    noPlanTitle: 'Sin plan activo',
+    noPlanMessage: 'Importa o crea un plan primero para asignar sesiones.',
+    tab_week: 'Esta semana',
+    tab_plan: 'Plan completo',
+    tab_import: 'Importar',
+    week: 'Semana',
+    weeks: 'semanas',
+    startDate: 'Fecha de inicio',
+    todayMacros: 'Macros ajustados de hoy',
+    cal: 'Cal',
+    prot: 'Prot',
+    carbs: 'Carbs',
+    fat: 'Grasa',
+    selectSession: 'Selecciona tipo de sesión',
+    removeSession: 'Eliminar sesión',
+    emptyTitle: 'Sin plan de entrenamiento',
+    emptyDesc: 'Añade un plan para recibir recomendaciones de macros adaptadas a cada sesión del día.',
+    importPlan: 'Importar plan',
+    importConfirm: '¿Quieres cargar este plan? Se convertirá en tu plan activo.',
+    importBtn: 'Importar',
+    planAdded: 'Plan cargado',
+    templates: 'Plantillas de entrenamiento',
+    templatesDesc: 'Elige un plan y empieza a entrenar con macros adaptados a cada día.',
+    createManual: 'Crear manualmente',
+    createManualDesc: 'Pulsa cada día de la semana para asignar el tipo de sesión.',
+    createManualHint: 'Usa la pestaña "Esta semana" para definir tus sesiones semanales.',
+    deletePlan: 'Eliminar plan',
+    deletePlanConfirm: '¿Seguro? Esto eliminará todas las sesiones de este plan.',
+  },
+
+  // Info Tooltips educativos
+  infoTooltips: {
+    fasting_title: 'Ayuno Intermitente',
+    fasting_body: 'El ayuno intermitente no es una dieta, es un horario de comidas. Solo comes durante una ventana de tiempo (por ejemplo, 8 horas) y ayunas el resto.\n\nLa ciencia muestra que puede ayudar a reducir la ingesta calórica, mejorar la sensibilidad a la insulina y favorecer la pérdida de grasa, sin necesidad de contar cada comida.\n\nNo hace milagros, pero muchas personas lo encuentran más fácil de mantener que las dietas tradicionales.',
+
+    activityLevel_title: 'Nivel de Actividad',
+    activityLevel_body: 'Tu nivel de actividad se usa para calcular tu TDEE (Gasto Energético Total Diario): las calorías que quema tu cuerpo en un día completo.\n\nSedentario: trabajo de escritorio, poco o nada de ejercicio.\nLigeramente activo: 1-3 entrenos por semana.\nModerado: 3-5 entrenamientos por semana.\nMuy activo: ejercicio intenso diario.\nAtleta: varias sesiones al día.\n\nSi tienes dudas, elige un nivel por debajo de lo que crees. La mayoría sobreestima su actividad.',
+
+    goalMode_title: 'Modo Objetivo',
+    goalMode_body: 'Cada modo objetivo define una estrategia diferente de calorías y macros:\n\n🔥 Perder Grasa: déficit calórico + proteína alta para preservar músculo.\n💪 Ganar Músculo: superávit calórico + carbos para el entrenamiento.\n♻️ Recomposición: calorías de mantenimiento, proteína muy alta. Más lento pero efectivo.\n⚖️ Mantener: macros equilibrados para mantener tu peso actual.\n✂️ Mini Cut: déficit agresivo a corto plazo.\n📈 Lean Bulk: superávit pequeño para maximizar músculo con mínima grasa.\n\nLa app ajusta tus objetivos automáticamente según tu progreso.',
+
+    calories_title: 'Calorías',
+    calories_body: 'Una caloría es una unidad de energía. Tu cuerpo las usa para respirar, moverte, digerir y pensar.\n\nTu objetivo calórico diario se calcula a partir de tu BMR (lo que quema tu cuerpo en reposo) más tu nivel de actividad.\n\nComer menos de lo que quemas → pérdida de grasa. Comer más → aumento de peso. La clave es ser consistente semana a semana, no obsesionarse con un día concreto.',
+
+    macros_title: 'Macros: Proteína, Carbos y Grasa',
+    macros_body: 'Los macronutrientes son las tres fuentes principales de calorías:\n\n💜 Proteína (4 kcal/g): construye y repara músculo. También es el macro más saciante — ideal para no pasar hambre.\n\n🍚 Carbohidratos (4 kcal/g): el combustible preferido de tu cuerpo, especialmente durante el ejercicio intenso. No son el enemigo — úsalos con cabeza.\n\n🧈 Grasa (9 kcal/g): esencial para las hormonas, el cerebro y la absorción de vitaminas. No la recortes demasiado.',
+  },
+
   // Errors
   errors: {
     generic: 'Ha ocurrido un error. Inténtalo de nuevo.',

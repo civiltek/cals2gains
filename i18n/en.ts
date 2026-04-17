@@ -1310,6 +1310,56 @@ export default {
     exportDataDesc: 'Share with your coach',
   },
 
+  trainingPlan: {
+    title: 'Training Plan',
+    noPlan: 'No active plan',
+    noPlanTitle: 'No plan active',
+    noPlanMessage: 'Import or create a plan first to assign sessions.',
+    tab_week: 'This week',
+    tab_plan: 'Full plan',
+    tab_import: 'Import',
+    week: 'Week',
+    weeks: 'weeks',
+    startDate: 'Start date',
+    todayMacros: "Today's adjusted macros",
+    cal: 'Cal',
+    prot: 'Prot',
+    carbs: 'Carbs',
+    fat: 'Fat',
+    selectSession: 'Select session type',
+    removeSession: 'Remove session',
+    emptyTitle: 'No training plan',
+    emptyDesc: 'Add a plan to get daily macro recommendations adapted to each session.',
+    importPlan: 'Import plan',
+    importConfirm: 'Do you want to load this plan? It will become your active plan.',
+    importBtn: 'Import',
+    planAdded: 'Plan loaded',
+    templates: 'Training templates',
+    templatesDesc: 'Choose a plan and start training with macros adapted to each day.',
+    createManual: 'Create manually',
+    createManualDesc: 'Tap each day of the week to assign the session type.',
+    createManualHint: 'Use the "This week" tab to define your weekly sessions.',
+    deletePlan: 'Delete plan',
+    deletePlanConfirm: 'Are you sure? This will remove all sessions from this plan.',
+  },
+
+  infoTooltips: {
+    fasting_title: 'Intermittent Fasting',
+    fasting_body: 'Intermittent fasting is not a diet — it\'s an eating schedule. You eat only during a specific window (e.g., 8 hours) and fast the rest of the time.\n\nScience shows it can help reduce calorie intake, improve insulin sensitivity, and support fat loss — without needing to count every meal.\n\nIt doesn\'t work miracles, but many people find it easier to stick to than traditional diets.',
+
+    activityLevel_title: 'Activity Level',
+    activityLevel_body: 'Your activity level is used to calculate your TDEE (Total Daily Energy Expenditure) — how many calories your body burns in a day.\n\nSedentary: desk job, little or no exercise.\nLightly active: 1-3 workouts/week.\nModerately active: 3-5 workouts/week.\nVery active: daily intense exercise.\nAthlete: multiple sessions/day.\n\nWhen in doubt, choose one level below what you think — most people overestimate their activity.',
+
+    goalMode_title: 'Goal Mode',
+    goalMode_body: 'Each goal mode sets a different calorie and macro strategy:\n\n🔥 Lose Fat: calorie deficit + high protein to preserve muscle.\n💪 Gain Muscle: calorie surplus + carbs to fuel training.\n♻️ Recomp: maintenance calories, very high protein — slower but effective.\n⚖️ Maintain: balanced macros to hold your current weight.\n✂️ Mini Cut: aggressive short-term deficit.\n📈 Lean Bulk: small surplus to maximize muscle with minimal fat.\n\nThe app adjusts your targets automatically as you progress.',
+
+    calories_title: 'Calories',
+    calories_body: 'A calorie is a unit of energy. Your body uses calories to breathe, move, digest food, and think.\n\nYour daily calorie goal is calculated from your BMR (what your body burns at rest) plus your activity level.\n\nEating less than you burn → fat loss. Eating more → weight gain. The key is hitting your goal consistently over weeks, not obsessing over a single day.',
+
+    macros_title: 'Macros: Protein, Carbs & Fat',
+    macros_body: 'Macronutrients are the three main sources of calories:\n\n💜 Protein (4 kcal/g): builds and repairs muscle. Also the most satiating macro — great for staying full.\n\n🍚 Carbohydrates (4 kcal/g): your body\'s preferred fuel, especially during intense exercise. Not the enemy — just use them wisely.\n\n🧈 Fat (9 kcal/g): essential for hormones, brain function, and vitamin absorption. Don\'t cut it too low.',
+  },
+
   errors: {
     generic: 'An error occurred. Please try again.',
     network: 'Connection error. Check your internet.',

@@ -17,6 +17,7 @@ import * as Haptics from 'expo-haptics';
 import Svg, { Circle } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
+import InfoButton from '../components/ui/InfoButton';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -360,6 +361,11 @@ export default function FastingScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={[styles.headerTitle, { color: C.text }]}>{t('fasting.title')}</Text>
+          <InfoButton
+            emoji="⏱️"
+            title={t('infoTooltips.fasting_title')}
+            body={t('infoTooltips.fasting_body')}
+          />
         </View>
 
         {/* Timer Section */}
@@ -544,6 +550,9 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   headerTitle: {
     fontSize: 28,

@@ -18,6 +18,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { BRAND_COLORS, BRAND_FONTS } from '../theme';
 import { useColors } from '../store/themeStore';
+import InfoButton from '../components/ui/InfoButton';
 import { useUserStore } from '../store/userStore';
 import { AdaptiveMacroEngine, GoalMode } from '../services/adaptiveMacroEngine';
 import type { GoalModeConfig } from '../services/adaptiveMacroEngine';
@@ -260,7 +261,14 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
     >
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: C.border }]}>
-        <Text style={[styles.headerTitle, { color: C.text }]}>{t('goalModes.title')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={[styles.headerTitle, { color: C.text }]}>{t('goalModes.title')}</Text>
+          <InfoButton
+            emoji="🎯"
+            title={t('infoTooltips.goalMode_title')}
+            body={t('infoTooltips.goalMode_body')}
+          />
+        </View>
         <Text style={[styles.headerSubtitle, { color: C.textSecondary }]}>
           {t('goalModes.subtitle')}
         </Text>
@@ -296,7 +304,14 @@ export const GoalModesScreen: React.FC<GoalModesScreenProps> = ({
 
           {/* Macro Distribution Preview */}
           <View style={[styles.macroPreviewCard, { backgroundColor: C.card }]}>
-            <Text style={[styles.macroPreviewTitle, { color: C.text }]}>{t('goalModes.macroDistribution')}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <Text style={[styles.macroPreviewTitle, { color: C.text }]}>{t('goalModes.macroDistribution')}</Text>
+              <InfoButton
+                emoji="🍽️"
+                title={t('infoTooltips.macros_title')}
+                body={t('infoTooltips.macros_body')}
+              />
+            </View>
 
             {/* Macro Bars */}
             <View style={styles.macroBarsContainer}>

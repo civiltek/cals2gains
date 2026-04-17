@@ -15,6 +15,25 @@ Intento de `eas build --profile production --platform ios` cancelado por límite
 - Acción requerida: upgrade plan EAS en https://expo.dev/accounts/civiltek/settings/billing
   O esperar al 1 de mayo y relanzar: `eas build --profile production --platform ios --non-interactive`
 
+## 2026-04-17 — Añadir Feature 1: Plan de comida adaptado a entrenamiento deportivo
+
+Implementación completa del motor de planes de entrenamiento con ajuste diario de macros:
+
+- **`services/trainingPlanEngine.ts`** (nuevo): motor de ajuste de macros por tipo de sesión. 9 tipos de sesión (descanso, cardio suave, tempo, series, tirada larga, fuerza, CrossFit, competición, recuperación activa). Factores de ajuste basados en evidencia científica (Jeukendrup, Burke). 3 plantillas de plan precargadas (Maratón 12 sem, CrossFit 8 sem, 10K 6 sem).
+- **`store/trainingPlanStore.ts`** (nuevo): Zustand store persistente con AsyncStorage. CRUD completo de planes y sesiones.
+- **`app/training-plan.tsx`** (nueva pantalla): 3 tabs — "Esta semana" (grid 7 días + macros ajustados de hoy), "Plan completo" (listado de semanas), "Importar" (plantillas). Modal de selección de tipo de sesión por día. Modal de detalle con comparativa base vs ajustado.
+- **i18n**: claves `trainingPlan.*` añadidas en `en.ts` y `es.ts`.
+
+## 2026-04-17 — Añadir Feature 2: Botones de info educativos (ℹ️)
+
+Componente reutilizable InfoButton y tooltips en pantallas clave:
+
+- **`components/ui/InfoButton.tsx`** (nuevo): botón ℹ️ que abre modal educativo. Acepta `title`, `body` (con párrafos separados por `\n\n`) y `emoji`. Brand-styled, compatible dark/light mode y haptics.
+- **`app/fasting.tsx`**: InfoButton junto al título — explica qué es el ayuno intermitente.
+- **`app/goal-modes.tsx`**: InfoButton junto al título (modos objetivo) y junto a "Distribución de macros".
+- **`app/analysis.tsx`**: InfoButton en "Información nutricional" (explica calorías) y junto al grid de macros (explica proteína/carbos/grasa).
+- **i18n**: 5 tooltips (`fasting`, `activityLevel`, `goalMode`, `calories`, `macros`) en EN + ES. Tono cercano, motivador, basado en ciencia.
+
 ## 2026-04-17 — Fix iOS HealthKit: isHealthDataAvailable + entitlement + archivo truncado
 
 Build 52 iOS fallaba al conectar a Salud. Tres problemas encontrados y corregidos:
