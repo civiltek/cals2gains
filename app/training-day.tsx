@@ -19,6 +19,7 @@ import { format } from 'date-fns';
 // Mock store imports
 import { useUserStore } from '../store/userStore';
 import { useTrainingPlanStore, buildPresetsFromGoals } from '../store/trainingPlanStore';
+import InfoButton from '../components/ui/InfoButton';
 
 const { width } = Dimensions.get('window');
 
@@ -224,7 +225,20 @@ export default function TrainingDay() {
 
   const renderMacroComparison = () => (
     <View style={styles.comparisonContainer}>
-      <Text style={styles.comparisonTitle}>{t('trainingDay.macroComparison')}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={styles.comparisonTitle}>{t('trainingDay.macroComparison')}</Text>
+        <InfoButton
+          emoji="📊"
+          title="¿Por qué los macros cambian según el día?"
+          body={
+            'Los días de entreno necesitan más energía y, sobre todo, más carbohidratos — son el combustible principal de tus músculos en sesiones intensas.\n\n' +
+            'En los días de descanso bajan los carbohidratos (tu cuerpo los necesita menos) y sube ligeramente la grasa para cubrir la saciedad.\n\n' +
+            'El refeed es un día "alto" pensado para recargar depósitos de glucógeno y dar un descanso psicológico si estás en déficit.\n\n' +
+            'La proteína se mantiene CONSTANTE todos los días. No necesitas cambiarla: el objetivo es siempre el mismo — proteger tu masa muscular (1.6–2.2 g/kg según tu perfil).\n\n' +
+            'Referencias: ISSN 2017 (proteína), Burke 2011 e Impey 2018 ("fuel for the work required"), Helms 2024 (grasa en descanso).'
+          }
+        />
+      </View>
 
       <View style={styles.comparisonTable}>
         {/* Header row */}
@@ -355,7 +369,20 @@ export default function TrainingDay() {
 
   const renderMacroDistribution = () => (
     <View style={styles.distributionContainer}>
-      <Text style={styles.distributionTitle}>{t('trainingDay.macroDistribution', { type: DAY_LABELS[todayType].label })}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={styles.distributionTitle}>{t('trainingDay.macroDistribution', { type: DAY_LABELS[todayType].label })}</Text>
+        <InfoButton
+          emoji="🍽️"
+          title="¿Cómo leer la distribución de macros?"
+          body={
+            'Las barras muestran cuánto peso tiene cada macronutriente en tu objetivo calórico del día:\n\n' +
+            '• Proteína (1g = 4 kcal): es el macro más importante para mantener músculo. Debería estar entre el 20-35% del total.\n\n' +
+            '• Carbohidratos (1g = 4 kcal): combustible principal. Varía según el día de entreno.\n\n' +
+            '• Grasa (1g = 9 kcal): esencial para hormonas y saciedad. Nunca por debajo de 0.5-0.8 g/kg de peso.\n\n' +
+            'Los porcentajes te ayudan a comparar: una dieta equilibrada típica es 25/45/30 (prot/carb/grasa) en mantenimiento.'
+          }
+        />
+      </View>
 
       <View style={styles.distributionBars}>
         {/* Protein */}
@@ -520,9 +547,23 @@ export default function TrainingDay() {
       {/* Active plan banner */}
       {todayTrainingInfo && (
         <View style={[styles.card, { backgroundColor: '#FF6A4D15', borderColor: '#FF6A4D40', borderWidth: 1, marginBottom: 12 }]}>
-          <Text style={{ fontSize: 12, color: '#FF6A4D', fontWeight: '700', marginBottom: 2 }}>
-            📋 {todayTrainingInfo.plan.name}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+            <Text style={{ fontSize: 12, color: '#FF6A4D', fontWeight: '700' }}>
+              📋 {todayTrainingInfo.plan.name}
+            </Text>
+            <InfoButton
+              size={15}
+              color="#FF6A4D"
+              emoji="📋"
+              title="¿Cómo funciona el plan activo?"
+              body={
+                'Mientras tengas un plan activo, Cals2Gains ajusta automáticamente tus macros cada día según lo que tu plan marque (entreno, descanso, refeed, competición).\n\n' +
+                'Los números se calculan de forma proporcional a TU base personal — los mismos multiplicadores se aplican sobre el objetivo que ya tenías configurado, no sobre valores fijos.\n\n' +
+                'Cuando el plan termine, tus macros volverán automáticamente a tu configuración normal.\n\n' +
+                'Puedes desactivar el plan en cualquier momento desde "Plan de entrenamiento".'
+              }
+            />
+          </View>
           <Text style={{ fontSize: 13, color: C.text }}>
             Día {todayTrainingInfo.dayNumber} de {todayTrainingInfo.totalDays} · {todayTrainingInfo.daysRemaining} días restantes
           </Text>

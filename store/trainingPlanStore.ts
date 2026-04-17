@@ -73,13 +73,18 @@ export const DEFAULT_MACRO_PRESETS: Record<TrainingDayType, MacroPreset> = {
 // with their individual TDEE instead of the hardcoded defaults above.
 // Protein roughly constant; carbs cycle up on training/refeed; fat compensates on rest.
 
+// Protein se mantiene constante en todos los tipos de día (ISSN Position Stand
+// 2017 — Jäger et al., Helms et al. 2014/2024): la ingesta proteica óptima no
+// depende del día de entreno, sino del objetivo y peso corporal.
+// CHO cicla +25%/-20% (rango moderado respaldado por Burke 2011, Impey 2018).
+// Grasa compensa en reposo para saciedad (Helms 2024).
 export const DAY_TYPE_MULTIPLIERS: Record<
   TrainingDayType,
   { calories: number; protein: number; carbs: number; fat: number }
 > = {
-  entreno:     { calories: 1.12, protein: 1.05, carbs: 1.25, fat: 0.90 },
+  entreno:     { calories: 1.12, protein: 1.00, carbs: 1.25, fat: 0.90 },
   descanso:    { calories: 0.95, protein: 1.00, carbs: 0.80, fat: 1.10 },
-  refeed:      { calories: 1.20, protein: 0.95, carbs: 1.45, fat: 0.85 },
+  refeed:      { calories: 1.20, protein: 1.00, carbs: 1.45, fat: 0.85 },
   competicion: { calories: 1.08, protein: 1.00, carbs: 1.20, fat: 0.95 },
 };
 

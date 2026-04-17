@@ -554,17 +554,19 @@ export default function HomeScreen() {
           })()}
         </View>
 
-        {/* Day Type Selector */}
-        <DayTypeSelector
-          current={todayDayType}
-          onSelect={(type) => {
-            setTodayDayType(type);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }}
-          t={t}
-          C={C}
-          styles={styles}
-        />
+        {/* Day Type Selector — oculto mientras hay plan activo (el plan manda el tipo de día) */}
+        {!todayTraining && (
+          <DayTypeSelector
+            current={todayDayType}
+            onSelect={(type) => {
+              setTodayDayType(type);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            t={t}
+            C={C}
+            styles={styles}
+          />
+        )}
 
         {/* Quick Actions */}
         <View style={styles.quickActionsSection}>

@@ -199,6 +199,35 @@ class HealthService {
   }
 
   /**
+   * iOS-only: fuerza el registro de la app como "HealthKit consumer" en iOS.
+   * Apple NO lista una app en Ajustes > Salud > Acceso a datos hasta que al
+   * menos una vez se haya llamado a HKHealthStore.requestAuthorization.
+   * Este prime se llama una sola vez al arrancar la app con permiso mínimo
+   * (StepCount read). Si el usuario cancela el diálogo, la app queda
+   * igualmente registrada y aparecerá en Ajustes > Salud.
+   * Fire-and-forget: no bloquea el arranque ni rompe si falla.
+   */
+  async primeHealthKitRegistration(): Promise<void> {
+    if (Platform.OS !== 'ios') return;
+    try {
+      const AppleHealthKit = await getAppleHealthKit();
+      if (!AppleHealthKit) return;
+      const available = await this.checkAvailability();
+      if (!available) return;
+      AppleHealthKit.initHealthKit(
+        { permissions: { read: ['StepCount'], write: [] } },
+        (_err: any) => {
+          // Intencional: no marcamos isAuthorized aquí porque este init
+          // solo pide StepCount. El flujo real se inicia cuando el usuario
+          // pulse el toggle de Apple Health en ajustes.
+        }
+      );
+    } catch (err) {
+      console.warn('[HealthService] primeHealthKitRegistration failed:', err);
+    }
+  }
+
+  /**
    * Get today's health summary
    */
   async getTodaySummary(): Promise<HealthData | null> {

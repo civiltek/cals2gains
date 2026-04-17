@@ -15,6 +15,7 @@ import { useUserStore } from '../store/userStore';
 import { useThemeStore } from '../store/themeStore';
 import { useReminderStore } from '../store/reminderStore';
 import { initializeRevenueCat } from '../services/revenuecat';
+import { healthService } from '../services/healthKit';
 import '../i18n'; // Initialize i18n
 import i18n from 'i18next';
 
@@ -78,6 +79,11 @@ export default function RootLayout() {
     // Re-schedule persisted reminders on app startup
     const t = i18n.t.bind(i18n);
     useReminderStore.getState().rehydrateReminders(t).catch(() => {});
+
+    // Prime HealthKit: iOS solo lista la app en Ajustes > Salud tras una
+    // primera llamada a HKHealthStore.requestAuthorization. Fire-and-forget,
+    // permiso mínimo (StepCount). No-op en Android.
+    healthService.primeHealthKitRegistration().catch(() => {});
 
     return unsubscribe;
   }, []);
