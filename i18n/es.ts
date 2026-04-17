@@ -228,7 +228,7 @@ export default {
     quickActions: {
       title: 'Acciones rápidas',
       aiAnalysis: 'Revisión IA',
-      searchFood: 'Buscar alimento',
+      addFood: 'Añadir alimento',
       camera: 'Cámara',
       whatToEat: '¿Qué como?',
     },
@@ -1103,10 +1103,13 @@ export default {
     weightLabel: 'Peso:',
     increaseServings: 'Aumentar porciones',
     decreaseServings: 'Reducir porciones',
-    logButton: 'Registrar',
+    logButton: 'Guardar',
     protAbbr: 'Prot',
     carbAbbr: 'Carb',
     fatAbbr: 'Gras',
+    useCamera: 'Cámara',
+    useMic: 'Voz',
+    orSearchBelow: 'O busca por nombre',
   },
 
   // Food Verification

@@ -24,6 +24,8 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { useTranslation } from 'react-i18next';
 import * as Crypto from 'expo-crypto';
 import { useColors } from '../../store/themeStore';
+
+const LOGO_MARK = require('../../brand-assets/C2G-Mark-512.png');
 import { signInWithGoogle, signInWithApple, signInWithEmail, createAccountWithEmail } from '../../services/firebase';
 import { useUserStore } from '../../store/userStore';
 
@@ -164,7 +166,7 @@ export default function WelcomeScreen() {
           {/* Logo + Title */}
           <View style={styles.hero}>
             <View style={styles.logoContainer}>
-              <Text style={styles.logoEmoji}>🔬</Text>
+              <Image source={LOGO_MARK} style={{ width: 56, height: 56 }} resizeMode="contain" />
             </View>
             <Text style={styles.appName}>{t('appName')}</Text>
             <Text style={styles.tagline}>{t('auth.welcome')}</Text>

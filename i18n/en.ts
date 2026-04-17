@@ -222,7 +222,7 @@ export default {
     quickActions: {
       title: 'Quick actions',
       aiAnalysis: 'AI Review',
-      searchFood: 'Search food',
+      addFood: 'Add food',
       camera: 'Camera',
       whatToEat: 'What to eat?',
     },
@@ -1070,6 +1070,9 @@ export default {
     protAbbr: 'Prot',
     carbAbbr: 'Carb',
     fatAbbr: 'Fat',
+    useCamera: 'Camera',
+    useMic: 'Voice',
+    orSearchBelow: 'Or search by name',
   },
 
   foodVerification: {

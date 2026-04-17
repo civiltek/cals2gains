@@ -524,7 +524,7 @@ export default function HomeScreen() {
           <View style={styles.quickActionsGrid}>
             <QuickAction icon="camera-outline" label={t('home.quickActions.camera')} color="#FF6A4D" onPress={() => router.push('/(tabs)/camera')} styles={styles} />
             <QuickAction icon="sparkles-outline" label={t('home.quickActions.aiAnalysis')} color="#9C8CFF" onPress={() => router.push('/ai-review')} styles={styles} />
-            <QuickAction icon="search-outline" label={t('home.quickActions.searchFood')} color="#4FC3F7" onPress={() => router.push('/food-search')} styles={styles} />
+            <QuickAction icon="add-circle-outline" label={t('home.quickActions.addFood')} color="#4FC3F7" onPress={() => router.push('/food-search')} styles={styles} />
             <QuickAction icon="restaurant-outline" label={t('home.quickActions.whatToEat')} color="#4ADE80" onPress={() => router.push('/what-to-eat')} styles={styles} />
           </View>
         </View>

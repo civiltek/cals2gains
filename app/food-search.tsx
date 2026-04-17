@@ -378,6 +378,33 @@ export default function FoodSearchScreen() {
         )}
       </View>
 
+      {/* Camera + Mic quick-add row */}
+      {query.length === 0 && (
+        <View style={styles.quickAddRow}>
+          <TouchableOpacity
+            style={[styles.quickAddBtn, { backgroundColor: `${C.accent}18`, borderColor: `${C.accent}40` }]}
+            onPress={() => router.push('/capture-hub')}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="camera-outline" size={22} color={C.accent} />
+            <Text style={[styles.quickAddLabel, { color: C.accent }]}>{t('foodSearch.useCamera')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.quickAddBtn, { backgroundColor: `${C.violet}18`, borderColor: `${C.violet}40` }]}
+            onPress={() => router.push('/voice-log')}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="mic-outline" size={22} color={C.violet} />
+            <Text style={[styles.quickAddLabel, { color: C.violet }]}>{t('foodSearch.useMic')}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Separator label */}
+      {query.length === 0 && (
+        <Text style={[styles.orLabel, { color: C.textMuted }]}>{t('foodSearch.orSearchBelow')}</Text>
+      )}
+
       {/* AI Analysis Button */}
       {query.length > 3 && results.length === 0 && !loading && (
         <TouchableOpacity
@@ -441,47 +468,62 @@ export default function FoodSearchScreen() {
       {/* Selected Item Footer */}
       {selectedItem && (
         <View style={[styles.footer, { backgroundColor: C.surface, borderTopColor: C.border, paddingBottom: Math.max(16, insets.bottom) }]}>
-          {/* Servings stepper */}
-          <View style={styles.servingsRow}>
-            <Text style={[styles.servingsLabel, { color: C.textSecondary }]}>{t('foodSearch.servingsLabel')}</Text>
-            <TouchableOpacity
-              onPress={() => { setCustomGrams(''); setServings(Math.max(0.5, servings - 0.5)); }}
-              style={styles.servingsBtn}
-              accessibilityRole="button"
-              accessibilityLabel={t('foodSearch.decreaseServings')}
-            >
-              <Ionicons name="remove" size={20} color={C.text} />
-            </TouchableOpacity>
-            <Text style={[styles.servingsValue, { color: C.text }]}>{servings}</Text>
-            <TouchableOpacity
-              onPress={() => { setCustomGrams(''); setServings(servings + 0.5); }}
-              style={styles.servingsBtn}
-              accessibilityRole="button"
-              accessibilityLabel={t('foodSearch.increaseServings')}
-            >
-              <Ionicons name="add" size={20} color={C.text} />
-            </TouchableOpacity>
+          {/* Controls row: servings stepper + grams input side by side */}
+          <View style={styles.footerControls}>
+            {/* Servings stepper */}
+            <View style={styles.servingsPart}>
+              <Text style={[styles.servingsLabel, { color: C.textSecondary }]}>{t('foodSearch.servingsLabel')}</Text>
+              <View style={styles.stepperRow}>
+                <TouchableOpacity
+                  onPress={() => { setCustomGrams(''); setServings(Math.max(0.5, servings - 0.5)); }}
+                  style={[styles.servingsBtn, { backgroundColor: `${C.primary}20` }]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('foodSearch.decreaseServings')}
+                >
+                  <Ionicons name="remove" size={18} color={C.text} />
+                </TouchableOpacity>
+                <Text style={[styles.servingsValue, { color: C.text }]}>{servings}</Text>
+                <TouchableOpacity
+                  onPress={() => { setCustomGrams(''); setServings(servings + 0.5); }}
+                  style={[styles.servingsBtn, { backgroundColor: `${C.primary}20` }]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('foodSearch.increaseServings')}
+                >
+                  <Ionicons name="add" size={18} color={C.text} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={[styles.footerDivider, { backgroundColor: C.border }]} />
+
+            {/* Exact weight input (grams) */}
+            <View style={styles.gramsPart}>
+              <Text style={[styles.servingsLabel, { color: C.textSecondary }]}>{t('foodSearch.weightLabel')}</Text>
+              <View style={styles.gramsInputRow}>
+                <TextInput
+                  style={[styles.gramsInput, { color: C.text, borderColor: C.border, backgroundColor: C.background }]}
+                  placeholder={String(Math.round((selectedItem.servingSize || 100) * servings))}
+                  placeholderTextColor={C.textMuted}
+                  keyboardType="numeric"
+                  value={customGrams}
+                  onChangeText={setCustomGrams}
+                  maxLength={5}
+                  accessibilityLabel={t('foodSearch.weightLabel')}
+                />
+                <Text style={[styles.gramsUnit, { color: C.textSecondary }]}>g</Text>
+              </View>
+            </View>
           </View>
 
-          {/* Exact weight input (grams) */}
-          <View style={styles.gramsRow}>
-            <Text style={[styles.servingsLabel, { color: C.textSecondary }]}>{t('foodSearch.weightLabel')}</Text>
-            <TextInput
-              style={[styles.gramsInput, { color: C.text, borderColor: C.border, backgroundColor: C.background }]}
-              placeholder={String(Math.round((selectedItem.servingSize || 100) * servings))}
-              placeholderTextColor={C.textMuted}
-              keyboardType="numeric"
-              value={customGrams}
-              onChangeText={setCustomGrams}
-              maxLength={5}
-              accessibilityLabel={t('foodSearch.weightLabel')}
-            />
-            <Text style={[styles.gramsUnit, { color: C.textSecondary }]}>g</Text>
-          </View>
-
-          <TouchableOpacity style={[styles.logButton, { backgroundColor: C.primary }]} onPress={handleLogFood} accessibilityRole="button" accessibilityLabel={t('foodSearch.logButton')}>
-            <Ionicons name="add-circle" size={20} color={C.text} />
-            <Text style={[styles.logButtonText, { color: C.text }]}>{t('foodSearch.logButton')}</Text>
+          {/* Save button — full width */}
+          <TouchableOpacity
+            style={[styles.logButton, { backgroundColor: C.primary }]}
+            onPress={handleLogFood}
+            accessibilityRole="button"
+            accessibilityLabel={t('foodSearch.logButton')}
+          >
+            <Ionicons name="checkmark-circle" size={20} color="#fff" />
+            <Text style={[styles.logButtonText, { color: '#fff' }]}>{t('foodSearch.logButton')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -664,30 +706,76 @@ const createStyles = (C: any) => StyleSheet.create({
     color: C.textSecondary,
     marginTop: 2,
   },
-  footer: {
+  quickAddRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginHorizontal: 16,
+    marginTop: 12,
+  },
+  quickAddBtn: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  quickAddLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  orLabel: {
+    textAlign: 'center',
+    fontSize: 12,
+    marginTop: 14,
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+  footer: {
+    flexDirection: 'column',
     paddingHorizontal: 16,
     paddingTop: 14,
+    gap: 12,
     backgroundColor: C.surface,
     borderTopWidth: 1,
     borderTopColor: C.border,
   },
-  servingsRow: {
+  footerControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 0,
+  },
+  footerDivider: {
+    width: 1,
+    height: 40,
+    marginHorizontal: 12,
+  },
+  servingsPart: {
+    flex: 1,
+    gap: 6,
+  },
+  gramsPart: {
+    flex: 1,
+    gap: 6,
   },
   servingsLabel: {
-    fontSize: 14,
+    fontSize: 12,
+    fontWeight: '600',
     color: C.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+  },
+  stepperRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   servingsBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(156,140,255,0.2)',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -695,14 +783,13 @@ const createStyles = (C: any) => StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: C.text,
-    minWidth: 30,
+    minWidth: 28,
     textAlign: 'center',
   },
-  gramsRow: {
+  gramsInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginTop: 10,
+    gap: 6,
   },
   gramsInput: {
     flex: 1,
@@ -710,27 +797,25 @@ const createStyles = (C: any) => StyleSheet.create({
     fontWeight: '600',
     borderWidth: 1,
     borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    textAlign: 'right',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    textAlign: 'center',
   },
   gramsUnit: {
     fontSize: 14,
     fontWeight: '600',
-    minWidth: 20,
+    minWidth: 16,
   },
   logButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
-    backgroundColor: C.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 14,
+    borderRadius: 14,
   },
   logButtonText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
-    color: C.text,
   },
 });
