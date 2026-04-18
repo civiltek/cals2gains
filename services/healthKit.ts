@@ -104,9 +104,16 @@ class HealthService {
           if (typeof AppleHealthKit.isAvailable === 'function') {
             let callbackCalled = false;
             try {
-              const maybeResult = AppleHealthKit.isAvailable((err: any, result: boolean) => {
+              const maybeResult = AppleHealthKit.isAvailable((...args: any[]) => {
                 callbackCalled = true;
-                resolve(err ? false : !!result);
+                // Older versions of react-native-health call the callback
+                // with `(available)` only. Newer versions use `(err, available)`.
+                if (args.length >= 2) {
+                  const [err, result] = args;
+                  resolve(err ? false : !!result);
+                } else {
+                  resolve(!!args[0]);
+                }
               });
               // Some versions return a boolean synchronously.
               if (!callbackCalled && typeof maybeResult === 'boolean') {
@@ -116,8 +123,12 @@ class HealthService {
               resolve(false);
             }
           } else {
-            // Fallback: HealthKit is available on all iPhones running iOS 8+
-            resolve(true);
+            // If isAvailable is not a function, the JS bridge to the native
+            // module is almost certainly broken — don't assume HealthKit works.
+            console.warn(
+              '[HealthService] AppleHealthKit.isAvailable is not a function; assuming HealthKit unavailable'
+            );
+            resolve(false);
           }
         }), false, 2500);
         this.isAvailable = available;
@@ -183,6 +194,12 @@ class HealthService {
       if (Platform.OS === 'ios') {
         const AppleHealthKit = await getAppleHealthKit();
         if (!AppleHealthKit) return false;
+        if (typeof AppleHealthKit.initHealthKit !== 'function') {
+          console.warn(
+            '[HealthService] AppleHealthKit.initHealthKit is not a function — native module not linked?'
+          );
+          return false;
+        }
 
         // Apple docs: you MUST call isHealthDataAvailable() before requesting
         // authorization. If HealthKit is not available, do not attempt to use it.
@@ -887,7 +904,31 @@ class HealthService {
 async function getAppleHealthKit(): Promise<any | null> {
   try {
     const mod = require('react-native-health');
-    return mod.default || mod;
+    const rn = require('react-native');
+    // Some versions of react-native-health expose the native module as
+    // `default`, others as a named export `AppleHealthKit`, others as the
+    // whole module object, and in some broken/autolinked setups the JS
+    // bridge is only reachable via `NativeModules.AppleHealthKit`. Try them
+    // all and pick the first one that actually has the expected methods.
+    const candidates = [
+      mod?.default,
+      mod?.AppleHealthKit,
+      mod,
+      rn?.NativeModules?.AppleHealthKit,
+    ].filter(Boolean);
+    for (const candidate of candidates) {
+      if (
+        typeof candidate?.initHealthKit === 'function'
+        || typeof candidate?.isAvailable === 'function'
+      ) {
+        return candidate;
+      }
+    }
+    console.warn(
+      '[HealthService] react-native-health loaded but no usable AppleHealthKit export found',
+      { candidates: candidates.map((c) => typeof c) }
+    );
+    return null;
   } catch {
     console.warn('react-native-health not available');
     return null;
