@@ -380,6 +380,21 @@ Componente reutilizable InfoButton y tooltips en pantallas clave:
 - **`app/analysis.tsx`**: InfoButton en "Información nutricional" (explica calorías) y junto al grid de macros (explica proteína/carbos/grasa).
 - **i18n**: 5 tooltips (`fasting`, `activityLevel`, `goalMode`, `calories`, `macros`) en EN + ES. Tono cercano, motivador, basado en ciencia.
 
+## 2026-04-17 — Fix macros proporcionales, botones tipo día, Health Connect Android y voz iOS + branding paywall/login
+
+Seis bugs reportados por Judith tras tanda de pruebas en dispositivo:
+
+1. **Macros de días de entreno no se ajustaban al usuario** — estaban hardcoded (2800/2500/3100/2600). Nuevo helper `buildPresetsFromGoals(user.goals)` aplica multiplicadores proporcionales: entreno +12% cal/+25% carbs/-10% fat; descanso -5% cal/-20% carbs/+10% fat; refeed +20% cal/+45% carbs/-15% fat; competición +8% cal/+20% carbs/-5% fat.
+2. **Botones "tipo de día" en training-day no hacían nada** — `handleSelectDayType` solo actualizaba estado local. Ahora llama `userStore.setTodayDayType(en)` que setea un `todayDayTypeOverride` con fecha del día actual.
+3. **Dashboard no se actualizaba al activar plan** — `activatePlan`/`deactivatePlan` ahora limpian override stale y notifican userStore. `getActiveGoals` reordenado: override manual > plan activo > legacy dayTypeGoals > user.goals.
+4. **Health Connect Android: faltaban permisos críticos** — `android.permission.health.READ_BODY_FAT` y `READ_LEAN_BODY_MASS` se pedían en código pero no estaban en el manifest `app.json`. Sin ellos, la request fallaba silenciosamente. Añadidos. También se reemplazaron catches silenciosos (`catch {}`) por `console.error` para ver errores en logcat.
+5. **Paywall y Welcome: emoji microscopio 🔬 en lugar del logo** — ambas pantallas reemplazadas: logo `C2G-Mark-512.png` + wordmark con colores de marca (`#9C8CFF` violeta para "Cals"/"Gains", `#FF6A4D` coral para "2").
+6. **Grabación de voz iOS: "Grabando 0s" sin grabar realmente** — `handleStartRecording` ahora envuelto en try/catch, `prepareToRecordAsync` explícito, `await recorder.record()`, y `setScreenState('recording')` solo se setea DESPUÉS del éxito (antes se setaba antes del await → race condition). `stopAndProcess` ya no tiene early-return silencioso; errores se loguean.
+
+**Arquitectura tipos día**: `DayType` de `types/index.ts` extendido de `'training' | 'rest'` a `'training' | 'rest' | 'refeed' | 'competition'`. Helpers bidireccionales `trainingDayTypeToEnglish` / `trainingDayTypeFromEnglish` entre el español (`TrainingDayType` en trainingPlanStore) y el inglés.
+
+**Requiere nuevo build Android + iOS** — los builds #24570989383/#24570991128 previos no incluyen estos fixes.
+
 ## 2026-04-17 — Fix iOS HealthKit: isHealthDataAvailable + entitlement + archivo truncado
 
 Build 52 iOS fallaba al conectar a Salud. Tres problemas encontrados y corregidos:

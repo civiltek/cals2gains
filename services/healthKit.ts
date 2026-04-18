@@ -132,12 +132,17 @@ class HealthService {
         try {
           const status = await HealthConnect.getSdkStatus();
           this.isAvailable = status === SDK_AVAILABLE;
-        } catch {
+          if (!this.isAvailable) {
+            console.warn('[HealthService] Health Connect SDK not available, status=', status);
+          }
+        } catch (err) {
+          console.error('[HealthService] getSdkStatus error:', err);
           this.isAvailable = false;
         }
       }
       return this.isAvailable;
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] checkAvailability error:', err);
       return false;
     }
   }
@@ -382,6 +387,30 @@ class HealthService {
   }
 
   /**
+   * Get health summary for an arbitrary calendar day (00:00 → 23:59:59 local).
+   * Used by the weekly rebalance engine to reconstruct the last 7 days.
+   */
+  async getDaySummary(day: Date): Promise<HealthData | null> {
+    if (!this.isAuthorized) return null;
+
+    try {
+      const start = new Date(day);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(day);
+      end.setHours(23, 59, 59, 999);
+
+      if (Platform.OS === 'ios') {
+        return await this.getIOSSummary(start, end);
+      } else {
+        return await this.getAndroidSummary(start, end);
+      }
+    } catch (error) {
+      console.error('Health day fetch error:', error);
+      return null;
+    }
+  }
+
+  /**
    * Write weight to health platform
    */
   async saveWeight(weightKg: number): Promise<boolean> {
@@ -412,7 +441,8 @@ class HealthService {
         ]);
         return true;
       }
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] saveWeight error:', err);
       return false;
     }
   }
@@ -607,7 +637,8 @@ class HealthService {
       } else {
         return await this.getAndroid7DayCalorieAverage(startDate, endDate, days);
       }
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] get7DayCalorieAverage error:', err);
       return { avgCalories: 0, daysWithData: 0 };
     }
   }
@@ -670,7 +701,8 @@ class HealthService {
           date: new Date(s.startTime),
         }));
       }
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] getRecentWorkouts error:', err);
       return [];
     }
   }
@@ -838,7 +870,8 @@ class HealthService {
         exerciseMinutes: Math.round(activeCalories / 8),
         lastSynced: new Date(),
       };
-    } catch {
+    } catch (err) {
+      console.error('[HealthService] getAndroidSummary error:', err);
       return {
         steps: 0, activeCalories: 0, restingCalories: 0,
         totalCalories: 0, exerciseMinutes: 0, lastSynced: new Date(),

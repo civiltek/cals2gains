@@ -24,6 +24,7 @@ import MacroRing from '../../components/ui/MacroRing';
 import MealCard from '../../components/ui/MealCard';
 import { useUserStore } from '../../store/userStore';
 import { useMealStore } from '../../store/mealStore';
+import { useWeeklyStore } from '../../store/weeklyStore';
 import { useAdaptiveStore } from '../../store/adaptiveStore';
 import { useAdaptiveEngines } from '../../hooks/useAdaptiveEngines';
 import { useStreakStore } from '../../store/streakStore';
@@ -106,7 +107,7 @@ export default function HomeScreen() {
   const dismissRecommendation = useAdaptiveStore((s) => s.dismissRecommendation);
   const updateUserGoals = useUserStore((s) => s.updateUserGoals);
   const getTodayTrainingInfo = useTrainingPlanStore((s) => s.getTodayInfo);
-  const todayTraining = isToday ? getTodayTrainingInfo(user?.goals) : null;
+  const todayTraining = isToday ? getTodayTrainingInfo() : null;
 
   const locale = i18n.language === 'es' ? es : enUS;
   const today = useMemo(
@@ -125,6 +126,15 @@ export default function HomeScreen() {
       loadGameProgress(user.uid);
     }
   }, [user?.uid, viewDate.toDateString()]);
+
+  // Load the rolling 7-day window when dynamic TDEE + rebalance is enabled.
+  // Refreshes itself every 6h internally — see weeklyStore.loadWeek.
+  const loadWeek = useWeeklyStore((s) => s.loadWeek);
+  const getTodayTarget = useWeeklyStore((s) => s.getTodayTarget);
+  useEffect(() => {
+    if (!user?.uid || !user?.profile || !user.dynamicTDEEEnabled) return;
+    loadWeek(user.uid, user.profile);
+  }, [user?.uid, user?.dynamicTDEEEnabled, todayNutrition.calories]);
 
   // Refresh streak whenever meals are loaded for the day
   useEffect(() => {
@@ -172,9 +182,35 @@ export default function HomeScreen() {
 
   // Use getActiveGoals() for reactivity — it respects goalMode, dayType, etc.
   const activeGoals = getActiveGoals();
-  const goals = activeGoals.calories > 0
+  const baseGoals = activeGoals.calories > 0
     ? activeGoals
     : { calories: 2000, protein: 150, carbs: 200, fat: 65, fiber: 30 };
+
+  // Weekly rebalance: if dynamicTDEEEnabled is on AND we have the profile,
+  // compute today's target from the 7-day rolling budget instead of the
+  // flat daily goal. Falls back to baseGoals on kill switch / no data.
+  const rebalancedTarget = useMemo(() => {
+    if (!user?.dynamicTDEEEnabled || !user?.profile) return null;
+    if (!isToday) return null; // only adjust today's view
+    // If an active training plan marks today as refeed or competition, skip
+    // rebalance so the plan's macros take precedence (nutrition agent R9).
+    const trainingInfo = getTodayTrainingInfo();
+    const trainingDay =
+      trainingInfo?.dayType === 'refeed' || trainingInfo?.dayType === 'competicion'
+        ? trainingInfo.dayType
+        : null;
+    return getTodayTarget(user, baseGoals, trainingDay);
+  }, [user, isToday, baseGoals.calories, getTodayTarget, getTodayTrainingInfo]);
+
+  const goals = rebalancedTarget
+    ? {
+        calories: rebalancedTarget.calories,
+        protein: rebalancedTarget.protein,
+        carbs: rebalancedTarget.carbs,
+        fat: rebalancedTarget.fat,
+        fiber: rebalancedTarget.fiber,
+      }
+    : baseGoals;
 
   // Consumed macros
   const consumed = {
@@ -423,6 +459,42 @@ export default function HomeScreen() {
 
         {/* ===== CALORIE RING + MACRO BARS DASHBOARD ===== */}
         <View style={styles.dashboardCard}>
+          {/* Rebalance banner: only shown when today's target differs from base.
+              Includes the nutrition-agent-mandated medical disclaimer (R2). */}
+          {rebalancedTarget && rebalancedTarget.calories !== rebalancedTarget.baseTarget && (
+            <View style={[styles.rebalanceBanner, { backgroundColor: C.violet + '22', borderColor: C.violet }]}>
+              <View style={styles.rebalanceHeader}>
+                <Ionicons name="sync" size={14} color={C.violet} />
+                <Text style={[styles.rebalanceText, { color: C.text }]}>
+                  {t('home.rebalance.adjusted', {
+                    today: rebalancedTarget.calories,
+                    base: rebalancedTarget.baseTarget,
+                    defaultValue: 'Hoy {{today}} kcal · base {{base}}',
+                  })}
+                </Text>
+              </View>
+              {rebalancedTarget.flags.includes('delta_vs_static_exceeded') && (
+                <Text style={[styles.rebalanceWarning, { color: C.warning }]}>
+                  {t('home.rebalance.deltaExceeded', {
+                    defaultValue: 'El ajuste supera el 25 % de tu objetivo inicial. Considera revisar tu baseline o consultar con un profesional.',
+                  })}
+                </Text>
+              )}
+              {rebalancedTarget.flags.includes('mini_cut_duration_exceeded') && (
+                <Text style={[styles.rebalanceWarning, { color: C.warning }]}>
+                  {t('home.rebalance.miniCutTooLong', {
+                    defaultValue: 'Llevas más de 6 semanas en mini_cut. Es recomendable hacer un descanso en mantenimiento antes de continuar.',
+                  })}
+                </Text>
+              )}
+              <Text style={[styles.rebalanceDisclaimer, { color: C.text + 'aa' }]}>
+                {t('home.rebalance.disclaimer', {
+                  defaultValue: 'Información general basada en tu actividad reciente. No sustituye el consejo de un profesional de la salud.',
+                })}
+              </Text>
+            </View>
+          )}
+
           {/* Calorie ring centered */}
           <View style={styles.ringRow}>
             <MacroRing
@@ -975,6 +1047,38 @@ const getStyles = (C: ReturnType<typeof useColors>) =>
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 20,
+    },
+    rebalanceBanner: {
+      flexDirection: 'column',
+      gap: 4,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      borderRadius: 10,
+      borderWidth: 1,
+      marginBottom: 12,
+    },
+    rebalanceHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    rebalanceDisclaimer: {
+      fontSize: 10,
+      fontFamily: 'InstrumentSans',
+      fontStyle: 'italic',
+      lineHeight: 14,
+      marginTop: 2,
+    },
+    rebalanceWarning: {
+      fontSize: 11,
+      fontFamily: 'InstrumentSans-Medium',
+      lineHeight: 15,
+      marginTop: 4,
+    },
+    rebalanceText: {
+      fontSize: 12,
+      fontFamily: 'InstrumentSans-Medium',
+      flex: 1,
     },
     calorieStats: {
       flex: 1,

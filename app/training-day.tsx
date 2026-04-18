@@ -18,8 +18,11 @@ import { format } from 'date-fns';
 
 // Mock store imports
 import { useUserStore } from '../store/userStore';
-import { useTrainingPlanStore, buildPresetsFromGoals } from '../store/trainingPlanStore';
-import InfoButton from '../components/ui/InfoButton';
+import {
+  useTrainingPlanStore,
+  buildPresetsFromGoals,
+  trainingDayTypeToEnglish,
+} from '../store/trainingPlanStore';
 
 const { width } = Dimensions.get('window');
 
@@ -41,37 +44,10 @@ interface WeekDay {
   isToday: boolean;
 }
 
-// DAY_TYPE_PRESETS will be created inside component with access to theme colors
-const BASE_DAY_TYPE_PRESETS = {
-  entreno: {
-    type: 'entreno' as DayType,
-    calories: 2800,
-    protein: 160,
-    carbs: 380,
-    fat: 65,
-  },
-  descanso: {
-    type: 'descanso' as DayType,
-    calories: 2500,
-    protein: 160,
-    carbs: 250,
-    fat: 85,
-  },
-  refeed: {
-    type: 'refeed' as DayType,
-    calories: 3100,
-    protein: 150,
-    carbs: 450,
-    fat: 60,
-  },
-  competicion: {
-    type: 'competicion' as DayType,
-    calories: 2600,
-    protein: 140,
-    carbs: 350,
-    fat: 60,
-  },
-};
+// Fallback presets used when the user has no saved goals yet (first-run).
+// Normally the presets are derived from the user's personal goals
+// via `buildPresetsFromGoals(user.goals)`.
+const FALLBACK_BASE_GOALS = { calories: 2500, protein: 160, carbs: 300, fat: 75 };
 
 // DAY_LABELS will be created inside component with access to t() for translations
 const BASE_DAY_LABELS: Record<DayType, { emoji: string; icon: string }> = {
@@ -95,35 +71,28 @@ export default function TrainingDay() {
     competicion: { label: 'Competición',                        emoji: BASE_DAY_LABELS.competicion.emoji, icon: BASE_DAY_LABELS.competicion.icon },
   }), [t]);
 
-  // User goals drive proportional macros; fall back to hardcoded defaults.
-  const user = useUserStore((s) => s.user);
-  const userGoals = user?.goals && user.goals.calories > 0 ? user.goals : null;
-
-  // Build DAY_TYPE_PRESETS — proportional to user goals when available.
-  const DAY_TYPE_PRESETS: Record<DayType, DayTypeGoals> = useMemo(() => {
-    const colors = { entreno: C.primary, descanso: C.info, refeed: C.success, competicion: '#FF9800' };
-    if (userGoals) {
-      const p = buildPresetsFromGoals(userGoals);
-      return {
-        entreno:     { type: 'entreno',     ...p.entreno,     color: colors.entreno },
-        descanso:    { type: 'descanso',    ...p.descanso,    color: colors.descanso },
-        refeed:      { type: 'refeed',      ...p.refeed,      color: colors.refeed },
-        competicion: { type: 'competicion', ...p.competicion, color: colors.competicion },
-      };
-    }
-    return {
-      entreno:     { ...BASE_DAY_TYPE_PRESETS.entreno,     color: colors.entreno },
-      descanso:    { ...BASE_DAY_TYPE_PRESETS.descanso,    color: colors.descanso },
-      refeed:      { ...BASE_DAY_TYPE_PRESETS.refeed,      color: colors.refeed },
-      competicion: { ...BASE_DAY_TYPE_PRESETS.competicion, color: colors.competicion },
-    };
-  }, [C.primary, C.info, C.success, userGoals]);
-
-  // Read active training plan for today (pass goals so plan macros scale with user TDEE)
+  // Read user goals and active plan for proportional macros
+  const userGoals = useUserStore((s) => s.user?.goals);
+  const setTodayDayType = useUserStore((s) => s.setTodayDayType);
   const getTodayTrainingInfo = useTrainingPlanStore((s) => s.getTodayInfo);
-  const todayTrainingInfo = getTodayTrainingInfo(userGoals ?? undefined);
+  const todayTrainingInfo = getTodayTrainingInfo();
   const planDayType = todayTrainingInfo?.dayType as DayType | undefined;
-  const planMacros = todayTrainingInfo?.macros;
+
+  // Build proportional presets from user's personal goals (or fallback base)
+  const DAY_TYPE_PRESETS: Record<DayType, DayTypeGoals> = useMemo(() => {
+    const base = (userGoals && userGoals.calories > 0)
+      ? userGoals
+      : FALLBACK_BASE_GOALS;
+    const presets = buildPresetsFromGoals(base);
+    return {
+      entreno:     { type: 'entreno',     ...presets.entreno,     color: C.primary },
+      descanso:    { type: 'descanso',    ...presets.descanso,    color: C.info },
+      refeed:      { type: 'refeed',      ...presets.refeed,      color: C.success },
+      competicion: { type: 'competicion', ...presets.competicion, color: '#FF9800' },
+    };
+  }, [userGoals?.calories, userGoals?.protein, userGoals?.carbs, userGoals?.fat, C.primary, C.info, C.success]);
+
+  const planMacros = planDayType ? DAY_TYPE_PRESETS[planDayType] : undefined;
 
   const [todayType, setTodayType] = useState<DayType>(planDayType ?? 'entreno');
   const [weekDays, setWeekDays] = useState<WeekDay[]>([]);
@@ -172,6 +141,8 @@ export default function TrainingDay() {
   const handleSelectDayType = (type: DayType) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setTodayType(type);
+    // Propagate to userStore so the home dashboard macros update immediately
+    setTodayDayType(trainingDayTypeToEnglish(type));
   };
 
   const handleToggleAutoDetect = () => {
@@ -181,6 +152,8 @@ export default function TrainingDay() {
 
   const handleApplyToday = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    // Persist today's override so the home dashboard macros update for the rest of the day
+    setTodayDayType(trainingDayTypeToEnglish(todayType));
     const goalData = DAY_TYPE_PRESETS[todayType];
     Alert.alert(
       t('trainingDay.goalsUpdated'),
@@ -225,20 +198,7 @@ export default function TrainingDay() {
 
   const renderMacroComparison = () => (
     <View style={styles.comparisonContainer}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Text style={styles.comparisonTitle}>{t('trainingDay.macroComparison')}</Text>
-        <InfoButton
-          emoji="📊"
-          title="¿Por qué los macros cambian según el día?"
-          body={
-            'Los días de entreno necesitan más energía y, sobre todo, más carbohidratos — son el combustible principal de tus músculos en sesiones intensas.\n\n' +
-            'En los días de descanso bajan los carbohidratos (tu cuerpo los necesita menos) y sube ligeramente la grasa para cubrir la saciedad.\n\n' +
-            'El refeed es un día "alto" pensado para recargar depósitos de glucógeno y dar un descanso psicológico si estás en déficit.\n\n' +
-            'La proteína se mantiene CONSTANTE todos los días. No necesitas cambiarla: el objetivo es siempre el mismo — proteger tu masa muscular (1.6–2.2 g/kg según tu perfil).\n\n' +
-            'Referencias: ISSN 2017 (proteína), Burke 2011 e Impey 2018 ("fuel for the work required"), Helms 2024 (grasa en descanso).'
-          }
-        />
-      </View>
+      <Text style={styles.comparisonTitle}>{t('trainingDay.macroComparison')}</Text>
 
       <View style={styles.comparisonTable}>
         {/* Header row */}
@@ -369,20 +329,7 @@ export default function TrainingDay() {
 
   const renderMacroDistribution = () => (
     <View style={styles.distributionContainer}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Text style={styles.distributionTitle}>{t('trainingDay.macroDistribution', { type: DAY_LABELS[todayType].label })}</Text>
-        <InfoButton
-          emoji="🍽️"
-          title="¿Cómo leer la distribución de macros?"
-          body={
-            'Las barras muestran cuánto peso tiene cada macronutriente en tu objetivo calórico del día:\n\n' +
-            '• Proteína (1g = 4 kcal): es el macro más importante para mantener músculo. Debería estar entre el 20-35% del total.\n\n' +
-            '• Carbohidratos (1g = 4 kcal): combustible principal. Varía según el día de entreno.\n\n' +
-            '• Grasa (1g = 9 kcal): esencial para hormonas y saciedad. Nunca por debajo de 0.5-0.8 g/kg de peso.\n\n' +
-            'Los porcentajes te ayudan a comparar: una dieta equilibrada típica es 25/45/30 (prot/carb/grasa) en mantenimiento.'
-          }
-        />
-      </View>
+      <Text style={styles.distributionTitle}>{t('trainingDay.macroDistribution', { type: DAY_LABELS[todayType].label })}</Text>
 
       <View style={styles.distributionBars}>
         {/* Protein */}
@@ -547,23 +494,9 @@ export default function TrainingDay() {
       {/* Active plan banner */}
       {todayTrainingInfo && (
         <View style={[styles.card, { backgroundColor: '#FF6A4D15', borderColor: '#FF6A4D40', borderWidth: 1, marginBottom: 12 }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-            <Text style={{ fontSize: 12, color: '#FF6A4D', fontWeight: '700' }}>
-              📋 {todayTrainingInfo.plan.name}
-            </Text>
-            <InfoButton
-              size={15}
-              color="#FF6A4D"
-              emoji="📋"
-              title="¿Cómo funciona el plan activo?"
-              body={
-                'Mientras tengas un plan activo, Cals2Gains ajusta automáticamente tus macros cada día según lo que tu plan marque (entreno, descanso, refeed, competición).\n\n' +
-                'Los números se calculan de forma proporcional a TU base personal — los mismos multiplicadores se aplican sobre el objetivo que ya tenías configurado, no sobre valores fijos.\n\n' +
-                'Cuando el plan termine, tus macros volverán automáticamente a tu configuración normal.\n\n' +
-                'Puedes desactivar el plan en cualquier momento desde "Plan de entrenamiento".'
-              }
-            />
-          </View>
+          <Text style={{ fontSize: 12, color: '#FF6A4D', fontWeight: '700', marginBottom: 2 }}>
+            📋 {todayTrainingInfo.plan.name}
+          </Text>
           <Text style={{ fontSize: 13, color: C.text }}>
             Día {todayTrainingInfo.dayNumber} de {todayTrainingInfo.totalDays} · {todayTrainingInfo.daysRemaining} días restantes
           </Text>

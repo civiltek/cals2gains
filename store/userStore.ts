@@ -32,6 +32,12 @@ import { loginRevenueCat, logoutRevenueCat } from '../services/revenuecat';
 import { calculateTDEE, calculateBMR } from '../utils/nutrition';
 import { HealthData } from '../services/healthKit';
 import { differenceInDays } from 'date-fns';
+import {
+  useTrainingPlanStore,
+  buildPresetsFromGoals,
+  trainingDayTypeToEnglish,
+  trainingDayTypeFromEnglish,
+} from './trainingPlanStore';
 
 interface UserState {
   user: User | null;
@@ -40,6 +46,9 @@ interface UserState {
   authInitialized: boolean;
   dayTypeGoals: DayTypeGoals | null;
   todayDayType: DayType;
+  /** Manual override of today's day type (user tapped a button). YYYY-MM-DD of when it was set. Null = follow active plan. */
+  todayDayTypeOverride: DayType | null;
+  todayDayTypeOverrideDate: string | null;
 
   // Health integration
   healthData: HealthData | null;
@@ -105,6 +114,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   authInitialized: false,
   dayTypeGoals: null,
   todayDayType: 'rest',
+  todayDayTypeOverride: null,
+  todayDayTypeOverrideDate: null,
   healthData: null,
 
   // Convenience — derived at read time (not reactive, use user?.uid in components)
@@ -232,56 +243,62 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
 
   setTodayDayType: (type: DayType) => {
-    set({ todayDayType: type });
+    const today = new Date().toISOString().split('T')[0];
+    set({
+      todayDayType: type,
+      todayDayTypeOverride: type,
+      todayDayTypeOverrideDate: today,
+    });
   },
 
   getActiveGoals: () => {
-    const { user, dayTypeGoals, todayDayType } = get();
+    const { user, dayTypeGoals, todayDayType, todayDayTypeOverride, todayDayTypeOverrideDate } = get();
     if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
 
-    // If a training plan is active, it overrides everything until the plan ends.
-    // Macros are proportional to the user's personal goals, not the plan's hardcoded defaults.
-    if (user.goals && user.goals.calories > 0) {
+    const today = new Date().toISOString().split('T')[0];
+    const hasValidOverride =
+      todayDayTypeOverride !== null && todayDayTypeOverrideDate === today;
+
+    // Determine today's day type: manual override > active training plan > legacy dayTypeGoals > none
+    let resolvedDayType: DayType | null = null;
+    if (hasValidOverride) {
+      resolvedDayType = todayDayTypeOverride!;
+    } else {
+      // Pull today's day type from active training plan (if any)
       try {
-        // Lazy-require to avoid circular import at module-init time.
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { useTrainingPlanStore } = require('./trainingPlanStore');
-        const planInfo = useTrainingPlanStore.getState().getTodayInfo(user.goals);
+        const planInfo = useTrainingPlanStore.getState().getTodayInfo();
         if (planInfo) {
-          return {
-            calories: planInfo.macros.calories,
-            protein: planInfo.macros.protein,
-            carbs: planInfo.macros.carbs,
-            fat: planInfo.macros.fat,
-            fiber: user.goals.fiber,
-          };
+          resolvedDayType = trainingDayTypeToEnglish(planInfo.dayType);
         }
-      } catch {
-        /* training plan store not ready — fall through */
+      } catch (err) {
+        // Training plan store not yet hydrated — fall through
       }
     }
 
-    if (!dayTypeGoals || !dayTypeGoals.enabled) {
-      return user.goals;
+    // If we have a resolved day type, compute proportional macros from user's base goals
+    if (resolvedDayType && user.goals && user.goals.calories > 0) {
+      const presets = buildPresetsFromGoals(user.goals);
+      const esKey = trainingDayTypeFromEnglish(resolvedDayType);
+      const preset = presets[esKey];
+      return {
+        calories: preset.calories,
+        protein: preset.protein,
+        carbs: preset.carbs,
+        fat: preset.fat,
+        fiber: user.goals.fiber,
+      };
     }
 
-    // Use specific goals if configured
-    if (todayDayType === 'refeed' && dayTypeGoals.refeed) return dayTypeGoals.refeed;
-    if (todayDayType === 'competition' && dayTypeGoals.competition) return dayTypeGoals.competition;
-
-    // Derive refeed/competition from training goals when no specific goals are set
-    if (todayDayType === 'refeed') {
-      const base = dayTypeGoals.training;
-      const extraCarbs = Math.round((base.carbs || 0) * 0.3);
-      return { ...base, carbs: (base.carbs || 0) + extraCarbs, fat: Math.round((base.fat || 0) * 0.8), calories: (base.calories || 0) + extraCarbs * 4 };
-    }
-    if (todayDayType === 'competition') {
-      const base = dayTypeGoals.training;
-      const extraCarbs = Math.round((base.carbs || 0) * 0.5);
-      return { ...base, carbs: (base.carbs || 0) + extraCarbs, fat: Math.round((base.fat || 0) * 0.7), calories: (base.calories || 0) + extraCarbs * 4 };
+    // Legacy fallback: manual training/rest goals
+    if (dayTypeGoals && dayTypeGoals.enabled) {
+      const key = todayDayType as keyof DayTypeGoals;
+      const legacy = (dayTypeGoals as any)[key];
+      if (legacy && typeof legacy === 'object' && 'calories' in legacy) {
+        return legacy as UserGoals;
+      }
     }
 
-    return dayTypeGoals[todayDayType];
+    return user.goals;
   },
 
   // =========================================================================
