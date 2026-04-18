@@ -29,8 +29,6 @@ const LOGO_MARK = require('../../brand-assets/C2G-Mark-512.png');
 import { signInWithGoogle, signInWithApple, signInWithEmail, createAccountWithEmail } from '../../services/firebase';
 import { useUserStore } from '../../store/userStore';
 
-const LOGO_MARK = require('../../brand-assets/C2G-Mark-512.png');
-
 // Conditional import — native module not available in Expo Go
 let GoogleSignin: any = null;
 try {
@@ -355,6 +353,15 @@ function createStyles(C: any) {
     brandLogo: {
       width: 80,
       height: 80,
+      marginBottom: 16,
+    },
+    logoContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 20,
+      backgroundColor: C.card,
+      alignItems: 'center',
+      justifyContent: 'center',
       marginBottom: 16,
     },
     appName: {
