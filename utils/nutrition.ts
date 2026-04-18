@@ -1,9 +1,18 @@
 ﻿// Cals2Gains - Nutrition Utility Functions
 
-import { ActivityLevel, FitnessGoal, Nutrition, UserGoals, UserProfile } from '../types';
+import { ActivityLevel, FitnessGoal, GoalMode, Nutrition, UserGoals, UserProfile } from '../types';
+import { calculateMacroTargets } from './macros';
 
 // Minimum days of health data required to trust the moving average
 const MIN_HEALTH_DAYS = 3;
+
+/**
+ * Wearable calibration factor — consumer wearables overestimate active calories:
+ * Apple Watch ~9 % high (Shcherbina et al., J Pers Med 2017),
+ * Fitbit 12-18 % high (Fuller et al., JMIR Mhealth Uhealth 2020).
+ * We apply a 10 % discount to approach real expenditure.
+ */
+export const WEARABLE_CALIBRATION_FACTOR = 0.9;
 
 export function calculateBMR(profile: UserProfile): number {
   const { weight, height, age, gender } = profile;
@@ -41,36 +50,42 @@ export function calculateDynamicTDEE(
 ): number | null {
   if (daysWithData < MIN_HEALTH_DAYS || avgActiveCalories7d <= 0) return null;
 
-  // Apply a small discount (0.9) to account for wearable over-estimation
-  const adjustedActive = Math.round(avgActiveCalories7d * 0.9);
+  // Apply calibration discount (see WEARABLE_CALIBRATION_FACTOR above).
+  const adjustedActive = Math.round(avgActiveCalories7d * WEARABLE_CALIBRATION_FACTOR);
 
   // Dynamic TDEE = BMR + real active calories
   return Math.round(bmr + adjustedActive);
 }
 
+/**
+ * Map the legacy `FitnessGoal` enum to the canonical `GoalMode` used by
+ * `calculateMacroTargets`. `improve_health` and `maintain_weight` both map to
+ * `maintain` (same calorie factor).
+ */
+function fitnessGoalToGoalMode(goal: FitnessGoal): GoalMode {
+  switch (goal) {
+    case 'lose_weight':    return 'lose_fat';
+    case 'gain_muscle':    return 'gain_muscle';
+    case 'maintain_weight':
+    case 'improve_health':
+    default:               return 'maintain';
+  }
+}
+
+/**
+ * Legacy entry point — kept to preserve the public API used by callers that
+ * operate on `FitnessGoal` instead of `GoalMode`. Delegates to the canonical
+ * `calculateMacroTargets`.
+ */
 export function calculateRecommendedGoals(profile: UserProfile): UserGoals {
-  const tdee = calculateTDEE(profile);
-  let targetCalories = tdee;
-
-  switch (profile.goal as FitnessGoal) {
-    case 'lose_weight':    targetCalories = Math.round(tdee * 0.8); break;
-    case 'gain_muscle':    targetCalories = Math.round(tdee * 1.1); break;
-    default:               targetCalories = tdee;
-  }
-
-  let proteinRatio: number, carbsRatio: number, fatRatio: number;
-  switch (profile.goal as FitnessGoal) {
-    case 'lose_weight':  proteinRatio = 0.35; carbsRatio = 0.35; fatRatio = 0.30; break;
-    case 'gain_muscle':  proteinRatio = 0.30; carbsRatio = 0.45; fatRatio = 0.25; break;
-    default:             proteinRatio = 0.25; carbsRatio = 0.45; fatRatio = 0.30;
-  }
-
+  const goalMode = fitnessGoalToGoalMode(profile.goal as FitnessGoal);
+  const targets = calculateMacroTargets(profile, goalMode);
   return {
-    calories: targetCalories,
-    protein: Math.round((targetCalories * proteinRatio) / 4),
-    carbs: Math.round((targetCalories * carbsRatio) / 4),
-    fat: Math.round((targetCalories * fatRatio) / 9),
-    fiber: profile.gender === 'male' ? 38 : 25,
+    calories: targets.calories,
+    protein: targets.protein,
+    carbs: targets.carbs,
+    fat: targets.fat,
+    fiber: targets.fiber,
   };
 }
 

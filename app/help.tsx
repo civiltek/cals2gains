@@ -102,6 +102,14 @@ export default function HelpScreen() {
     Linking.openURL('https://cals2gains.com');
   };
 
+  const handleMethodology = () => {
+    Linking.openURL('https://cals2gains.com/guides/metodologia.html');
+  };
+
+  const handleUserManual = () => {
+    Linking.openURL('https://cals2gains.com/guides/manual.html');
+  };
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: C.background }]}
@@ -173,6 +181,40 @@ export default function HelpScreen() {
           <View style={styles.contactButtonContent}>
             <Text style={[styles.contactButtonTitle, { color: C.text }]}>{t('help.visitWeb')}</Text>
             <Text style={[styles.contactButtonSubtitle, { color: C.textSecondary }]}>cals2gains.com</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={C.textTertiary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.contactButton, { backgroundColor: C.card }]}
+          onPress={handleUserManual}
+          activeOpacity={0.7}
+          accessibilityRole="link"
+          accessibilityLabel={t('help.manualTitle')}
+        >
+          <Ionicons name="book-outline" size={22} color={C.primary} />
+          <View style={styles.contactButtonContent}>
+            <Text style={[styles.contactButtonTitle, { color: C.text }]}>{t('help.manualTitle')}</Text>
+            <Text style={[styles.contactButtonSubtitle, { color: C.textSecondary }]}>
+              {t('help.manualSubtitle')}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={C.textTertiary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.contactButton, { backgroundColor: C.card }]}
+          onPress={handleMethodology}
+          activeOpacity={0.7}
+          accessibilityRole="link"
+          accessibilityLabel={t('help.methodologyTitle')}
+        >
+          <Ionicons name="flask-outline" size={22} color={C.primary} />
+          <View style={styles.contactButtonContent}>
+            <Text style={[styles.contactButtonTitle, { color: C.text }]}>{t('help.methodologyTitle')}</Text>
+            <Text style={[styles.contactButtonSubtitle, { color: C.textSecondary }]}>
+              {t('help.methodologySubtitle')}
+            </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={C.textTertiary} />
         </TouchableOpacity>

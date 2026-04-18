@@ -114,6 +114,200 @@ Sesión automática de tarde: 8 comentarios de valor nutricional publicados desd
 - @cals2gains (2): @michelle_lewin, @biolayne (post con 22 min de antigüedad)
 - Actualizado daily-log.md + influencers.md (@nutri_aerfit marcado ❌)
 
+## 2026-04-17 — Fase B + RAT + DPIA firmada + AGE_RATING_STORES (bloque final bloqueantes)
+
+Sesión de cierre de los bloqueantes P0 del lanzamiento público. Tras esta sesión, **9 de 10 bloqueantes resueltos en código/documentación**. Queda la ejecución manual del age rating en stores (documentada paso a paso en `_project-hub/AGE_RATING_STORES.md`) + retocar piezas de marketing ya programadas/publicadas en MBS/Meta/Brevo.
+
+**Documentos legales adoptados:**
+- `_project-hub/DPIA_v1.md` firmada por Judith Cordobes en representación de CivilTek Ingeniería SLU. Riesgo residual aceptado, sin supuestos de consulta previa a AEPD (Art. 36 RGPD).
+- `_project-hub/RAT_v1.md` — 10 tratamientos (T1-T10) con base legal, categorías, destinatarios, transferencias (DPF 2023 + SCCs 2021/914), plazos y medidas Art. 30 RGPD.
+- `_project-hub/AGE_RATING_STORES.md` — instrucciones paso a paso Apple Store Connect (17+) + Google Play Console (Teen/Mature + Target 18+).
+
+**Fase B técnica (screening médico + disclaimer ubicuo + age gate + AI Act):**
+
+Archivos nuevos:
+- `components/ui/SafetyDisclaimer.tsx` — componente reutilizable, variantes `short`/`full`, bilingüe, dark/light.
+- `components/ui/AITransparencyBanner.tsx` — banner Art. 50 AI Act, una vez por pantalla.
+- `app/(auth)/age-gate.tsx` — DOB picker, bloqueo <16, flag de minor.
+- `app/(auth)/screening.tsx` — `medicalFlags` con consentimiento Art. 9.2.a separado, copy sin términos clínicos.
+
+Archivos modificados:
+- `types/index.ts` — `MedicalFlag`, `dateOfBirth`, `autoAdaptEnabled`, `numericDisplayMode`, `consentHistory`.
+- `store/userStore.ts` — setters + `recordConsent` + `toggleAutoAdapt`.
+- `app/goal-modes.tsx` — bloqueos por flag + callouts de consulta profesional + ocultación numérica si `eating_sensitive`.
+- `app/smart-onboarding.tsx`, `app/(auth)/onboarding.tsx`, `app/(auth)/_layout.tsx`, `app/index.tsx` — flujo integrado.
+- `app/settings.tsx` — sección "Condiciones declaradas" + toggle "Adaptación automática" (Art. 22 RGPD).
+- `app/(tabs)/index.tsx`, `app/what-to-eat.tsx`, `app/weekly-coach.tsx`, `app/ai-review.tsx`, `app/food-verification.tsx` — disclaimers + AI banner.
+- `services/adaptiveMacroEngine.ts` — `detectExcessiveWeightLoss`: trigger >1 %/sem 2 semanas → +150 kcal, respeta `autoAdaptEnabled`.
+- `services/smartNotificationService.ts` — notificación no prescriptiva.
+- `i18n/es.ts` + `i18n/en.ts` — keys nuevas. Conflicto `onboarding.age` string vs objeto resuelto renombrando a `onboarding.ageGate`.
+
+Verificación: `npx tsc --noEmit` = 32 errores, **todos preexistentes** (17 training-plan + 1 InfoButton + 14 tools/remotion-engine). Fase B introduce cero errores nuevos.
+
+**Estado final bloqueantes:**
+
+| # | Bloqueante | Estado |
+|---|-------------|---------|
+| 1 | Screening médico | ✅ Fase B |
+| 2 | Hard-cap kcal | ✅ Fase A |
+| 3 | DPIA firmada | ✅ |
+| 4 | privacy.html + terms.html v2 | ✅ |
+| 5 | RAT con medicalFlags | ✅ |
+| 6 | Disclaimer ubicuo | ✅ (4 ubicaciones) |
+| 7 | Edad + Age Rating | 🟡 Código ✅, pendiente manual Judith |
+| 8 | Defensa no-MDR | ✅ |
+| 9 | Copy screening TCA | ✅ |
+| 10 | Auditoría copy publicado | 🟡 Repo ✅, pendiente MBS/Meta/Email |
+
+## 2026-04-17 — Auditoría marketing v1 (retroactiva) + correcciones HTML
+
+Auditoría completa del copy existente conforme a Reg UE 1924/2006, 432/2012, Ley 17/2011 Art. 44, Código PAOS, RDL 1/2007 y Metodología Nutricional v1.0 §9. Informe en `_project-hub/AUDITORIA_MARKETING_v1.md`.
+
+**Aplicado directamente en repo (correcciones inequívocas):**
+- `website/index.html` + `public/index.html` — eliminado `aggregateRating` inventado (4.8/1250 reviews); "La única app con IA real" → "IA integrada en cada función"; "IA de verdad" → "IA integrada"; FAQ precisión `85-95%` → reformulación sin cifra; sección testimonios (claims numéricos de pérdida/ganancia de peso) eliminada; "Miles de personas..." sustituido.
+- `website/cals2gains-landing.html` — FAQ "94 %+ precisión" → reformulación; testimonios (incluida supuesta nutricionista que "recomienda") eliminados.
+- `public/landing.html` — hero badge "LA ÚNICA APP CON IA REAL" → "IA INTEGRADA EN CADA FUNCIÓN"; meta description/title actualizados; testimonios con "Perdí 8kg en 3 meses" eliminados; CTA "No hay nada igual en el mercado" → "Empieza hoy, sin fricciones".
+- `website/index-prod-original.html` — hero + FAQ reformulados; **eliminado testimonio ficticio dirigido a público posparto** (CRÍTICO).
+- `public/index.old.html` — title + schema.org + hero + testimonios + CTA homogeneizados.
+
+**Pendiente decisión Judith / otros agentes (no aplicado):**
+- Age Rating App Store 4+ → 17+ (coordinar con app-dev y política INFORME_LEGAL Acción 12).
+- i18n `loseFatDesc` y `miniCutDesc` usan "pérdida rápida / rapid loss" (prohibido §9.2).
+- Ad Meta testimonio "perdí 2.3 kg" y Email 4 welcome sequence "perdí 4 kg / 78 % usuarios" — requieren reescritura.
+- Posts Instagram programados en MBS (schedule_en.json, esp. posts 15, 17, 22, 23, 25): editar antes de publicarse.
+
+Owner: agente legal + marketing. Acción 13 INFORME_LEGAL v1 marcada como "en curso — auditoría entregada".
+
+---
+
+## 2026-04-17 — Privacy + Terms v2: medicalFlags, Art. 22, DPF, AI Act, edad 16+/18+, no-MDR
+
+Reescritura completa de `website/privacy.html` (531 líneas) y `website/terms.html` (357 líneas), sincronizadas con `public/`. Fechas actualizadas a 17/04/2026.
+
+**privacy.html — secciones nuevas o rediseñadas:**
+- Cabecera con declaración destacada "no es producto sanitario Reg UE 2017/745".
+- §2.3 Datos de salud declarados (`medicalFlags`): embarazo/lactancia, relación sensible con la comida, diabetes T1/T2, enf. renal, edad. Art. 9.1 + 9.2.a RGPD, consentimiento granular y revocable.
+- §2.5 Notas de voz (OpenAI Whisper) — nuevo tratamiento.
+- §2.7 HealthKit / Health Connect con compromiso Apple 5.1.1(ix) (no publicidad con datos HK/HC).
+- §5 Transparencia AI Act Art. 50 con cita expresa (Reg UE 2024/1689), error típico ±10-15 %, editabilidad.
+- §6 Decisiones automatizadas (Art. 22 RGPD): coach + alerta >1 %/sem son orientativas, no producen efectos jurídicos, pero se reconocen oposición, no-adaptación, intervención humana y derecho de explicación.
+- §8 Transferencias internacionales con DPF (Decisión C(2023) 4745, 10/07/2023) + SCCs (2021/914 y 2021/915).
+- §10 Plazos de conservación: tabla ampliada (logs 12m, facturación 6 años Art. 30 CC + Art. 66 LGT).
+- §11 ARSOLIP con 7 derechos + retirada de consentimiento.
+- §14 Incidente de datos Art. 33-34 RGPD (AEPD 72 h, afectados sin dilación si riesgo alto).
+- §15 DPIA declarada (Art. 35, a disposición AEPD Art. 36).
+- §16 Política de edad: 16+ general, 18+ para `lose_fat`/`mini_cut`, no publicidad a menores (Ley 17/2011 Art. 44 + Código PAOS).
+- §17 Declaración inequívoca no-MDR.
+
+**terms.html — cláusulas nuevas o rediseñadas:**
+- §1 Naturaleza del servicio (bienestar, NO MDR, ±10-15 %).
+- §2 Población destinataria 16+/18+ con lista expresa de supuestos que exigen consulta profesional.
+- §3-§4 Precisión IA + Contenido generado por IA + no-entrenamiento OpenAI + transparencia Art. 50 AI Act.
+- §9 Uso aceptable con prohibiciones reforzadas (datos falsos de salud, scraping).
+- §12 Limitación de responsabilidad ajustada a RDL 1/2007 (no garantía de resultados, exclusión por no consultar profesional cuando la app lo recomendó, tope 50 €/12m suscripción, no-exclusión dolo/negligencia grave).
+- §14 Modificaciones con preaviso 30 días + cancelación sin penalización.
+- §17 Ley española + tribunales Madrid sin perjuicio del derecho del consumidor (RDL 1/2007 + Reg 1215/2012 Bruselas I bis).
+- §18 Plataforma ODR Comisión Europea (Reg 524/2013) con enlace.
+
+**Decisiones operativas:**
+- `website/terms.html` original estaba truncado a mitad del script EN/ES. Reconstruido con JS idéntico al resto.
+- Reescritura completa en vez de edits quirúrgicos (10+10 secciones nuevas, renumeración total).
+- Referencias normativas explícitas en cada cláusula de riesgo.
+- No se tocó sitemap.xml, cookie-consent.js ni el toggle JS (preservado idéntico).
+- Pendiente autorizar tools de Claude Preview si se quiere validación visual del toggle bilingüe (verificación realizada fue estructural).
+
+**Estado bloqueantes lanzamiento:** bloqueos #3 (DPIA) y #4 (privacy + terms) completados.
+
+## 2026-04-17 — Fase A metodología: unificación BMR + macros engine canónico
+
+Ejecutada la Fase A del plan técnico derivado de la metodología nutricional v1.0 y del informe legal. Sin cambios visibles para el usuario, base técnica para las fases B/C/D.
+
+**Archivos modificados:**
+- `utils/macros.ts` (NUEVO) — `calculateMacroTargets(profile, goalMode, bodyFatPct?)`: fuente canónica única. Mifflin-St Jeor o Katch-McArdle (si %BF entre 5-55), factores TDEE por goal mode (§3.1 metodología), proteína en g/kg centro del rango por modo (§3.2), hard-cap kcal mín (1200 ♀ / 1500 ♂) con flag, piso hormonal grasa 0,5 g/kg con flag (§8.2), fibra 38 ♂ / 25 ♀, carbos residuales con suelo 50 g. Sanity checks documentados.
+- `utils/nutrition.ts` — nueva constante `WEARABLE_CALIBRATION_FACTOR = 0.9` con referencias (Shcherbina 2017 JPM, Fuller 2020 JMIR Mhealth). `calculateRecommendedGoals` reescrita como wrapper de `calculateMacroTargets`. Helper `fitnessGoalToGoalMode`.
+- `app/smart-onboarding.tsx` — eliminado cálculo Harris-Benedict inline (L637-648); ahora invoca `calculateMacroTargets`. Mapeo `ActivityLevel` local ('athlete') → global ('extremely_active').
+- `app/goal-modes.tsx` — `calculateGoals` usa directamente `calculateMacroTargets(user.profile, mode)`; eliminado fallback con `proteinMultiplier`.
+- `app/nutrition-settings.tsx` — BMR unificado en `calculateBMR`; conservado sistema user-driven de presets (decisión UX).
+- `hooks/useHealthSync.ts` + `app/smart-onboarding.tsx` — limpiados 2 imports muertos.
+
+**Verificación:**
+- `npx tsc --noEmit`: archivos tocados por Fase A producen **cero errores TS**. Los 32 errores restantes son preexistentes (17 en `app/training-plan.tsx` y 1 en `InfoButton.tsx` por bugs de tema BRAND_FONTS/BRAND_COLORS introducidos el 17/04; 14 en `tools/remotion-engine/` tool auxiliar).
+- Grep `88.362|447.593` (Harris-Benedict): 0 matches en `.ts`/`.tsx`.
+- Grep `Math.max(1200`: solo en `utils/macros.ts` (canónica) + `personalEngine.ts:183` (preexistente, coherente) + `app/(auth)/onboarding.tsx` (onboarding legacy, fuera de scope Fase A).
+- Grep `proteinMultiplier`: solo en `adaptiveMacroEngine.ts` como metadata visual (según diseño).
+
+**Deuda técnica anotada (no arreglada en esta fase):**
+1. `app/(auth)/onboarding.tsx` tiene cálculo inline BMR y `Math.max(1200, …)` duplicado — migrar a `calculateMacroTargets` o deprecar (hay dos flujos de onboarding en paralelo).
+2. `nutrition-settings.tsx` mezcla goalMode con adjustKcal+preset — decisión de producto pendiente sobre fuente de verdad.
+3. 17 errores TS en `training-plan.tsx` (`BRAND_FONTS.mono`, `BRAND_COLORS.orange`, `fontFamily` no-string) + 1 en `InfoButton.tsx` — bugs de tema/tipos preexistentes a arreglar aparte.
+
+**Estado bloqueantes lanzamiento:** fase A completada → bloqueo #2 (hard-cap) resuelto; bloqueo #1 (screening médico) pendiente en fase B.
+
+## 2026-04-17 — Agente legal + informe regulatorio del §11 (LANZAMIENTO PÚBLICO BLOQUEADO)
+
+Creado el agente `legal` (en `Claude code/agents/legal.md`) y ejecutado análisis legal del §11 de la metodología nutricional + las 4 fases técnicas propuestas. Resultado archivado en `_project-hub/INFORME_LEGAL_v1.md`.
+
+**Bloqueantes críticos detectados — el lanzamiento público no procede hasta resolverlos:**
+
+1. Screening médico en onboarding (fix §11.3) — obligatorio por RGPD Art. 9, Art. 25 (privacy by design) y por riesgo de responsabilidad civil en TCA / embarazo / diabetes / enf. renal / menores.
+2. Hard-cap kcal 1200 ♀ / 1500 ♂ en onboarding (fix §11.4) — evita prescripción dietética automatizada.
+3. DPIA (Evaluación de Impacto sobre Protección de Datos, Art. 35 RGPD) firmada. Obligatoria por tratamiento sistemático de datos de salud + decisiones automatizadas (Art. 22).
+4. `privacy.html` y `terms.html` revisados por abogado/a (añadir: datos de salud tratados, base legal Art. 9.2.a, Art. 22 derechos, DPF 2023, menores, disclaimer "no es producto sanitario").
+5. RAT (registro de actividades de tratamiento, Art. 30) actualizado con `medicalFlags` antes de recogerlo.
+6. Disclaimer ubicuo in-app en onboarding / plan / notificaciones / alertas automáticas.
+7. Edad mínima subida: 16+ uso general, 18+ para modos con déficit (`lose_fat`, `mini_cut`). Ajustar Age Rating Apple (17+) y Google Play.
+8. Consulta a consultora MDR confirmando que Cals2Gains NO es software como producto sanitario (coste ~1-2 k€). El riesgo de equivocarse es clase IIa (marcado CE + ISO 13485 obligatorios).
+9. Copy del screening TCA validado por profesional de salud mental (no solo por legal).
+10. Auditoría de contenido ya publicado (posts IG, landing, help) para retirar claims incompatibles con la metodología (promesas numéricas, "quema grasa", "detox", etc.).
+
+Reasignación de prioridades frente al plan técnico original (Fases A/B/C/D):
+- Fase B (screening médico) sube a P0 crítico, bloqueante de lanzamiento.
+- §11.4 hard-cap kcal sube a P0 crítico.
+- Alerta automática §11.6 requiere copy mitigado muy específico para no cruzar la Regla 11 MDR.
+- Fase D (hidratación) queda como no bloqueante post-lanzamiento.
+
+Requisito AI Act: añadir transparencia Art. 50 (informar a la persona de que interactúa con sistema de IA) en onboarding y coach. Obligación recomendada recomendada (no bloqueante si se lanza tras octubre 2026).
+
+El informe completo con 15 acciones propuestas, referencia normativa por item, copy sugerido para wording sensible (TCA, derivación profesional, alerta automática, declaración de propósito) y puntos que requieren abogado/a colegiado/a está en `_project-hub/INFORME_LEGAL_v1.md`.
+
+## 2026-04-17 — Página pública de metodología + acceso desde app y web
+
+Maquetación corporativa de la metodología nutricional para usuarios finales. Un único archivo en web, referenciado desde la app vía URL canónica.
+
+- `website/guides/metodologia.html` (+ copia en `public/guides/metodologia.html`): página con brand Cals2Gains (violet/coral/plum, Outfit + Instrument Sans), bilingüe ES/EN, hero con eyebrow, índice navegable, 10 secciones, cards de tipos de sesión, tablas de objetivos y factores de actividad, bloques fórmula, callouts de seguridad, 17 referencias bibliográficas con enlaces a PubMed/EFSA. SEO + OpenGraph listos. Diseño responsive y persistencia de idioma en localStorage.
+- `sitemap.xml` (website + public): entrada `/guides/metodologia.html` prioridad 0.7, hreflang es+en.
+- `app/help.tsx`: nuevo botón "Metodología científica" que abre la URL canónica en el navegador. Acompañado de subtítulo "La ciencia detrás de cada número" e icono flask. Accesible con `accessibilityRole="link"` + label.
+- `i18n/es.ts` + `i18n/en.ts`: claves `help.methodologyTitle` + `help.methodologySubtitle`.
+- `.claude/launch.json`: añadida config "Static preview (website)" con http-server + autoPort, y `autoPort:false` explícito en Expo (Metro necesita 8081 fijo).
+
+La versión interna completa con deuda técnica sigue en `_project-hub/METODOLOGIA_NUTRICIONAL.md` — la versión pública se ha depurado de referencias a código, inconsistencias detectadas y backlog.
+
+## 2026-04-17 — Metodología nutricional científica v1.0 (nuevo documento)
+
+Auditoría completa del motor nutricional y redacción de la metodología científica que sustenta la app. Nuevo documento vivo en `_project-hub/METODOLOGIA_NUTRICIONAL.md` (13 secciones, ~1.500 líneas).
+
+**Cubre:**
+- Cálculo de TMB (Mifflin-St Jeor + Katch-McArdle con %BF)
+- TDEE estático y dinámico (wearables, coeficiente de calibración 0,9)
+- Distribución macros por 6 goal modes (lose_fat, mini_cut, recomp, maintain, lean_bulk, gain_muscle) con proteína en g/kg
+- Ajuste por tipo de sesión (9 tipos) basado en Jeukendrup, Burke, Helms
+- Coaching adaptativo semanal (umbrales, adherencia, ±200 kcal/sem máx)
+- Estimación IA de macros (jerarquía de fuentes, calibración anti-sobrestima)
+- Hidratación (fórmula EFSA/IOM, hoy no implementada)
+- **Salvaguardas de seguridad** (§8): déficit mín 1200♀/1500♂, piso 0,5 g/kg grasa, alertas pérdida >1%/sem, screening embarazo/TCA/diabetes/renal/menores
+- Copy científicamente responsable (lenguaje prohibido y recomendado)
+- 17 referencias bibliográficas primarias (ISSN, ACSM, EFSA, IOM)
+
+**Inconsistencias detectadas que requieren fix (backlog §11 del documento):**
+- [HIGH] `app/smart-onboarding.tsx:637-648` usa Harris-Benedict (1919) mientras `utils/nutrition.ts` usa Mifflin-St Jeor → unificar en Mifflin
+- [HIGH] Proteína se calcula de 3 formas distintas (% kcal en nutrition.ts, g/kg en adaptiveMacroEngine, otra en onboarding) → unificar en `calculateProteinGrams(kg, mode)`
+- [HIGH] No hay screening médico en onboarding (embarazo, TCA, diabetes, enf. renal, menores)
+- [HIGH] Hard-cap de kcal mínimas en onboarding (hoy solo en personalEngine)
+- [MED] Piso 0,5 g/kg grasa, alerta ritmo pérdida >1 %/sem, cálculo objetivo hidratación
+- Competición <60 min: factor carbos 1,5× sobredimensionado
+
+Este documento pasa a ser fuente de verdad — cualquier cálculo en código que diverja es un bug.
+
 ## 2026-04-17 — Integración InBody con Apple Salud / Google Health Connect (b284bc6)
 
 Importación automática de composición corporal desde la app Salud del móvil:

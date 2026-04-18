@@ -28,7 +28,19 @@ export default function Index() {
     return <Redirect href="/(auth)/welcome" />;
   }
 
-  // Check if user needs onboarding
+  // --- Fase B compliance gates ---
+  // 1) Age gate (dateOfBirth) debe completarse antes de nada.
+  if (user && !user.dateOfBirth) {
+    return <Redirect href="/(auth)/age-gate" />;
+  }
+
+  // 2) Screening médico — se considera completado cuando existe la clave
+  //    `medicalFlags` en el usuario (array, puede estar vacía = "ninguna").
+  if (user && user.medicalFlags === undefined) {
+    return <Redirect href="/(auth)/screening" />;
+  }
+
+  // 3) Onboarding clásico.
   if (user && !user.onboardingCompleted) {
     return <Redirect href="/(auth)/onboarding" />;
   }

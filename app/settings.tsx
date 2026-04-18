@@ -63,6 +63,9 @@ const SettingsScreen = () => {
   const C = useColors();
   const user = useUserStore((s) => s.user);
   const setHealthEnabled = useUserStore((s) => s.setHealthEnabled);
+  // Fase B — AI Act Art. 50 + medical flags actions
+  const setAutoAdaptEnabled = useUserStore((s) => s.setAutoAdaptEnabled);
+  const withdrawMedicalConsent = useUserStore((s) => s.withdrawMedicalConsent);
   const reminderState = useReminderStore();
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState<UserSettings>({
@@ -641,6 +644,136 @@ const SettingsScreen = () => {
                 {t('nutritionMode.advanced')}
               </Text>
             </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* ======================================================= */}
+        {/* Fase B — Inteligencia artificial (AI Act Art. 50)        */}
+        {/* ======================================================= */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>
+            {t('aiTransparency.sectionTitle')}
+          </Text>
+          <View style={[styles.sectionContent, { backgroundColor: C.background }]}>
+            <View style={[styles.settingRow, { borderBottomColor: C.border, alignItems: 'flex-start' }]}>
+              <View style={{ flex: 1, marginRight: 12 }}>
+                <Text style={[styles.settingLabel, { color: C.text }]}>
+                  {t('aiTransparency.autoAdaptTitle')}
+                </Text>
+                <Text style={[styles.settingDescription, { color: C.textSecondary, marginTop: 4 }]}>
+                  {t('aiTransparency.autoAdaptBody')}
+                </Text>
+              </View>
+              <Switch
+                // default activado (user?.autoAdaptEnabled === undefined → true)
+                value={user?.autoAdaptEnabled !== false}
+                onValueChange={async (val) => {
+                  try {
+                    await setAutoAdaptEnabled(val);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  } catch {
+                    // silent
+                  }
+                }}
+                trackColor={{ false: C.border, true: `${C.primary}40` }}
+                thumbColor={user?.autoAdaptEnabled !== false ? C.primary : C.textSecondary}
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* ======================================================= */}
+        {/* Fase B — Condiciones declaradas (RGPD Art. 9.2.a)        */}
+        {/* ======================================================= */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: C.text }]}>
+            {t('screening.settingsSectionTitle')}
+          </Text>
+          <View style={[styles.sectionContent, { backgroundColor: C.background }]}>
+            {(() => {
+              const flags = user?.medicalFlags || [];
+              if (flags.length === 0) {
+                return (
+                  <Text style={[styles.settingDescription, { color: C.textSecondary, padding: 14 }]}>
+                    {t('screening.settingsEmptyState')}
+                  </Text>
+                );
+              }
+              return (
+                <View style={{ padding: 14, gap: 6 }}>
+                  {flags.map((f) => (
+                    <View
+                      key={f}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
+                    >
+                      <Ionicons name="checkmark-circle" size={16} color={C.primary} />
+                      <Text style={[styles.settingLabel, { color: C.text, fontSize: 13 }]}>
+                        {t(
+                          f === 'pregnancy_lactation'
+                            ? 'screening.optionPregnancy'
+                            : f === 'eating_sensitive'
+                            ? 'screening.optionEatingSensitive'
+                            : f === 'diabetes'
+                            ? 'screening.optionDiabetes'
+                            : 'screening.optionKidney',
+                        )}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              );
+            })()}
+            <TouchableOpacity
+              style={[styles.linkItem, { borderBottomColor: C.border }]}
+              onPress={() => router.push('/(auth)/screening')}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                <Ionicons name="create-outline" size={20} color={C.primary} />
+                <Text style={[styles.linkText, { color: C.text }]}>
+                  {t('screening.settingsEditBtn')}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={C.textSecondary} />
+            </TouchableOpacity>
+            {(user?.medicalFlags?.length ?? 0) > 0 && (
+              <TouchableOpacity
+                style={[styles.linkItem, { borderBottomWidth: 0 }]}
+                onPress={() => {
+                  Alert.alert(
+                    t('screening.settingsWithdrawBtn'),
+                    t('screening.settingsConsentWithdrawn'),
+                    [
+                      { text: t('common.cancel'), style: 'cancel' },
+                      {
+                        text: t('common.confirm'),
+                        style: 'destructive',
+                        onPress: async () => {
+                          try {
+                            await withdrawMedicalConsent();
+                            await Haptics.notificationAsync(
+                              Haptics.NotificationFeedbackType.Success,
+                            );
+                          } catch {
+                            // silent — reintentable
+                          }
+                        },
+                      },
+                    ],
+                  );
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                  <Ionicons name="trash-outline" size={20} color={C.error} />
+                  <Text style={[styles.linkText, { color: C.error }]}>
+                    {t('screening.settingsWithdrawBtn')}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 

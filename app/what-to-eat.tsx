@@ -28,6 +28,8 @@ import {
   clearPendingMessage,
   CoachAdjustmentMessage,
 } from '../services/adaptiveCoachBridge';
+import SafetyDisclaimer from '../components/ui/SafetyDisclaimer';
+import AITransparencyBanner from '../components/ui/AITransparencyBanner';
 
 // ============================================================================
 // Types
@@ -621,6 +623,12 @@ export default function WhatToEatScreen() {
           ))}
         </View>
       )}
+
+      {/* AI Act Art. 50 — Transparency banner (Fase B) */}
+      <AITransparencyBanner screenKey="what-to-eat" style={{ marginHorizontal: 16, marginTop: 8 }} />
+
+      {/* Safety disclaimer (Fase B) */}
+      <SafetyDisclaimer variant="short" style={{ marginHorizontal: 16, marginTop: 12 }} />
 
       <View style={styles.footerSpacing} />
     </ScrollView>

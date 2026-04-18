@@ -136,11 +136,12 @@ const TEXTS = {
   adaptiveAdjust: {
     es: {
       title: 'Tu coach ha ajustado tus macros ⚙️',
-      body: 'He actualizado tus objetivos según tu progreso. Toca para ver el motivo.',
+      // Disclaimer corto incluido al final (Fase B — Informe legal §7 Acción 6).
+      body: 'He actualizado tus objetivos según tu progreso. Toca para ver el motivo. Orientativo, no sustituye consejo profesional.',
     },
     en: {
       title: 'Your coach adjusted your macros ⚙️',
-      body: "I've updated your targets based on your progress. Tap to see why.",
+      body: "I've updated your targets based on your progress. Tap to see why. Indicative; does not replace professional advice.",
     },
   },
 };

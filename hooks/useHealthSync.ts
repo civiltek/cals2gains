@@ -10,7 +10,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { healthService } from '../services/healthKit';
-import { calculateDynamicTDEE, calculateRecommendedGoals, calculateBMR } from '../utils/nutrition';
+import { calculateDynamicTDEE, calculateBMR } from '../utils/nutrition';
 import { useUserStore } from '../store/userStore';
 
 const SYNC_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
