@@ -10,7 +10,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { healthService } from '../services/healthKit';
-import { calculateDynamicTDEE, calculateRecommendedGoals, calculateBMR } from '../utils/nutrition';
+import { calculateDynamicTDEE, calculateBMR } from '../utils/nutrition';
 import { useUserStore } from '../store/userStore';
 
 const SYNC_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
@@ -38,7 +38,9 @@ export function useHealthSync() {
       if (user.dynamicTDEEEnabled && user.profile) {
         const { avgCalories, daysWithData } = await healthService.get7DayCalorieAverage(7);
         const bmr = calculateBMR(user.profile);
-        const dynamicTDEE = calculateDynamicTDEE(bmr, avgCalories, daysWithData);
+        const { getActivityMultiplier } = await import('../utils/nutrition');
+        const pal = getActivityMultiplier(user.profile.activityLevel);
+        const dynamicTDEE = calculateDynamicTDEE(bmr, pal, avgCalories, daysWithData);
 
         if (dynamicTDEE !== null) {
           // Persist updated TDEE — imported lazily to avoid circular deps

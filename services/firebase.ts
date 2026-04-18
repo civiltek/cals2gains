@@ -234,6 +234,12 @@ export async function getUserData(uid: string): Promise<User | null> {
       dynamicTDEEEnabled: data.dynamicTDEEEnabled,
       allergies: data.allergies || [],
       intolerances: data.intolerances || [],
+      // Fase B — compliance fields (RGPD Art. 9.2.a, AI Act Art. 50)
+      dateOfBirth: data.dateOfBirth,
+      medicalFlags: data.medicalFlags,
+      numericDisplayMode: data.numericDisplayMode,
+      autoAdaptEnabled: data.autoAdaptEnabled,
+      consentHistory: data.consentHistory,
     } as User;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -283,6 +289,8 @@ export async function updateUserGoalsAndMode(
     weight?: number;
     healthEnabled?: boolean;
     dynamicTDEEEnabled?: boolean;
+    autoAdaptEnabled?: boolean;
+    numericDisplayMode?: string;
   }
 ): Promise<void> {
   const userRef = doc(db, 'users', uid);
@@ -297,6 +305,66 @@ export async function updateUserGoalsAndMode(
   if (data.weight !== undefined) update.weight = data.weight;
   if (data.healthEnabled !== undefined) update.healthEnabled = data.healthEnabled;
   if (data.dynamicTDEEEnabled !== undefined) update.dynamicTDEEEnabled = data.dynamicTDEEEnabled;
+  if (data.autoAdaptEnabled !== undefined) update.autoAdaptEnabled = data.autoAdaptEnabled;
+  if (data.numericDisplayMode !== undefined) update.numericDisplayMode = data.numericDisplayMode;
+
+  if (Object.keys(update).length > 0) {
+    await updateDoc(userRef, update);
+  }
+}
+
+/**
+ * Persist medical/compliance fields (RGPD Art. 9.2.a, AI Act).
+ * Separado de `updateUserGoalsAndMode` intencionadamente: datos de salud Art. 9
+ * y consentimientos tienen que poder auditarse y eliminarse de forma aislada.
+ */
+export async function updateUserMedicalProfile(
+  uid: string,
+  data: {
+    dateOfBirth?: string | null;
+    medicalFlags?: string[];
+    numericDisplayMode?: string;
+    consentHistoryAppend?: {
+      timestamp: string;
+      action: 'granted' | 'withdrawn';
+      scope: 'medical_flags_art_9_2_a';
+      flagsSnapshot?: string[];
+    };
+    consentHistoryReplace?: Array<{
+      timestamp: string;
+      action: 'granted' | 'withdrawn';
+      scope: 'medical_flags_art_9_2_a';
+      flagsSnapshot?: string[];
+    }>;
+  }
+): Promise<void> {
+  const userRef = doc(db, 'users', uid);
+  const update: Record<string, any> = {};
+
+  if (data.dateOfBirth !== undefined) update.dateOfBirth = data.dateOfBirth;
+  if (data.medicalFlags !== undefined) update.medicalFlags = data.medicalFlags;
+  if (data.numericDisplayMode !== undefined) update.numericDisplayMode = data.numericDisplayMode;
+
+  // Append-only register by reading current doc first (Firestore has no atomic
+  // arrayUnion for complex objects keeping order). Conservador: si falla la
+  // lectura, guardamos al menos el último evento.
+  if (data.consentHistoryAppend || data.consentHistoryReplace) {
+    try {
+      const snap = await getDoc(userRef);
+      const existing: any[] =
+        (snap.exists() && Array.isArray(snap.data()?.consentHistory))
+          ? snap.data()!.consentHistory
+          : [];
+      if (data.consentHistoryReplace) {
+        update.consentHistory = data.consentHistoryReplace;
+      } else if (data.consentHistoryAppend) {
+        update.consentHistory = [...existing, data.consentHistoryAppend];
+      }
+    } catch {
+      if (data.consentHistoryReplace) update.consentHistory = data.consentHistoryReplace;
+      else if (data.consentHistoryAppend) update.consentHistory = [data.consentHistoryAppend];
+    }
+  }
 
   if (Object.keys(update).length > 0) {
     await updateDoc(userRef, update);

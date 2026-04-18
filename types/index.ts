@@ -3,6 +3,35 @@
 export type GoalMode = 'lose_fat' | 'gain_muscle' | 'recomp' | 'maintain' | 'mini_cut' | 'lean_bulk';
 export type NutritionMode = 'simple' | 'advanced';
 
+// ============================================
+// Medical screening (RGPD Art. 9.2.a — datos de salud)
+// ============================================
+// UI conservadora: NO usar términos clínicos ("TCA", "anorexia", "bulimia").
+// "eating_sensitive" = "relación sensible con la comida".
+// Ver INFORME_LEGAL_v1.md §7 Acción 7 y METODOLOGIA_NUTRICIONAL.md §8.4.
+export type MedicalFlag =
+  | 'pregnancy_lactation'
+  | 'eating_sensitive'
+  | 'diabetes'
+  | 'kidney_disease';
+
+// Cómo se presentan las cifras de calorías/macros al usuario.
+// 'hidden' se activa cuando el usuario marca `eating_sensitive` — oculta números
+// en UI (dashboard, plan, captura). Los cálculos internos NO cambian.
+export type NumericDisplayMode = 'visible' | 'hidden';
+
+/**
+ * Registro de eventos de consentimiento para Art. 9.2.a RGPD.
+ * Se guarda en local (AsyncStorage) y opcionalmente se sincroniza con backend.
+ * `action`: 'granted' = el usuario acepta; 'withdrawn' = retira consentimiento.
+ */
+export interface ConsentEvent {
+  timestamp: string; // ISO 8601
+  action: 'granted' | 'withdrawn';
+  scope: 'medical_flags_art_9_2_a';
+  flagsSnapshot?: MedicalFlag[]; // snapshot al momento del evento
+}
+
 export interface User {
   uid: string;
   email: string | null;
@@ -32,6 +61,61 @@ export interface User {
   // Allergies & intolerances (safety feature)
   allergies?: string[];
   intolerances?: string[];
+
+  // ---- Fase B (compliance) ----
+  // Fecha de nacimiento ISO yyyy-mm-dd. NO guardamos la edad calculada — se
+  // deriva on-read con `calculateAgeFromDateOfBirth` para evitar que quede
+  // obsoleta.
+  dateOfBirth?: string;
+  // Condiciones de salud declaradas por el usuario (opcional). Base legal:
+  // RGPD Art. 9.2.a. Consentimiento registrado en `consentHistory`.
+  medicalFlags?: MedicalFlag[];
+  // Modo de visualización numérica — 'hidden' si declara "eating_sensitive".
+  numericDisplayMode?: NumericDisplayMode;
+  // Toggle AI Act Art. 50 / RGPD Art. 22: decide si los ajustes del coach se
+  // aplican solos o solo se muestran como sugerencia. Default true.
+  autoAdaptEnabled?: boolean;
+  // Historial local de consentimientos Art. 9.2.a.
+  consentHistory?: ConsentEvent[];
+}
+
+// ============================================
+// Age helpers — edad se calcula on-read, nunca se persiste
+// ============================================
+
+/**
+ * Calcula la edad (años completos) a partir de fecha de nacimiento ISO.
+ * Devuelve null si la fecha está mal formada o es futura.
+ */
+export function calculateAgeFromDateOfBirth(
+  dateOfBirthIso: string | undefined | null,
+): number | null {
+  if (!dateOfBirthIso) return null;
+  const dob = new Date(dateOfBirthIso);
+  if (isNaN(dob.getTime())) return null;
+  const now = new Date();
+  if (dob.getTime() > now.getTime()) return null;
+  let age = now.getFullYear() - dob.getFullYear();
+  const m = now.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) {
+    age--;
+  }
+  if (age < 0 || age > 120) return null;
+  return age;
+}
+
+/** true si edad < 18. Conservador: si no hay fecha válida, devuelve false. */
+export function isMinor(dateOfBirthIso: string | undefined | null): boolean {
+  const age = calculateAgeFromDateOfBirth(dateOfBirthIso);
+  if (age == null) return false;
+  return age < 18;
+}
+
+/** true si edad < 16. Bloqueo absoluto de uso. */
+export function isUnder16(dateOfBirthIso: string | undefined | null): boolean {
+  const age = calculateAgeFromDateOfBirth(dateOfBirthIso);
+  if (age == null) return false;
+  return age < 16;
 }
 
 export interface UserProfile {

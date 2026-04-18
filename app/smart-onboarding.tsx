@@ -24,7 +24,9 @@ import { useTranslation } from 'react-i18next';
 
 import { useColors } from '../store/themeStore';
 import { useUserStore } from '../store/userStore';
-import PersonalEngine from '../services/personalEngine';
+import { calculateMacroTargets } from '../utils/macros';
+import type { ActivityLevel as GlobalActivityLevel, GoalMode as GlobalGoalMode, UserProfile } from '../types';
+import SafetyDisclaimer from '../components/ui/SafetyDisclaimer';
 
 // ============================================================================
 // TYPES
@@ -625,6 +627,9 @@ const Step6_Summary = ({ data, t, styles, C }: any) => {
       <Text style={styles.finalNote}>
         {t('onboarding.summary.adjustNote')}
       </Text>
+
+      {/* Safety disclaimer en resultado onboarding — variante full (Fase B) */}
+      <SafetyDisclaimer variant="full" style={{ marginTop: 16 }} />
     </View>
   );
 };
@@ -633,47 +638,51 @@ const Step6_Summary = ({ data, t, styles, C }: any) => {
 // HELPER FUNCTIONS
 // ============================================================================
 
+// Map onboarding's local ActivityLevel ('athlete') to the global enum
+// ('extremely_active') expected by utils/nutrition.
+function mapActivityLevel(a: ActivityLevel | null): GlobalActivityLevel {
+  switch (a) {
+    case 'sedentary':         return 'sedentary';
+    case 'lightly_active':    return 'lightly_active';
+    case 'very_active':       return 'very_active';
+    case 'athlete':           return 'extremely_active';
+    case 'moderately_active':
+    default:                  return 'moderately_active';
+  }
+}
+
 function calculateGoals(data: OnboardingData) {
-  // Simplified calorie calculation based on Harris-Benedict equation
-  let tdee = 2000; // Default
-
-  if (data.gender && data.age && data.height && data.weight) {
-    const h = data.height;
-    const w = data.weight;
-    const a = data.age;
-
-    if (data.gender === 'male') {
-      tdee = 88.362 + 13.397 * w + 4.799 * h - 5.677 * a;
-    } else {
-      tdee = 447.593 + 9.247 * w + 3.098 * h - 4.33 * a;
-    }
-
-    // Adjust by activity level
-    const multipliers: Record<string, number> = {
-      sedentary: 1.2,
-      lightly_active: 1.375,
-      moderately_active: 1.55,
-      very_active: 1.725,
-      athlete: 1.9,
+  // Default fallback when profile is incomplete — keep legacy behavior.
+  if (!data.gender || !data.age || !data.height || !data.weight || !data.goal) {
+    const tdee = 2000;
+    return {
+      dailyCalories: tdee,
+      proteinGrams: Math.round((tdee * 0.30) / 4),
+      carbsGrams: Math.round((tdee * 0.40) / 4),
+      fatGrams: Math.round((tdee * 0.30) / 9),
     };
-
-    tdee *= multipliers[data.activityLevel || 'moderately_active'] || 1.55;
   }
 
-  // Adjust by goal
-  let adjustedCalories = tdee;
-  if (data.goal === 'lose_fat' || data.goal === 'mini_cut') {
-    adjustedCalories = tdee * 0.85; // 15% deficit
-  } else if (data.goal === 'gain_muscle' || data.goal === 'lean_bulk') {
-    adjustedCalories = tdee * 1.1; // 10% surplus
-  }
+  const profile: UserProfile = {
+    age: data.age,
+    weight: data.weight,
+    height: data.height,
+    gender: data.gender,
+    activityLevel: mapActivityLevel(data.activityLevel),
+    // The onboarding picks a GoalMode (`data.goal`), not a legacy FitnessGoal.
+    // We pass `maintain_weight` as a placeholder here — the canonical macro
+    // calculation below uses `data.goal` directly as the GoalMode.
+    goal: 'maintain_weight',
+  };
 
-  // Calculate macros
+  const goalMode: GlobalGoalMode = data.goal as GlobalGoalMode;
+  const targets = calculateMacroTargets(profile, goalMode);
+
   return {
-    dailyCalories: Math.round(adjustedCalories),
-    proteinGrams: Math.round((adjustedCalories * 0.30) / 4), // 30% protein
-    carbsGrams: Math.round((adjustedCalories * 0.40) / 4), // 40% carbs
-    fatGrams: Math.round((adjustedCalories * 0.30) / 9), // 30% fat
+    dailyCalories: targets.calories,
+    proteinGrams: targets.protein,
+    carbsGrams: targets.carbs,
+    fatGrams: targets.fat,
   };
 }
 

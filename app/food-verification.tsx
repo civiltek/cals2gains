@@ -19,6 +19,7 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '../store/themeStore';
+import AITransparencyBanner from '../components/ui/AITransparencyBanner';
 
 // Type definitions
 interface FoodItem {
@@ -400,6 +401,12 @@ const FoodVerificationScreen = () => {
             {t('foodVerification.subtitle')}
           </Text>
         </View>
+
+        {/* AI Act Art. 50 — Transparency banner (Fase B) */}
+        <AITransparencyBanner
+          screenKey="food-verification"
+          style={{ marginHorizontal: 16, marginBottom: 8 }}
+        />
 
         {/* Search Bar */}
         <View style={[styles.searchContainer, { borderColor: C.border }]}>

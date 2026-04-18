@@ -1,9 +1,18 @@
 ﻿// Cals2Gains - Nutrition Utility Functions
 
-import { ActivityLevel, FitnessGoal, Nutrition, UserGoals, UserProfile } from '../types';
+import { ActivityLevel, FitnessGoal, GoalMode, Nutrition, UserGoals, UserProfile } from '../types';
+import { calculateMacroTargets } from './macros';
 
 // Minimum days of health data required to trust the moving average
 const MIN_HEALTH_DAYS = 3;
+
+/**
+ * Wearable calibration factor — consumer wearables overestimate active calories:
+ * Apple Watch ~9 % high (Shcherbina et al., J Pers Med 2017),
+ * Fitbit 12-18 % high (Fuller et al., JMIR Mhealth Uhealth 2020).
+ * We apply a 10 % discount to approach real expenditure.
+ */
+export const WEARABLE_CALIBRATION_FACTOR = 0.9;
 
 export function calculateBMR(profile: UserProfile): number {
   const { weight, height, age, gender } = profile;
@@ -25,52 +34,75 @@ export function calculateTDEE(profile: UserProfile): number {
   return Math.round(calculateBMR(profile) * ACTIVITY_MULTIPLIERS[profile.activityLevel]);
 }
 
+// Dampening applied to the activity delta: half of the extra/missing activity
+// flows into the target. Prevents a 20k-step day from moving the target +1000 kcal.
+// Pure design choice, not clinical consensus — tuneable if telemetry requires.
+export const ACTIVITY_DAMPENING = 0.5;
+
 /**
  * Calculate TDEE using real activity data from HealthKit / Health Connect.
- * Uses a 7-day moving average of active calories to smooth daily variance.
  *
- * @param bmr         Basal metabolic rate (kcal/day) from Mifflin-St Jeor
- * @param avgActiveCalories7d  Average active kcal/day over last 7 days (0 = no data)
- * @param daysWithData         How many of the 7 days actually had data
- * @returns Dynamic TDEE, or null when there's insufficient data (falls back to static)
+ * Anti double-count formula:
+ *   TDEE_base       = BMR * PAL               (activity already assumed by profile)
+ *   delta_activity  = active_real * CORRECTION − BMR * (PAL − 1)
+ *   TDEE_dynamic    = TDEE_base + delta * DAMPENING
+ *
+ * Bounded to [BMR*1.15, BMR*2.5] for sanity.
+ *
+ * @returns Dynamic TDEE, or null when there's insufficient data (fall back to static).
  */
 export function calculateDynamicTDEE(
   bmr: number,
+  pal: number,
   avgActiveCalories7d: number,
   daysWithData: number
 ): number | null {
   if (daysWithData < MIN_HEALTH_DAYS || avgActiveCalories7d <= 0) return null;
 
-  // Apply a small discount (0.9) to account for wearable over-estimation
-  const adjustedActive = Math.round(avgActiveCalories7d * 0.9);
+  const tdeeBase = bmr * pal;
+  const activityExpected = bmr * (pal - 1);
+  const activityReal = avgActiveCalories7d * WEARABLE_CALIBRATION_FACTOR;
+  const delta = activityReal - activityExpected;
 
-  // Dynamic TDEE = BMR + real active calories
-  return Math.round(bmr + adjustedActive);
+  const dynamic = tdeeBase + delta * ACTIVITY_DAMPENING;
+  const clamped = Math.max(bmr * 1.15, Math.min(bmr * 2.5, dynamic));
+  return Math.round(clamped);
 }
 
+/** Returns the PAL multiplier for a given ActivityLevel. */
+export function getActivityMultiplier(level: ActivityLevel): number {
+  return ACTIVITY_MULTIPLIERS[level];
+}
+
+/**
+ * Map the legacy `FitnessGoal` enum to the canonical `GoalMode` used by
+ * `calculateMacroTargets`. `improve_health` and `maintain_weight` both map to
+ * `maintain` (same calorie factor).
+ */
+function fitnessGoalToGoalMode(goal: FitnessGoal): GoalMode {
+  switch (goal) {
+    case 'lose_weight':    return 'lose_fat';
+    case 'gain_muscle':    return 'gain_muscle';
+    case 'maintain_weight':
+    case 'improve_health':
+    default:               return 'maintain';
+  }
+}
+
+/**
+ * Legacy entry point — kept to preserve the public API used by callers that
+ * operate on `FitnessGoal` instead of `GoalMode`. Delegates to the canonical
+ * `calculateMacroTargets`.
+ */
 export function calculateRecommendedGoals(profile: UserProfile): UserGoals {
-  const tdee = calculateTDEE(profile);
-  let targetCalories = tdee;
-
-  switch (profile.goal as FitnessGoal) {
-    case 'lose_weight':    targetCalories = Math.round(tdee * 0.8); break;
-    case 'gain_muscle':    targetCalories = Math.round(tdee * 1.1); break;
-    default:               targetCalories = tdee;
-  }
-
-  let proteinRatio: number, carbsRatio: number, fatRatio: number;
-  switch (profile.goal as FitnessGoal) {
-    case 'lose_weight':  proteinRatio = 0.35; carbsRatio = 0.35; fatRatio = 0.30; break;
-    case 'gain_muscle':  proteinRatio = 0.30; carbsRatio = 0.45; fatRatio = 0.25; break;
-    default:             proteinRatio = 0.25; carbsRatio = 0.45; fatRatio = 0.30;
-  }
-
+  const goalMode = fitnessGoalToGoalMode(profile.goal as FitnessGoal);
+  const targets = calculateMacroTargets(profile, goalMode);
   return {
-    calories: targetCalories,
-    protein: Math.round((targetCalories * proteinRatio) / 4),
-    carbs: Math.round((targetCalories * carbsRatio) / 4),
-    fat: Math.round((targetCalories * fatRatio) / 9),
-    fiber: profile.gender === 'male' ? 38 : 25,
+    calories: targets.calories,
+    protein: targets.protein,
+    carbs: targets.carbs,
+    fat: targets.fat,
+    fiber: targets.fiber,
   };
 }
 

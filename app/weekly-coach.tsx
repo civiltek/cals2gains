@@ -22,6 +22,8 @@ import { Meal, Nutrition, UserGoals } from '../types';
 import { getRecentMeals } from '../services/firebase';
 import { startOfDay, subDays, format, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
+import SafetyDisclaimer from '../components/ui/SafetyDisclaimer';
+import AITransparencyBanner from '../components/ui/AITransparencyBanner';
 
 const { width } = Dimensions.get('window');
 
@@ -426,6 +428,12 @@ export default function WeeklyCoachScreen() {
           ))}
         </View>
       )}
+
+      {/* AI Act Art. 50 transparency banner (Fase B) */}
+      <AITransparencyBanner screenKey="weekly-coach" style={{ marginHorizontal: 16, marginTop: 16 }} />
+
+      {/* Safety disclaimer — variante completa tras el recap semanal (Fase B) */}
+      <SafetyDisclaimer variant="full" style={{ marginHorizontal: 16, marginTop: 16 }} />
 
       {/* Footer Spacing */}
       <View style={styles.footerSpacing} />

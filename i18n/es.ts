@@ -182,6 +182,21 @@ export default {
       timeframe: '8-12 semanas',
       adjustNote: 'Puedes ajustar estos valores en tu perfil en cualquier momento.',
     },
+    // Fase B — Age gate
+    ageGate: {
+      title: '¿Cuál es tu fecha de nacimiento?',
+      subtitle:
+        'La usamos para calcular tus objetivos y para verificar que tienes la edad mínima de uso (16 años).',
+      day: 'Día',
+      month: 'Mes',
+      year: 'Año',
+      previewLine: 'Tienes {{age}} años',
+      blockTitle: 'Gracias por tu interés',
+      blockBody:
+        'Cals2Gains es una app para personas desde 16 años. Agradecemos tu interés; vuelve cuando cumplas 16.',
+      minorDeficitBlock:
+        'Estos modos incluyen déficit calórico y están disponibles a partir de los 18 años. Si necesitas pautas de pérdida de peso antes de esa edad, consulta a un profesional sanitario.',
+    },
   },
 
   // Dashboard / Home
@@ -923,6 +938,10 @@ export default {
     contactSection: '¿No encuentras lo que buscas?',
     contactSupport: 'Contactar soporte',
     visitWeb: 'Visitar web',
+    manualTitle: 'Manual completo',
+    manualSubtitle: 'Cómo usarla, la ciencia detrás y tus derechos',
+    methodologyTitle: 'Metodología científica',
+    methodologySubtitle: 'La ciencia detrás de cada número',
     faq1: {
       q: '¿Cómo registro una comida?',
       a: 'Puedes registrar comidas tomando una foto con nuestro analizador de IA, escaneando el código de barras, usando la adición rápida o buscando en nuestra base de datos de alimentos. Cada método detecta automáticamente la información nutricional.',
@@ -1454,6 +1473,7 @@ export default {
     done: 'Listo',
     next: 'Siguiente',
     back: 'Atrás',
+    continue: 'Continuar',
     yes: 'Sí',
     no: 'No',
     ok: 'OK',
@@ -1790,6 +1810,84 @@ export default {
     csvStart: 'Inicio',
     csvEnd: 'Fin',
     csvDuration: 'Duración (horas)',
+  },
+
+  // ==============================================
+  // Fase B — Age gate (RGPD / LOPD-GDD / Apple 1.4.1)
+  // ==============================================
+  // Nota legal: NO usar términos clínicos ("TCA", "anorexia") en UI.
+  // Ver INFORME_LEGAL_v1.md §7 Acción 7.
+
+  // Nota: 'onboarding.age.*' se añade al bloque `onboarding` ya existente,
+  //        lo insertamos aquí al final para no romper el orden original.
+
+  // ==============================================
+  // Screening médico (RGPD Art. 9.2.a)
+  // ==============================================
+  // ==============================================
+  // Fase B — Safety disclaimer (RGPD / MDR / Apple 1.4.1)
+  // ==============================================
+  disclaimer: {
+    short: 'Orientativo, no sustituye consejo profesional.',
+    full:
+      'Cals2Gains ofrece estimaciones orientativas basadas en literatura científica y no sustituye el consejo de un profesional sanitario. Si tienes una condición médica, estás embarazada o en lactancia, o tienes antecedentes de trastornos de la conducta alimentaria, consulta con tu médico o dietista-nutricionista antes de aplicar estas recomendaciones.',
+  },
+
+  // ==============================================
+  // Fase B — Transparencia AI Act (Reg. UE 2024/1689 Art. 50)
+  // ==============================================
+  aiTransparency: {
+    banner:
+      'Las recomendaciones y el asistente de esta app están generados por un sistema de inteligencia artificial. Son orientativas y editables por ti. (Reg. UE 2024/1689 Art. 50)',
+    gotIt: 'Entendido',
+    // Toggle en Ajustes
+    sectionTitle: 'Inteligencia artificial',
+    autoAdaptTitle: 'Adaptación automática de objetivos',
+    autoAdaptBody:
+      'Cuando está activado, el coach ajustará tus objetivos cada semana en función de tu progreso. Si lo desactivas, verás las sugerencias pero no se aplicarán solas.',
+  },
+
+  // ==============================================
+  // Fase B — Alerta de pérdida acelerada (§8.3 metodología)
+  // ==============================================
+  excessiveLoss: {
+    title: 'Hemos detectado una pérdida de peso rápida',
+    body:
+      'Hemos detectado que tu ritmo de pérdida está siendo superior al rango habitualmente recomendado. Suele ser señal de que el déficit es demasiado agresivo. Vamos a ajustar tu objetivo calórico al alza (+150 kcal/día). Puedes revertirlo en Ajustes. Si esta pérdida rápida es deliberada y la estás haciendo con supervisión profesional, dinos para no volver a ajustar.',
+    bodyReadOnly:
+      'Hemos detectado que tu ritmo de pérdida está siendo superior al rango habitualmente recomendado. Suele ser señal de que el déficit es demasiado agresivo. Como tienes desactivada la adaptación automática, no hemos cambiado nada: puedes revisar tu objetivo manualmente. Si esta pérdida rápida es deliberada y la estás haciendo con supervisión profesional, ignora este aviso.',
+  },
+
+  screening: {
+    title: 'Queremos adaptar la app a ti',
+    subtitle: '¿Alguna de estas situaciones te aplica ahora o recientemente?',
+    optionPregnancy: 'Embarazo o lactancia',
+    optionEatingSensitive:
+      'Mi relación con la comida es un tema sensible y prefiero no ver números de calorías',
+    optionDiabetes: 'Tengo diabetes (tipo 1 o 2)',
+    optionKidney: 'Tengo una enfermedad renal diagnosticada',
+    optionNone: 'Ninguna de las anteriores',
+    footerNote:
+      'Puedes cambiar esto cuando quieras en Ajustes. No compartimos esta información con nadie.',
+    consentIntro: 'He leído la ',
+    privacyLink: 'Política de Privacidad',
+    consentBody:
+      ' y consiento expresamente el tratamiento de estos datos de salud para adaptar las recomendaciones de la app (base legal: Art. 9.2.a RGPD). Puedo retirar este consentimiento en Ajustes en cualquier momento.',
+    // Condiciones declaradas (usado en Settings y bloqueos)
+    settingsSectionTitle: 'Condiciones declaradas',
+    settingsEmptyState: 'No has declarado ninguna condición.',
+    settingsEditBtn: 'Actualizar mis condiciones',
+    settingsWithdrawBtn: 'Retirar consentimiento y vaciar datos',
+    settingsConsentWithdrawn:
+      'Has retirado tu consentimiento. Tus condiciones declaradas se han eliminado.',
+    // Copy para bloqueos/callouts consumidos por goal-modes
+    blockLoseFatTitle: 'Consulta con profesional',
+    blockLoseFatBody:
+      'Estos modos incluyen déficit calórico y no son adecuados con embarazo, lactancia o para menores de 18 años. Te recomendamos acompañarlo con un/a profesional sanitario.',
+    calloutDiabetes:
+      'Te recomendamos acompañar este objetivo con tu profesional sanitario.',
+    calloutKidney:
+      'Te recomendamos acompañar este objetivo con tu profesional sanitario.',
   },
 
   health: {

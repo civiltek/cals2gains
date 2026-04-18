@@ -4,13 +4,25 @@
 
 import { create } from 'zustand';
 import { Platform } from 'react-native';
-import { DayType, DayTypeGoals, GoalMode, NutritionMode, User, UserGoals, UserProfile } from '../types';
+import {
+  ConsentEvent,
+  DayType,
+  DayTypeGoals,
+  GoalMode,
+  MedicalFlag,
+  NumericDisplayMode,
+  NutritionMode,
+  User,
+  UserGoals,
+  UserProfile,
+} from '../types';
 import {
   getUserData,
   updateUserProfile,
   updateUserLanguage,
   updateUserGoalsAndMode,
   updateUserAllergies,
+  updateUserMedicalProfile,
   onAuthStateChange,
   redeemPromoCodeInFirestore,
   signOut as firebaseSignOut,
@@ -20,6 +32,12 @@ import { loginRevenueCat, logoutRevenueCat } from '../services/revenuecat';
 import { calculateTDEE, calculateBMR } from '../utils/nutrition';
 import { HealthData } from '../services/healthKit';
 import { differenceInDays } from 'date-fns';
+import {
+  useTrainingPlanStore,
+  buildPresetsFromGoals,
+  trainingDayTypeToEnglish,
+  trainingDayTypeFromEnglish,
+} from './trainingPlanStore';
 
 interface UserState {
   user: User | null;
@@ -28,6 +46,9 @@ interface UserState {
   authInitialized: boolean;
   dayTypeGoals: DayTypeGoals | null;
   todayDayType: DayType;
+  /** Manual override of today's day type (user tapped a button). YYYY-MM-DD of when it was set. Null = follow active plan. */
+  todayDayTypeOverride: DayType | null;
+  todayDayTypeOverrideDate: string | null;
 
   // Health integration
   healthData: HealthData | null;
@@ -72,6 +93,14 @@ interface UserState {
     expiresAt?: Date;
   }>;
 
+  // Fase B — medical flags, age gate, AI Act transparency
+  setMedicalFlags: (flags: MedicalFlag[]) => Promise<void>;
+  setDateOfBirth: (iso: string) => Promise<void>;
+  setNumericDisplayMode: (mode: NumericDisplayMode) => Promise<void>;
+  setAutoAdaptEnabled: (enabled: boolean) => Promise<void>;
+  recordConsentEvent: (event: ConsentEvent) => Promise<void>;
+  withdrawMedicalConsent: () => Promise<void>;
+
   // Computed getters
   isSubscriptionActive: () => boolean;
   trialDaysRemaining: () => number;
@@ -85,6 +114,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   authInitialized: false,
   dayTypeGoals: null,
   todayDayType: 'rest',
+  todayDayTypeOverride: null,
+  todayDayTypeOverrideDate: null,
   healthData: null,
 
   // Convenience — derived at read time (not reactive, use user?.uid in components)
@@ -212,56 +243,62 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
 
   setTodayDayType: (type: DayType) => {
-    set({ todayDayType: type });
+    const today = new Date().toISOString().split('T')[0];
+    set({
+      todayDayType: type,
+      todayDayTypeOverride: type,
+      todayDayTypeOverrideDate: today,
+    });
   },
 
   getActiveGoals: () => {
-    const { user, dayTypeGoals, todayDayType } = get();
+    const { user, dayTypeGoals, todayDayType, todayDayTypeOverride, todayDayTypeOverrideDate } = get();
     if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
 
-    // If a training plan is active, it overrides everything until the plan ends.
-    // Macros are proportional to the user's personal goals, not the plan's hardcoded defaults.
-    if (user.goals && user.goals.calories > 0) {
+    const today = new Date().toISOString().split('T')[0];
+    const hasValidOverride =
+      todayDayTypeOverride !== null && todayDayTypeOverrideDate === today;
+
+    // Determine today's day type: manual override > active training plan > legacy dayTypeGoals > none
+    let resolvedDayType: DayType | null = null;
+    if (hasValidOverride) {
+      resolvedDayType = todayDayTypeOverride!;
+    } else {
+      // Pull today's day type from active training plan (if any)
       try {
-        // Lazy-require to avoid circular import at module-init time.
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { useTrainingPlanStore } = require('./trainingPlanStore');
-        const planInfo = useTrainingPlanStore.getState().getTodayInfo(user.goals);
+        const planInfo = useTrainingPlanStore.getState().getTodayInfo();
         if (planInfo) {
-          return {
-            calories: planInfo.macros.calories,
-            protein: planInfo.macros.protein,
-            carbs: planInfo.macros.carbs,
-            fat: planInfo.macros.fat,
-            fiber: user.goals.fiber,
-          };
+          resolvedDayType = trainingDayTypeToEnglish(planInfo.dayType);
         }
-      } catch {
-        /* training plan store not ready — fall through */
+      } catch (err) {
+        // Training plan store not yet hydrated — fall through
       }
     }
 
-    if (!dayTypeGoals || !dayTypeGoals.enabled) {
-      return user.goals;
+    // If we have a resolved day type, compute proportional macros from user's base goals
+    if (resolvedDayType && user.goals && user.goals.calories > 0) {
+      const presets = buildPresetsFromGoals(user.goals);
+      const esKey = trainingDayTypeFromEnglish(resolvedDayType);
+      const preset = presets[esKey];
+      return {
+        calories: preset.calories,
+        protein: preset.protein,
+        carbs: preset.carbs,
+        fat: preset.fat,
+        fiber: user.goals.fiber,
+      };
     }
 
-    // Use specific goals if configured
-    if (todayDayType === 'refeed' && dayTypeGoals.refeed) return dayTypeGoals.refeed;
-    if (todayDayType === 'competition' && dayTypeGoals.competition) return dayTypeGoals.competition;
-
-    // Derive refeed/competition from training goals when no specific goals are set
-    if (todayDayType === 'refeed') {
-      const base = dayTypeGoals.training;
-      const extraCarbs = Math.round((base.carbs || 0) * 0.3);
-      return { ...base, carbs: (base.carbs || 0) + extraCarbs, fat: Math.round((base.fat || 0) * 0.8), calories: (base.calories || 0) + extraCarbs * 4 };
-    }
-    if (todayDayType === 'competition') {
-      const base = dayTypeGoals.training;
-      const extraCarbs = Math.round((base.carbs || 0) * 0.5);
-      return { ...base, carbs: (base.carbs || 0) + extraCarbs, fat: Math.round((base.fat || 0) * 0.7), calories: (base.calories || 0) + extraCarbs * 4 };
+    // Legacy fallback: manual training/rest goals
+    if (dayTypeGoals && dayTypeGoals.enabled) {
+      const key = todayDayType as keyof DayTypeGoals;
+      const legacy = (dayTypeGoals as any)[key];
+      if (legacy && typeof legacy === 'object' && 'calories' in legacy) {
+        return legacy as UserGoals;
+      }
     }
 
-    return dayTypeGoals[todayDayType];
+    return user.goals;
   },
 
   // =========================================================================
@@ -379,6 +416,124 @@ export const useUserStore = create<UserState>((set, get) => ({
     } catch (error) {
       set({ user: { ...user, allergies: user.allergies, intolerances: user.intolerances } });
       console.error('Failed to update allergies:', error);
+      throw error;
+    }
+  },
+
+  // =========================================================================
+  // FASE B — MEDICAL FLAGS, AGE, AI ACT TRANSPARENCY
+  // =========================================================================
+
+  /**
+   * Set declared medical flags (RGPD Art. 9.2.a).
+   * IMPORTANTE: los datos de salud no se loguean en ningún console.* ni en
+   * crash reports (ver DPIA T6). Solo se persisten en Firestore del usuario.
+   */
+  setMedicalFlags: async (flags: MedicalFlag[]) => {
+    const { user } = get();
+    if (!user) return;
+    // If user declares 'eating_sensitive', auto-switch numeric display to 'hidden'.
+    const numericDisplayMode: NumericDisplayMode =
+      flags.includes('eating_sensitive') ? 'hidden' : (user.numericDisplayMode || 'visible');
+    set({ user: { ...user, medicalFlags: flags, numericDisplayMode } });
+    try {
+      await updateUserMedicalProfile(user.uid, {
+        medicalFlags: flags,
+        numericDisplayMode,
+      });
+    } catch (error) {
+      // Revert silently — do not log flags content.
+      set({ user });
+      throw error;
+    }
+  },
+
+  setDateOfBirth: async (iso: string) => {
+    const { user } = get();
+    if (!user) return;
+    set({ user: { ...user, dateOfBirth: iso } });
+    try {
+      await updateUserMedicalProfile(user.uid, { dateOfBirth: iso });
+    } catch (error) {
+      set({ user });
+      throw error;
+    }
+  },
+
+  setNumericDisplayMode: async (mode: NumericDisplayMode) => {
+    const { user } = get();
+    if (!user) return;
+    set({ user: { ...user, numericDisplayMode: mode } });
+    try {
+      await updateUserGoalsAndMode(user.uid, { numericDisplayMode: mode });
+    } catch (error) {
+      set({ user });
+      throw error;
+    }
+  },
+
+  setAutoAdaptEnabled: async (enabled: boolean) => {
+    const { user } = get();
+    if (!user) return;
+    set({ user: { ...user, autoAdaptEnabled: enabled } });
+    try {
+      await updateUserGoalsAndMode(user.uid, { autoAdaptEnabled: enabled });
+    } catch (error) {
+      set({ user });
+      throw error;
+    }
+  },
+
+  /**
+   * Append one consent event to local history. Base legal: Art. 7.3 RGPD
+   * (trazabilidad de consentimientos).
+   */
+  recordConsentEvent: async (event: ConsentEvent) => {
+    const { user } = get();
+    if (!user) return;
+    const next = [...(user.consentHistory || []), event];
+    set({ user: { ...user, consentHistory: next } });
+    try {
+      await updateUserMedicalProfile(user.uid, {
+        consentHistoryAppend: event,
+      });
+    } catch (error) {
+      set({ user });
+      throw error;
+    }
+  },
+
+  /**
+   * Retira el consentimiento Art. 9.2.a: vacía medicalFlags, registra el
+   * evento y vuelve a 'visible' el modo numérico. Reversible — el usuario
+   * puede volver a declarar flags más tarde.
+   */
+  withdrawMedicalConsent: async () => {
+    const { user } = get();
+    if (!user) return;
+    const withdrawalEvent: ConsentEvent = {
+      timestamp: new Date().toISOString(),
+      action: 'withdrawn',
+      scope: 'medical_flags_art_9_2_a',
+      flagsSnapshot: user.medicalFlags,
+    };
+    const nextHistory = [...(user.consentHistory || []), withdrawalEvent];
+    set({
+      user: {
+        ...user,
+        medicalFlags: [],
+        numericDisplayMode: 'visible',
+        consentHistory: nextHistory,
+      },
+    });
+    try {
+      await updateUserMedicalProfile(user.uid, {
+        medicalFlags: [],
+        numericDisplayMode: 'visible',
+        consentHistoryAppend: withdrawalEvent,
+      });
+    } catch (error) {
+      set({ user });
       throw error;
     }
   },

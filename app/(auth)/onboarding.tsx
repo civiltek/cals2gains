@@ -16,6 +16,7 @@ import { useUserStore } from '../../store/userStore';
 import { markOnboardingCompleted } from '../../services/firebase';
 import { calculateGoalsFromPreset, getPresetById, MACRO_PRESETS } from '../../constants/macroPresets';
 import { healthService } from '../../services/healthKit';
+import SafetyDisclaimer from '../../components/ui/SafetyDisclaimer';
 
 const { width: SW } = Dimensions.get('window');
 
@@ -705,6 +706,9 @@ export default function OnboardingScreen() {
         <Text style={[s.stepDesc, { marginTop: 12, fontSize: 13 }]}>
           {t('onboarding.adjustWeekly')}
         </Text>
+
+        {/* Safety disclaimer en resultado del onboarding (Fase B) */}
+        <SafetyDisclaimer variant="full" style={{ marginTop: 16 }} />
       </View>
     );
   };
