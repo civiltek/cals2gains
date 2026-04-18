@@ -309,6 +309,13 @@ class HealthService {
     const AppleHealthKit = await getAppleHealthKit();
     if (!AppleHealthKit || typeof AppleHealthKit.getAuthStatus !== 'function') return true;
 
+    // IMPORTANT:
+    // - iOS typically reports READ permissions as "notDetermined" (0) even when granted.
+    // - If we include WRITE permissions (e.g. Weight) and user denies write, iOS reports
+    //   explicit denial (1). Blocking on that would incorrectly fail the whole connection,
+    //   even though READ access (what sync needs) is available.
+    // Therefore, probe READ-only and do not block on this call unless the native SDK
+    // returns a hard error.
     const perms = {
       permissions: {
         read: [
@@ -316,7 +323,7 @@ class HealthService {
           this.resolveIOSPermission(AppleHealthKit, 'ActiveEnergyBurned'),
           this.resolveIOSPermission(AppleHealthKit, 'BasalEnergyBurned'),
         ],
-        write: [this.resolveIOSPermission(AppleHealthKit, 'Weight', 'BodyMass')],
+        write: [],
       },
     };
 
@@ -333,10 +340,9 @@ class HealthService {
             else allValues.push(group);
           }
           console.log('[HealthKit] getAuthStatus values:', JSON.stringify(allValues));
-          // Only explicit sharingDenied (1) blocks. notDetermined (0) is the
-          // default iOS response for READ perms and does NOT mean denied.
-          const hasExplicitDenial = allValues.some((v) => v === 1);
-          resolve(!hasExplicitDenial);
+          // For READ scopes iOS commonly returns 0 (notDetermined) by design.
+          // Treat probe as informational only; initHealthKit success is the source of truth.
+          resolve(true);
         });
       } catch (e) {
         console.warn('[HealthKit] getAuthStatus threw, passing:', e);
@@ -431,7 +437,12 @@ class HealthService {
           AppleHealthKit.initHealthKit(
             {
               permissions: {
-                read: ['BodyFatPercentage', 'LeanBodyMass', 'Weight', 'BasalEnergyBurned'],
+                read: [
+                  this.resolveIOSPermission(AppleHealthKit, 'BodyFatPercentage'),
+                  this.resolveIOSPermission(AppleHealthKit, 'LeanBodyMass'),
+                  this.resolveIOSPermission(AppleHealthKit, 'Weight', 'BodyMass'),
+                  this.resolveIOSPermission(AppleHealthKit, 'BasalEnergyBurned'),
+                ],
                 write: [],
               },
             },
