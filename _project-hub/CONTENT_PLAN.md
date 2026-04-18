@@ -57,6 +57,24 @@ Generar expectación, construir audiencia y preparar el terreno para el lanzamie
 - Colaboraciones con micro-influencers
 - ⏳ Pendiente planificación detallada
 
+## Fuente de contenido científico (content-source)
+
+Directorio `marketing/content-source/` — creado 2026-04-18. Fuente de verdad para todo contenido de marketing basado en la metodología científica.
+
+| Archivo | Descripción |
+|---------|-------------|
+| `METHODOLOGY_CONTENT.md` | Pilares científicos, claims verificables, FAQs, terminología (ES+EN) |
+| `SCIENCE_UPDATES.md` | Estudios recientes 2024-2026 para contenido educativo (ES+EN) |
+| `posts/CAROUSELS_IDEAS_ES.md` | 10 ideas de carruseles con slides detallados (ES) |
+| `posts/CAROUSELS_IDEAS_EN.md` | 10 carousel ideas with detailed slides (EN) |
+| `posts/REELS_STORIES_IDEAS_ES.md` | 10 reels + 10 stories interactivas (ES) |
+| `posts/REELS_STORIES_IDEAS_EN.md` | 10 reels + 10 interactive stories (EN) |
+| `blog/01-05_*.md` | 5 artículos de blog (ES+EN) sobre pilares científicos |
+| `email/ONBOARDING_SEQUENCE_ES.md` | 5 emails de onboarding científico (ES) |
+| `email/ONBOARDING_SEQUENCE_EN.md` | 5 onboarding emails (EN) |
+
+El agente de marketing debe consultar `METHODOLOGY_CONTENT.md` antes de crear contenido con claims científicos.
+
 ## Archivos de Referencia
 - Estrategia completa: `marketing/strategies/C2G_Plan_Crecimiento_Completo.md`
 - Calendario ES: `marketing/content-calendar/C2G_Fase1_Calendario_ES.xlsx`

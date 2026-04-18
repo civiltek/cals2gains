@@ -8,7 +8,7 @@
   "slides_data": [
     {
       "type": "cover",
-      "prompt": "Floating smartphone showing Cals2Gains dark UI with holographic feature icons orbiting around it, violet and coral particle effects, dark space background, premium tech aesthetic, 4:5",
+      "prompt": "Abstract flowing ribbons of violet and coral light against deep plum atmosphere, minimal cinematic composition, no objects, no text",
       "headline": "5 FUNCIONES",
       "subheadline": "Que hacen Cals2Gains diferente",
       "text_style": "hero",
@@ -16,51 +16,46 @@
     },
     {
       "type": "content",
-      "prompt": "Close-up of phone camera scanning a plate of food with AI recognition lines highlighting each ingredient, dark background, violet scan lines, futuristic, 4:5",
-      "headline": "1. ESCANER IA",
-      "body": "Haz una foto de cualquier comida.\nLa IA identifica cada ingrediente.\nMacros exactos en 3 segundos.\nSin buscar. Sin codigo de barras.",
-      "text_style": "feature",
-      "icon": "scan"
+      "prompt": "Dynamic violet scan lines flowing over deep plum atmosphere, futuristic minimal composition, no literal objects",
+      "headline": "1. ESCÁNER IA",
+      "body": "Haz una foto de cualquier comida.\nLa IA identifica cada ingrediente.\nMacros exactos en 3 segundos.\nSin buscar. Sin código de barras.",
+      "text_style": "feature"
     },
     {
       "type": "content",
-      "prompt": "Dark premium app screen showing adaptive coaching dashboard with weekly adjustment arrows, AI brain icon glowing, personalized recommendations, 4:5",
+      "prompt": "Soft violet atmospheric glow with subtle geometric neural patterns, minimal cinematic premium composition",
       "headline": "2. COACH IA ADAPTATIVO",
-      "body": "Tu plan se ajusta cada semana.\nBasado en tu progreso real, no plantillas.\nEstancado? La IA recalcula.\nComo tener un nutricionista en el bolsillo.",
-      "text_style": "feature",
-      "icon": "brain"
+      "body": "Tu plan se ajusta cada semana.\nBasado en tu progreso real, no plantillas.\n¿Estancado? La IA recalcula.\nComo tener un nutricionista en el bolsillo.",
+      "text_style": "feature"
     },
     {
       "type": "content",
-      "prompt": "Five glowing mode icons (cut, bulk, maintain, recomp, performance) floating in dark space with violet and coral gradients, clean premium UI cards, 4:5",
+      "prompt": "Five soft glowing light orbs floating in deep plum space with violet and coral gradients, premium minimalism",
       "headline": "3. CINCO MODOS",
-      "body": "Definicion — Deficit inteligente\nVolumen — Superavit controlado\nMantenimiento — Tu equilibrio\nRecomposicion — Musculo + perder grasa\nRendimiento — Combustible para atletas",
-      "text_style": "feature",
-      "icon": "target"
+      "body": "Definición — déficit inteligente\nVolumen — superávit controlado\nMantenimiento — tu equilibrio\nRecomposición — músculo + perder grasa\nRendimiento — combustible para atletas",
+      "text_style": "feature"
     },
     {
       "type": "content",
-      "prompt": "Weekly progress chart with trend lines and streak counter on dark premium UI, confetti particles, motivational achievement badges, violet glow, 4:5",
+      "prompt": "Flowing coral and violet ribbons ascending over dark plum atmosphere, motivational abstract minimalism",
       "headline": "4. RACHAS INTELIGENTES",
-      "body": "Rachas diarias que te mantienen constante.\nTendencias semanales, no obsesion diaria.\nCelebra logros, aprende de fallos.\nHecho para la vida real, no la perfeccion.",
-      "text_style": "feature",
-      "icon": "fire"
+      "body": "Rachas diarias que te mantienen constante.\nTendencias semanales, no obsesión diaria.\nCelebra logros, aprende de fallos.\nHecho para la vida real, no la perfección.",
+      "text_style": "feature"
     },
     {
       "type": "content",
-      "prompt": "Dark premium app showing recipe builder with macro breakdown per serving, beautiful food photography integration, violet accent UI elements, 4:5",
+      "prompt": "Soft warm coral glow over deep plum atmosphere, minimal cinematic premium composition",
       "headline": "5. CREADOR DE RECETAS",
-      "body": "Anade tus propias recetas.\nMacros por racion automaticos.\nGuarda favoritos para registrar con un toque.\nTus comidas, trackeadas perfectamente.",
-      "text_style": "feature",
-      "icon": "recipe"
+      "body": "Añade tus propias recetas.\nMacros por ración automáticos.\nGuarda favoritos para registrar con un toque.\nTus comidas, trackeadas perfectamente.",
+      "text_style": "feature"
     },
     {
       "type": "cta",
-      "prompt": "All five feature icons converging into the Cals2Gains logo, dark premium background with violet and coral light burst, aspirational and powerful, 4:5",
+      "prompt": "Coral light burst emerging from deep plum darkness, aspirational cinematic minimalism",
       "headline": "PRUEBA LAS 5 GRATIS",
-      "body": "7 dias gratis. Acceso completo. Sin tarjeta.",
+      "body": "7 días gratis. Acceso completo.",
       "text_style": "cta",
-      "cta_text": "Link en bio 🔗",
+      "cta_text": "Próximamente",
       "hashtags": ["#cals2gains", "#appnutricion", "#coachia", "#macrotracking", "#fittech"]
     }
   ]

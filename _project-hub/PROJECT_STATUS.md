@@ -1,5 +1,6 @@
 # Cals2Gains - Estado del Proyecto
-> Última actualización: 2026-04-17 — Build iOS bloqueado: créditos EAS al 100% (reset 1 mayo). app.json reparado (c8ab16c). buildNumber iOS en remoto: 52.
+> Última actualización: 2026-04-17 23:05 — ✅ Android Health Connect VALIDADO en device (expo-health-connect fix). iOS HealthKit build #63 en compilación (run 24588091600).
+> Finanzas actualizadas: 2026-04-18 (auto) — 2 nuevos recibos: Anthropic €170 (15 abr) + ElevenLabs €12,25 (14 abr)
 
 ## App
 - **Versión actual:** 1.0.0
@@ -83,11 +84,13 @@ Pantallas principales:
 ## Finanzas (resumen)
 | Concepto | Valor |
 |----------|-------|
-| Gasto total acumulado (desde 24 mar) | **413,76 €** |
-| Burn rate mensual confirmado | ~207 €/mes |
-| Suscripciones activas | 3 (Claude Max 20x, iCloud+, Meta Verified) |
+| Gasto total acumulado (desde 24 mar) | **1.302,33 €** |
+| Burn rate mensual confirmado | ~221 €/mes |
+| Suscripciones activas | 4 (Claude Team, ElevenLabs, iCloud+, Meta Verified) |
+| Nuevo servicio (14/04) | ElevenLabs Creator — ~24,49 €/mes post-promo |
+| ⚠️ Anthropic uso extra | €595 (13 abr) + €170 (15 abr) — revisar consumo |
 | Ingresos | 0 € (app no lanzada) |
-| Última revisión automática | 13 abr 2026, 19:00 — sin nuevos gastos |
+| Última revisión automática | 18 abr 2026 — 2 nuevos recibos encontrados |
 
 Ver `FINANCES.md` para detalle completo.
 
@@ -124,6 +127,8 @@ Ver `ACCOUNTS.md` para detalle completo.
 8. Resolver bug Firebase Storage para progress photos
 9. Vincular @cals2gains a Meta Business Suite para obtener insights
 10. Instalar tag GA4 en cals2gains.com (propiedad ya creada: macrolens-ai-4c482)
+11. **[FINANZAS]** Revisar consumo API/Claude — cargos extra Anthropic €595 + €170 en 2 días son elevados
+12. **[FINANZAS]** Confirmar cargo Apple Developer ~99 USD en extracto bancario
 
 ## Notas de build
 - **Cals2Gains NO puede correr en Expo Go** desde SDK 53. Usa módulos nativos (RevenueCat, GoogleSignIn, expo-notifications, CameraView con children). Para probar en dispositivo físico siempre generar APK vía EAS (`eas build --profile preview --platform android`).

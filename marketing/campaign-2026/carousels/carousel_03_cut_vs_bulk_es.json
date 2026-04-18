@@ -1,5 +1,5 @@
 {
-  "title": "Definicion vs Volumen: Cual Eres Tu?",
+  "title": "Definición vs Volumen: ¿Cuál Eres Tú?",
   "lang": "es",
   "format": "carousel",
   "slides": 7,
@@ -8,59 +8,54 @@
   "slides_data": [
     {
       "type": "cover",
-      "prompt": "Split screen dark aesthetic: left side lean physique with cool blue tones, right side muscular physique with warm coral tones, VS graphic in center with violet glow, dramatic lighting, 4:5",
-      "headline": "DEFINICION vs VOLUMEN",
-      "subheadline": "Cual eres tu?",
+      "prompt": "Dynamic split atmosphere of deep plum with cool violet and warm coral flowing energies meeting in the center, cinematic minimalism, no objects",
+      "headline": "DEFINICIÓN vs VOLUMEN",
+      "subheadline": "¿Cuál eres tú?",
       "text_style": "hero",
       "cta_text": "Desliza para decidir →"
     },
     {
       "type": "content",
-      "prompt": "Clean dark infographic showing downward arrow with deficit numbers, lean athletic body silhouette, cool blue and violet color scheme, minimal data visualization, 4:5",
-      "headline": "DEFINICION",
-      "body": "Objetivo: Perder grasa, mantener musculo.\nDeficit calorico: 300-500 cal por debajo.\nProteina: ALTA siempre (2g/kg minimo).\nCardio: Moderado, sin pasarse.\nDuracion: 8-16 semanas.",
-      "text_style": "educational",
-      "icon": "scissors"
+      "prompt": "Cool blue-violet atmospheric gradient descending over deep plum, minimal abstract composition",
+      "headline": "DEFINICIÓN",
+      "body": "Objetivo: perder grasa, mantener músculo.\nDéficit calórico: 300-500 kcal por debajo.\nProteína: ALTA siempre (2 g/kg mínimo).\nCardio: moderado, sin pasarse.\nDuración: 8-16 semanas.",
+      "text_style": "educational"
     },
     {
       "type": "content",
-      "prompt": "Clean dark infographic showing upward arrow with surplus numbers, muscular body silhouette, warm coral and violet color scheme, minimal data visualization, 4:5",
+      "prompt": "Warm coral atmospheric gradient ascending over deep plum, minimal abstract composition",
       "headline": "VOLUMEN",
-      "body": "Objetivo: Ganar musculo, peso controlado.\nSuperavit calorico: 200-400 cal por encima.\nProteina: 1.8-2.2g/kg.\nEntreno: Sobrecarga progresiva es clave.\nDuracion: 12-24 semanas.",
-      "text_style": "educational",
-      "icon": "dumbbell"
+      "body": "Objetivo: ganar músculo, peso controlado.\nSuperávit calórico: 200-400 kcal por encima.\nProteína: 1,8-2,2 g/kg.\nEntreno: sobrecarga progresiva es clave.\nDuración: 12-24 semanas.",
+      "text_style": "educational"
     },
     {
       "type": "content",
-      "prompt": "Dark premium decision tree flowchart with glowing nodes, body fat percentage indicators, violet and coral connected pathways, clean infographic, 4:5",
-      "headline": "COMO ELEGIR",
-      "body": "Grasa corporal +20% (H) / +30% (M)? → DEFINICION\nGrasa corporal -15% (H) / -23% (M)? → VOLUMEN\nEntre medias? → Vale cualquiera. Elige prioridad.\nLlevas +16 semanas en deficit? → Descanso de mantenimiento.",
-      "text_style": "educational",
-      "icon": "compass"
+      "prompt": "Abstract decision-tree flowchart with soft violet glowing nodes over deep plum, minimal premium infographic",
+      "headline": "CÓMO ELEGIR",
+      "body": "Grasa corporal +20% (H) / +30% (M) → Definición\nGrasa corporal -15% (H) / -23% (M) → Volumen\nEntre medias: vale cualquiera, elige prioridad.\n+16 semanas en déficit: descanso de mantenimiento.",
+      "text_style": "educational"
     },
     {
       "type": "content",
-      "prompt": "Side by side comparison: messy dirty bulk plate vs clean lean bulk plate, dark background, one with red X one with green check, dramatic food photography, 4:5",
-      "headline": "ERRORES TIPICOS",
-      "body": "Deficit muy agresivo → pierdes musculo, efecto rebote\nVolumen sin control → grasa innecesaria\nSin trackear → adivinar = cero resultados\nSin priorizar proteina → esfuerzo perdido",
-      "text_style": "educational",
-      "icon": "warning"
+      "prompt": "Abstract contrast atmosphere, two energy flows, dark premium plum with violet and coral accents, minimal composition",
+      "headline": "ERRORES TÍPICOS",
+      "body": "Déficit muy agresivo → pierdes músculo, efecto rebote.\nVolumen sin control → grasa innecesaria.\nSin trackear → adivinar = cero resultados.\nSin priorizar proteína → esfuerzo perdido.",
+      "text_style": "educational"
     },
     {
-      "type": "content",
-      "prompt": "Phone showing Cals2Gains app switching between Cut and Bulk mode with smooth animation, dark premium UI, violet and coral mode indicators, 4:5",
+      "type": "screenshot_card",
+      "prompt": "Soft violet and coral gradient over deep plum, clean space for UI overlay, cinematic minimalism",
       "headline": "CAMBIA DE MODO AL INSTANTE",
-      "body": "Cals2Gains tiene modos dedicados de Definicion y Volumen.\nLa IA ajusta calorias y macros automaticamente.\nCambia cuando quieras — la app se adapta contigo.",
-      "text_style": "feature",
-      "icon": "switch"
+      "body": "Cals2Gains tiene modos dedicados de Definición y Volumen.\nLa IA ajusta calorías y macros automáticamente.\nCambia cuando quieras — la app se adapta contigo.",
+      "text_style": "feature"
     },
     {
       "type": "cta",
-      "prompt": "Bold split design: DEFINICION and VOLUMEN text with arrow pointing to Cals2Gains logo in center, dark premium with violet and coral gradient, powerful, 4:5",
+      "prompt": "Coral glow emerging from deep plum darkness, powerful motivational cinematic minimalism",
       "headline": "ELIGE TU MODO",
-      "body": "Empieza tu definicion o volumen con guia IA. Gratis 7 dias.",
+      "body": "Empieza tu definición o volumen con guía IA. Gratis 7 días.",
       "text_style": "cta",
-      "cta_text": "Link en bio 🔗",
+      "cta_text": "Próximamente",
       "hashtags": ["#definicionvsvolumen", "#definicion", "#volumen", "#cals2gains", "#recomposicioncorporal"]
     }
   ]

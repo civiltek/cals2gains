@@ -362,6 +362,48 @@
         /* ANIMATIONS */
         @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
         .fade-up{opacity:0;animation:fadeUp 0.7s ease-out forwards}
+        /* ── PHONE ENHANCED ─────────────────────────────────────── */
+        .phone{width:295px!important;height:618px!important;border-radius:40px!important;box-shadow:0 50px 130px rgba(156,140,255,0.18)!important}
+        .phone-status{display:flex;justify-content:space-between;align-items:center;padding:0.4rem 1.2rem 0.1rem;font-size:0.58rem;color:var(--bone-40);margin-top:0.7rem}
+        .phone-screen{padding:0.2rem 0.9rem 0.8rem!important;font-size:0.75rem;overflow:hidden}
+        .phone-greeting{font-size:1rem!important;font-weight:700;margin-bottom:0.4rem!important;font-family:'Outfit',sans-serif}
+        .phone-ring-wrap{position:relative;width:128px;height:128px;margin:0.2rem auto 0.45rem}
+        .phone-ring-wrap svg{position:absolute;inset:0}
+        .phone-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        .phone-bar-section{margin-bottom:0.3rem}
+        .phone-bar-row{margin-bottom:0.3rem}
+        .phone-bar-label{display:flex;justify-content:space-between;font-size:0.58rem;color:var(--bone-60);margin-bottom:0.15rem}
+        .phone-bar-label span:last-child{color:var(--bone-80);font-weight:600}
+        .phone-bar-track{height:4px;background:rgba(247,242,234,0.07);border-radius:999px;overflow:hidden}
+        .phone-bar-fill{height:100%;border-radius:999px}
+        .ph-section{font-size:0.52rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--bone-40);margin:0.4rem 0 0.25rem}
+        .phone-meal-row{display:flex;justify-content:space-between;align-items:center;padding:0.25rem 0;border-bottom:1px solid rgba(247,242,234,0.04);font-size:0.6rem}
+        .phone-meal-row:last-child{border-bottom:none}
+        .phone-meal-name{font-weight:600;color:var(--bone-80);font-size:0.61rem}
+        .phone-meal-sub{font-size:0.53rem;color:var(--bone-40);margin-top:1px}
+        .phone-meal-kcal{color:var(--coral);font-weight:700;font-family:'Geist Mono',monospace;font-size:0.61rem;flex-shrink:0;margin-left:0.5rem}
+        .phone-coach{background:rgba(156,140,255,0.1);border:1px solid rgba(156,140,255,0.2);border-radius:10px;padding:0.4rem 0.55rem;margin-top:0.35rem;font-size:0.59rem;color:var(--bone-60)}
+        .phone-coach strong{color:var(--violet);display:block;margin-bottom:2px;font-size:0.6rem}
+        .phone-bottom-row{display:flex;justify-content:space-between;align-items:center;margin-top:0.35rem}
+        .phone-streak{display:flex;align-items:center;gap:0.3rem;background:rgba(255,152,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:6px;padding:0.2rem 0.45rem;color:#FFD700;font-weight:700;font-size:0.58rem}
+        .phone-water{display:flex;align-items:center;gap:0.3rem;color:var(--bone-40);font-size:0.58rem}
+        /* ── SCIENCE STRIP ───────────────────────────────────────── */
+        .science-strip{padding:4rem 2rem;background:linear-gradient(180deg,var(--deep) 0%,var(--plum) 100%);border-top:1px solid var(--violet-15);border-bottom:1px solid var(--violet-15)}
+        .science-grid{max-width:960px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+        .sc-card{background:var(--card);border:1px solid var(--violet-15);border-radius:14px;padding:1.5rem 1.2rem;text-align:center;transition:all .3s}
+        .sc-card:hover{border-color:var(--violet-25);transform:translateY(-5px);box-shadow:0 16px 48px rgba(156,140,255,0.12)}
+        .sc-icon{font-size:1.7rem;margin-bottom:0.55rem}
+        .sc-num{font-family:'Outfit',sans-serif;font-size:2.2rem;font-weight:900;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.2rem;line-height:1}
+        .sc-label{font-size:0.78rem;color:var(--bone-60);line-height:1.45}
+        /* ── DIFFERENTIATORS ─────────────────────────────────────── */
+        .diff-grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+        .diff-card{background:var(--card);border:1px solid var(--violet-15);border-radius:16px;padding:2rem;transition:all .3s}
+        .diff-card:hover{border-color:var(--violet-25);transform:translateY(-4px);box-shadow:0 16px 48px rgba(156,140,255,0.08)}
+        .diff-check{width:36px;height:36px;background:linear-gradient(135deg,rgba(74,222,128,0.15),rgba(74,222,128,0.04));border:1px solid rgba(74,222,128,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#4ADE80;font-weight:700;margin-bottom:0.9rem;font-size:1rem}
+        .diff-title{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:0.5rem}
+        .diff-desc{color:var(--bone-60);font-size:0.87rem;line-height:1.65}
+        @media(max-width:900px){.science-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:768px){.science-grid{grid-template-columns:repeat(2,1fr)}.diff-grid{grid-template-columns:1fr}.phone{width:260px!important;height:540px!important}}
     </style>
 </head><body>
     <!-- NAV -->
@@ -397,10 +439,10 @@
             <div class="hero-text">
                 <div class="hero-badge">
                     <span class="dot"></span>
-                    <span data-es="La única app con IA real" data-en="The only app with real AI">La única app con IA real</span>
+                    <span data-es="Ciencia real. IA real. Sin caja negra." data-en="Real science. Real AI. No black box.">Ciencia real. IA real. Sin caja negra.</span>
                 </div>
                 <h1 class="hero-title" data-es="Tu nutrición merece <span class='grad'>IA de verdad.</span>" data-en="Your nutrition deserves <span class='grad'>real AI.</span>">Tu nutrición merece <span class="grad">IA de verdad.</span></h1>
-                <p class="hero-sub" data-es="Escanea tu plato, recibe coaching semanal personalizado y deja que la IA ajuste tus macros automáticamente. Sin publicidad. Sin excusas." data-en="Scan your plate, get weekly personalized coaching and let AI adjust your macros automátically. No ads. No excuses.">Escanea tu plato, recibe coaching semanal personalizado y deja que la IA ajuste tus macros automáticamente. Sin publicidad. Sin excusas.</p>
+                <p class="hero-sub" data-es="Macros ajustados por deporte y tipo de sesión. Coach semanal que te explica cada decisión. Basado en 17 estudios científicos. Sin publicidad. Sin caja negra." data-en="Macros adjusted by sport and session type. Weekly coach that explains every decision. Based on 17 scientific studies. No ads. No black box.">Macros ajustados por deporte y tipo de sesión. Coach semanal que te explica cada decisión. Basado en 17 estudios científicos. Sin publicidad. Sin caja negra.</p>
                 <div class="hero-buttons">
                     <a href="#download" class="btn btn-primary" data-es="Probar 7 días gratis" data-en="Try 7 days free">Probar 7 días gratis</a>
                     <a href="#features" class="btn btn-ghost" data-es="Ver funciones" data-en="See features">Ver funciones</a>
@@ -414,20 +456,59 @@
             <div class="hero-visual">
                 <div class="phone">
                     <div class="phone-notch"></div>
+                    <div class="phone-status"><span>9:41</span><span>●●● 🔋</span></div>
                     <div class="phone-screen">
-                        <div class="phone-header">14 abril 2026</div>
-                        <div class="phone-greeting" data-es="Hola, Judith &#128170;" data-en="Hi, Judith &#128170;">Hola, Judith &#128170;</div>
-                        <div class="phone-ring">
-                            <div class="phone-cal">1,847<small data-es="de 2,100 kcal" data-en="of 2,100 kcal">de 2,100 kcal</small></div>
+                        <div class="phone-header" data-es="Sábado · Día de fuerza ⚡" data-en="Saturday · Strength day ⚡">Sábado · Día de fuerza ⚡</div>
+                        <div class="phone-greeting" data-es="Hola, Judith 💪" data-en="Hi, Judith 💪">Hola, Judith 💪</div>
+                        <!-- Ring SVG -->
+                        <div class="phone-ring-wrap">
+                            <svg width="128" height="128" viewBox="0 0 128 128" style="transform:rotate(-90deg)">
+                                <circle cx="64" cy="64" r="54" fill="none" stroke="rgba(247,242,234,0.07)" stroke-width="8"/>
+                                <circle cx="64" cy="64" r="54" fill="none" stroke="url(#rg1)" stroke-width="8" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="41"/>
+                                <defs><linearGradient id="rg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#9C8CFF"/><stop offset="100%" stop-color="#FF6A4D"/></linearGradient></defs>
+                            </svg>
+                            <div class="phone-ring-inner">
+                                <div class="phone-cal">1,847<small data-es="de 2,100 kcal" data-en="of 2,100 kcal">de 2,100 kcal</small></div>
+                            </div>
                         </div>
-                        <div class="phone-macros">
-                            <div class="phone-macro p"><span class="val">142g</span><span data-es="Proteína" data-en="Protein">Proteína</span></div>
-                            <div class="phone-macro c"><span class="val">198g</span><span data-es="Carbos" data-en="Carbs">Carbos</span></div>
-                            <div class="phone-macro f"><span class="val">58g</span><span data-es="Grasa" data-en="Fat">Grasa</span></div>
+                        <!-- Macro bars -->
+                        <div class="phone-bar-section">
+                            <div class="phone-bar-row">
+                                <div class="phone-bar-label"><span data-es="Proteína" data-en="Protein">Proteína</span><span>142 / 180g</span></div>
+                                <div class="phone-bar-track"><div class="phone-bar-fill" style="width:79%;background:#9C8CFF"></div></div>
+                            </div>
+                            <div class="phone-bar-row">
+                                <div class="phone-bar-label"><span data-es="Carbos" data-en="Carbs">Carbos</span><span>198 / 220g</span></div>
+                                <div class="phone-bar-track"><div class="phone-bar-fill" style="width:90%;background:linear-gradient(90deg,#B4A3FF,#9C8CFF)"></div></div>
+                            </div>
+                            <div class="phone-bar-row">
+                                <div class="phone-bar-label"><span data-es="Grasa" data-en="Fat">Grasa</span><span>58 / 65g</span></div>
+                                <div class="phone-bar-track"><div class="phone-bar-fill" style="width:89%;background:#FF6A4D"></div></div>
+                            </div>
                         </div>
-                        <div class="phone-ai">
-                            <strong data-es="&#129302; Coach IA" data-en="&#129302; AI Coach">&#129302; Coach IA</strong>
-                            <span data-es="Vas genial hoy. Sube un poco la proteína en la cena para llegar al objetivo." data-en="Looking great today. Add a bit more protein at dinner to hit your target.">Vas genial hoy. Sube un poco la proteína en la cena para llegar al objetivo.</span>
+                        <!-- Meal log -->
+                        <div class="ph-section" data-es="COMIDAS DE HOY" data-en="TODAY'S MEALS">COMIDAS DE HOY</div>
+                        <div class="phone-meal-row">
+                            <div><div class="phone-meal-name" data-es="🌅 Desayuno" data-en="🌅 Breakfast">🌅 Desayuno</div><div class="phone-meal-sub" data-es="Avena + frutos secos" data-en="Oats + nuts">Avena + frutos secos</div></div>
+                            <div class="phone-meal-kcal">420 kcal</div>
+                        </div>
+                        <div class="phone-meal-row">
+                            <div><div class="phone-meal-name" data-es="🌞 Almuerzo" data-en="🌞 Lunch">🌞 Almuerzo</div><div class="phone-meal-sub" data-es="Pollo + arroz + verduras" data-en="Chicken + rice + veggies">Pollo + arroz + verduras</div></div>
+                            <div class="phone-meal-kcal">648 kcal</div>
+                        </div>
+                        <div class="phone-meal-row">
+                            <div><div class="phone-meal-name" data-es="☕ Merienda" data-en="☕ Snack">☕ Merienda</div><div class="phone-meal-sub" data-es="Yogur griego + proteína" data-en="Greek yogurt + protein">Yogur griego + proteína</div></div>
+                            <div class="phone-meal-kcal">185 kcal</div>
+                        </div>
+                        <!-- Coach message -->
+                        <div class="phone-coach">
+                            <strong data-es="🤖 Coach IA" data-en="🤖 AI Coach">🤖 Coach IA</strong>
+                            <span data-es="Día de fuerza: +20g carbos en la cena para recuperación muscular óptima." data-en="Strength day: +20g carbs at dinner for optimal muscle recovery.">Día de fuerza: +20g carbos en la cena para recuperación muscular óptima.</span>
+                        </div>
+                        <!-- Streak + hydration -->
+                        <div class="phone-bottom-row">
+                            <div class="phone-streak">🔥 14 días</div>
+                            <div class="phone-water">💧 1,8 / 2,4 L</div>
                         </div>
                     </div>
                 </div>
@@ -438,10 +519,42 @@
     <!-- STATS BAR -->
     <section class="stats">
         <div class="stats-inner">
-            <div><div class="stat-num">40+</div><div class="stat-label" data-es="Funciones" data-en="Features">Funciones</div></div>
-            <div><div class="stat-num">IA</div><div class="stat-label" data-es="Motor inteligente" data-en="Smart engine">Motor inteligente</div></div>
-            <div><div class="stat-num">100%</div><div class="stat-label" data-es="Privado" data-en="Private">Privado</div></div>
-            <div><div class="stat-num">0</div><div class="stat-label" data-es="Anuncios" data-en="Ads">Anuncios</div></div>
+            <div><div class="stat-num">17+</div><div class="stat-label" data-es="estudios científicos revisados por pares" data-en="peer-reviewed scientific studies">estudios científicos revisados por pares</div></div>
+            <div><div class="stat-num">82%</div><div class="stat-label" data-es="precisión con Mifflin-St Jeor (referencia ISSN)" data-en="accuracy with Mifflin-St Jeor (ISSN reference)">precisión con Mifflin-St Jeor (referencia ISSN)</div></div>
+            <div><div class="stat-num">8</div><div class="stat-label" data-es="tipos de sesión deportiva con macros ajustados" data-en="sport session types with adjusted macros">tipos de sesión deportiva con macros ajustados</div></div>
+            <div><div class="stat-num">0</div><div class="stat-label" data-es="anuncios — ni en la versión gratuita" data-en="ads — not even in the free version">anuncios — ni en la versión gratuita</div></div>
+        </div>
+    </section>
+
+    <!-- SCIENCE CLAIMS -->
+    <section class="science-strip">
+        <div class="section-label" data-es="Metodología científica" data-en="Scientific methodology">Metodología científica</div>
+        <h2 class="section-title" data-es="17 estudios. 0 pseudociencia." data-en="17 studies. 0 pseudoscience.">17 estudios. 0 pseudociencia.</h2>
+        <p class="section-desc" data-es="Cada cálculo de Cals2Gains tiene una referencia científica detrás. Sin cajas negras, sin fórmulas inventadas." data-en="Every Cals2Gains calculation has a scientific reference behind it. No black boxes, no made-up formulas.">Cada cálculo de Cals2Gains tiene una referencia científica detrás. Sin cajas negras, sin fórmulas inventadas.</p>
+        <div class="science-grid">
+            <div class="sc-card">
+                <div class="sc-icon">📐</div>
+                <div class="sc-num" data-es="17+" data-en="17+">17+</div>
+                <div class="sc-label" data-es="estudios revisados por pares sustentan cada cálculo de macros y TDEE" data-en="peer-reviewed studies support every macro and TDEE calculation">estudios revisados por pares sustentan cada cálculo de macros y TDEE</div>
+            </div>
+            <div class="sc-card">
+                <div class="sc-icon">⚡</div>
+                <div class="sc-num" data-es="82%" data-en="82%">82%</div>
+                <div class="sc-label" data-es="de precisión con Mifflin-St Jeor — frente al 69% de Harris-Benedict" data-en="accuracy with Mifflin-St Jeor — vs 69% for Harris-Benedict">de precisión con Mifflin-St Jeor — frente al 69% de Harris-Benedict</div>
+            </div>
+            <div class="sc-card">
+                <div class="sc-icon">🏋️</div>
+                <div class="sc-num" data-es="8" data-en="8">8</div>
+                <div class="sc-label" data-es="tipos de sesión deportiva con macros diarios adaptados: fuerza, cardio, HIIT, competición..." data-en="sport session types with daily adapted macros: strength, cardio, HIIT, competition...">tipos de sesión deportiva con macros diarios adaptados: fuerza, cardio, HIIT, competición...</div>
+            </div>
+            <div class="sc-card">
+                <div class="sc-icon">🔍</div>
+                <div class="sc-num" data-es="0" data-en="0">0</div>
+                <div class="sc-label" data-es="cajas negras — cada ajuste del coach viene explicado con la ciencia detrás" data-en="black boxes — every coach adjustment comes explained with the science behind it">cajas negras — cada ajuste del coach viene explicado con la ciencia detrás</div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:2.5rem">
+            <a href="/guides/metodologia.html" class="btn btn-ghost" style="display:inline-flex" data-es="Ver la metodología completa →" data-en="See the full methodology →">Ver la metodología completa →</a>
         </div>
     </section>
 
@@ -454,7 +567,7 @@
             <div class="feat"><div class="feat-tag" data-es="Killer feature" data-en="Killer feature">Killer feature</div><div class="feat-icon">&#128247;</div><div class="feat-title" data-es="Escáner IA de comida" data-en="AI Food Scanner">Escáner IA de comida</div><div class="feat-desc" data-es="Haz una foto a tu plato y la IA identifica ingredientes, estima porciones y calcula macros al instante." data-en="Snap a photo of your meal and AI identifies ingredients, estimates portions and calculates macros instantly.">Haz una foto a tu plato y la IA identifica ingredientes, estima porciones y calcula macros al instante.</div></div>
             <div class="feat"><div class="feat-tag" data-es="Exclusivo" data-en="Exclusive">Exclusivo</div><div class="feat-icon">&#129302;</div><div class="feat-title" data-es="Coach IA de macros" data-en="AI Macro Coach">Coach IA de macros</div><div class="feat-desc" data-es="Cada semana, tu coach IA analiza tu progreso, ajusta macros y te da recomendaciones personalizadas basadas en tus datos reales." data-en="Every week, your AI coach analyzes progress, adjusts macros and gives personalized recommendations based on your real data.">Cada semana, tu coach IA analiza tu progreso, ajusta macros y te da recomendaciones personalizadas basadas en tus datos reales.</div></div>
             <div class="feat"><div class="feat-icon">&#128270;</div><div class="feat-title" data-es="Búsqueda + código de barras" data-en="Search + barcode scanner">Búsqueda + código de barras</div><div class="feat-desc" data-es="Base de datos con 500+ alimentos verificados. Escanea códigos de barras o busca manualmente en segundos." data-en="Database with 500+ verified foods. Scan barcodes or search manually in seconds.">Base de datos con 500+ alimentos verificados. Escanea códigos de barras o busca manualmente en segundos.</div></div>
-            <div class="feat"><div class="feat-icon">&#128202;</div><div class="feat-title" data-es="Tracking de peso e hidratación" data-en="Weight &amp; hydration tracking">Tracking de peso e hidratación</div><div class="feat-desc" data-es="Registra tu peso diario y consumo de agua. Graficas de tendencia y media movil para ver tu progreso real." data-en="Log daily weight and water intake. Trend graphs and moving average to see your real progress.">Registra tu peso diario y consumo de agua. Graficas de tendencia y media movil para ver tu progreso real.</div></div>
+            <div class="feat"><div class="feat-icon">&#128202;</div><div class="feat-title" data-es="Tracking de peso e hidratación" data-en="Weight &amp; hydration tracking">Tracking de peso e hidratación</div><div class="feat-desc" data-es="Registra tu peso diario y consumo de agua. Gráficas de tendencia y media móvil para ver tu progreso real." data-en="Log daily weight and water intake. Trend graphs and moving average to see your real progress.">Registra tu peso diario y consumo de agua. Gráficas de tendencia y media móvil para ver tu progreso real.</div></div>
             <div class="feat"><div class="feat-tag" data-es="IA dinámica" data-en="Dynamic AI">IA dinámica</div><div class="feat-icon">&#127869;</div><div class="feat-title" data-es="Sugerencias de recetas" data-en="Smart recipe suggestions">Sugerencias de recetas</div><div class="feat-desc" data-es="Recetas inteligentes basadas en tus macros disponibles, tus preferencias y tu objetivo del dia." data-en="Smart recipes based on your available macros, preferences and daily goal.">Recetas inteligentes basadas en tus macros disponibles, tus preferencias y tu objetivo del dia.</div></div>
             <div class="feat"><div class="feat-icon">&#128197;</div><div class="feat-title" data-es="Planificación de comidas" data-en="Meal planning">Planificación de comidas</div><div class="feat-desc" data-es="Planifica tus comidas de la semana y deja que la IA ajuste las cantidades para cumplir tus objetivos de macros." data-en="Plan your weekly meals and let AI adjust portions to hit your macro targets.">Planifica tus comidas de la semana y deja que la IA ajuste las cantidades para cumplir tus objetivos de macros.</div></div>
             <div class="feat"><div class="feat-icon">&#128200;</div><div class="feat-title" data-es="Dashboard de progreso" data-en="Progress dashboard">Dashboard de progreso</div><div class="feat-desc" data-es="Visualiza tu progreso con estadísticas detalladas: tendencias de peso, adherencia a macros, rachas y más." data-en="Visualize your progress with detailed stats: weight trends, macro adherence, streaks and more.">Visualiza tu progreso con estadísticas detalladas: tendencias de peso, adherencia a macros, rachas y más.</div></div>
@@ -465,7 +578,7 @@
             <div class="feat"><div class="feat-tag" data-es="Wearables" data-en="Wearables">Wearables</div><div class="feat-icon">&#8987;</div><div class="feat-title" data-es="HealthKit &amp; Health Connect" data-en="HealthKit &amp; Health Connect">HealthKit &amp; Health Connect</div><div class="feat-desc" data-es="Sincroniza con Apple Health y Google Health Connect. TDEE dinámico con tus pasos reales y calorías quemadas." data-en="Sync with Apple Health and Google Health Connect. Dynamic TDEE with your real steps and calories burned.">Sincroniza con Apple Health y Google Health Connect. TDEE dinámico con tus pasos reales y calorías quemadas.</div></div>
             <div class="feat"><div class="feat-icon">&#127942;</div><div class="feat-title" data-es="Gamificación y rachas" data-en="Gamification &amp; streaks">Gamificación y rachas</div><div class="feat-desc" data-es="Mantén tus rachas, desbloquea logros y acumula puntos. La constancia tiene recompensa." data-en="Keep your streaks, unlock achievements and earn points. Consistency has its rewards.">Mantén tus rachas, desbloquea logros y acumula puntos. La constancia tiene recompensa.</div></div>
             <div class="feat"><div class="feat-icon">&#128242;</div><div class="feat-title" data-es="Widget y coach adaptativo" data-en="Widget &amp; adaptive coach">Widget y coach adaptativo</div><div class="feat-desc" data-es="Widget en pantalla de inicio con tus macros en tiempo real. El coach aprende de ti y adapta sus recomendaciones semana a semana." data-en="Home screen widget with real-time macros. The coach learns from you and adapts its recommendations week by week.">Widget en pantalla de inicio con tus macros en tiempo real. El coach aprende de ti y adapta sus recomendaciones semana a semana.</div></div>
-            <div class="feat"><div class="feat-icon">&#127760;</div><div class="feat-title" data-es="Multiidioma (ES / EN)" data-en="Multilingual (ES / EN)">Multiidioma (ES / EN)</div><div class="feat-desc" data-es="Disponible en espanol e ingles. Toda la experiencia adaptada a tu idioma desde el primer uso." data-en="Available in Spanish and English. The entire experience adapted to your language from day one.">Disponible en espanol e ingles. Toda la experiencia adaptada a tu idioma desde el primer uso.</div></div>
+            <div class="feat"><div class="feat-icon">&#127760;</div><div class="feat-title" data-es="Multiidioma (ES / EN)" data-en="Multilingual (ES / EN)">Multiidioma (ES / EN)</div><div class="feat-desc" data-es="Disponible en español e inglés. Toda la experiencia adaptada a tu idioma desde el primer uso." data-en="Available in Spanish and English. The entire experience adapted to your language from day one.">Disponible en español e inglés. Toda la experiencia adaptada a tu idioma desde el primer uso.</div></div>
         </div></section>
 
     <!-- AI SPOTLIGHT -->
@@ -474,7 +587,7 @@
             <div class="ai-text">
                 <div class="section-label" style="text-align:left" data-es="Inteligencia artificial" data-en="Artificial intelligence">Inteligencia artificial</div>
                 <h3 data-es="La IA no es un extra. <br>Es el núcleo." data-en="AI isn't an add-on. <br>It's the core.">La IA no es un extra. <br>Es el núcleo.</h3>
-                <p data-es="Mientras otras apps pegan un chatbot genérico, Cals2Gains integra IA avanzada en cada función: visión por foto, coaching semanal, sugerencias de comida y ajuste automático de macros." data-en="While other apps bolt on a generic chatbot, Cals2Gains integrates advanced AI into every feature: photo vision, weekly coaching, food suggestions and automatic macro adjustment.">Mientras otras apps pegan un chatbot genérico, Cals2Gains integra IA avanzada en cada función: visión por foto, coaching semanal, sugerencias de comida y ajuste automático de macros.</p>
+                <p data-es="Mientras otras apps te dan un número sin explicarte de dónde viene, Cals2Gains muestra cada cálculo: fórmula usada, factor de actividad, corrección por wearable. La IA sabe que tiende a sobreestimar porciones y aplica autocorrección del 15-20% antes de darte el resultado final." data-en="While other apps give you a number without explaining where it comes from, Cals2Gains shows every calculation: formula used, activity factor, wearable correction. The AI knows it tends to overestimate portions and applies a 15-20% self-correction before giving you the final result.">Mientras otras apps te dan un número sin explicarte de dónde viene, Cals2Gains muestra cada cálculo: fórmula usada, factor de actividad, corrección por wearable. La IA sabe que tiende a sobreestimar porciones y aplica autocorrección del 15-20% antes de darte el resultado final.</p>
                 <ul class="ai-list">
                     <li data-es="Visión IA para escaneo de platos" data-en="AI Vision for plate scanning">Visión IA para escaneo de platos</li>
                     <li data-es="Coaching semanal personalizado" data-en="Personalized weekly coaching">Coaching semanal personalizado</li>
@@ -485,13 +598,42 @@
             </div>
             <div class="ai-card">
                 <div class="ai-card-badge" data-es="IA en acción" data-en="AI in action">IA en acción</div>
-                <h4 data-es="&#128248; Escaneo instantaneo" data-en="&#128248; Instant scanning">&#128248; Escaneo instantaneo</h4>
+                <h4 data-es="&#128248; Escaneo instantáneo" data-en="&#128248; Instant scanning">&#128248; Escaneo instantáneo</h4>
                 <p data-es="Pasta bolo&#241;esa con ensalada" data-en="Bolognese pasta with salad">Pasta bolo&#241;esa con ensalada</p>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin:1rem 0;font-size:0.85rem">
                     <div style="background:var(--plum);padding:0.5rem;border-radius:8px;border:1px solid var(--violet-15)"><div style="color:var(--bone-40);font-size:0.7rem" data-es="Calorías" data-en="Calories">Calorías</div><div style="color:var(--coral);font-weight:700">685</div></div>
                     <div style="background:var(--plum);padding:0.5rem;border-radius:8px;border:1px solid var(--violet-15)"><div style="color:var(--bone-40);font-size:0.7rem" data-es="Proteína" data-en="Protein">Proteína</div><div style="color:var(--violet);font-weight:700">38g</div></div>
                     <div style="background:var(--plum);padding:0.5rem;border-radius:8px;border:1px solid var(--violet-15)"><div style="color:var(--bone-40);font-size:0.7rem" data-es="Carbos" data-en="Carbs">Carbos</div><div style="font-weight:700">72g</div></div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DIFFERENTIATORS -->
+    <section class="section" id="diferencial" style="background:var(--deep);border-top:1px solid var(--violet-15)">
+        <div class="section-label" data-es="Por qué elegirla" data-en="Why choose it">Por qué elegirla</div>
+        <h2 class="section-title" data-es="No todas las apps de nutrición son iguales." data-en="Not all nutrition apps are the same.">No todas las apps de nutrición son iguales.</h2>
+        <p class="section-desc" data-es="Mientras la mayoría pide que cuentes calorías a mano, Cals2Gains hace el trabajo pesado — con ciencia de verdad detrás." data-en="While most apps ask you to count calories manually, Cals2Gains does the heavy lifting — with real science behind it.">Mientras la mayoría pide que cuentes calorías a mano, Cals2Gains hace el trabajo pesado — con ciencia de verdad detrás.</p>
+        <div class="diff-grid">
+            <div class="diff-card">
+                <div class="diff-check">✓</div>
+                <div class="diff-title" data-es="Periodización deportiva" data-en="Sport periodization">Periodización deportiva</div>
+                <div class="diff-desc" data-es="Tus macros cambian cada día según la sesión: fuerza, cardio, HIIT o descanso. No comes lo mismo el día de competición que el de recuperación. Ninguna otra app gratuita hace esto." data-en="Your macros change daily based on the session: strength, cardio, HIIT or rest. You don't eat the same on competition day as on recovery day. No other free app does this.">Tus macros cambian cada día según la sesión: fuerza, cardio, HIIT o descanso. No comes lo mismo el día de competición que el de recuperación. Ninguna otra app gratuita hace esto.</div>
+            </div>
+            <div class="diff-card">
+                <div class="diff-check">✓</div>
+                <div class="diff-title" data-es="Cálculo 100% transparente" data-en="100% transparent calculation">Cálculo 100% transparente</div>
+                <div class="diff-desc" data-es="Ves exactamente cómo se calculan tus macros: Mifflin-St Jeor, factor de actividad (1,20–1,90), corrección de wearable al 90%. Sin fórmulas secretas, sin caja negra." data-en="You see exactly how your macros are calculated: Mifflin-St Jeor, activity factor (1.20–1.90), 90% wearable correction. No secret formulas, no black box.">Ves exactamente cómo se calculan tus macros: Mifflin-St Jeor, factor de actividad (1,20–1,90), corrección de wearable al 90%. Sin fórmulas secretas, sin caja negra.</div>
+            </div>
+            <div class="diff-card">
+                <div class="diff-check">✓</div>
+                <div class="diff-title" data-es="Coach que propone, no impone" data-en="Coach that proposes, not imposes">Coach que propone, no impone</div>
+                <div class="diff-desc" data-es="Cada ajuste semanal viene con explicación. Máximo ±200 kcal por semana para no desestabilizarte. El coach propone, tú decides. Sin cambios sorpresa de un día para otro." data-en="Every weekly adjustment comes with an explanation. Maximum ±200 kcal per week to keep you stable. The coach proposes, you decide. No surprise changes overnight.">Cada ajuste semanal viene con explicación. Máximo ±200 kcal por semana para no desestabilizarte. El coach propone, tú decides. Sin cambios sorpresa de un día para otro.</div>
+            </div>
+            <div class="diff-card">
+                <div class="diff-check">✓</div>
+                <div class="diff-title" data-es="Sin publicidad, nunca" data-en="No ads, ever">Sin publicidad, nunca</div>
+                <div class="diff-desc" data-es="Ni en la versión gratuita. Tus datos de salud no son el producto. Sin venta de datos a terceros, sin notificaciones de marketing, sin anuncios disfrazados de consejos." data-en="Not even in the free version. Your health data is not the product. No data selling, no marketing notifications, no ads disguised as advice.">Ni en la versión gratuita. Tus datos de salud no son el producto. Sin venta de datos a terceros, sin notificaciones de marketing, sin anuncios disfrazados de consejos.</div>
             </div>
         </div>
     </section>
@@ -517,7 +659,7 @@
     <!-- HOW IT WORKS -->
     <section class="section" id="how">
         <div class="section-label" data-es="Cómo funciona" data-en="How it works">Cómo funciona</div>
-        <h2 class="section-title" data-es="3 pasos. Cero friccion." data-en="3 steps. Zero friction.">3 pasos. Cero friccion.</h2>
+        <h2 class="section-title" data-es="3 pasos. Cero fricción." data-en="3 steps. Zero friction.">3 pasos. Cero fricción.</h2>
         <p class="section-desc" data-es="De instalar la app a comer mejor en menos de 2 minutos." data-en="From installing the app to eating better in under 2 minutes.">De instalar la app a comer mejor en menos de 2 minutos.</p>
         <div class="steps-grid">
             <div class="step"><div class="step-num">01</div><div class="step-icon">&#128241;</div><div class="step-title" data-es="Descarga la app" data-en="Download the app">Descarga la app</div><div class="step-desc" data-es="Disponible en iOS y Android. Configura tu perfil en 60 segundos." data-en="Available on iOS and Android. Set up your profile in 60 seconds.">Disponible en iOS y Android. Configura tu perfil en 60 segundos.</div></div>
@@ -593,9 +735,11 @@
             <div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span data-es="¿Es precisa la IA para analizar mis comidas?" data-en="Is the AI accurate for analyzing my meals?">¿Es precisa la IA para analizar mis comidas?</span><span class="faq-toggle">+</span></button><div class="faq-a"><p data-es="Sí. Utilizamos IA de visión avanzada que identifica alimentos, estima cantidades y calcula macros con una precisión del 85-95%. Puedes ajustar manualmente si lo deseas, y la IA aprende de tus correcciones." data-en="Yes. We use advanced vision AI that identifies food, estimates quantities and calculates macros with 85-95% accuracy. You can manually adjust if you want, and the AI learns from your corrections.">Sí. Utilizamos IA de visión avanzada que identifica alimentos, estima cantidades y calcula macros con una precisión del 85-95%. Puedes ajustar manualmente si lo deseas, y la IA aprende de tus correcciones.</p></div></div>
             <div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span data-es="¿Mis datos están seguros?" data-en="Is my data safe?">¿Mis datos están seguros?</span><span class="faq-toggle">+</span></button><div class="faq-a"><p data-es="Absolutamente. Tus datos se almacenan con cifrado de extremo a extremo. Cumplimos con RGPD. Las fotos se procesan en tiempo real y no se almacenan en servidores de IA. Nunca vendemos tus datos a terceros." data-en="Absolutely. Your data is stored with end-to-end encryption. We comply with GDPR. Photos are processed in real-time and not stored on AI servers. We never sell your data to third parties.">Absolutamente. Tus datos se almacenan con cifrado de extremo a extremo. Cumplimos con RGPD. Las fotos se procesan en tiempo real y no se almacenan en servidores de IA. Nunca vendemos tus datos a terceros.</p></div></div>
             <div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span data-es="¿Cuánto cuesta Premium?" data-en="How much does Premium cost?">¿Cuánto cuesta Premium?</span><span class="faq-toggle">+</span></button><div class="faq-a"><p data-es="8,90&#8364;/mes o 59,90&#8364;/a&#241;o (ahorra un 44% — equivale a 4,99&#8364;/mes). Incluye 7 días de prueba gratuita. Puedes cancelar en cualquier momento. Sin compromisos, sin letra peque&#241;a." data-en="&#8364;8.90/month or &#8364;59.90/year (save 44% — just &#8364;4.99/month). Includes a 7-day free trial. Cancel anytime. No commitments, no fine print.">8,90&#8364;/mes o 59,90&#8364;/a&#241;o (ahorra un 44% — equivale a 4,99&#8364;/mes). Incluye 7 días de prueba gratuita. Puedes cancelar en cualquier momento. Sin compromisos, sin letra peque&#241;a.</p></div></div>
-            <div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span data-es="¿En qué se diferencia de otras apps?" data-en="How is it different from other apps?">¿En qué se diferencia de otras apps?</span><span class="faq-toggle">+</span></button><div class="faq-a"><p data-es="La mayoria de apps usan bases de datos estaticas y búsqueda manual. Cals2Gains tiene IA real integrada: escaneo de platos por foto, coaching semanal personalizado, sugerencias ¿Qué como? en tiempo real, TDEE adaptativo y 0 anuncios incluso en la version gratuita." data-en="Most apps use static databases and manual search. Cals2Gains has real integrated AI: photo plate scanning, personalized weekly coaching, real-time What should I eat? suggestions, adaptive TDEE and 0 ads even in the free version.">La mayoria de apps usan bases de datos estaticas y búsqueda manual. Cals2Gains tiene IA real integrada: escaneo de platos por foto, coaching semanal personalizado, sugerencias ¿Qué como? en tiempo real, TDEE adaptativo y 0 anuncios incluso en la version gratuita.</p></div></div>
+            <div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span data-es="¿En qué se diferencia de otras apps?" data-en="How is it different from other apps?">¿En qué se diferencia de otras apps?</span><span class="faq-toggle">+</span></button><div class="faq-a"><p data-es="La mayoría de apps usan bases de datos estáticas y búsqueda manual. Cals2Gains tiene IA real integrada: escaneo de platos por foto, coaching semanal personalizado, sugerencias ¿Qué como? en tiempo real, TDEE adaptativo y 0 anuncios incluso en la versión gratuita." data-en="Most apps use static databases and manual search. Cals2Gains has real integrated AI: photo plate scanning, personalized weekly coaching, real-time What should I eat? suggestions, adaptive TDEE and 0 ads even in the free version.">La mayoría de apps usan bases de datos estáticas y búsqueda manual. Cals2Gains tiene IA real integrada: escaneo de platos por foto, coaching semanal personalizado, sugerencias ¿Qué como? en tiempo real, TDEE adaptativo y 0 anuncios incluso en la versión gratuita.</p></div></div>
             <div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span data-es="¿Funciona sin conexión?" data-en="Does it work offline?">¿Funciona sin conexión?</span><span class="faq-toggle">+</span></button><div class="faq-a"><p data-es="Parcialmente. Registro manual, búsqueda de alimentos y escáner de código de barras funcionan offline. Las funciones de IA (foto, coaching, sugerencias) necesitan conexión para procesar datos en la nube." data-en="Partially. Manual logging, food search and barcode scanning work offline. AI features (photo, coaching, suggestions) need a connection to process data in the cloud.">Parcialmente. Registro manual, búsqueda de alimentos y escáner de código de barras funcionan offline. Las funciones de IA (foto, coaching, sugerencias) necesitan conexión para procesar datos en la nube.</p></div></div>
             <div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span data-es="¿Puedo usarla con restricciones alimentarias?" data-en="Can I use it with dietary restrictions?">¿Puedo usarla con restricciones alimentarias?</span><span class="faq-toggle">+</span></button><div class="faq-a"><p data-es="Sí. Configura tu objetivo (pérdida de grasa, ganancia muscular, mantenimiento, recomposición) y la IA se adapta. El coaching semanal tiene en cuenta tus preferencias, alergias y estilo de vida." data-en="Yes. Set your goal (fat loss, muscle gain, maintenance, recomp) and the AI adapts. Weekly coaching considers your preferences, allergies and lifestyle.">Sí. Configura tu objetivo (pérdida de grasa, ganancia muscular, mantenimiento, recomposición) y la IA se adapta. El coaching semanal tiene en cuenta tus preferencias, alergias y estilo de vida.</p></div></div>
+            <div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span data-es="¿Cómo calcula la app mis macros exactamente?" data-en="How does the app calculate my macros exactly?">¿Cómo calcula la app mis macros exactamente?</span><span class="faq-toggle">+</span></button><div class="faq-a"><p data-es="Usamos la fórmula Mifflin-St Jeor (precisa en el 82% de los casos, frente al 69% de Harris-Benedict). Si tienes datos de composición corporal, la sustituimos por Katch-McArdle. El TDEE se calcula multiplicando por tu factor de actividad (1,20 a 1,90), con corrección del 10% si usas wearable. Los macros se distribuyen en gramos por kilo —no en porcentajes— siguiendo las directrices de la ISSN. Todo queda visible en la sección Metodología de la app." data-en="We use the Mifflin-St Jeor formula (accurate in 82% of cases, vs 69% for Harris-Benedict). If you have body composition data, we switch to Katch-McArdle. TDEE is calculated by multiplying by your activity factor (1.20 to 1.90), with a 10% correction if you use a wearable. Macros are distributed in grams per kilo — not percentages — following ISSN guidelines. Everything is visible in the Methodology section of the app.">Usamos la fórmula Mifflin-St Jeor (precisa en el 82% de los casos, frente al 69% de Harris-Benedict). Si tienes datos de composición corporal, la sustituimos por Katch-McArdle. El TDEE se calcula multiplicando por tu factor de actividad (1,20 a 1,90), con corrección del 10% si usas wearable. Los macros se distribuyen en gramos por kilo —no en porcentajes— siguiendo las directrices de la ISSN. Todo queda visible en la sección Metodología de la app.</p></div></div>
+            <div class="faq-item"><button class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span data-es="¿Qué es la periodización nutricional por deporte?" data-en="What is sport nutrition periodization?">¿Qué es la periodización nutricional por deporte?</span><span class="faq-toggle">+</span></button><div class="faq-a"><p data-es="Es adaptar carbohidratos y proteínas según el tipo de sesión del día. En días de fuerza, la app aumenta carbos post-entreno para recuperación muscular óptima. En días de descanso, reduce carbos y ajusta proteína al mínimo de mantenimiento. En días de cardio o HIIT, adapta según duración e intensidad. Esto sigue las directrices de la ISSN y la investigación de Burke y Jeukendrup, y es uno de los diferenciadores clave de Cals2Gains frente a otras apps." data-en="It means adapting carbohydrates and proteins based on the type of session that day. On strength days, the app increases post-workout carbs for optimal muscle recovery. On rest days, it reduces carbs and adjusts protein to the maintenance minimum. On cardio or HIIT days, it adapts based on duration and intensity. This follows ISSN guidelines and research by Burke and Jeukendrup, and is one of Cals2Gains' key differentiators from other apps.">Es adaptar carbohidratos y proteínas según el tipo de sesión del día. En días de fuerza, la app aumenta carbos post-entreno para recuperación muscular óptima. En días de descanso, reduce carbos y ajusta proteína al mínimo de mantenimiento. En días de cardio o HIIT, adapta según duración e intensidad. Esto sigue las directrices de la ISSN y la investigación de Burke y Jeukendrup, y es uno de los diferenciadores clave de Cals2Gains frente a otras apps.</p></div></div>
         </div>
     </section>
 
@@ -635,6 +779,7 @@
                     <li><a href="#features" data-es="Funciones" data-en="Features">Funciones</a></li>
                     <li><a href="#pricing" data-es="Precios" data-en="Pricing">Precios</a></li>
                     <li><a href="#faq" data-es="FAQ" data-en="FAQ">FAQ</a></li>
+                    <li><a href="/guides/metodologia.html" data-es="Metodología científica" data-en="Scientific methodology">Metodología científica</a></li>
                     <li><a href="/link" data-es="Link in Bio" data-en="Link in Bio">Link in Bio</a></li>
                 </ul>
             </div>

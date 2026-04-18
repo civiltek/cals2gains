@@ -122,6 +122,7 @@ tr:last-child td { border-bottom: none; }
 .badge-red { background: rgba(248,113,113,0.15); color: var(--red); }
 .badge-blue { background: rgba(96,165,250,0.15); color: var(--blue); }
 .badge-violet { background: rgba(156,140,255,0.15); color: var(--violet); }
+.badge-orange { background: rgba(251,146,60,0.15); color: var(--orange); }
 
 /* Status cards */
 .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
@@ -144,6 +145,14 @@ tr:last-child td { border-bottom: none; }
 .social-card .handle { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
 .social-card .followers { font-size: 32px; font-weight: 800; }
 .social-card .followers-label { font-size: 11px; color: var(--text-secondary); }
+
+/* Alert banner */
+.alert-banner {
+  background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.3);
+  border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px; font-size: 13px;
+}
+.alert-banner .alert-icon { font-size: 18px; }
 
 /* Responsive */
 @media (max-width: 900px) {
@@ -170,13 +179,13 @@ tr:last-child td { border-bottom: none; }
     <div class="logo">C2G</div>
     <div>
       <h1>Cals<span>2</span>Gains — Dashboard</h1>
-      <div class="header-date">Actualizado: 13 abril 2026 (auto)</div>
+      <div class="header-date">Actualizado: 18 abril 2026 (auto) · +2 nuevos recibos</div>
     </div>
   </div>
   <div class="tabs">
     <button class="tab active" onclick="showTab('finanzas')">Finanzas</button>
     <button class="tab" onclick="showTab('rrss')">Redes Sociales</button>
-    <button class="tab" onclick="showTab('app')">App & Web</button>
+    <button class="tab" onclick="showTab('app')">App &amp; Web</button>
   </div>
 </div>
 
@@ -184,21 +193,27 @@ tr:last-child td { border-bottom: none; }
 
   <!-- ===== FINANZAS ===== -->
   <div id="finanzas" class="section active">
+
+    <div class="alert-banner">
+      <span class="alert-icon">⚠️</span>
+      <span><strong>2 nuevos recibos (18/04/2026):</strong> Anthropic €170 (15 abr) · ElevenLabs €12,25 (14 abr, nuevo servicio). Total acumulado actualizado a <strong>1.302,33 €</strong>.</span>
+    </div>
+
     <div class="kpi-row">
       <div class="kpi-card highlight">
         <div class="kpi-label">Gasto Total Acumulado</div>
-        $11.120,08 €</div>
+        <div class="kpi-value coral">1.302,33 €</div>
         <div class="kpi-sub">Desde 24 marzo 2026</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Burn Rate Mensual</div>
-        <div class="kpi-value violet">~197 €/mes</div>
-        <div class="kpi-sub">Basado en suscripciones confirmadas</div>
+        <div class="kpi-value violet">~221 €/mes</div>
+        <div class="kpi-sub">4 suscripciones activas confirmadas</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Coste Recurrente Confirmado</div>
-        <div class="kpi-value gold">196,98 €/mes</div>
-        <div class="kpi-sub">3 suscripciones activas</div>
+        <div class="kpi-value gold">221,47 €/mes</div>
+        <div class="kpi-sub">↑ +24,49 € vs. anterior (ElevenLabs)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Ingresos</div>
@@ -230,15 +245,22 @@ tr:last-child td { border-bottom: none; }
             <td><span class="badge badge-green">Activa</span></td><td>info@civiltek.es</td>
           </tr>
           <tr>
-            <td>iCloud+ 2TB</td><td>Mensual</td><td style="font-weight:600">9,99 €</td><td>06/05/2026</td>
-            <td><span class="badge badge-green">Activa</span></td><td>judith.cordobes@gmail.com</td>
+            <td>ElevenLabs</td><td>Creator</td><td style="font-weight:600">~24,49 €/mes*</td><td>14/05/2026</td>
+            <td><span class="badge badge-orange">Activa — NUEVO</span></td><td>cals2gains@gmail.com</td>
           </tr>
           <tr>
             <td>Meta Verified for Business</td><td>Instagram</td><td style="font-weight:600">16,99 €</td><td>12/05/2026</td>
             <td><span class="badge badge-green">Activa</span></td><td>judith.cordobes@gmail.com</td>
           </tr>
+          <tr>
+            <td>iCloud+ 2TB</td><td>Mensual</td><td style="font-weight:600">9,99 €</td><td>06/05/2026</td>
+            <td><span class="badge badge-green">Activa</span></td><td>judith.cordobes@gmail.com</td>
+          </tr>
         </tbody>
       </table>
+      <div style="margin-top:10px; font-size:11px; color:var(--text-secondary);">
+        *ElevenLabs: 1er mes $13,31 USD (50% off). Precio regular: $22 USD/mes + 21% IVA ≈ 24,49 €/mes
+      </div>
     </div>
 
     <div class="table-card">
@@ -250,7 +272,7 @@ tr:last-child td { border-bottom: none; }
         <tbody>
           <tr><td>ChatGPT Plus (OpenAI)</td><td>~20 €/mes</td><td><span class="badge badge-yellow">Sin recibos</span></td></tr>
           <tr><td>Google Workspace</td><td>~6 €/mes</td><td><span class="badge badge-yellow">No Cals2Gains</span></td></tr>
-          <tr><td>Apple Developer Program</td><td>~8,25 €/mes (99 USD/año)</td><td><span class="badge badge-yellow">Pendiente pago</span></td></tr>
+          <tr><td>Apple Developer Program</td><td>~99 USD/año (~91 €)</td><td><span class="badge badge-blue">Enrollment completado 14/04 — confirmar pago</span></td></tr>
           <tr><td>Expo (EAS)</td><td>Gratis</td><td><span class="badge badge-blue">Free tier</span></td></tr>
           <tr><td>Dominio cals2gains.com</td><td>Por determinar</td><td><span class="badge badge-yellow">Sin recibos</span></td></tr>
         </tbody>
@@ -264,8 +286,23 @@ tr:last-child td { border-bottom: none; }
           <tr><th>Fecha</th><th>Proveedor</th><th>Concepto</th><th>Categoría</th><th>Importe</th></tr>
         </thead>
         <tbody>
+          <tr style="background:rgba(251,146,60,0.04);">
+            <td><strong>15/04/2026</strong></td><td>Anthropic</td><td>Prepaid extra usage, Individual plan (5RBPQUSE-0006)</td>
+            <td><span class="badge badge-violet">IA/Suscripciones</span></td>
+            <td style="font-weight:700; color:var(--orange)">170,00 € 🆕</td>
+          </tr>
+          <tr style="background:rgba(251,146,60,0.04);">
+            <td><strong>14/04/2026</strong></td><td>ElevenLabs</td><td>Creator subscription (50% off 1er mes)</td>
+            <td><span class="badge badge-violet">IA/Suscripciones</span></td>
+            <td style="font-weight:700; color:var(--orange)">12,25 € 🆕</td>
+          </tr>
           <tr>
-            <td>13/04/2026</td><td>Anthropic</td><td>Claude Max — Prepaid extra usage</td>
+            <td>13/04/2026</td><td>Anthropic</td><td>Prepaid extra usage, Individual plan (5RBPQUSE-0005)</td>
+            <td><span class="badge badge-violet">IA/Suscripciones</span></td>
+            <td style="font-weight:600; color:var(--red)">595,00 € ⚠️</td>
+          </tr>
+          <tr>
+            <td>13/04/2026</td><td>Anthropic</td><td>Claude Team — Suscripción mensual</td>
             <td><span class="badge badge-violet">IA/Suscripciones</span></td>
             <td style="font-weight:600">170,00 €</td>
           </tr>
@@ -275,12 +312,17 @@ tr:last-child td { border-bottom: none; }
             <td style="font-weight:600">16,99 €</td>
           </tr>
           <tr>
+            <td>10/04/2026</td><td>OpenAI</td><td>API Credits — Pay-as-you-go ($121 USD)</td>
+            <td><span class="badge badge-violet">IA/Suscripciones</span></td>
+            <td style="font-weight:600">111,32 €</td>
+          </tr>
+          <tr>
             <td>10/04/2026</td><td>Apple</td><td>iCloud+ 2TB (Mensual)</td>
             <td><span class="badge badge-violet">IA/Suscripciones</span></td>
             <td style="font-weight:600">9,99 €</td>
           </tr>
           <tr>
-            <td>09/04/2026</td><td>Anthropic</td><td>Claude Max plan 20x — Upgrade desde Pro</td>
+            <td>09/04/2026</td><td>Anthropic</td><td>Claude Team — Upgrade desde Pro</td>
             <td><span class="badge badge-violet">IA/Suscripciones</span></td>
             <td style="font-weight:600">170,78 €</td>
           </tr>
@@ -299,14 +341,9 @@ tr:last-child td { border-bottom: none; }
             <td><span class="badge badge-violet">IA/Suscripciones</span></td>
             <td style="font-weight:600">18,00 €</td>
           </tr>
-          <tr>
-            <td>10/04/2026</td><td>OpenAI</td><td>API Credits — Pay-as-you-go ($121 USD)</td>
-            <td><span class="badge badge-violet">IA/Suscripciones</span></td>
-            <td style="font-weight:600">111,32 €</td>
-          </tr>
           <tr style="background:rgba(255,106,77,0.06);">
             <td colspan="4" style="font-weight:700; text-align:right">TOTAL ACUMULADO</td>
-            <td style="font-weight:800; color:var(--coral)">1.120,08 €</td>
+            <td style="font-weight:800; color:var(--coral)">1.302,33 €</td>
           </tr>
         </tbody>
       </table>
@@ -473,7 +510,7 @@ tr:last-child td { border-bottom: none; }
       <div class="kpi-card">
         <div class="kpi-label">Estado iOS</div>
         <div class="kpi-value" style="color:var(--orange)">Pendiente</div>
-        <div class="kpi-sub">Apple Developer en verificación</div>
+        <div class="kpi-sub">Apple Developer activado 14/04/2026</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Fixes Aplicados</div>
@@ -493,9 +530,9 @@ tr:last-child td { border-bottom: none; }
       <div class="status-card">
         <h3>🍎 iOS</h3>
         <div class="status-item"><span class="label">Build iOS</span><span class="value badge badge-red">No generado</span></div>
-        <div class="status-item"><span class="label">Apple Developer</span><span class="value badge badge-yellow">En verificación</span></div>
+        <div class="status-item"><span class="label">Apple Developer</span><span class="value badge badge-green">Activo — 14/04/2026</span></div>
         <div class="status-item"><span class="label">App Store Connect</span><span class="value badge badge-red">Pendiente</span></div>
-        <div class="status-item"><span class="label">Coste estimado</span><span class="value">99 USD/año</span></div>
+        <div class="status-item"><span class="label">Coste</span><span class="value">99 USD/año</span></div>
       </div>
       <div class="status-card">
         <h3>🌐 Web — cals2gains.com</h3>
@@ -538,13 +575,15 @@ tr:last-child td { border-bottom: none; }
         <thead><tr><th>#</th><th>Tarea</th><th>Prioridad</th></tr></thead>
         <tbody>
           <tr><td>1</td><td>Completar testing Android con APK actual</td><td><span class="badge badge-red">Alta</span></td></tr>
-          <tr><td>2</td><td>Resolver cuenta Apple Developer → build iOS</td><td><span class="badge badge-red">Alta</span></td></tr>
+          <tr><td>2</td><td>Generar build iOS — Apple Developer ya activo (14/04/2026)</td><td><span class="badge badge-red">Alta</span></td></tr>
           <tr><td>3</td><td>Vincular @cals2gains a Meta Business Suite</td><td><span class="badge badge-red">Alta</span></td></tr>
           <tr><td>4</td><td>Verificar acceso a Google Play Console (fee pagado, cuenta no accesible)</td><td><span class="badge badge-red">Alta</span></td></tr>
-          <tr><td>5</td><td>Completar posts EN faltantes (6–14)</td><td><span class="badge badge-yellow">Media</span></td></tr>
-          <tr><td>6</td><td>Preparar submission a Google Play Store</td><td><span class="badge badge-yellow">Media</span></td></tr>
-          <tr><td>7</td><td>Resolver bug Firebase Storage (progress photos)</td><td><span class="badge badge-yellow">Media</span></td></tr>
-          <tr><td>8</td><td>Instalar tag GA4 en cals2gains.com (propiedad creada: macrolens-ai-4c482)</td><td><span class="badge badge-red">Alta</span></td></tr>
+          <tr><td>5</td><td>Confirmar cargo Apple Developer (~99 USD) en extracto bancario</td><td><span class="badge badge-yellow">Media</span></td></tr>
+          <tr><td>6</td><td>Completar posts EN faltantes (6–14)</td><td><span class="badge badge-yellow">Media</span></td></tr>
+          <tr><td>7</td><td>Preparar submission a Google Play Store</td><td><span class="badge badge-yellow">Media</span></td></tr>
+          <tr><td>8</td><td>Resolver bug Firebase Storage (progress photos)</td><td><span class="badge badge-yellow">Media</span></td></tr>
+          <tr><td>9</td><td>Instalar tag GA4 en cals2gains.com (propiedad: macrolens-ai-4c482)</td><td><span class="badge badge-red">Alta</span></td></tr>
+          <tr><td>10</td><td>Revisar uso API/Claude para controlar cargos extra Anthropic (€595 + €170 en 2 días)</td><td><span class="badge badge-red">Alta</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -575,7 +614,7 @@ new Chart(document.getElementById('chartCategoria'), {
     labels: ['IA / Suscripciones', 'App Stores', 'Publicidad'],
     datasets: [{
       label: 'Gasto (€)',
-      data: [1080.10, 23.00, 16.99],
+      data: [1262.35, 23.00, 16.99],
       backgroundColor: ['#9C8CFF', '#60A5FA', '#FF6A4D'],
       borderRadius: 8,
       borderSkipped: false,
@@ -599,10 +638,10 @@ new Chart(document.getElementById('chartCategoria'), {
 new Chart(document.getElementById('chartEvolucion'), {
   type: 'line',
   data: {
-    labels: ['24 Mar', '25 Mar', '09 Abr', '09 Abr', '10 Abr', '10 Abr', '13 Abr', '13 Abr', '13 Abr'],
+    labels: ['24 Mar', '25 Mar', '09 Abr', '09 Abr', '10 Abr', '10 Abr', '13 Abr', '13 Abr', '13 Abr', '14 Abr', '15 Abr'],
     datasets: [{
       label: 'Gasto acumulado (€)',
-      data: [18.00, 23.00, 193.78, 216.78, 226.77, 338.09, 355.08, 525.08, 1120.08],
+      data: [18.00, 23.00, 193.78, 216.78, 226.77, 338.09, 355.08, 525.08, 1120.08, 1132.33, 1302.33],
       borderColor: '#FF6A4D',
       backgroundColor: 'rgba(255,106,77,0.1)',
       fill: true,
@@ -679,5 +718,3 @@ new Chart(document.getElementById('chartEngagement'), {
 
 </body>
 </html>
-
-

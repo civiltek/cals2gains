@@ -2,6 +2,71 @@
 
 ---
 
+## 2026-04-17 — Afternoon Session
+
+### PHASE 1 — Spanish (@cals2gains_es)
+
+| # | Influencer | Post ID | Topic | Category | Status |
+|---|------------|---------|-------|----------|--------|
+| 1 | @midietacojea | — | Paprika / vitamina C en pimientos (reciente) | A — Vitamina C pimientos rojos 140mg/100g vs naranja 53mg, piperina biodisponibilidad | ✅ Posted |
+| 2 | @nataliasipra | — | Snack / picoteo entre horas | B — Pre-portioning, bowl vs bolsa, 150-200 kcal por snack, proteína 15-20g | ✅ Posted |
+| 3 | @alerisacademia | — | Fitosteroles / colesterol LDL | A — Fitosteroles 2g/día bloquean absorción colesterol 10-15%, nueces/aguacate/semillas | ✅ Posted |
+| 4 | @carlosriosq | — | EGCG matcha / calidad té verde (2026-04-06, 11 días) | A — EGCG 137mg/g matcha vs 25-50mg té verde normal, L-teanina 200mg efecto sinérgico cafeína | ✅ Posted |
+
+**Notes:**
+- @carlosriosq post was 11 days old (April 6) — used as last resort after all other Spanish accounts had no eligible posts within 7-day window
+- @lanutrimorell, @realfooding, @hsnstore_es, @sabervivir_tve — avoided (used morning 2026-04-14)
+- New accounts @cbrasharez_nutricion and @fanrun investigated but not suitable (fake/spam accounts)
+- @nutri_aerfit investigated — account not found / broken handle (mark ❌)
+
+---
+
+### PHASE 2B — English (@calstogains)
+
+| # | Influencer | Post ID | Topic | Category | Status |
+|---|------------|---------|-------|----------|--------|
+| 5 | @athleanx | — | Pull-up strength / bodyweight training | A — Fat mass as dead weight in pull-ups: 10kg extra body fat = ~15-22% harder, 0.3g/kg protein pre-training | ✅ Posted |
+| 6 | @kayla_itsines | — | ABS / core training (22h, 899 comments) | A — Body fat% threshold for ab visibility: women 16-19%, men 10-12%, visceral vs subcutaneous | ✅ Posted |
+
+**Notes:**
+- Account switch: @cals2gains → @calstogains via Cambiar de cuenta dialog
+- Multiple @willtenny, @cbum, @megsquats posts had existing @cals2gains or @calstogains comments — skipped
+- @athleanx and @kayla_itsines both clean (no prior C2G comments)
+
+---
+
+### PHASE 2A — English (@cals2gains)
+
+| # | Influencer | Post ID | Topic | Category | Status |
+|---|------------|---------|-------|----------|--------|
+| 7 | @michelle_lewin | DXM7cEgClIw | LEG PRESS technique (22h, 47→48 comments) | A — Foot placement: high=glutes/hamstrings, low=quads; no lockout = constant tension | ✅ Posted |
+| 8 | @biolayne | DXPU1ZAOslM | Carbohydrate-insulin model debunked / @drjasonfung (22 min, 7→8 comments) | A — Kevin Hall NIH metabolic ward study + DIETFITS trial (800 pax, 12 months): equal fat loss when calories+protein matched regardless of carb/insulin | ✅ Posted |
+
+**Notes:**
+- @megsquats DXHkhpDNICH (deadlift form) and DW9aMYrOx0Z already had @cals2gains comments from prior sessions — skipped
+- @biolayne DXPU1ZAOslM was 22 minutes old at time of posting — freshest post of the entire session
+- Anti-repetition rule respected: all @cals2gains influencers different from morning (2026-04-14) session
+
+---
+
+### Session Totals
+
+| Account | Comments Posted | Influencers Hit |
+|---------|----------------|-----------------|
+| @cals2gains_es | 4 | @midietacojea, @nataliasipra, @alerisacademia, @carlosriosq |
+| @calstogains | 2 | @athleanx, @kayla_itsines |
+| @cals2gains | 2 | @michelle_lewin, @biolayne |
+| **Total** | **8** | **8 unique accounts** |
+
+---
+
+### Notes for Next Morning Session (2026-04-18)
+- Avoid (used today afternoon): @midietacojea, @nataliasipra, @alerisacademia, @carlosriosq (Spanish), @athleanx, @kayla_itsines, @michelle_lewin, @biolayne (English)
+- Spanish fresh candidates: @lanutrimorell, @realfooding, @hsnstore_es, @sabervivir_tve (all rested since 2026-04-14)
+- English fresh candidates: @cbum, @willtenny, @megsquats (DW1rBCdOrQj, DWhaCuxp2um not yet commented), @mindpumpmedia, @steficohen, @simeonpanda, @senada.greca
+
+---
+
 ## 2026-04-14 — Morning Session
 
 ### PHASE 1 — Spanish (@cals2gains_es)
@@ -420,3 +485,4 @@
 - **@lanutrimorell** — Spanish registered dietitian (Laura Morell), evidence-based nutrition. Add to Spanish verified list.
 
 ---
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

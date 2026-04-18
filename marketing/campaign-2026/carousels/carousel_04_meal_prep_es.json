@@ -8,7 +8,7 @@
   "slides_data": [
     {
       "type": "cover",
-      "prompt": "Overhead shot of organized meal prep containers in grid formation on dark marble countertop, steam rising, warm coral and violet accent lighting, professional food photography, 4:5",
+      "prompt": "Flowing warm coral and soft violet ribbons over deep plum atmosphere, organized minimalism, no literal objects",
       "headline": "MEAL PREP COMO UN PRO",
       "subheadline": "5 pasos. 2 horas. Toda la semana lista.",
       "text_style": "hero",
@@ -16,51 +16,46 @@
     },
     {
       "type": "content",
-      "prompt": "Phone screen showing weekly macro targets with shopping list auto-generated, dark premium app UI, violet accent glow, organized list aesthetic, 4:5",
+      "prompt": "Soft violet geometric pattern over deep plum atmosphere, organized minimal composition",
       "headline": "1. FIJA TUS OBJETIVOS",
-      "body": "Conoce tus macros semanales primero.\nCalorias, proteina, carbos, grasas — todo planificado.\nCals2Gains los calcula automaticamente segun tu meta.\nSin adivinar. Solo sigue los numeros.",
-      "text_style": "educational",
-      "icon": "target"
+      "body": "Conoce tus macros semanales primero.\nCalorías, proteína, carbos, grasas — todo planificado.\nCals2Gains los calcula automáticamente según tu meta.\nSin adivinar. Solo sigue los números.",
+      "text_style": "educational"
     },
     {
       "type": "content",
-      "prompt": "Grocery store aisle with hand selecting lean protein packages, dark moody color grading, organized shopping cart, warm lighting, lifestyle shot, 4:5",
+      "prompt": "Warm coral light streaks over dark plum atmosphere, abstract motion minimalism",
       "headline": "2. COMPRA INTELIGENTE",
-      "body": "Elige 2-3 fuentes de proteina (pollo, pescado, huevos).\n2-3 fuentes de carbos (arroz, patata, avena).\nVerduras a granel.\nSimplifica — la variedad mata la constancia.",
-      "text_style": "educational",
-      "icon": "cart"
+      "body": "Elige 2-3 fuentes de proteína (pollo, pescado, huevos).\n2-3 fuentes de carbos (arroz, patata, avena).\nVerduras a granel.\nSimplifica — la variedad mata la constancia.",
+      "text_style": "educational"
     },
     {
       "type": "content",
-      "prompt": "Kitchen scene with batch cooking: multiple pans, oven timer, organized mise en place on dark countertop, warm dramatic lighting, efficient cooking process, 4:5",
+      "prompt": "Dynamic warm coral rays crossing deep plum atmosphere, efficient minimal composition",
       "headline": "3. COCINA EN LOTE",
-      "body": "Cocina proteinas en bloque (horno + fuego).\nPrepara carbos en grandes cantidades.\nVerduras asadas en bandeja.\nTiempo total: 90-120 minutos para 5 dias.",
-      "text_style": "educational",
-      "icon": "flame"
+      "body": "Cocina proteínas en bloque (horno + fuego).\nPrepara carbos en grandes cantidades.\nVerduras asadas en bandeja.\nTiempo total: 90-120 minutos para 5 días.",
+      "text_style": "educational"
     },
     {
       "type": "content",
-      "prompt": "Close-up of portioning food into labeled containers with kitchen scale, dark background, organized assembly line, violet and coral accent lighting, precise and satisfying, 4:5",
+      "prompt": "Soft violet grid gradient over deep plum, precise minimal composition",
       "headline": "4. PORCIONA Y GUARDA",
-      "body": "Pesa porciones con bascula (o escanea con IA).\nEtiqueta tupers: L/M/X/J/V.\n3-4 dias en nevera, resto al congelador.\nEscanea cada tuper una vez — guardado para siempre.",
-      "text_style": "educational",
-      "icon": "scale"
+      "body": "Pesa porciones con báscula (o escanea con IA).\nEtiqueta tupers: L/M/X/J/V.\n3-4 días en nevera, resto al congelador.\nEscanea cada tuper una vez — guardado para siempre.",
+      "text_style": "educational"
     },
     {
       "type": "content",
-      "prompt": "Person grabbing ready container from organized fridge, morning rush scene, dark premium aesthetic, quick and effortless, warm coral lighting, 4:5",
+      "prompt": "Warm coral glow emerging from deep plum darkness, effortless premium atmospheric minimalism",
       "headline": "5. COGE Y LISTO",
-      "body": "Lunes por la manana? Coge tu tuper.\nMacros ya registrados desde el domingo.\nCalienta. Come. Hecho.\nCero decisiones. Cero estres. Puro progreso.",
-      "text_style": "educational",
-      "icon": "rocket"
+      "body": "¿Lunes por la mañana? Coge tu tuper.\nMacros ya registrados desde el domingo.\nCalienta. Come. Hecho.\nCero decisiones. Cero estrés. Puro progreso.",
+      "text_style": "educational"
     },
     {
       "type": "cta",
-      "prompt": "Full week of meal prep containers in perfect grid with Cals2Gains app overlay showing all macros tracked, dark premium background, violet and coral glow, satisfying organization, 4:5",
+      "prompt": "Coral light burst over deep plum atmosphere, satisfying organized cinematic minimalism",
       "headline": "TRACKEA TU PREP",
-      "body": "Escanea una vez. Registra toda la semana. Gratis 7 dias.",
+      "body": "Escanea una vez. Registra toda la semana. Gratis 7 días.",
       "text_style": "cta",
-      "cta_text": "Link en bio 🔗",
+      "cta_text": "Próximamente",
       "hashtags": ["#mealprep", "#batchcooking", "#macroamigable", "#cals2gains", "#preparacioncomidas"]
     }
   ]

@@ -1,10 +1,85 @@
 # Changelog - Cals2Gains
 
+## 2026-04-18 — Web: actualizar landing con iPhone rico + secciones científicas + diferenciadores
+
+Rediseño competitivo de `website/index.html`:
+- **iPhone flotante**: pantalla completa con anillo SVG animado (88% kcal), 3 barras de macros con progreso real, lista de comidas del día (desayuno/almuerzo/merienda + kcal), mensaje del coach IA adaptado a la sesión deportiva del día, racha 🔥 e hidratación 💧.
+- **Nueva sección "17 estudios. 0 pseudociencia."**: 4 cards con claims científicos verificables (17+ estudios, 82% Mifflin-St Jeor, 8 tipos de sesión, 0 cajas negras) + botón a metodologia.html.
+- **Stats bar renovada**: sustituye "40+ funciones / IA / 100% privado" por datos científicos (17+ estudios, 82% precisión, 8 tipos sesión, 0 anuncios).
+- **Nueva sección "Por qué elegirla"**: 4 diferenciadores vs competencia (periodización deportiva, cálculo transparente, coach que propone no impone, 0 publicidad siempre).
+- **Copy hero** mejorado con mensajes de brand voice (macros por deporte, 17 estudios, sin caja negra).
+- **Sección IA**: copy actualizado con autocorrección 15-20% y enfoque en transparencia.
+- **2 FAQ nuevas**: cómo se calculan los macros (Mifflin-St Jeor, Katch-McArdle, ISSN) + periodización deportiva.
+- **Footer**: añadido link "Metodología científica" → /guides/metodologia.html.
+- **Tildes**: corregidas 6 instancias (gráficas, móvil, fricción, español, inglés, instantáneo, mayoría, estáticas, versión).
+
 ## 2026-04-18 — Web: corregir tildes/eñes en metodologia.html y privacy.html + TOC colapsable en móvil
 
 - `website/guides/metodologia.html`: corrección completa de tildes y eñes en todo el archivo (TOC, h2, h3, párrafos, meta tags, atributos data-es). TOC ahora colapsable en móvil (toggle con chevron, abierto por defecto en desktop).
 - `website/privacy.html`: corrección completa de tildes y eñes (~80 palabras corregidas).
 - `website/terms.html`: revisado, no requirió cambios.
+
+## 2026-04-18 — Crear kit completo de contenido de marketing basado en la metodología científica
+
+Creado directorio `marketing/content-source/` con todo el contenido de marketing basado en la metodología científica de la app. Incluye:
+- `METHODOLOGY_CONTENT.md`: fuente de verdad con 7 pilares científicos, 10 claims verificables, datos/cifras, frases gancho, FAQs, terminología (ES+EN)
+- `SCIENCE_UPDATES.md`: 14 estudios recientes (2024-2026) con ideas de contenido para RRSS (ES+EN)
+- `posts/`: 10 carruseles + 10 reels + stories interactivas (ES+EN, 4 archivos)
+- `blog/`: 5 artículos de blog en borrador (ES+EN, 10 archivos)
+- `email/`: secuencia de 5 emails de onboarding científico (ES+EN, 2 archivos)
+Actualizado `_project-hub/CONTENT_PLAN.md` con referencia al nuevo content-source.
+Actualizado `Claude code/agents/marketing.md` para que el agente de marketing consulte METHODOLOGY_CONTENT.md y SCIENCE_UPDATES.md antes de crear contenido con claims científicos.
+
+## 2026-04-18 — Crear guía completa de voz de marca (Brand Voice Guide)
+
+Creado documento `marketing/brand-voice/BRAND_VOICE_GUIDE.md` con guía completa de brand voice: personalidad y arquetipos, dimensiones del tono, vocabulario (usamos/evitamos), terminología propia, 5 pilares de comunicación, propuesta de valor, elevator pitch, taglines, guía específica por canal (IG ES/EN, web, email, app, soporte), do's & don'ts, notas para inglés con glosario bilingüe, checklist de contenido y ejemplos prácticos. Actualizado `_project-hub/BRAND.md` con referencia al nuevo documento.
+
+## 2026-04-18 — Revisión automática de finanzas: 2 nuevos recibos
+
+**Tarea automática ejecutada.** Revisadas las 4 cuentas de email en busca de nuevos recibos desde el 13/04/2026.
+
+**Nuevos gastos encontrados:**
+- **Anthropic #2771-7868-1788** (15/04/2026) — Prepaid extra usage, Individual plan — **€170,00** (Invoice 5RBPQUSE-0006, info@civiltek.es)
+- **ElevenLabs #2265-9525-8929** (14/04/2026) — Creator subscription 1er mes (50% off) — **€12,25** (,31 USD, cals2gains@gmail.com)
+
+**ElevenLabs** es un servicio nuevo, no registrado previamente. Plan Creator:  USD/mes + 21% IVA España = ~,62 USD/mes (~24,49 €/mes) después del periodo promocional.
+
+**Apple Developer Program**: Welcome email recibido el 14/04/2026 — enrollment completado. Sin email de factura por el pago de  USD (cargo sin recibo en email).
+
+**Totales actualizados:**
+- Gasto total acumulado: 1.120,08 € → **1.302,33 €** (+182,25 €)
+- Burn rate mensual: 196,98 €/mes → **221,47 €/mes** (+24,49 € por ElevenLabs)
+- Suscripciones activas: 3 → **4** (+ ElevenLabs Creator)
+
+**Archivos actualizados:** FINANCES.md, Cals2Gains_Finances.xlsx (hojas Gastos + Suscripciones), dashboard.html (finances/ y _project-hub/), PROJECT_STATUS.md.
+
+**Recibos guardados:** receipts/anthropic/2026-04-15_anthropic_receipt-2771-7868-1788_170eur.txt · receipts/otros/2026-04-14_elevenlabs_receipt-2265-9525-8929_13.31usd.txt
+
+## 2026-04-18 — Fix iOS HealthKit build #70: resolver módulo nativo + guardas defensivas
+
+Build 69 (b54dfbf, con el fix `isHealthDataAvailable` + entitlement + `resolveIOSPermission`) sigue fallando con el mismo **"Ha ocurrido un error. Inténtalo de nuevo."** en el onboarding. Nueva hipótesis (GPT Codex): la JS bridge de `react-native-health` no expone el módulo nativo en el path esperado — `AppleHealthKit.initHealthKit` puede no ser una función si el módulo autolinked se entrega vía `NativeModules.AppleHealthKit` en vez de `mod.default`.
+
+Cambios en `services/healthKit.ts`:
+- **`getAppleHealthKit()`**: probar cuatro paths de export (`mod.default`, `mod.AppleHealthKit`, `mod`, `NativeModules.AppleHealthKit`) y aceptar solo el candidato que exponga `initHealthKit` o `isAvailable` como función. Si ninguno cualifica → log + `null`.
+- **`checkAvailability()`**: si `AppleHealthKit.isAvailable` NO es función, devolver `false` + log (antes asumía `true` como fallback). Además compat callback para firmas `(available)` (legacy) y `(err, available)` (actual).
+- **`requestAuthorization()`**: guard temprano `typeof AppleHealthKit.initHealthKit !== 'function' → return false` con log explicativo — evita rompernos silenciosamente si el módulo nativo no está enlazado.
+
+Main: `6028d85`. Rama integración `claude/integration-nutri-legal`: cherry-pick `9450d5d` (para que PR #32 no regrese el fix). Build iOS disparado: **run 24592713096** desde `main`.
+
+Si build 70 sigue fallando, el log del teléfono debe mostrar uno de:
+- `AppleHealthKit.isAvailable is not a function` → módulo no linkado (react-native-health no se autolinked en el EAS build).
+- `AppleHealthKit.initHealthKit is not a function` → mismo problema, rama diferente.
+- Error nativo del NSError en `[HealthKit init error]` → entitlement o usage string.
+
+## 2026-04-17 — Fix Android Health Connect VALIDADO en device ✅
+
+APK firmado con debug keystore (`cals2gains-v2.apk`, 119 MB, del build run 24587043044) instalado en Samsung S20 Ultra (Android 13). Tras pulsar **Conectar Health Connect**: **NO crash**. El diálogo nativo de permisos se abre correctamente.
+
+Confirma que `expo-health-connect@0.1.1` cabrea `HealthConnectPermissionDelegate.setPermissionDelegate(activity)` en MainActivity.onCreate vía `ReactActivityLifecycleListener` — el `lateinit property requestPermission` ya está inicializado cuando el usuario pulsa el botón.
+
+Logcat filtrado a ReactNativeJS/System.err/AndroidRuntime/HealthConnect durante el test: **sin errores de Health Connect**. Solo ruido conocido y no relacionado (RevenueCat ConfigurationError + Firestore permission-denied en StreakStore).
+
+**Android Health Connect: resuelto end-to-end**. Pendiente solo la declaración administrativa en Play Console para poder submitir a producción.
 
 ## 2026-04-17 — iOS HealthKit build #63: limpiar config clínica + logging crudo
 
@@ -489,170 +564,4 @@ Informe completo en contexto de Claude (no commiteado). Resumen ejecutivo:
 - **Firebase**: `updateUserAllergies(uid, allergies, intolerances)` en `services/firebase.ts`
 - **Zustand store**: acción `updateAllergies` en `userStore.ts` con optimistic update y rollback
 - **i18n**: traducciones completas ES + EN (`allergies.*`) — 14 alérgenos + 4 intolerancias + disclaimer médico
-- **Onboarding**: nuevo step 5 (de 8) con chips seleccionables para alérgenos e intolerancias + campo libre "Otras"
-- **Pantalla nueva**: `app/allergy-settings.tsx` — edición de alergias desde ajustes en cualquier momento
-- **Settings**: enlace en `app/settings.tsx` en sección propia entre "Objetivo" y "Modo nutricional"
-- **Filtro IA — sugerencias**: `openai.ts generateAIMealSuggestions` nunca sugiere alimentos con alérgenos declarados
-- **Filtro IA — análisis de foto**: `openai.ts analyzeFoodPhoto` añade `allergenWarnings[]` cuando detecta alérgenos; banner rojo prominente en `analysis.tsx`
-- **Filtro IA — macro coach**: `macroCoach.ts buildCoachingContext` incluye las alergias en el contexto del coach
-- **Filtro IA — recetas**: `recipeService.ts` — función `detectRecipeAllergens()` con mapa de keywords; `importRecipeFromUrl` marca `allergenWarnings` automáticamente
-- **Disclaimer médico** en pantalla de alergias y en step de onboarding
-
-## 2026-04-16 — Widget iOS/Android + Coach adaptativo mejorado
-
-### Feature A: Widget (infraestructura JS)
-- **`services/widgetDataService.ts`** (nuevo): sincroniza datos de nutrición del día (consumido/objetivo, porcentajes de progreso, colores de marca) hacia AsyncStorage como puente para widgets nativos. Expone `sync()`, `buildSmallPayload()` y `buildMediumPayload()`.
-- **`docs/WIDGETS.md`** (nuevo): guía completa de activación para Android (AppWidgetProvider + config plugin Expo) y iOS (WidgetKit SwiftUI). Diseño small 2×2 y medium 4×2 con colores de marca Coral/Violet/Dark. Pendiente de build EAS tras configurar cuenta Apple Developer.
-
-### Feature B: Coach adaptativo mejorado
-- **`services/adaptiveCoachBridge.ts`** (nuevo): conecta `AdaptiveMacroEngine` con `macroCoach`. Cuando el motor decide ajustar macros, genera explicación en lenguaje natural vía GPT-4o-mini (con fallback sin IA). Persiste mensaje en AsyncStorage para que la UI lo recoja al abrir "Qué como hoy".
-- **`services/smartNotificationService.ts`** (nuevo): notificaciones inteligentes — "8h sin registrar comida", "¡macros cumplidos!", "proteína pendiente en cena". Usa `expo-notifications` con graceful no-op si FCM no configurado. Bilingüe ES/EN.
-- **`app/what-to-eat.tsx`**: añadido `CoachAdjustmentBanner` (muestra explicación del ajuste adaptativo con botón de dismiss), `UrgencyBanner` (alerta si >14:00 y <300kcal, o >19:00 y >50g proteína pendiente), detección de `urgencyMode` para adaptar sugerencias IA.
-- **`services/openai.ts`**: `generateAIMealSuggestions` acepta nuevo param `urgencyMode?: 'high_calories' | 'high_protein'` que modifica el system prompt para priorizar comidas sustanciosas o altas en proteína según el contexto.
-- **`i18n/es.ts` + `i18n/en.ts`**: nuevas claves `coachAdjustedTitle`, `urgencyCaloriesTitle/Body`, `urgencyProteinTitle/Body`.
-
-## 2026-04-16 — Feature: DB alimentos 500+ y gamificación (streaks + logros)
-
-### Feature A — Base de datos de alimentos expandida (167 → 500 alimentos)
-- `data/spanishFoods.ts`: ampliado de 167 a 500 alimentos con nuevas categorías: mexicana, argentina, colombiana/venezolana, peruana, centroamericana, caribeña, tapas, desayunos latinos, postres, bebidas latinas, comida italiana/asiática/internacional
-- Nuevas categorías en DB: `mexicana`, `argentina`, `colombiana`, `peruana`, `centroamericana`, `caribena`, `tapas`, `desayunos`, `postres`
-- Mantenido formato exacto f() con nutritionPer100g + nutritionPerServing, locale es/en, aliases
-
-### Feature B — Gamificación: streaks y logros
-- `store/streakStore.ts` (nuevo): Zustand store con streak (≥2 comidas/día), 13 logros, persistencia en Firestore `users/{uid}/gameProgress/main`
-- `components/ui/StreakBadge.tsx` (nuevo): badge compacto con animación pulse, navega a pantalla de logros
-- `app/achievements.tsx` (nuevo): pantalla completa con streak actual/máximo, barra de progreso, lista de 13 logros con estado bloqueado/desbloqueado + celebración animada al desbloquear
-- `app/(tabs)/index.tsx`: añadido StreakBadge en greeting, overlay celebración cuando se desbloquea logro, refresh streak cuando hay ≥2 comidas
-- `app/(tabs)/profile.tsx`: sección "Actividad y Logros" con streak + link a pantalla achievements
-- `i18n/es.ts` + `i18n/en.ts`: claves `achievements.*` añadidas (es + en)
-
-## 2026-04-16 — Motor Remotion v2: 6 fixes de calidad (tildes, voz, CTA, textos, Sora, música)
-
-- **Fix UTF-8**: `create_reel_v2.py` — todos los `write_text()` ahora usan `encoding="utf-8"` explícito (corrige tildes/acentos en subtítulos karaoke en Windows)
-- **Fix voz España**: ElevenLabs llama con `stability=0.75, similarity_boost=0.75` para maximizar acento castellano peninsular (voice_id `pFZP5JQG7iQjIQuC4Bku` — Lucía, España)
-- **CTASlide nuevo**: componente `CTASlide.tsx` — pantalla final 3.5s con logo C2G-Logo-Light, "@cals2gains", "Descarga la app gratis", gradiente coral→violet; se añade automáticamente a todos los reels
-- **Textos sentence case**: `TitleText.tsx` — función `toSentenceCase()` convierte títulos Title Case de GPT a minúsculas normales (solo primera letra mayúscula). Pill fondo cambiado a coral `rgba(255,106,77,0.78)` sobre fondo blanco
-- **Prompts Sora realistas**: `BRAND_VIDEO_SUFFIX` en ambos scripts Python cambiado de "cinematic/neon/violet palette" a "realistic, handheld camera, natural lighting, casual everyday setting, no dramatic lighting"
-- **Soporte música de fondo**: `ReelComposition.tsx` reproduce `backgroundMusicFile` a 25% volumen con loop; `create_reel_v2.py` busca automáticamente `public/background_music.mp3` (u otros nombres estándar). Para activar: colocar MP3 libre de royalties en `tools/remotion-engine/public/background_music.mp3`
-- **Prompt GPT-4o actualizado**: pide sentence case explícitamente y tildes/acentos correctos en todos los textos
-- **ReelProps actualizado**: nuevos campos `backgroundMusicFile?` y `showCTASlide?` en `types.ts`
-- **calculateMetadata actualizado**: `Root.tsx` suma los frames del CTA slide al total de la composición
-
-## 2026-04-16 — Fix iOS build: patch expo-dev-menu reloadAppAsync
-
-- **Error**: Build iOS #19 fallaba con `AppContext has no member reloadAppAsync` (Swift compile error)
-- **Causa**: `expo-dev-menu 55.0.23` llama `appContext?.reloadAppAsync()` pero `AppContext` en `expo-modules-core 3.0.29` no tiene ese método nativo
-- **Fix**: `patch-package` → parche en `patches/expo-dev-menu+55.0.23.patch` que sustituye la llamada por `bridge?.reload()`
-- **Archivos**: `patches/expo-dev-menu+55.0.23.patch` (nuevo), `package.json` (añadido `patch-package ^8.0.1` + script `postinstall`)
-
-## 2026-04-16 — Build AAB Android producción (versionCode 14) generado
-
-- **AAB generado**: `builds/app-release.aab` (75 MB, firmado con keystore EAS)
-- **versionCode**: autoincrement desde EAS (~v14 según intentos fallidos previos)
-- **Método**: GitHub Actions ubuntu-latest + `eas build --local` (sin cuota EAS cloud)
-- **Workflow reutilizable**: `.github/workflows/build-android-production.yml`
-- **Fix aplicado**: Config plugin `plugins/withMinSdkVersion.js` → `minSdkVersion=26` vía `withGradleProperties` (requerido por `react-native-health-connect` / `androidx.health.connect:connect-client:1.1.0-alpha11`)
-- **Listo para subir** a Google Play Console (internal testing track)
-
-## 2026-04-16 — Formato viral + fixes pipeline render (PR #16, PR #18)
-
-- **Subtítulos karaoke**: palabra activa en dorado #FFD700 con glow, font 52-58px bold, zona segura IG (340px bottom)
-- **Logo esquina izquierda**: movido de top-right a top-left, opacidad 75%
-- **Ken Burns effect**: imágenes estáticas con zoom lento 100→108% + pan sutil
-- **TitleText pill**: fondo semi-transparente en hook y escenas regulares, mejor shadow
-- **Zona segura Instagram**: subtítulos 340px bottom, watermark 330px
-- **Framework 3/8/12**: GPT-4o genera hooks 3s, contenido 2-3s por escena, CTA 4s
-- **Voz Lucía (ElevenLabs)**: castellana España peninsular (pFZP5JQG7iQjIQuC4Bku)
-- **Fix fonts**: fonts.css con rutas relativas para webpack (antes fallaba en bundling)
-- **Fix video faststart**: `_apply_faststart()` en generate_sora_clips.py — Chrome headless requiere moov atom al inicio
-- **Fix render concurrency**: concurrency=1 para evitar timeout al cargar videos Sora en paralelo
-- **Reel de prueba v2**: `output/2026-04-16T12-26-42_3_tips_viral.mp4` (14MB, 19.4s, 5 clips Sora 2)
-
-## 2026-04-16 — Motor de reels v2: Remotion + Sora 2 + ElevenLabs
-
-- **Nuevo motor**: `tools/remotion-engine/` creado desde cero (NO toca visual-engine existente)
-- **Stack**: Remotion 4.0.291 (React/TypeScript) + Sora 2 API + DALL-E 3 fallback + ElevenLabs voiceovers
-- **Componentes Remotion**: `ReelComposition`, `SceneLayer`, `Background`, `TitleText`, `Subtitles`, `Logo`, `ProgressBar`, `Watermark`
-- **Pipeline Python**: GPT-4o (guion) -> Sora 2 (clips video) -> ElevenLabs (voiceovers con timestamps) -> Remotion render
-- **Formato**: 1080x1920 px 30fps H.264, tipografia Outfit, colores brand (coral #FF6A4D, violet #9C8CFF)
-- **Reel de prueba generado**: `3 tips para beber mas agua` (ES, 23s, 690 frames, 10MB)
-  - scene_0, scene_4: clips Sora 2 (4s, 720x1280)
-  - scene_1-3: imagenes DALL-E 3 (5s -> fallback por limites Sora: solo acepta 4/8/12s)
-  - 5 voiceovers ElevenLabs con word-level timestamps para subtitulos
-  - Output: `tools/remotion-engine/output/2026-04-16T11-33-41_3_tips_para_beber_mas_agua.mp4`
-- **Bugs conocidos/resueltos**: Sora 2 solo acepta 4/8/12s -> quantizador anadido en generate_sora_clips.py; Windows subprocess npx -> shell=True fix en create_reel_v2.py
-- **Uso**: `cd tools/remotion-engine && python create_reel_v2.py --topic "tema" --lang es`
-
-## 2026-04-15 — Pipeline visual-engine end-to-end validado + corrección de 8 bugs moviepy v2
-
-- **API key Muapi**: `MUAPI_KEY` y `MUAPI_API_KEY` añadidas al `.env` raíz
-- **Pipeline probado**: `create_reel.py --topic "3 mitos sobre las proteínas"` → GPT script ✅ → Sora 2 (5 clips) ✅ → ElevenLabs (5 voces ES) ✅ → composición ✅
-- **Fallback activo**: Muapi devuelve 402 (key sin prefijo `sk-`) → Sora 2 hace de fallback automático
-- **Bugs corregidos en `reel_composer.py` y `create_reel.py`**:
-  - `→` U+2192 → `->` (charmap Windows cp1252 crash en print)
-  - `scene_voices` kwarg ausente en `compose_reel()` → añadido con `CompositeAudioClip` por escena
-  - `generate_voice()` devuelve dict → `create_reel.py` desempaqueta `result["audio_path"]`
-  - `AudioClip.resized()` no existe → eliminado de `mix_audio_tracks`
-  - `clip.resized(newsize=)` → `clip.resized(new_size=)` (moviepy v2)
-  - `clip.fl()` → `clip.transform()` (moviepy v2)
-  - `add_watermark(position=)` kwarg inválido → eliminado
-  - `with_volume_multiplied` → `with_volume_scaled` (moviepy v2)
-  - `write_videofile(verbose=False)` → eliminado (moviepy v2)
-- **Archivo final**: `tools/visual-engine/output/3_mitos_sobre_las_proteínas_1776266756/compose_test.mp4` (7.7 MB, ~24s, 1080×1920)
-
-## 2026-04-15 — Generar carrusel PIEZA-01 "Huevos y colesterol" con imágenes Gamma
-
-- **render_gamma_slides.py**: ejecutado completo — genera 14 slides (7 ES + 7 EN) con imágenes Gamma como fondo + overlays de marca Outfit Bold/Regular
-- **Calidad**: 453 KB – 1.07 MB por slide (vs 37-74 KB del script anterior sin Gamma)
-- **Output ES**: `content/piezas/pieza-01-assets/slide_01-07.png` + copia en `pieza-01-final/`
-- **Output EN**: `content/piezas/pieza-01-assets-en/slide_01-07.png`
-- **Enviado a Telegram**: 7 slides ES enviadas como media group al canal de aprobación (`draft_id: pieza-01-es-v1`), pendiente aprobación de Judith
-
-## 2026-04-15 — Deploy Firebase: reglas Firestore, índices y hosting
-
-- **Firestore rules**: `firestore.rules` compilado y publicado en Cloud Firestore (water tracker, fasting y seguridad activos en producción)
-- **Firestore indexes**: `firestore.indexes.json` desplegado en base de datos `(default)`
-- **Hosting**: 16 archivos en `public/`, release completo — cals2gains.com actualizado
-
-## 2026-04-15 — Migrar visual-engine a API open source de Higgsfield (Muapi.ai)
-
-- **higgsfield_client.py**: reescritura completa — cambia de `cloud.higgsfield.ai` (de pago) a `api.muapi.ai` (open source, tier gratuito)
-- **Auth**: de `Authorization: Bearer` a header `x-api-key`; env var renombrada de `HIGGSFIELD_API_KEY` a `MUAPI_API_KEY`
-- **Endpoints actualizados**: submit `POST /api/v1/{model-id}` · polling `GET /api/v1/predictions/{id}/result` · upload `POST /api/v1/upload_file`
-- **40+ modelos disponibles**: Kling v2.6 Pro (por defecto), Seedance 2.0, Veo 3.1, Sora 2, Runway, Wan 2.6, etc.
-- **Mapeo automático** de nombres heredados (sora-2, kling-3.0, veo-3.1…) a IDs de Muapi
-- **brand_config.py**: añadido `MUAPI_API_KEY` + `HIGGSFIELD_DEFAULT_MODEL`; `HIGGSFIELD_API_KEY` queda como alias de compatibilidad
-- **.env**: añadido placeholder `MUAPI_API_KEY=` (pendiente de rellenar con key gratuita de muapi.ai)
-- **Sin breaking changes**: misma interfaz pública (`HiggsFieldClient`, `CameraPresets`, `StylePresets`, `generate_scene_clip`); `create_reel.py` funciona sin modificar
-
-## 2026-04-15 — Notion workspace completo + auto-sync diario
-
-- **Notion API**: workspace completo conectado al repo vía integración "Cals2Gains hub"
-- **Páginas estáticas**: Dashboard & KPIs, SEO & Web, Brand Guidelines, Tech Stack, Cuentas & Servicios, Agentes IA, Legal
-- **Bases de datos**: Roadmap (19 tareas), Finanzas (9 gastos), Features App (42 pantallas), Plan de Contenido (10 piezas)
-- **Auto-sync diario 9:00**: tarea programada `notion-sync-cals2gains` creada via Claude Code scheduled tasks
-- **Scripts**: `tools/setup-notion.mjs` (setup), `tools/update-notion.mjs` (auto-sync), `tools/sync-notion.mjs` (manual/CLI)
-- **IDs Notion**: `tools/notion-ids.json` · Parent page: `3435c636bbd680b181b0d03f747b2cd0`
-- **Qué actualiza el auto-sync**: Dashboard (KPIs + alertas desde hub), Finanzas DB (nuevos gastos sin duplicar), timestamp HQ
-
-## 2026-04-15 — Fix bloqueantes pre-lanzamiento (rama claude/awesome-herschel)
-
-- **gpt-5.4 → gpt-4o**: sustituido el modelo inexistente en 6 archivos de código (openai.ts, label-scanner.tsx, foodDatabase.ts, macroCoach.ts, recipeService.ts, create_reel.py)
-- **firestore.indexes.json**: añadido índice compuesto `fastingSessions` (userId ASC + startTime DESC)
-- **waterStore.setGoal**: ahora persiste el goal en Firestore (antes solo local)
-- **Streak proteínas**: implementado cálculo real desde `recentMeals` en protein-dashboard.tsx
-- **TS errors export-data.tsx**: corregidos accesos incorrectos a `Meal.date`, `Meal.calories`, `Meal.name` → `timestamp`, `nutrition.calories`, `dishName`; añadidos estilos `loadingContainer`/`loadingText` faltantes
-- **TS errors coach-share.tsx**: corregido `m.date → m.timestamp`, `user.profile.name → user.displayName`; añadidos estilos de coach faltantes en StyleSheet
-- **TS errors edit-profile.tsx**: corregidas referencias a `user.profile.name → user.displayName`
-- **types/index.ts**: añadidos `bio?`, `avatarType?`, `name?` opcionales a `UserProfile`
-- **Nota**: `services/firebase.ts` — sin bytes nulos (limpio). `services/openai.ts` — no estaba truncado, sólo faltaba el fix del modelo.
-- **Pendiente**: errores TS pre-existentes en otros archivos (history.tsx, measurements.tsx, fastingStore.ts, etc.) — no formaban parte de esta tarea
-
-## 2026-04-14 (noche-4) — Motor audiovisual v4.0 (Studio)
-
-### Visual Engine — Upgrade a calidad de estudio profesional
-Ruta: `tools/visual-engine/`
-
-**Nuevos módulos:**
-- `post_processing.py` — Pipeline de postproducción cinematográfica: color grading (lift/gamma/gain con presets de marca), curva S filmica, vignette, grano de película, bloom, sharpening selectivo, aberración cromática
-- `transitions.py` — Transicion
+- **Onboarding**: nuevo step 5 (de 8) con chips seleccionables para alérgenos e intolerancias 

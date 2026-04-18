@@ -1,5 +1,5 @@
 {
-  "title": "Macros 101: La Unica Guia Que Necesitas",
+  "title": "Macros 101: La Única Guía Que Necesitas",
   "lang": "es",
   "format": "carousel",
   "slides": 7,
@@ -8,60 +8,55 @@
   "slides_data": [
     {
       "type": "cover",
-      "prompt": "Dark premium background with floating 3D macro nutrient icons (protein, carbs, fats) in violet and coral neon glow, holographic style, clean typography space, 4:5",
+      "prompt": "Abstract flowing ribbons of violet and coral light against deep plum atmosphere, cinematic minimalism, no objects, no text",
       "headline": "MACROS 101",
-      "subheadline": "La unica guia que necesitas",
+      "subheadline": "La única guía que necesitas",
       "text_style": "hero",
       "cta_text": "Desliza para aprender →"
     },
     {
       "type": "content",
-      "prompt": "Elegant split visual: left side shows protein-rich foods (chicken, eggs, fish) in dark moody lighting, right side shows muscle fiber illustration, violet accent lighting, 4:5",
-      "headline": "PROTEINA",
-      "body": "Construye y repara musculo.\n4 cal por gramo.\nObjetivo: 1.6-2.2g por kg de peso.\nMejores fuentes: pollo, pescado, huevos, yogur griego, legumbres.",
-      "text_style": "educational",
-      "icon": "muscle"
+      "prompt": "Dark moody composition with soft violet gradient, abstract minimal wellness atmosphere, no literal food, no text",
+      "headline": "PROTEÍNA",
+      "body": "Construye y repara músculo.\n4 kcal por gramo.\nObjetivo: 1,6-2,2 g por kg de peso.\nMejores fuentes: pollo, pescado, huevos, yogur griego, legumbres.",
+      "text_style": "educational"
     },
     {
       "type": "content",
-      "prompt": "Dynamic shot of complex carb foods (oats, sweet potato, rice, fruits) arranged on dark surface with energy wave graphics, warm coral lighting, 4:5",
+      "prompt": "Warm coral atmospheric gradient flowing across deep plum, abstract premium composition, no literal objects",
       "headline": "CARBOHIDRATOS",
-      "body": "Tu fuente principal de energia.\n4 cal por gramo.\nObjetivo: 3-5g por kg en dias de entreno.\nMejores fuentes: avena, arroz, patata, fruta, cereales integrales.",
-      "text_style": "educational",
-      "icon": "lightning"
+      "body": "Tu fuente principal de energía.\n4 kcal por gramo.\nObjetivo: 3-5 g por kg en días de entreno.\nMejores fuentes: avena, arroz, patata, fruta, cereales integrales.",
+      "text_style": "educational"
     },
     {
       "type": "content",
-      "prompt": "Artistic arrangement of healthy fat foods (avocado, nuts, olive oil, salmon) on dark marble with golden light accents, premium food photography, 4:5",
+      "prompt": "Golden warm light rays crossing a dark premium plum atmosphere, minimal cinematic composition, no literal objects",
       "headline": "GRASAS",
-      "body": "Hormonas, cerebro, absorcion de vitaminas.\n9 cal por gramo.\nObjetivo: 0.8-1.2g por kg de peso.\nMejores fuentes: aguacate, frutos secos, aceite de oliva, pescado azul.",
-      "text_style": "educational",
-      "icon": "brain"
+      "body": "Hormonas, cerebro, absorción de vitaminas.\n9 kcal por gramo.\nObjetivo: 0,8-1,2 g por kg de peso.\nMejores fuentes: aguacate, frutos secos, aceite de oliva, pescado azul.",
+      "text_style": "educational"
     },
     {
-      "type": "content",
-      "prompt": "Infographic-style plate divided into macro sections with percentage labels, dark background with violet grid overlay, data visualization aesthetic, 4:5",
+      "type": "stat",
+      "prompt": "Abstract geometric composition over deep plum, soft violet grid overlay, minimal data visualization aesthetic",
       "headline": "EL PLATO PERFECTO",
-      "body": "Ganar musculo: 30% proteina, 45% carbos, 25% grasas\nPerder grasa: 35% proteina, 35% carbos, 30% grasas\nMantenimiento: 25% proteina, 45% carbos, 30% grasas",
-      "text_style": "stat",
-      "icon": "chart"
+      "body": "Ganar músculo: 30% proteína, 45% carbos, 25% grasas\nPerder grasa: 35% proteína, 35% carbos, 30% grasas\nMantenimiento: 25% proteína, 45% carbos, 30% grasas",
+      "text_style": "stat"
     },
     {
-      "type": "content",
-      "prompt": "Person scanning a balanced meal with smartphone showing AI macro breakdown, dark premium app interface glowing violet, lifestyle shot, warm lighting, 4:5",
+      "type": "screenshot_card",
+      "prompt": "Soft violet and coral light gradient over plum background, clean space for UI overlay, cinematic minimalism",
       "headline": "OLVIDA LAS MATES",
-      "body": "Cals2Gains escanea tu comida y calcula macros al instante con IA. Sin bases de datos. Sin adivinar. Solo una foto.",
-      "text_style": "feature",
-      "icon": "camera"
+      "body": "Cals2Gains escanea tu comida y calcula macros al instante con IA.\nSin bases de datos.\nSin adivinar.\nSolo una foto.",
+      "text_style": "feature"
     },
     {
       "type": "cta",
-      "prompt": "Dark premium background with Cals2Gains app mockup showing macro tracking dashboard, violet and coral gradient glow, floating food icons, aspirational, 4:5",
+      "prompt": "Coral glow emerging from deep plum darkness, motivational cinematic atmospheric minimalism",
       "headline": "EMPIEZA A TRACKEAR BIEN",
-      "body": "Gratis 7 dias. Sin tarjeta.",
+      "body": "Gratis 7 días.",
       "text_style": "cta",
-      "cta_text": "Link en bio 🔗",
-      "hashtags": ["#macros101", "#proteina", "#nutriciondeportiva", "#cals2gains", "#macrotracking"]
+      "cta_text": "Próximamente",
+      "hashtags": ["#macros101", "#nutricionsaludable", "#macronutrientes", "#nutriciondeportiva", "#cals2gains"]
     }
   ]
 }

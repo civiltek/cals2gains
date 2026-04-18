@@ -1,6 +1,6 @@
 # Influencer Target List
 
-Last verified: 2026-04-14
+Last verified: 2026-04-17
 
 ## How to Use This File
 
@@ -34,6 +34,7 @@ Prioritize influencers with:
 | @fitnessrevolucionario | — | — | — | ❌ "Esta página no está disponible" (2026-04-11) |
 | @nutricionsinbulos | — | — | — | ❌ "Esta página no está disponible" (2026-04-11) |
 | @sergiopeinado | Sergio Peinado | — | Fitness trainer | ❌ Handle not found (2026-04-11) |
+| @nutri_aerfit | — | — | Nutrition | ❌ Handle not found (2026-04-17) |
 | @vikikacostaofficial | Vikika Costa | — | Fitness | ❌ Handle not found (2026-04-11) |
 | @prozis_es | Prozis España | — | Supplements | ❌ "Esta página no está disponible" (2026-04-12) |
 | @myprotein_es | Myprotein España | — | Supplements | ❌ "Esta página no está disponible" (2026-04-12) |

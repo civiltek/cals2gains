@@ -1,6 +1,6 @@
 # Cals2Gains - Brand Guide
 
-> Última actualización: 2026-04-13
+> Última actualización: 2026-04-18
 
 ## Nombre
 - **Nombre completo:** Cals2Gains
@@ -54,6 +54,14 @@
 ### Idiomas
 - **Inglés:** Principal, mercado global
 - **Español:** Mercado hispanohablante, mismo tono adaptado
+
+## Guía de Voz de Marca (documento completo)
+
+Para la guía completa de brand voice — personalidad, arquetipos, vocabulario, tono por canal, do's & don'ts, ejemplos prácticos y checklist de contenido — consultar:
+
+**→ [`marketing/brand-voice/BRAND_VOICE_GUIDE.md`](../marketing/brand-voice/BRAND_VOICE_GUIDE.md)**
+
+Incluye: pilares de comunicación, elevator pitch, glosario bilingüe ES/EN, guía específica por canal (IG, web, email, app, soporte) y ejemplos de "así sí" vs "así no".
 
 ---
 *Para actualizar: revisa `constants/` y `theme.ts` para colores actualizados en código.*

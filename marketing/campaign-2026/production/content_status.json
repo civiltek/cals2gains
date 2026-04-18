@@ -1,1 +1,75 @@
-{}
+{
+  "_meta": {
+    "last_updated": "2026-04-17T18:20:00+02:00",
+    "updated_by": "batch-2026-04-17 · lote 22 carruseles aprobado por Judith",
+    "campaign": "blitz-2026-04-17",
+    "calendar_ref": "marketing/campaign-2026/CALENDAR-BLITZ-2026-04-17.md"
+  },
+  "2026-04-17": {
+    "tema": "Macros 101",
+    "es": {
+      "script": "marketing/campaign-2026/carousels/carousel_01_macro_basics_es.json",
+      "assets": "content/piezas/carousel_01_macro_basics_es/",
+      "account": "@cals2gains_es",
+      "scheduled_time": "ASAP (original 13:30 pasado)",
+      "status": "approved"
+    },
+    "en": {
+      "script": "marketing/campaign-2026/carousels/carousel_01_macro_basics_en.json",
+      "assets": "content/piezas/carousel_01_macro_basics_en/",
+      "account": "@cals2gains",
+      "scheduled_time": "18:00",
+      "status": "approved"
+    }
+  },
+  "2026-04-18": {
+    "tema": "Escanea en 3 segundos",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_reel02_scan_demo_es.json", "assets": "content/piezas/carousel_reel02_scan_demo_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_reel02_scan_demo_en.json", "assets": "content/piezas/carousel_reel02_scan_demo_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  },
+  "2026-04-19": {
+    "tema": "Mito de la proteina",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_reel01_protein_myth_es.json", "assets": "content/piezas/carousel_reel01_protein_myth_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_reel01_protein_myth_en.json", "assets": "content/piezas/carousel_reel01_protein_myth_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  },
+  "2026-04-20": {
+    "tema": "5 Features que nos diferencian",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_02_app_features_es.json", "assets": "content/piezas/carousel_02_app_features_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_02_app_features_en.json", "assets": "content/piezas/carousel_02_app_features_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  },
+  "2026-04-21": {
+    "tema": "Apps 2015 vs 2026",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_reel04_old_vs_new_es.json", "assets": "content/piezas/carousel_reel04_old_vs_new_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_reel04_old_vs_new_en.json", "assets": "content/piezas/carousel_reel04_old_vs_new_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  },
+  "2026-04-22": {
+    "tema": "3 Mitos de calorias",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_reel05_calorie_myths_es.json", "assets": "content/piezas/carousel_reel05_calorie_myths_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_reel05_calorie_myths_en.json", "assets": "content/piezas/carousel_reel05_calorie_myths_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  },
+  "2026-04-23": {
+    "tema": "6 Errores de principiante",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_05_beginner_mistakes_es.json", "assets": "content/piezas/carousel_05_beginner_mistakes_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_05_beginner_mistakes_en.json", "assets": "content/piezas/carousel_05_beginner_mistakes_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  },
+  "2026-04-24": {
+    "tema": "5 Alimentos sorpresa con proteina",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_reel03_5_foods_es.json", "assets": "content/piezas/carousel_reel03_5_foods_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_reel03_5_foods_en.json", "assets": "content/piezas/carousel_reel03_5_foods_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  },
+  "2026-04-25": {
+    "tema": "Meal Prep en 5 pasos",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_04_meal_prep_es.json", "assets": "content/piezas/carousel_04_meal_prep_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_04_meal_prep_en.json", "assets": "content/piezas/carousel_04_meal_prep_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  },
+  "2026-04-26": {
+    "tema": "Cut vs Bulk",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_03_cut_vs_bulk_es.json", "assets": "content/piezas/carousel_03_cut_vs_bulk_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_03_cut_vs_bulk_en.json", "assets": "content/piezas/carousel_03_cut_vs_bulk_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  },
+  "2026-04-27": {
+    "tema": "Dia completo de macros",
+    "es": { "script": "marketing/campaign-2026/carousels/carousel_reel06_day_of_macros_es.json", "assets": "content/piezas/carousel_reel06_day_of_macros_es/", "account": "@cals2gains_es", "scheduled_time": "13:30", "status": "approved" },
+    "en": { "script": "marketing/campaign-2026/carousels/carousel_reel06_day_of_macros_en.json", "assets": "content/piezas/carousel_reel06_day_of_macros_en/", "account": "@cals2gains", "scheduled_time": "18:00", "status": "approved" }
+  }
+}

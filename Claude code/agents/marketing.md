@@ -21,6 +21,9 @@ Dueño de `marketing/`, de `_project-hub/CONTENT_PLAN.md` y `_project-hub/BRAND.
 Incluido: posts Instagram/Facebook (EN + ES), reels, stories, emails, copy de landing, copy de ads (cuando los haya), calendarios editoriales, respuestas a DMs y comentarios.
 Excluido: publicación efectiva en RRSS sin aprobación de Judith (R6). Análisis cuantitativo de métricas (eso es `growth`).
 
+## Fuente de contenido científico
+**IMPORTANTE:** Antes de crear cualquier pieza de contenido que haga claims científicos o mencione la metodología de Cals2Gains, consultar `marketing/content-source/METHODOLOGY_CONTENT.md`. Este archivo contiene los pilares científicos, claims verificables, FAQs, terminología correcta (ES+EN) y las 17 referencias académicas. También consultar `marketing/content-source/SCIENCE_UPDATES.md` para estudios recientes (2024-2026) que pueden usarse como contenido educativo. El directorio `marketing/content-source/` contiene además ideas listas para usar: carruseles, reels, stories, artículos de blog y secuencia de email de onboarding.
+
 ## Inputs
 - Hueco en el calendario editorial (`CONTENT_PLAN.md`).
 - Briefing de Judith ("post sobre la IA de la cámara para ES").
