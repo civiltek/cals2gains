@@ -891,6 +891,10 @@ export default {
     contactSection: "Can't find what you're looking for?",
     contactSupport: 'Contact support',
     visitWeb: 'Visit website',
+    manualTitle: 'Complete manual',
+    manualSubtitle: 'How to use it, the science behind it, and your rights',
+    methodologyTitle: 'Scientific methodology',
+    methodologySubtitle: 'The science behind every number',
     faq1: {
       q: 'How do I log a meal?',
       a: 'You can log meals by taking a photo with our AI analyzer, scanning the barcode, using quick add, or searching our food database. Each method detects nutritional information automatically.',

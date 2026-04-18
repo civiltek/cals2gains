@@ -923,6 +923,10 @@ export default {
     contactSection: '¿No encuentras lo que buscas?',
     contactSupport: 'Contactar soporte',
     visitWeb: 'Visitar web',
+    manualTitle: 'Manual completo',
+    manualSubtitle: 'Cómo usarla, la ciencia detrás y tus derechos',
+    methodologyTitle: 'Metodología científica',
+    methodologySubtitle: 'La ciencia detrás de cada número',
     faq1: {
       q: '¿Cómo registro una comida?',
       a: 'Puedes registrar comidas tomando una foto con nuestro analizador de IA, escaneando el código de barras, usando la adición rápida o buscando en nuestra base de datos de alimentos. Cada método detecta automáticamente la información nutricional.',
