@@ -1,5 +1,11 @@
 # Changelog - Cals2Gains
 
+## 2026-04-18 — Web: corregir tildes/eñes en metodologia.html y privacy.html + TOC colapsable en móvil
+
+- `website/guides/metodologia.html`: corrección completa de tildes y eñes en todo el archivo (TOC, h2, h3, párrafos, meta tags, atributos data-es). TOC ahora colapsable en móvil (toggle con chevron, abierto por defecto en desktop).
+- `website/privacy.html`: corrección completa de tildes y eñes (~80 palabras corregidas).
+- `website/terms.html`: revisado, no requirió cambios.
+
 ## 2026-04-17 — iOS HealthKit build #63: limpiar config clínica + logging crudo
 
 Build 62 (sin prime, sin background-delivery) siguió fallando en device. Diagnóstico de ChatGPT convincente: la hipótesis del "mismatch binary↔profile" es **errónea** (Apple docs: provisioning profile funciona como allowlist, el binario puede pedir subconjunto). Los sospechosos reales:
